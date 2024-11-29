@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PageBanner from '../Ui components/PageBanner';
 import SearchResultInfo from '../Ui components/SearchResultInfo';
 import ExpandedBox from '../Ui components/ExpandedBox';
-import Filter from '../Ui components/filter';
+import Filter from '../Ui components/Filter';
 import SearchResultBox from '../Ui components/SearchResultBox';
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import BestRated from '../Components/BestRated';
