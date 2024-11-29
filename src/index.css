@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer components{
+    .CustomFlex{
+        @apply flex items-center justify-center
+    }
+    .footerText{
+        @apply !text-white transition-all hover:!text-[#B82025]
+    }
+}
+
+@layer utilities {
+    .scrollbar-thumb-red::-webkit-scrollbar-thumb {
+      background-color: red; 
+      border-radius: 10px;
+    }
+  
+    .scrollbar-thumb-red::-webkit-scrollbar {
+      width: 8px; 
+    }
+  
+    .scrollbar-thumb-red::-webkit-scrollbar-track {
+      background-color: transparent; 
+    }
+  }
+  
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+html{
+    min-width: 380px;
+}
+
+input[type="text"] {
+    background-color: transparent;
+    outline: none;
+  }
+
+  button{
+    cursor: pointer;
+  }
+a{
+    text-decoration: none;
+    color: black;
+    cursor:pointer;
+}
+
+.banner-img{
+    position: relative;
+    background-image: url('./assets/Images/mainBanner.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: bottom;
+}
+.viewmorebtn{
+    background-color: red;
+    color: white;
+    padding: 0.6vw 2vw;
+    border-radius: 8px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.box{
+    min-height: 450px;
+    max-height: 540px;
+    flex: 1;
+    min-width: 240px;
+    max-width: 500px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.imageContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height:58%;
+    height: 290px;
+    width: 100%;
+    overflow: hidden;
+}
+.textContainer{
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+
+}
+
+/* .gradient-background {
+    background: linear-gradient(to right, 
+        #ffe7c0 10%, 
+        #FDECD2 30%, 
+        #E1EFF5 60%,  
+        #D4E6FA 85%, 
+        #FFFFFF 100%  
+    );
+} */
+.gradient-background {
+    background-image: url('./assets/Images/categories/catbg.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.instructor{
+    background-image: url('./assets/Images/instructor2.jpg');
+    background-position: center 20%;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.reviews{
+    background-image: url('./assets/Images/bg.jpg');
+    background-position: center 20%;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.tabsScroll {
+    overflow: scroll;
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+  }
+  
+  .tabsScroll::-webkit-scrollbar {
+    display: none; 
+  }
+  
+
+  .scrollbar-thumb-red::-webkit-scrollbar-thumb {
+    background-color: red; /* Red scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners */
+  }
+  
+  .scrollbar-thumb-red::-webkit-scrollbar {
+    width: 8px; /* Set width of the scrollbar */
+  }
+  
+  .scrollbar-thumb-red::-webkit-scrollbar-track {
+    background-color: transparent; /* Transparent background */
+  }
+
+
+
+
+
+  
+  

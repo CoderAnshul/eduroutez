@@ -1,0 +1,125 @@
+import React, { useState } from "react";
+import PersonalInfo from "../Components/Stepperparts/PersonalInfo";
+import VerifyDetails from "../Components/Stepperparts/VerifyDetails";
+import InputReview from "../Components/Stepperparts/InputReview";
+import UploadDocument from "../Components/Stepperparts/UploadDocument";
+import SocialLinks from "../Components/Stepperparts/SocialLinks";
+import Feedback from "../Components/Stepperparts/Feedback";
+import { Link } from "react-router-dom";
+
+const Writereview = () => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+
+  // Total Steps
+  const steps = [
+    "Personal Info",
+    "Verify Details",
+    "Write Review",
+    "Upload Document",
+    "Social Links",
+    "Feedback",
+  ];
+
+  // Move to the next step
+  const nextStep = () => {
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      setIsModalOpen(true); // Open modal when "Submit" is clicked
+    }
+  };
+
+  // Move to the previous step
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
+  };
+
+  // Render Step Components
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return <PersonalInfo />;
+      case 2:
+        return <VerifyDetails />;
+      case 3:
+        return <InputReview />;
+      case 4:
+        return <UploadDocument />;
+      case 5:
+        return <SocialLinks />;
+      case 6:
+        return <Feedback />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="p-3 h-[600px] pb-14 bg-white relative flex flex-col">
+      {/* Step Content */}
+      <div className=" p-2 md:p-6 rounded h-[300px] relative overflow-hidden shadow flex-1">
+        {renderStepContent()}
+      </div>
+
+      {/* Stepper Bar and Navigation Buttons */}
+      <div className="absolute bottom-0 left-0 w-full bg-white border-t shadow-md">
+        {/* Progress Bar */}
+        <div className="w-full h-2 bg-gray-300 relative">
+          <div
+            className="h-2 bg-red-500 transition-all duration-500 ease-in-out"
+            style={{
+              width: `${(currentStep / steps.length) * 100}%`,
+            }}
+          ></div>
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between px-6 py-4">
+          <button
+            onClick={prevStep}
+            disabled={currentStep === 1}
+            className={`px-4 py-2 ${
+              currentStep === 1 ? "bg-gray-300" : "bg-gray-500"
+            } text-white rounded`}
+          >
+            Previous
+          </button>
+          <button
+            onClick={nextStep}
+            className="px-4 py-2 bg-red-500 text-white rounded"
+          >
+            {currentStep === steps.length ? "Submit" : "Next"}
+          </button>
+        </div>
+      </div>
+
+      {/* Modal for Submission */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 className="text-xl font-bold text-gray-800">
+              Review Submitted!
+            </h2>
+            <p className="mt-2 text-gray-600">
+              Thank you for submitting your review. We appreciate your
+              feedback!
+            </p>
+           <div className="flex justify-center">
+           <Link to='/'>
+           <button
+              onClick={() => setIsModalOpen(false)}
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+            >
+              Go Home
+            </button>
+           </Link>
+           </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Writereview;
