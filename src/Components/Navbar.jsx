@@ -641,9 +641,9 @@ const Navbar = () => {
               <img className='h-5' src={notification} alt="notification" />
             </div>
 
-            <div className='CustomFlex relative gap-1 font-medium cursor-pointer text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl'>
-              <img className='h-3 opacity-75' src={menu} alt="menu" />
-              <span className='bg-gray-500 h-5 w-5 rounded-full'></span>
+            <div className='CustomFlex relative gap-1 font-medium  text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl'>
+              <img className='h-3 opacity-75 cursor-pointer' src={menu} alt="menu" />
+              <Link to='/login' className='bg-gray-500 cursor-pointer hover:scale-105 transition-all h-5 w-5 rounded-full'></Link>
             </div>
           </div>
         </div>
@@ -681,7 +681,7 @@ const Navbar = () => {
             <li><Link to="/" onClick={toggleMenu}>Home</Link></li>
             <li><Link to="/searchpage" onClick={toggleMenu}>Explore</Link></li>
             <li><Link to="/writereview" onClick={toggleMenu}>Write a Review</Link></li>
-            <div className='md:hidden overflow-y-scroll'>
+            <div className='md:hidden overflow-y-scroll scrollbar-thumb-transparent'>
               <MobileNavbar categories={categories}/>
             </div>
           </ul>
