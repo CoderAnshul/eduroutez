@@ -53,15 +53,15 @@ const Navbar = () => {
           </div>
 
           <div className='CustomFlex gap-3 opacity-80'>
-            <Link to="/writereview" className='CustomFlex gap-1 font-medium cursor-pointer text-sm hidden lg:flex'>
+            <Link to="/writereview" className='CustomFlex gap-1 group hover:text-red-500 hover:scale-95 transform transition-all font-medium cursor-pointer text-sm hidden lg:flex'>
               <button>
-                <img className='h-4' src={edit} alt="editBtn" />
+                <img className='h-4 group-hover:rotate-[360deg] transition-all' src={edit} alt="editBtn" />
               </button>
               <h4>Write a Review</h4>
             </Link>
 
-            <Link to="/searchpage" className='CustomFlex gap-1 font-medium cursor-pointer text-sm hidden lg:flex'>
-              <img className='h-4' src={explore} alt="exploreBtn" />
+            <Link to="/searchpage" className='CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex'>
+              <img className='h-4 group-hover:rotate-180 transition-all' src={explore} alt="exploreBtn" />
               <span>Explore</span>
             </Link>
 
