@@ -91,7 +91,7 @@ const ReviewandRating = ({ ratings, reviews }) => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50 p-3">
+        <div className="fixed inset-0 z-[1000] h-dvh flex items-center justify-center bg-black bg-opacity-50 p-3">
           <div className="bg-white relative rounded-lg shadow-lg p-6 max-w-4xl w-full overflow-y-auto max-h-[90vh]">
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"

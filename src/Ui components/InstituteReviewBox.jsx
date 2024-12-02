@@ -51,7 +51,7 @@ const InstituteReviewBox = ({ reviewerName, designation, year, rating, review, c
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-[1000] flex items-center h-dvh  justify-center bg-black bg-opacity-50">
           <div className="bg-white relative rounded-lg shadow-lg p-6 max-w-lg w-full">
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"

@@ -656,7 +656,7 @@ const Navbar = () => {
         )}
 
         <div
-          className={`fixed top-0 left-0 h-full p-4 w-4/5 max-w-[300px] bg-gray-100 shadow-md z-[1000] transform ${
+          className={`fixed top-0 left-0 h-dvh p-4 w-4/5 max-w-[300px] bg-gray-100 shadow-md z-[1000] transform ${
             isMenuOpen ? 'translate-x-0' : '-translate-x-full'
           } transition-transform duration-300`}
         >
