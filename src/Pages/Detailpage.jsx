@@ -38,29 +38,30 @@ const Detailpage = () => {
       </div>
 
       {/* Tabs */}
-      <div className="w-full md:px-4 py-6">
-  <h1 className="text-2xl font-bold mb-4">Digital Marketing Course</h1>
-  <div className="w-full overflow-x-scroll">
-  <div className="border-2 rounded-lg border-gray-300 overflow-x-auto w-fit">
-    <ul className="flex whitespace-nowrap">
-      {tabs.map((tab) => (
-        <li
-          key={tab.name}
-          className={`cursor-pointer px-4 border-r-2 border-black border-opacity-55 py-2 text-sm font-medium 
-            ${
-              activeTab === tab.name
-                ? "bg-red-600 text-white border-red-600"
-                : "text-gray-700 border-transparent"
-            }`}
-          onClick={() => scrollToSection(tab.ref, tab.name)}
-        >
-          {tab.name}
-        </li>
-      ))}
-    </ul>
-  </div>
-  </div>
-</div>
+      <div className="w-full md:px-4 py-6 sticky top-0 bg-white z-100">
+        <h1 className="text-2xl font-bold mb-4">Digital Marketing Course</h1>
+        <div className="w-full overflow-x-auto">
+          <div className="border-2 rounded-lg border-gray-300">
+            <ul className="flex justify-evenly items-center whitespace-nowrap">
+              {tabs.map((tab) => (
+                <li
+                  key={tab.name}
+                  className={`cursor-pointer  px-8 py-2 text-sm font-medium 
+                    ${
+                      activeTab === tab.name
+                        ? "bg-red-600 py-2 rounded-full m-1 px-4 text-white border-red-600"
+                        : "text-gray-700 hover:text-black"
+                    }`}
+                  onClick={() => scrollToSection(tab.ref, tab.name)}
+                >
+                  {tab.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
 
 
       {/* Sections */}

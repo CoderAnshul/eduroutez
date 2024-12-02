@@ -4,6 +4,7 @@ import BlogandCareerBox from '../Ui components/BlogandCareerBox'
 import img from '../assets/Images/img.avif'
 import Events from '../Components/Events'
 import ConsellingBanner from '../Components/ConsellingBanner'
+import PopularCourses from '../Components/PopularCourses'
 
 const Blogpage = () => {
 
@@ -25,6 +26,7 @@ const Blogpage = () => {
       </div>
       <Events/>
       <ConsellingBanner/>
+      <PopularCourses/>
     </>
   )
 }

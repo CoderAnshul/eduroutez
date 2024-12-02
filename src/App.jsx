@@ -16,6 +16,9 @@ import QuestionandAnswer from './Pages/QuestionandAnswer';
 import Careerspage from './Pages/Careerspage';
 import Detailpage from './Pages/Detailpage';
 import Writereview from './Pages/Writereview';
+import Login from './Pages/Login';
+import Signup from './Pages/Signup';
+import Forgotpassword from './Pages/Forgotpassword';
 
 const App = () => {
   return (
@@ -41,6 +44,9 @@ const App = () => {
           <Route path='/careerspage' element={<Careerspage/>} />
           <Route path='/detailpage' element={<Detailpage/>} />
           <Route path='/writereview' element={<Writereview/>} />
+          <Route path='/login' element={<Login/>} />
+          <Route path='/signup' element={<Signup/>} />
+          <Route path='/forgotpassword' element={<Forgotpassword/>} />
         </Routes>
         <Footer/>
     </BrowserRouter>

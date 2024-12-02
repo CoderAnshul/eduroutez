@@ -6,6 +6,8 @@ import img2 from '../assets/Images/img2.png';
 import img3 from '../assets/Images/img3.png'; 
 import img4 from '../assets/Images/img4.png'; 
 import ConsellingBanner from "../Components/ConsellingBanner";
+import PopularCourses from "../Components/PopularCourses";
+import BlogComponent from "../Components/BlogComponent";
 
 
 
@@ -67,6 +69,8 @@ const Careerspage = () => {
       <div className="px-[4vw] py-[2vw] flex flex-col items-center w-full">
         <BlogandCareerBox boxData={boxData} />
       </div>
+      <PopularCourses/>
+      <BlogComponent/>
       <ConsellingBanner/>
     </>
   );
