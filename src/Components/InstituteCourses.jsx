@@ -2,116 +2,28 @@ import React, { useState, useEffect } from "react";
 import CourseCard from "../Ui components/CourseCard";
 import { Link } from "react-router-dom";
 
-const InstituteCourses = () => {
+const InstituteCourses = ({ instituteData }) => {
   const [activeTab, setActiveTab] = useState("All");
-  const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
-  const [visibleCourses, setVisibleCourses] = useState(6); 
-  const [isExpanded, setIsExpanded] = useState(false); 
+  const [visibleCourses, setVisibleCourses] = useState(6);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const tabs = ["All", "Part Time", "Full Time", "Online"];
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      const data = [
-        {
-          id: 1,
-          type: "Full Time",
-          program: "PGPM",
-          totalDuration: "2 Years",
-          examAccepted: "CAT",
-          applicationDate: "4 Oct - 13 Sept 2024",
-          eligibility: "Graduation + CAT",
-          cutOff: "75 PGPM",
-          ranking: "#15",
-          fee: "₹24,50,000",
-        },
-        {
-          id: 2,
-          type: "Full Time",
-          program: "MBA",
-          totalDuration: "2 Years",
-          examAccepted: "GMAT",
-          applicationDate: "5 Nov - 10 Oct 2024",
-          eligibility: "Graduation + GMAT",
-          cutOff: "80 GMAT",
-          ranking: "#10",
-          fee: "₹20,00,000",
-        },
-        {
-          id: 3,
-          type: "Part Time",
-          program: "BBA",
-          totalDuration: "3 Years",
-          examAccepted: "CAT",
-          applicationDate: "15 Jan - 30 Mar 2024",
-          eligibility: "12th Pass",
-          cutOff: "85%",
-          ranking: "#8",
-          fee: "₹12,00,000",
-        },
-        {
-          id: 4,
-          type: "Online",
-          program: "Data Science",
-          totalDuration: "6 Months",
-          examAccepted: "None",
-          applicationDate: "1 Feb - 15 Apr 2024",
-          eligibility: "Graduation",
-          cutOff: "N/A",
-          ranking: "#5",
-          fee: "₹3,00,000",
-        },
-        {
-          id: 5,
-          type: "Full Time",
-          program: "Engineering",
-          totalDuration: "4 Years",
-          examAccepted: "JEE",
-          applicationDate: "10 May - 31 Aug 2024",
-          eligibility: "12th + JEE",
-          cutOff: "90%",
-          ranking: "#1",
-          fee: "₹25,00,000",
-        },
-        {
-          id: 6,
-          type: "Full Time",
-          program: "Engineering",
-          totalDuration: "4 Years",
-          examAccepted: "JEE",
-          applicationDate: "10 May - 31 Aug 2024",
-          eligibility: "12th + JEE",
-          cutOff: "90%",
-          ranking: "#1",
-          fee: "₹25,00,000",
-        },
-        {
-          id: 7,
-          type: "Full Time",
-          program: "Engineering",
-          totalDuration: "4 Years",
-          examAccepted: "JEE",
-          applicationDate: "10 May - 31 Aug 2024",
-          eligibility: "12th + JEE",
-          cutOff: "90%",
-          ranking: "#1",
-          fee: "₹25,00,000",
-        },
-      ];
-      setCourses(data);
-      setFilteredCourses(data);
-    };
-
-    fetchCourses();
-  }, []);
+    if (instituteData?.data?.courses) {
+      setFilteredCourses(instituteData.data.courses);
+    }
+  }, [instituteData]);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     if (tab === "All") {
-      setFilteredCourses(courses);
+      setFilteredCourses(instituteData?.data?.courses);
     } else {
-      const filtered = courses.filter((course) => course.type === tab);
+      const filtered = instituteData.data.courses.filter(
+        (course) => course.courseType === tab
+      );
       setFilteredCourses(filtered);
     }
     setVisibleCourses(6); // Reset visible courses on tab change
@@ -150,7 +62,7 @@ const InstituteCourses = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="w-full border-2 p-3 rounded-xl max-h-fit  transition-all">
+        <div className="w-full border-2 p-3 rounded-xl max-h-fit transition-all">
           <div
             className="flex flex-wrap w-full sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
             style={{
@@ -159,7 +71,7 @@ const InstituteCourses = () => {
             }}
           >
             {filteredCourses.slice(0, visibleCourses).map((course) => (
-              <Link key={course.id} className="flex-1 w-full max-w-sm">
+              <Link to={`/coursesinfopage/${course._id}`} key={course._id} className="flex-1 w-full max-w-sm">
                 <CourseCard course={course} />
               </Link>
             ))}

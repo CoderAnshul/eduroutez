@@ -5,15 +5,19 @@ import rupee from "../assets/Images/rupee.png";
 import badge from "../assets/Images/badge.png";
 import cashhand from "../assets/Images/cashhand.png";
 import checklist from "../assets/Images/checklist.png";
+const imageURL = import.meta.env.IMAGE_BASE_URL;
 
-const SearchResultBox = () => {
+const SearchResultBox = ({institute}) => {
+  
+  
+  
   return (
     <div className="border rounded-lg shadow-md p-4 flex flex-col  space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2">
       {/* Left Section - Image */}
       <div className="flex justify-between flex-col md:flex-row gap-3">
       <div className="relative w-full md:w-2/6">
         <img
-          src={serachBoximg}
+          src={institute.thumbnailImage? `http://localhost:4001/uploads/${institute.thumbnailImage}` : serachBoximg}
           alt="IIT Madras"
           className="rounded-lg object-cover w-full h-44"
         />
@@ -42,7 +46,7 @@ const SearchResultBox = () => {
       <div className="w-full md:w-3/4 flex flex-col ">
         {/* Title */}
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">IIT Madras</h3>
+          <h3 className="text-lg font-semibold">{institute.instituteName}</h3>
           <span className="text-gray-500 font-medium">#2</span>
         </div>
 
@@ -52,7 +56,7 @@ const SearchResultBox = () => {
             <span className="text-yellow-500">★</span> 4.1
           </span>
           <span>(8 Reviews)</span>
-          <span>• location • private</span>
+          <span>• {institute.city+" "} {institute.state} • {institute.organisationType}</span>
         </div>
 
         {/* Pricing and Info */}
@@ -68,10 +72,7 @@ const SearchResultBox = () => {
 
         {/* Description */}
         <p className="text-sm text-gray-600 line-clamp-3">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor
-          sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
+          {institute.about}
         </p>
 
         {/* Footer Buttons */}
@@ -90,7 +91,7 @@ const SearchResultBox = () => {
           <button className="bg-red-600 text-white px-4 py-2 rounded-lg">
             Download Brochure
           </button>
-          <CustomButton className='!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md ' text='View more'>
+          <CustomButton to={`/institute/${institute._id}`} className='!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md ' text='View more'>
             View more
           </CustomButton>
         </div>

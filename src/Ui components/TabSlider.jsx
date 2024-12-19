@@ -23,12 +23,21 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
     }, []);
 
     const handleTabClick = (index) => {
-        setActiveIndex(index); // Set the clicked tab as active
-        sectionRefs[index].current.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-        });
+        setActiveIndex(index); 
+    
+        const section = sectionRefs[index].current; 
+        if (section) {
+            const topOffset = 100; 
+            const sectionTop = section.getBoundingClientRect().top + window.scrollY; 
+            const scrollToPosition = sectionTop - topOffset; 
+    
+            window.scrollTo({
+                top: scrollToPosition,
+                behavior: "smooth", 
+            });
+        }
     };
+    
 
     // Function to handle scrolling (left or right)
     const scroll = (direction) => {
@@ -41,7 +50,7 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
     };
 
     return (
-        <div className={`relative w-full ${className}`}>
+        <div className={`sticky top-16 bg-white z-[998] shadow-md w-full ${className}`}>
             <div
                 className="sticky tabsScroll top-0 bg-white z-10 border-[1.5px] solid border-black border-opacity-35 rounded-md overflow-x-auto scrollbar-hide"
                 ref={sliderRef}

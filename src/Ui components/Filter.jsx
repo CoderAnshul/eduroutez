@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Filter = ({ filterSections }) => {
+const Filter = ({ filterSections ,setState,setCity,setOrganisationType}) => {
   const [searchTerms, setSearchTerms] = useState({});
   const [openSections, setOpenSections] = useState(
     filterSections.map(() => true) // Initialize all sections as open
@@ -18,15 +18,14 @@ const Filter = ({ filterSections }) => {
       prev.map((isOpen, i) => (i === index ? !isOpen : isOpen))
     );
   };
+  // item.toLowerCase().includes(
+  //   (searchTerms[section.title] || "").toLowerCase()
+  // )
 
   return (
     <div className="space-y-2">
       {filterSections.map((section, index) => {
-        const filteredItems = section.items.filter((item) =>
-          item.toLowerCase().includes(
-            (searchTerms[section.title] || "").toLowerCase()
-          )
-        );
+        const filteredItems = section.items
 
         return (
           <div key={index} className="w-full border rounded-lg">
@@ -83,6 +82,9 @@ const Filter = ({ filterSections }) => {
                     >
                       <input
                         type="checkbox"
+                        onChange={(e) => {
+                          e.target.checked?setState(item):setState(null)}
+                        }
                         className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
                       />
                       <span className="ml-2">{item}</span>

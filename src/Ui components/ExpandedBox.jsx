@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 
-const ExpandedBox = ({ contentData }) => {
+const ExpandedBox = ({ contentData ,instituteData}) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // console.log(instituteData);
+  
 
   const toggleText = () => {
     setIsExpanded(!isExpanded);
@@ -14,12 +17,16 @@ const ExpandedBox = ({ contentData }) => {
         className="overflow-hidden transition-all duration-300"
         style={{ height: isExpanded ? 'auto' : '100px' }}
       >
-        {contentData.map((section, index) => (
+        {/* {contentData.map((section, index) => (
           <div key={index} className="mb-4">
             <h3 className="text-lg font-bold">{section.title}</h3>
             <p className="text-base">{section.content}</p>
           </div>
-        ))}
+        ))} */}
+        <div className="mb-4">
+            <h3 className="text-lg font-bold">{instituteData?.data?.instituteName || "College information"}</h3>
+            <p className="text-base">{instituteData?.data?.collegeInfo || "no data found"}</p>
+          </div>
         {/* Bottom gradient */}
         {!isExpanded && (
           <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white mb-10 to-transparent" />

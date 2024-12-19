@@ -22,18 +22,21 @@ const Login = React.lazy(() => import('./Pages/Login'));
 const Signup = React.lazy(() => import('./Pages/Signup'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
 
+
+
+
 const App = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ScrollToTop />
       <Navbar />
       <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="*" element={<PageNotFound />} />
-          <Route path="/institute" element={<Instituepage />} />
+          <Route path="/institute/:id" element={<Instituepage />} />
           <Route path="/searchpage" element={<SearchPage />} />
-          <Route path="/coursesinfopage" element={<Coursesinfopage />} />
+          <Route path="/coursesinfopage/:id" element={<Coursesinfopage />} />
           <Route path="/blogpage" element={<Blogpage />} />
           <Route path="/contactuspage" element={<Contactuspage />} />
           <Route path="/aboutus" element={<Aboutus />} />

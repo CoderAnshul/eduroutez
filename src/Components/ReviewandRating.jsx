@@ -4,7 +4,7 @@ import Rating from '@mui/material/Rating';
 import InstituteReviewBox from '../Ui components/InstituteReviewBox';
 import CustomButton from "../Ui components/CustomButton";
 
-const ReviewandRating = ({ ratings, reviews }) => {
+const ReviewandRating = ({ ratings, reviews, instituteData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Memoize average rating calculation for the first 6 reviews

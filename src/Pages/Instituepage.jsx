@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import ImageSlider from '../Ui components/ImageSlider'
 import InstitueName from '../Ui components/InstitueName'
 import TabSlider from '../Ui components/TabSlider'
@@ -11,6 +12,14 @@ import RecruitersSlider from '../Ui components/RecruitersSlider';
 import Faqs from '../Components/Faqs';
 import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
+import { useQuery } from 'react-query';
+import { getInstituteById } from '../ApiFunctions/api';
+import Loader from '../Components/Loader';
+import ExpandedBox from '../Ui components/ExpandedBox'
+import Addmissioninfo from '../Components/Addmissioninfo'
+import Placementinfo from '../Components/Placementinfo'
+import CampusInfo from '../Components/CampusInfo'
+import ScholarshipInfo from '../Components/ScholarshipInfo'
 
 const tabs = [
   "College Info",
@@ -137,12 +146,34 @@ const reviews = [
   },
 ];
 
-
-
 const Instituepage = () => {
-  
-  const sectionRefs = tabs.map(() => useRef(null));
+  const { id } = useParams(); 
   const [ratings, setRatings] = useState([]);
+  const sectionRefs = tabs.map(() => useRef(null));
+
+
+  const { data: instituteData, isLoading, isError, error } = useQuery(
+    ['institute', id], 
+    () => getInstituteById(id),
+    {
+      enabled: !!id, 
+    }
+  );
+
+  console.log(instituteData);
+
+  //fetching courses
+  // const { data: coursesData, isLoadingCourses, isErrorCourses, errorCourses } = useQuery(
+  //   ['courses', id],
+  //   () => getCourses(id),
+  //   {
+  //     enabled: !!id,
+  //   }
+  // );
+
+  // console.log("courses fetching ", coursesData);
+  
+
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -155,17 +186,28 @@ const Instituepage = () => {
       ];
       setRatings(data);
     };
-  
+
     fetchRatings();
   }, []);
+
+
+  if (!instituteData) {
+    return <div><Loader/></div>;
+  }
+
+  if (isError) {
+    return <div>Error: {error.message}</div>; // Show error if request fails
+  }
+
+  
 
 
 
   return (
     <>
         <div className='px-[4vw] py-[2vw] flex flex-col items-start'>
-             <ImageSlider/>
-             <InstitueName/>
+             <ImageSlider instituteData = {instituteData}/>
+             <InstitueName instituteData = {instituteData}/>
               <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
              <div className='w-full flex gap-4'>
 
@@ -173,13 +215,25 @@ const Instituepage = () => {
                 <div className='w-full lg:w-4/5'>
                   <div className='w-full min-h-24 '>
                       <div ref={sectionRefs[0]} className="min-h-24 pt-4 ">
-                          <CollegeInfo />
+                          <CollegeInfo instituteData = {instituteData} />
                       </div>
                       <div ref={sectionRefs[1]} className="min-h-24 py-4">
-                          <InstituteCourses />
+                          <InstituteCourses instituteData = {instituteData} />
+                      </div>
+                      <div ref={sectionRefs[2]} className="min-h-24 py-4">
+                          <Addmissioninfo instituteData={instituteData}/>
+                      </div>
+                      <div ref={sectionRefs[3]} className="min-h-24 pt-4">
+                          <Placementinfo instituteData={instituteData}/>
+                      </div>
+                      <div ref={sectionRefs[4]} className="min-h-24 pt-4">
+                          <CampusInfo instituteData={instituteData}/>
+                      </div>
+                      <div ref={sectionRefs[5]} className="min-h-24 pt-4">
+                          <ScholarshipInfo instituteData={instituteData}/>
                       </div>
                       <div ref={sectionRefs[8]} className="min-h-24 pt-4">
-                          <ReviewandRating ratings={ratings} reviews={reviews}/>
+                          <ReviewandRating ratings={ratings} reviews={reviews} instituteData={instituteData}/>
                       </div>
                       <div  className="min-h-24 py-4">
                           <InstituteFacilites/>
@@ -187,7 +241,7 @@ const Instituepage = () => {
                       <div  className="min-h-24 py-4">
                           <RecruitersSlider/>
                       </div>
-                      <div  className="min-h-24 py-4">
+                      <div ref={sectionRefs[7]} className="min-h-24 py-4">
                           <Faqs/>
                       </div>
                       {/* <div ref={sectionRefs[3]} className="min-h-screen p-4 bg-gray-50">

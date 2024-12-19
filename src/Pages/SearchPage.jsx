@@ -7,6 +7,8 @@ import SearchResultBox from '../Ui components/SearchResultBox';
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
+import { useQuery, useQueryClient } from 'react-query';
+import { getInstitutes } from '../ApiFunctions/api';
 
 const SearchPage = () => {
   const tabs = [
@@ -16,10 +18,43 @@ const SearchPage = () => {
   ];
 
   const [activeFilter, setActiveFilter] = useState(tabs[0].id);
+  const [selectedFilters, setSelectedFilters] = useState({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [contentVisibility, setContentVisibility] = useState({});
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [organisationType, setOrganisationType] = useState("");
+  const queryClient = useQueryClient();
 
-  const toggleFilter = () => {
+  console.log( state);
+
+  const { data, isLoading, isError, error  } = useQuery(
+    ["institutes", state, city, organisationType],
+    () => getInstitutes(state, city, organisationType),
+    {
+      enabled:true,
+    }
+  );
+
+  console.log(data);
+  
+
+  const toggleFilter = () => {                                             
     setIsFilterOpen(!isFilterOpen);
+  };
+
+  const handleFilterChange = (filterCategory, filterValue) => {
+    setSelectedFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterCategory]: filterValue,
+    }));
+  };
+
+  const toggleContentVisibility = (index) => {
+    setContentVisibility((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index],
+    }));
   };
 
   const contentData = [
@@ -40,6 +75,7 @@ const SearchPage = () => {
       content: `IIT Bombay offers diverse postgraduate programs, including M.Tech, MBA, MSc, and Ph.D. The admissions for M.Tech programs are primarily based on GATE (Graduate Aptitude Test in Engineering) scores, while MBA admissions are conducted through CAT (Common Admission Test). The institute is also renowned for its research opportunities, providing a world-class platform for innovation and exploration.`,
     },
   ];
+  
 
   const filterSections = [
     {
@@ -57,7 +93,7 @@ const SearchPage = () => {
     {
       title: "States",
       items: [
-        "Odisha",
+        "Rajasthan",
         "Karnataka",
         "Maharashtra",
         "Madhya Pradesh",
@@ -159,67 +195,70 @@ const SearchPage = () => {
         </div>
 
         <div className="flex gap-4 w-full mt-14 relative">
-          {/* Left Section - Filter Button */}
           <div className="filters w-[25%] mt-14 hidden lg:block">
-            <Filter filterSections={filterSections} />
+            <Filter filterSections={filterSections} onFilterChange={handleFilterChange} setState={setState} setCity={setCity} setOrganisationType={setOrganisationType} />
           </div>
 
-          {/* Mobile filter button */}
-          
-
-          {/* Mobile Filter - Fullscreen Overlay (Slide from left) */}
           {isFilterOpen && (
             <div
               className="md:hidden fixed top-0 left-0 w-[75%] h-full bg-white z-[1000] shadow-lg p-4 overflow-y-auto transition-transform transform ease-in-out duration-300"
               style={{ transform: 'translateX(0)' }}
             >
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Filters</h3>
-                <button onClick={toggleFilter} className="text-red-500">Close</button>
+              <h3 className="text-lg font-semibold">Filters</h3>
+                <button onClick={toggleFilter} className="text-red-500">
+                  Close
+                </button>
               </div>
-              <Filter filterSections={filterSections} />
+              <Filter filterSections={filterSections} onFilterChange={handleFilterChange} />
             </div>
           )}
 
-          {/* Right Section - Filtered Results */}
           <div className={`filterResult w-full ${isFilterOpen ? 'lg:w-[75%]' : 'lg:w-[75%]'}`}>
             <div className="flex flex-col py-4 px-2 border-b">
-          <button
-            onClick={toggleFilter}
-            className="lg:hidden max-w-28 bg-red-500 text-white py-2 px-4 rounded-lg"
-          >
-            Filter
-          </button>
-              <div className='flex items-center justify-between mt-3 flex-wrap whitespace-nowrap w-full'>
-                {/* Left Section */}
-              <div className="text-sm text-gray-700">
-                <span className="font-semibold text-red-500">"1"</span> Institute
-              </div>
-
-              {/* Tabs Section */}
-              <div className="flex border-2 border-opacity-15">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveFilter(tab.id)}
-                    className={`text-xs md:text-sm py-2 px-3 ${tab.id !== tabs[tabs.length - 1].id ? 'border-r-2' : ''} border-opacity-15 font-medium transition-colors ${activeFilter === tab.id ? 'text-red-500 border-red-500 font-semibold' : 'text-gray-700'}`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
+              <button
+                onClick={toggleFilter}
+                className="lg:hidden max-w-28 bg-red-500 text-white py-2 px-4 rounded-lg"
+              >
+                Filter
+              </button>
+              <div className="flex items-center justify-between mt-3 flex-wrap whitespace-nowrap w-full">
+                <div className="text-sm text-gray-700">
+                  <span className="font-semibold text-red-500">
+                    {data?.data?.result?.length || "0"}
+                  </span>{" "}
+                  Institutes
+                </div>
+                <div className="flex border-2 border-opacity-15">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveFilter(tab.id)}
+                      className={`text-xs md:text-sm py-2 px-3 ${
+                        tab.id !== tabs[tabs.length - 1].id ? 'border-r-2' : ''
+                      } border-opacity-15 font-medium transition-colors ${
+                        activeFilter === tab.id
+                          ? 'text-red-500 border-red-500 font-semibold'
+                          : 'text-gray-700'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-            {colleges.map((college, index) => (
-              <SearchResultBox key={index} college={college} />
+            {data?.data?.result?.map((institute, index) => (
+              <SearchResultBox key={institute._id || index} institute={institute} />
             ))}
           </div>
         </div>
       </div>
-      <BestRated/>
-      <Events/>
+      <BestRated />
+      <Events />
     </>
   );
 };
 
 export default SearchPage;
+

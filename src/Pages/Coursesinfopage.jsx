@@ -1,4 +1,5 @@
 import React, { useRef } from 'react'
+import { useParams } from 'react-router-dom'
 import CoursesName from '../Ui components/CoursesName'
 import TabSlider from '../Ui components/TabSlider';
 import QueryForm from '../Ui components/QueryForm';
@@ -6,6 +7,8 @@ import ExpandedBox from '../Ui components/ExpandedBox';
 import ProsandCons from '../Ui components/ProsandCons';
 import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
+import { getCoursesById } from '../ApiFunctions/api';
+import { useQuery } from 'react-query';
 
 
 const tabs = [
@@ -36,9 +39,24 @@ const tabs = [
     }
   ];
   
+
   
 
 const Coursesinfopage = () => {
+  const { id } = useParams(); 
+  console.log(id);
+
+    const { data: CourseData, isLoading, isError, error } = useQuery(
+      ['Course', id], 
+      () => getCoursesById(id),
+      {
+        enabled: !!id, 
+      }
+    );
+
+    console.log(CourseData);
+
+
     const sectionRefs = tabs.map(() => useRef(null));
   return (
     <div className='px-[4vw] py-[2vw] flex flex-col items-start'>
@@ -54,12 +72,24 @@ const Coursesinfopage = () => {
             <div className='w-full min-h-24'>
                 <div ref={sectionRefs[0]} className="min-h-24 pt-4 ">
                     <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 pt-8'>
-                        <ExpandedBox contentData={contentData}/>
+                        {/* <ExpandedBox contentData={contentData}/> */}
+                        {contentData.map((data,index) =>
+                            <div key={index} className="mb-4">
+                                <h3 className="text-lg font-bold">{data.title}</h3>
+                                <p className="text-base">{data.content}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div ref={sectionRefs[1]} className="min-h-24 pt-4 ">
                     <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 pt-8'>
-                        <ExpandedBox contentData={contentData}/>
+                        {/* <ExpandedBox contentData={contentData}/> */}
+                        {contentData.map((data,index) =>
+                            <div key={index} className="mb-4">
+                                <h3 className="text-lg font-bold">{data.title}</h3>
+                                <p className="text-base">{data.content}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <ProsandCons/>
