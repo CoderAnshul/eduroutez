@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-const UploadDocument = () => {
+const UploadDocument = ({ setFormData, setIsSubmit }) => {
   const [studentIdImage, setStudentIdImage] = useState(null); // State for Student ID/Marksheets
   const [selfieImage, setSelfieImage] = useState(null); // State for Selfie
 
@@ -11,8 +11,16 @@ const UploadDocument = () => {
       const imageUrl = URL.createObjectURL(file);
       if (type === "studentId") {
         setStudentIdImage(imageUrl);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          studentIdImage: file,
+        }));
       } else if (type === "selfie") {
         setSelfieImage(imageUrl);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          selfieImage: file,
+        }));
       }
     }
   };
@@ -21,8 +29,16 @@ const UploadDocument = () => {
   const handleRemoveImage = (type) => {
     if (type === "studentId") {
       setStudentIdImage(null);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        studentIdImage: null,
+      }));
     } else if (type === "selfie") {
       setSelfieImage(null);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        selfieImage: null,
+      }));
     }
   };
 
@@ -31,12 +47,12 @@ const UploadDocument = () => {
       <div className="w-full flex flex-col items-center max-w-4xl p-6 bg-white rounded-lg h-[480px] overflow-y-scroll scrollbar-thumb-red">
         {/* Title */}
         <h1 className="text-2xl font-semibold text-gray-800">Upload Documents</h1>
-        
+
         {/* Subtitle */}
         <p className="mt-1 text-sm text-gray-500">
           Make sure to upload a clear picture before you upload your documents
         </p>
-        
+
         {/* Upload Boxes */}
         <div className="grid grid-cols-2 gap-6 mt-6">
           {/* Left Box - Student ID */}

@@ -4,10 +4,11 @@ import location from "../assets/Images/location.png";
 import CustomButton from "./CustomButton";
 import { useLocation } from "react-router-dom";
 
-const CoursesName = () => {
+const CoursesName = ({content}) => {
   const pathname = useLocation().pathname;
   const segment = decodeURIComponent(pathname.split("/")[2]);
 
+  console.log()
   console.log(segment);
   return (
     <div className="min-h-20 w-full py-4 flex flex-col sm:flex-row gap-2 px-2 relative">
@@ -20,7 +21,7 @@ const CoursesName = () => {
 
       <div className="name w-full min-h-20 ">
         {/* <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold ">Industrial Engineering Course: Admission 2024, Fees, Syllabus, Entrance Exam, Career Scope</h2> */}
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold ">{segment}</h2>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold ">{content}</h2>
         <div className="text-container flex justify-end items-center flex-wrap gap-2 mt-1">
 
           {/* --------------button----------------- */}

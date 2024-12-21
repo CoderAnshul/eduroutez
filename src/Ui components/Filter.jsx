@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Filter = ({ filterSections ,setState,setCity,setOrganisationType}) => {
+const Filter = ({ filterSections ,settitle,setvalue}) => {
   const [searchTerms, setSearchTerms] = useState({});
   const [openSections, setOpenSections] = useState(
     filterSections.map(() => true) // Initialize all sections as open
@@ -83,7 +83,10 @@ const Filter = ({ filterSections ,setState,setCity,setOrganisationType}) => {
                       <input
                         type="checkbox"
                         onChange={(e) => {
-                          e.target.checked?setState(item):setState(null)}
+                          e.target.checked?settitle(section.title):settitle(null)
+                          e.target.checked?setvalue(item):setvalue(null)
+                          console.log(e.target.checked);
+                        }
                         }
                         className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
                       />
