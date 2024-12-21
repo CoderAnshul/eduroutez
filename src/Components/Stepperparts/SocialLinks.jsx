@@ -1,7 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 
-const SocialLinks = () => {
+const SocialLinks = ({ setFormData, setIsSubmit }) => {
   const [links, setLinks] = useState([""]); // Initialize with one empty input field
+
+  // Update the parent form data whenever links change
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      socialLinks: links,
+    }));
+  }, [links, setFormData]);
 
   // Handle input value change
   const handleInputChange = (index, value) => {
@@ -20,11 +28,10 @@ const SocialLinks = () => {
     const updatedLinks = links.filter((_, i) => i !== index);
     setLinks(updatedLinks);
   };
+
   return (
     <div className="flex flex-col items-center h-full">
       <div className="w-full flex flex-col items-center max-w-4xl p-6 bg-white rounded-lg h-[480px] overflow-y-scroll scrollbar-thumb-red">
-      <div className="flex flex-col items-center h-full">
-      <div className="w-full max-w-4xl p-6 bg-white rounded-lg">
         {/* Title */}
         <h1 className="text-2xl font-semibold text-gray-800 text-center">Social Links</h1>
 
@@ -65,9 +72,7 @@ const SocialLinks = () => {
         </button>
       </div>
     </div>
-      </div>
-    </div>
-  )
-}
+  );
+};
 
-export default SocialLinks
+export default SocialLinks;

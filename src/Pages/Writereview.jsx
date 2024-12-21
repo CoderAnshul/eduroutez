@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PersonalInfo from "../Components/Stepperparts/PersonalInfo";
 import VerifyDetails from "../Components/Stepperparts/VerifyDetails";
 import InputReview from "../Components/Stepperparts/InputReview";
@@ -6,10 +6,14 @@ import UploadDocument from "../Components/Stepperparts/UploadDocument";
 import SocialLinks from "../Components/Stepperparts/SocialLinks";
 import Feedback from "../Components/Stepperparts/Feedback";
 import { Link } from "react-router-dom";
+import {createReview} from '../ApiFunctions/api';
 
 const Writereview = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [formData,setFormData]=useState({});
+  const [isSubmit,setIsSubmit]=useState(false);
+
 
   // Total Steps
   const steps = [
@@ -26,9 +30,36 @@ const Writereview = () => {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     } else {
+      handleSubmit(formData);
       setIsModalOpen(true); // Open modal when "Submit" is clicked
     }
   };
+
+  const handleSubmit = (formData) => {
+    const { data, isLoading, isError, error  } = useQuery(
+        ["review"],
+        () => createReview(formData), // Passing formData to createReview
+        {
+          enabled: true, // Ensures that the query is executed
+        }
+    );
+
+    if (isLoading) {
+        // Handle loading state (e.g., display loading indicator)
+        console.log("Loading review creation...");
+    }
+
+    if (isError) {
+        // Handle error state
+        console.error("Error creating review:", error);
+    }
+
+    if (data) {
+        // Handle successful data retrieval
+        console.log("Review created successfully:", data);
+    }
+};
+
 
   // Move to the previous step
   const prevStep = () => {
@@ -39,21 +70,31 @@ const Writereview = () => {
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
-        return <PersonalInfo />;
+        return <PersonalInfo setFormData={setFormData} setIsSubmit={setIsSubmit} />;
       case 2:
         return <VerifyDetails />;
       case 3:
-        return <InputReview />;
+        return <InputReview setFormData={setFormData} setIsSubmit={setIsSubmit}/>;
       case 4:
-        return <UploadDocument />;
+        return <UploadDocument setFormData={setFormData} setIsSubmit={setIsSubmit}/>;
       case 5:
-        return <SocialLinks />;
+        return <SocialLinks setFormData={setFormData} setIsSubmit={setIsSubmit}/>;
       case 6:
-        return <Feedback />;
+        return <Feedback setFormData={setFormData} setIsSubmit={setIsSubmit}/>;
       default:
         return null;
     }
   };
+
+  console.log(formData);
+  console.log(isSubmit);
+
+  useEffect(() => {
+    if(isSubmit){
+      console.log(formData);
+    }
+  }, [isSubmit])
+  
 
   return (
     <div className="p-3 h-[600px] pb-14 bg-white relative flex flex-col">

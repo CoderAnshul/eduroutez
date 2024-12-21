@@ -43,3 +43,13 @@ export const getCoursesById = async (id) => {
     throw error;
   }
 };
+
+export const createReview= async (formData) => {
+  try {
+    const response = await axios.post(`${baseURL}/review`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching institute with ID ${id}:`, error);
+    throw error;
+  }
+};
