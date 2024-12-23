@@ -47,7 +47,7 @@ const Coursesinfopage = () => {
   console.log(id);
 
     const { data: CourseData, isLoading, isError, error } = useQuery(
-      ['Course', id], 
+      ['course', id], 
       () => getCoursesById(id),
       {
         enabled: !!id, 

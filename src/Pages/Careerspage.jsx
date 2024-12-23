@@ -8,6 +8,7 @@ import img4 from '../assets/Images/img4.png';
 import ConsellingBanner from "../Components/ConsellingBanner";
 import PopularCourses from "../Components/PopularCourses";
 import BlogComponent from "../Components/BlogComponent";
+import Events from "../Components/Events";
 
 
 
@@ -65,13 +66,16 @@ const boxData = [
 const Careerspage = () => {
   return (
     <>
-      <PageBanner pageName="Careers" currectPage="careers" />
+      <PageBanner pageName="Career Opportunity" currectPage="career opportunity" />
       <div className="px-[4vw] py-[2vw] flex flex-col items-center w-full">
         <BlogandCareerBox boxData={boxData} />
       </div>
       <PopularCourses/>
       <BlogComponent/>
+      <div className="flex gap-2 items-center">
+      <Events/>
       <ConsellingBanner/>
+      </div>
     </>
   );
 };

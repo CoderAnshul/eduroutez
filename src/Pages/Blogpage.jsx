@@ -5,6 +5,7 @@ import img from '../assets/Images/img.avif'
 import Events from '../Components/Events'
 import ConsellingBanner from '../Components/ConsellingBanner'
 import PopularCourses from '../Components/PopularCourses'
+import Events from "../Components/Events";
 
 const Blogpage = () => {
 
@@ -24,9 +25,11 @@ const Blogpage = () => {
       <div className="px-[4vw] pb-[2vw] flex flex-col items-start mt-10">
         <BlogandCareerBox boxData={boxData}/>
       </div>
+      <PopularCourses/>
+      <div className="flex gap-2 items-center">
       <Events/>
       <ConsellingBanner/>
-      <PopularCourses/>
+      </div>
     </>
   )
 }

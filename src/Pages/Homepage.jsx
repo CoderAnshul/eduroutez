@@ -17,12 +17,13 @@ const Homepage = () => {
       <Banner/>
       <div className='p-[4vw] flex flex-col items-center' >
           <Counselling/>
-          <TrendingInstitute/>
+          <PopularCourses/>
+         
       </div>
       <PopularCategories/>
       <div className='p-[4vw] flex flex-col items-center' >
          <BestRated/>
-         <PopularCourses/>
+         <TrendingInstitute/>
          <HighRatedCareers/>
       </div>
       <Instructor/>
