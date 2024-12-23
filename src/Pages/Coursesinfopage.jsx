@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import CoursesName from '../Ui components/CoursesName'
 import TabSlider from '../Ui components/TabSlider';
@@ -43,24 +43,29 @@ const tabs = [
   
 
 const Coursesinfopage = () => {
+  const [content, setcontent] = useState()
   const { id } = useParams(); 
   console.log(id);
 
-    const { data: CourseData, isLoading, isError, error } = useQuery(
-      ['course', id], 
-      () => getCoursesById(id),
-      {
-        enabled: !!id, 
-      }
-    );
+  const { data: CourseData, isLoading, isError, error } = useQuery(
+    ['course', id],
+    () => getCoursesById(id),
+    {
+      enabled: Boolean(id), // Ensures that the query is only triggered if 'id' is truthy
+    }
+  );
 
-    console.log(CourseData);
+  useEffect(() => {
+    setcontent(CourseData?.data);
+  }, [CourseData]);
+  console.log(content);
+    
 
 
     const sectionRefs = tabs.map(() => useRef(null));
   return (
     <div className='px-[4vw] py-[2vw] flex flex-col items-start'>
-        <CoursesName/>
+        <CoursesName content={content?.courseTitle}/>
         {/* <div className='w-full overflow-scroll'> */}
         <TabSlider tabs={tabs} sectionRefs={sectionRefs}  />
         {/* </div> */}

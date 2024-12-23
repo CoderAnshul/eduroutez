@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 const formSections = [
   {
@@ -104,12 +104,32 @@ const formSections = [
   },
 ];
 
+const Feedback = ({ setFormData, setIsSubmit }) => {
+  const [formState, setFormState] = useState({});
 
-const Feedback = () => {
+  const handleChange = (sectionTitle, option) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      [sectionTitle]: {
+        ...prevState[sectionTitle],
+        [option]: !prevState[sectionTitle]?.[option], // Toggle option
+      },
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // setFormData({ ...formState });
+    console.log('done1');
+    setIsSubmit(true);
+    console.log('done');
+    console.log('Form Data Submitted:', formState);
+  };
+
   return (
-    <div className="flex flex-col items-center bg- justify-center h-full overflow-x-hidden ">
-      <div className="w-full flex flex-col max-w-4xl items-center md:block p-6 bg-white rounded-lg h-[480px] overflow-y-scroll  scrollbar-thumb-red">
-          {/* Title */}
+    <div className="flex flex-col items-center justify-center h-full overflow-x-hidden">
+      <div className="w-full flex flex-col max-w-4xl items-center md:block p-6 bg-white rounded-lg h-[480px] overflow-y-scroll scrollbar-thumb-red">
+        {/* Title */}
         <h1 className="text-2xl font-semibold text-center text-gray-800">
           Social Links
         </h1>
@@ -118,18 +138,18 @@ const Feedback = () => {
         </p>
 
         {/* Form */}
-        <form className="mt-14 space-y-8 mx-auto md:px-10">
+        <form className="mt-14 space-y-8 mx-auto md:px-10" onSubmit={handleSubmit}>
           {formSections.map((section, index) => (
             <div key={index}>
-              <h2 className="text-lg font-medium text-gray-700">
-                {section.title}
-              </h2>
+              <h2 className="text-lg font-medium text-gray-700">{section.title}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                 {section.options.map((option, i) => (
                   <label key={i} className="flex items-center">
                     <input
                       type="checkbox"
                       className="mr-2 border-gray-300 focus:ring-blue-500"
+                      checked={formState[section.title]?.[option] || false}
+                      onChange={() => handleChange(section.title, option)}
                     />
                     {option}
                   </label>
@@ -137,10 +157,17 @@ const Feedback = () => {
               </div>
             </div>
           ))}
+          <button
+            type="submit"
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={handleSubmit}
+          >
+            Submit
+          </button>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Feedback
+export default Feedback;

@@ -1,16 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import Rating from "@mui/material/Rating";
 
-const InputReview = () => {
-  const [ratings, setRatings] = React.useState({
-    placements: 0,
-    faculty: 0,
-    campus: 0,
-    suggestions: 0,
+const InputReview = ({ setFormData, setIsSubmit }) => {
+  const [ratings, setRatings] = useState({
+    placementStars: 0,
+    facultyStars: 0,
+    campusLifeStars: 0,
+    suggestionsStars: 0,
   });
 
   const handleRatingChange = (category, newValue) => {
-    setRatings((prev) => ({ ...prev, [category]: newValue }));
+    setRatings((prev) => {
+      const updatedRatings = { ...prev, [category]: newValue };
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        ratings: updatedRatings,
+      }));
+      return updatedRatings;
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [id]: value,
+    }));
+  };
+
+  const handleRadioChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
 
   return (
@@ -38,6 +61,7 @@ const InputReview = () => {
             <input
               type="text"
               id="reviewTitle"
+              onChange={handleInputChange}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
               placeholder="Enter your review title"
             />
@@ -54,11 +78,12 @@ const InputReview = () => {
             <Rating
               value={ratings.placements}
               onChange={(event, newValue) =>
-                handleRatingChange("placements", newValue)
+                handleRatingChange("placementStars", newValue)
               }
             />
             <textarea
-              id="placements"
+              id="placementDescription"
+              onChange={handleInputChange}
               rows="4"
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your review on placements..."
@@ -68,7 +93,7 @@ const InputReview = () => {
           {/* Faculty / Course Content */}
           <div>
             <label
-              htmlFor="faculty"
+              htmlFor="facultyStars"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
               Faculty / Course Content
@@ -76,11 +101,12 @@ const InputReview = () => {
             <Rating
               value={ratings.faculty}
               onChange={(event, newValue) =>
-                handleRatingChange("faculty", newValue)
+                handleRatingChange("facultyStars", newValue)
               }
             />
             <textarea
-              id="faculty"
+              id="facultyDescription"
+              onChange={handleInputChange}
               rows="4"
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your review on faculty or course content..."
@@ -90,7 +116,7 @@ const InputReview = () => {
           {/* Campus / Hostel */}
           <div>
             <label
-              htmlFor="campus"
+              htmlFor="campusLifeStars"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
               Campus / Hostel
@@ -98,11 +124,12 @@ const InputReview = () => {
             <Rating
               value={ratings.campus}
               onChange={(event, newValue) =>
-                handleRatingChange("campus", newValue)
+                handleRatingChange("campusLifeStars", newValue)
               }
             />
             <textarea
-              id="campus"
+              id="campusLifeDescription"
+              onChange={handleInputChange}
               rows="4"
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your review on campus or hostel..."
@@ -120,11 +147,12 @@ const InputReview = () => {
             <Rating
               value={ratings.suggestions}
               onChange={(event, newValue) =>
-                handleRatingChange("suggestions", newValue)
+                handleRatingChange("suggestionsStars", newValue)
               }
             />
             <textarea
-              id="suggestions"
+              id="suggestionDescription"
+              onChange={handleInputChange}
               rows="4"
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your suggestions..."
@@ -140,8 +168,9 @@ const InputReview = () => {
               <label className="flex items-center gap-2">
                 <input
                   type="radio"
-                  name="recommend"
-                  value="yes"
+                  name="recommendation"
+                  value={true}
+                  onChange={handleRadioChange}
                   className="w-4 h-4 border-gray-300 focus:ring focus:ring-indigo-300"
                 />
                 Yes
@@ -149,8 +178,9 @@ const InputReview = () => {
               <label className="flex items-center gap-2">
                 <input
                   type="radio"
-                  name="recommend"
-                  value="no"
+                  name="recommendation"
+                  value={false}
+                  onChange={handleRadioChange}
                   className="w-4 h-4 border-gray-300 focus:ring focus:ring-indigo-300"
                 />
                 No

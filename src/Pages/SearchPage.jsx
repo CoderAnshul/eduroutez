@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PageBanner from '../Ui components/PageBanner';
 import SearchResultInfo from '../Ui components/SearchResultInfo';
 import ExpandedBox from '../Ui components/ExpandedBox';
@@ -21,22 +21,43 @@ const SearchPage = () => {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [contentVisibility, setContentVisibility] = useState({});
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [organisationType, setOrganisationType] = useState("");
+  // const [city, setCity] = useState("");
+  // const [state, setState] = useState("");
+  // const [organisationType, setOrganisationType] = useState("");
+  const [title, settitle] = useState(null)
+  const [value, setvalue] = useState(null)
+
   const queryClient = useQueryClient();
 
-  console.log( state);
+  // console.log( state);
 
   const { data, isLoading, isError, error  } = useQuery(
-    ["institutes", state, city, organisationType],
-    () => getInstitutes(state, city, organisationType),
+    ["institutes"],
+    () => getInstitutes(),
     {
       enabled:true,
     }
   );
-
   console.log(data);
+
+  const [content, setcontent] = useState([]);
+  const [filteredContent, setfilteredContent] = useState([]);
+
+  useEffect(() => {
+    const result=data?.data?.result;
+    setcontent(result);
+    setfilteredContent(result);
+  }, [data])
+
+  // useEffect(() => {
+  //   for(let i=0;i<content.length;i++){
+  //     filterSections[1].items.push(content[i]?.state);
+  //     //same for specialization
+  //   }
+  //   console.log(filterSections[1]);
+  // }, [content])
+  
+  
   
 
   const toggleFilter = () => {                                             
@@ -79,7 +100,7 @@ const SearchPage = () => {
 
   const filterSections = [
     {
-      title: "Stream",
+      title: "streams",
       items: [
         "Computer Science Engineering",
         "Mechanical Engineering",
@@ -91,28 +112,29 @@ const SearchPage = () => {
       ],
     },
     {
-      title: "States",
+      title: "state",
       items: [
         "Rajasthan",
         "Karnataka",
         "Maharashtra",
         "Madhya Pradesh",
-        "Assam",
+        "Uttar Pradesh",
         "Delhi",
+        "Tamil Nadu"
       ],
     },
     {
-      title: "Cities",
+      title: "city",
       items: [
         "Bangalore",
         "Indore",
         "Jaipur",
-        "Ahmedabad",
+        "Mumbai",
         "Delhi",
       ],
     },
     {
-      title: "Specialization",
+      title: "specialization",
       items: [
         "Health Information Administration",
         "Finance",
@@ -131,7 +153,7 @@ const SearchPage = () => {
       items: ["Jee Mains", "CAT", "GATE", "BITSAT"],
     },
     {
-      title: "Ownership",
+      title: "organisationType",
       items: ["Private", "Public"],
     },
     {
@@ -140,50 +162,45 @@ const SearchPage = () => {
     },
   ];
 
-  const colleges = [
-    {
-      name: "IIT Madras",
-      rank: "#2",
-      rating: 4.1,
-      reviews: 8,
-      location: "India",
-      type: "private",
-      fees: "5,000 - 2,00,000",
-      accreditation: "AICTE",
-      averageSalary: "9 Lacs",
-      entranceExam: "CAT",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      image: serachBoximg,
-    },
-    {
-      name: "IIT Bombay",
-      rank: "#3",
-      rating: 4.3,
-      reviews: 15,
-      location: "India",
-      type: "private",
-      fees: "10,000 - 2,50,000",
-      accreditation: "AICTE",
-      averageSalary: "10 Lacs",
-      entranceExam: "JEE Advanced",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      image: serachBoximg,
-    },
-    {
-      name: "IIT Delhi",
-      rank: "#4",
-      rating: 4.2,
-      reviews: 10,
-      location: "India",
-      type: "private",
-      fees: "12,000 - 2,00,000",
-      accreditation: "AICTE",
-      averageSalary: "8 Lacs",
-      entranceExam: "JEE Advanced",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      image: serachBoximg,
-    },
-  ];
+
+
+
+  useEffect(() => {
+    console.log("Title:", title);
+    console.log("Value:", value);
+    console.log("Initial filteredContent:", filteredContent);
+    
+    if (title && value && filteredContent.length > 0) {
+      const filteredArray = filteredContent.filter(item => {
+        const hasKey = item.hasOwnProperty(title);
+        
+        if (hasKey) {
+          const fieldValue = item[title];
+          
+          // Check if the field value is an array
+          if (Array.isArray(fieldValue)) {
+            // Check if the array includes the specified value
+            return fieldValue.includes(value);
+          } else {
+            // Otherwise, perform a direct equality check
+            return fieldValue === value;
+          }
+        }
+        
+        return false;
+      });
+  
+      console.log("Filtered Array:", filteredArray);
+      setfilteredContent(filteredArray);
+    }
+  
+    if (title === null || value === null) {
+      setfilteredContent(content);
+    }
+  }, [title, value]); // Dependencies
+  
+  
+  
 
   return (
     <>
@@ -196,10 +213,10 @@ const SearchPage = () => {
 
         <div className="flex gap-4 w-full mt-14 relative">
           <div className="filters w-[25%] mt-14 hidden lg:block">
-            <Filter filterSections={filterSections} onFilterChange={handleFilterChange} setState={setState} setCity={setCity} setOrganisationType={setOrganisationType} />
+            <Filter filterSections={filterSections} settitle={settitle} setvalue={setvalue} />
           </div>
 
-          {isFilterOpen && (
+          {/* {isFilterOpen && (
             <div
               className="md:hidden fixed top-0 left-0 w-[75%] h-full bg-white z-[1000] shadow-lg p-4 overflow-y-auto transition-transform transform ease-in-out duration-300"
               style={{ transform: 'translateX(0)' }}
@@ -212,7 +229,7 @@ const SearchPage = () => {
               </div>
               <Filter filterSections={filterSections} onFilterChange={handleFilterChange} />
             </div>
-          )}
+          )} */}
 
           <div className={`filterResult w-full ${isFilterOpen ? 'lg:w-[75%]' : 'lg:w-[75%]'}`}>
             <div className="flex flex-col py-4 px-2 border-b">
@@ -225,7 +242,7 @@ const SearchPage = () => {
               <div className="flex items-center justify-between mt-3 flex-wrap whitespace-nowrap w-full">
                 <div className="text-sm text-gray-700">
                   <span className="font-semibold text-red-500">
-                    {data?.data?.result?.length || "0"}
+                    {content?.length || "0"}
                   </span>{" "}
                   Institutes
                 </div>
@@ -248,7 +265,7 @@ const SearchPage = () => {
                 </div>
               </div>
             </div>
-            {data?.data?.result?.map((institute, index) => (
+            {filteredContent?.map((institute, index) => (
               <SearchResultBox key={institute._id || index} institute={institute} />
             ))}
           </div>
@@ -261,4 +278,5 @@ const SearchPage = () => {
 };
 
 export default SearchPage;
+
 
