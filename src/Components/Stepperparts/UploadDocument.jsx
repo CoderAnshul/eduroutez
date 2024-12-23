@@ -4,19 +4,19 @@ const UploadDocument = ({ setFormData, setIsSubmit }) => {
   const [studentIdImage, setStudentIdImage] = useState(null); // State for Student ID/Marksheets
   const [selfieImage, setSelfieImage] = useState(null); // State for Selfie
 
-  // Handle image upload
   const handleImageUpload = (e, type) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
       if (type === "studentId") {
-        setStudentIdImage(imageUrl);
+        // setStudentIdImage(imageUrl);
         setFormData((prevFormData) => ({
           ...prevFormData,
           studentIdImage: file,
         }));
       } else if (type === "selfie") {
-        setSelfieImage(imageUrl);
+        // setSelfieImage(imageUrl);
         setFormData((prevFormData) => ({
           ...prevFormData,
           selfieImage: file,
