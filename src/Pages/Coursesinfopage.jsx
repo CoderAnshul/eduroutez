@@ -45,7 +45,6 @@ const tabs = [
 const Coursesinfopage = () => {
   const [content, setcontent] = useState()
   const { id } = useParams(); 
-  console.log(id);
 
   const { data: CourseData, isLoading, isError, error } = useQuery(
     ['course', id],
@@ -76,18 +75,39 @@ const Coursesinfopage = () => {
         <div className='w-full lg:w-4/5'>
             <div className='w-full min-h-24'>
                 <div ref={sectionRefs[0]} className="min-h-24 pt-4 ">
-                    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 pt-8'>
+                    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 pb-5 p-2 pt-3'>
                         {/* <ExpandedBox contentData={contentData}/> */}
-                        {contentData.map((data,index) =>
+                        {/* {contentData.map((data,index) =>
                             <div key={index} className="mb-4">
                                 <h3 className="text-lg font-bold">{data.title}</h3>
                                 <p className="text-base">{data.content}</p>
-                            </div>
-                        )}
+                                </div>
+                                )} */}
+                           {/* <p className="text-base"
+                              dangerouslySetInnerHTML={{
+                                __html: content.courseOverview || "N/A",
+                              }}
+                           /> */}
+                           {/* {content?.courseOverview} */}
+
+                           <h4 className=' font-semibold text-red-500'>Overview</h4>
+
+                           <div className='flex mb-3 gap-6 flex-wrap'>
+                            <p className=' text-xs font-mono'> Instructor : {content?.instructor || "Not available"}</p>
+                            <p className=' text-xs font-mono'> Language : {content?.language || "Not available"}</p>
+                           </div>
+
+                           <p className="text-base"
+                              dangerouslySetInnerHTML={{
+                                __html: content?.courseOverview || "N/A",
+                              }}
+                            />
+
+                        
                     </div>
                 </div>
                 <div ref={sectionRefs[1]} className="min-h-24 pt-4 ">
-                    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 pt-8'>
+                    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 pt-3'>
                         {/* <ExpandedBox contentData={contentData}/> */}
                         {contentData.map((data,index) =>
                             <div key={index} className="mb-4">
@@ -95,6 +115,29 @@ const Coursesinfopage = () => {
                                 <p className="text-base">{data.content}</p>
                             </div>
                         )}
+                        {/* <h4 className=' font-semibold text-red-500 mb-3'>Course Curriculum</h4>  
+                              <p className="text-base"
+                                dangerouslySetInnerHTML={{
+                                  __html: content?.courseOverview || "N/A",
+                                }}
+                              /> */}
+                    </div>
+                </div>
+                <div ref={sectionRefs[1]} className="min-h-24 pt-4 ">
+                    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 pt-3 pb-5'>
+                        {/* <ExpandedBox contentData={contentData}/> */}
+                        {/* {contentData.map((data,index) =>
+                            <div key={index} className="mb-4">
+                                <h3 className="text-lg font-bold">{data.title}</h3>
+                                <p className="text-base">{data.content}</p>
+                            </div>
+                        )} */}
+                        <h4 className=' font-semibold text-red-500 mb-3'>Course Curriculum</h4>  
+                              <p className="text-base"
+                                dangerouslySetInnerHTML={{
+                                  __html: content?.courseOverview || "N/A",
+                                }}
+                              />
                     </div>
                 </div>
                 <ProsandCons/>

@@ -5,9 +5,20 @@ import img from '../assets/Images/img.avif'
 import Events from '../Components/Events'
 import ConsellingBanner from '../Components/ConsellingBanner'
 import PopularCourses from '../Components/PopularCourses'
-import Events from "../Components/Events";
+import { useQuery } from 'react-query'
+import { blogs } from '../ApiFunctions/api'
 
 const Blogpage = () => {
+
+    const { data: blogData, isLoading, isError, error } = useQuery(
+      ['blogs'], 
+      blogs,
+      { enabled: true }
+    );
+  
+    if (isLoading) return <p>Loading...</p>;
+    if (isError) return <p>Error: {error.message}</p>;
+  
 
     const boxData = [
         { title: "Agriculture", imgSrc: img, description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", link:'/detailpage' },
@@ -23,7 +34,8 @@ const Blogpage = () => {
     <>
     <PageBanner pageName="Blog" currectPage="blog" />
       <div className="px-[4vw] pb-[2vw] flex flex-col items-start mt-10">
-        <BlogandCareerBox boxData={boxData}/>
+        <BlogandCareerBox boxData={boxData} blogData={blogData}/>
+        
       </div>
       <PopularCourses/>
       <div className="flex gap-2 items-center">
