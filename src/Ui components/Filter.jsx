@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-const Filter = ({ filterSections ,settitle,setvalue}) => {
+const Filter = ({ filterSections, settitle, setvalue }) => {
   const [searchTerms, setSearchTerms] = useState({});
   const [openSections, setOpenSections] = useState(
     filterSections.map(() => true) // Initialize all sections as open
@@ -25,7 +25,7 @@ const Filter = ({ filterSections ,settitle,setvalue}) => {
   return (
     <div className="space-y-2">
       {filterSections.map((section, index) => {
-        const filteredItems = section.items
+        const filteredItems = section.items;
 
         return (
           <div key={index} className="w-full border rounded-lg">
@@ -66,9 +66,21 @@ const Filter = ({ filterSections ,settitle,setvalue}) => {
                     type="text"
                     placeholder={`Search ${section.title}`}
                     value={searchTerms[section.title] || ""}
-                    onChange={(e) =>
-                      handleSearchChange(section.title, e.target.value)
-                    }
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+
+                      // Set title and value conditionally
+                      if (newValue) {
+                        setTitle(section.title);
+                        setValue(newValue); // Assuming you're using `newValue` here
+                      } else {
+                        setTitle(null);
+                        setValue(null);
+                      }
+
+                      // You can log the value here for debugging purposes
+                      console.log(newValue);
+                    }}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
                 </div>
@@ -83,11 +95,12 @@ const Filter = ({ filterSections ,settitle,setvalue}) => {
                       <input
                         type="checkbox"
                         onChange={(e) => {
-                          e.target.checked?settitle(section.title):settitle(null)
-                          e.target.checked?setvalue(item):setvalue(null)
+                          e.target.checked
+                            ? settitle(section.title)
+                            : settitle(null);
+                          e.target.checked ? setvalue(item) : setvalue(null);
                           console.log(e.target.checked);
-                        }
-                        }
+                        }}
                         className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
                       />
                       <span className="ml-2">{item}</span>
@@ -106,4 +119,3 @@ const Filter = ({ filterSections ,settitle,setvalue}) => {
 };
 
 export default Filter;
-

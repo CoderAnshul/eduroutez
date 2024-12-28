@@ -7,6 +7,8 @@ import SocialLinks from "../Components/Stepperparts/SocialLinks";
 import Feedback from "../Components/Stepperparts/Feedback";
 import { Link } from "react-router-dom";
 import {createReview} from '../ApiFunctions/api';
+import { useQuery } from "react-query";
+// import { useMutation, useQuery } from '@tanstack/react-query';
 
 const Writereview = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -35,30 +37,40 @@ const Writereview = () => {
     }
   };
 
-  const handleSubmit = (formData) => {
-    const { data, isLoading, isError, error  } = useQuery(
-        ["review"],
-        () => createReview(formData), // Passing formData to createReview
-        {
-          enabled: true, // Ensures that the query is executed
+  const { data, isLoading, isError, error } = useQuery(
+    ["review", formData],
+    () => createReview(formData),
+    {
+        enabled: !!formData && isSubmit, // Only run the query when formData is set and submitting
+        onSuccess: () => {
+            // Reset formData after success
+            setFormData(null);
+            setIsSubmit(false);
+        },
+        onError: () => {
+            setIsSubmit(false);
         }
-    );
-
-    if (isLoading) {
-        // Handle loading state (e.g., display loading indicator)
-        console.log("Loading review creation...");
     }
+);
 
-    if (isError) {
-        // Handle error state
-        console.error("Error creating review:", error);
-    }
-
-    if (data) {
-        // Handle successful data retrieval
-        console.log("Review created successfully:", data);
-    }
+// Handle submit
+const handleSubmit = (newFormData) => {
+    setFormData(newFormData); // Set the form data for query to trigger
+    setIsSubmit(true); // Start submitting
 };
+
+// You can handle states like loading, error, success here
+if (isLoading) {
+    console.log("Loading review creation...");
+}
+
+if (isError) {
+    console.error("Error creating review:", error);
+}
+
+if (data) {
+    console.log("Review created successfully:", data);
+}
 
 
   // Move to the previous step

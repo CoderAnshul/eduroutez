@@ -46,13 +46,22 @@ export const getCoursesById = async (id) => {
 
 export const createReview= async (formData) => {
   try {
-    const response = await axios.post(`${baseURL}/review`);
+    const response = await axios.post(`${baseURL}/review`, formData);
     return response.data;
   } catch (error) {
     console.error(`Error fetching institute with ID ${id}:`, error);
     throw error;
   }
 };
+
+
+export const getReviews= async () => {
+  try {
+    const response = await axios.get(`${baseURL}/review`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+
 export const adds= async () => {
   try {
     const response = await axios.get(`${baseURL}/promotions`);
@@ -85,9 +94,18 @@ export const blogs= async () => {
     // return response.data;
   } catch (error) {
     console.error(`Error fetching banner `, error);
+
     throw error;
   }
 };
+
+
+export const createQuery= async (formData) => {
+  try {
+    const response = await axios.post(`${baseURL}/query`, formData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching institute with ID :`, error);
 
 export const careers= async () => {
   try {
@@ -110,6 +128,7 @@ export const counsellers= async () => {
     // return response.data;
   } catch (error) {
     console.error(`Error fetching banner `, error);
+
     throw error;
   }
 };

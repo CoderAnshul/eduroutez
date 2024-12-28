@@ -1,6 +1,9 @@
 import React from 'react'
 import CustomButton from '../Ui components/CustomButton'
 import ReviewBox from '../Ui components/ReviewBox';
+import { useQuery } from 'react-query';
+import { getReviews } from '../ApiFunctions/api';
+// import { useMutation, useQuery } from '@tanstack/react-query';
 
 const reviews = [
     {
@@ -37,7 +40,20 @@ const reviews = [
     },
   ];
 
+  
+
 export const Reviews = () => {
+
+  const { data, isLoading, isError, error  } = useQuery(
+    ["reviews"],
+    () => getReviews(),
+    {
+      enabled:true,
+    }
+  );
+  console.log(data);
+
+console.log(data);
   return (
     <>
         <div className='reviews w-full min-h-44 p-[4vw] pl-[10px]  pr-[10px] pb-10'>
