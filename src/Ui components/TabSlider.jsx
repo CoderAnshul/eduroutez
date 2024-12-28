@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 const TabSlider = ({ tabs, sectionRefs, className }) => {
     const sliderRef = useRef();
     const [isOverflowing, setIsOverflowing] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(null); // Track the active tab
+    const [activeIndex, setActiveIndex] = useState(0); // Track the active tab
 
     // Function to check if the content is overflowing
     const checkOverflow = () => {

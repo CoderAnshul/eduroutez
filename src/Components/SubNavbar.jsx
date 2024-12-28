@@ -71,8 +71,8 @@ const SubNavbar = ({categories}) => {
                               key={item.id}
                               className={`px-2 py-2 group text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
                                 activeContent[category.label] === item.id
-                                  ? 'bg-red-200 border-l-2 border-red-500'
-                                  : ''
+                                  ? 'bg-red-400 border-l-2 border-red-500 text-white'
+                                  : 'bg-red-500 text-white'
                               }`}
                               onMouseEnter={() =>
                                 setActiveContent((prev) => ({

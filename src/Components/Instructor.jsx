@@ -10,7 +10,7 @@ const Instructor = () => {
             <h2 className='text-4xl font-semibold mb-6'>Become an Instructor</h2>
 
             <p>Learn at your own pace, move the between multiple courses.</p>
-            <Link>
+            <Link to="/become-couseller">
             <button className='text-white text-sm flex items-center py-3 mt-8 px-4 bg-blue-600 gap-1'>
                 Apply now 
                 <img className='h-5' src={uparrow} alt="" />

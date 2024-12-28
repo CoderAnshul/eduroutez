@@ -16,6 +16,11 @@ const QuestionandAnswer = () => {
     'Physics',
     'Economics',
   ];
+  const Level = [
+    'School',
+    'Undergrad',
+    'Postgrad',
+  ];
 
   // Static array of questions and answers, with some unanswered questions
   const questionsAndAnswers = [
@@ -150,26 +155,63 @@ const QuestionandAnswer = () => {
       </div>
 
       {/* Main Content */}
-      <main className="w-full lg:w-1/2">
+      <main className="w-full lg:w-1/2 relative">
         {/* Search Section */}
         <div className="mb-6 bg-white shadow-lg rounded-lg p-4">
           <h2 className="text-lg font-semibold mb-2">
             Need guidance on career and education? Ask our experts
           </h2>
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              placeholder="Type Your Question"
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-            />
-            <button className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600">
+          <div className=" items-center space-x-2">
+            <div className="flex flex-col gap-2 mb-4">
+              <input
+                type="text"
+                placeholder="Type Your Question"
+                className="flex-1 px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+              />
+
+              {/* ------ changes should be done here --------- */}
+              <div className="flex flex-col gap-2 mb-4">
+                <select
+                  className="flex-1 px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+                  onChange={(event) => {
+                    document.getElementById('selectedQuestionInput').value = event.target.value;
+                  }}
+                >
+                  <option value="" disabled selected>
+                    Select an option
+                  </option>
+                  {options.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="flex-1 px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+                  onChange={(event) => {
+                    document.getElementById('selectedQuestionInput').value = event.target.value;
+                  }}
+                >
+                  <option value="" disabled selected>
+                    Select Education Level
+                  </option>
+                  {Level.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* ------ changes should be done here --------- */}
+            </div>
+            <button className="px-4 py-2 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600">
               Submit
             </button>
           </div>
         </div>
 
         {/* Question and Answer Section */}
-        <div className="space-y-4 max-h-96 overflow-y-scroll scrollbar-thumb-red">
+        <div className="space-y-4 max-h-[470px] overflow-y-scroll scrollbar-thumb-red">
           {questionsAndAnswers.map((item) => (
             <div key={item.id} className="bg-red-100 shadow-lg rounded-lg p-4 space-y-2">
               <div className="flex items-center space-x-2">
@@ -184,13 +226,13 @@ const QuestionandAnswer = () => {
                   Answered by: <span className="font-semibold">Ravi Jain</span>
                 </p>
               ) : (
-                <div className='flex justify-end'>
-                    <button
-                  onClick={() => handleAnswerQuestion(item.id)}
-                  className="px-3 py-1 bg-blue-500 text-xs text-white font-medium rounded-sm hover:bg-blue-600"
-                >
-                  Answer
-                </button>
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => handleAnswerQuestion(item.id)}
+                    className="px-3 py-1 bg-blue-500 text-xs text-white font-medium rounded-sm hover:bg-blue-600"
+                  >
+                    Answer
+                  </button>
                 </div>
               )}
               {item.answered && (

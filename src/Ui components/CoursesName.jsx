@@ -8,8 +8,6 @@ const CoursesName = ({content}) => {
   const pathname = useLocation().pathname;
   const segment = decodeURIComponent(pathname.split("/")[2]);
 
-  console.log()
-  console.log(segment);
   return (
     <div className="min-h-20 w-full py-4 flex flex-col sm:flex-row gap-2 px-2 relative">
       <div className="instituteLogo max-h-24 max-w-24 border-2 rounded-full overflow-hidden flex items-center justify-center ">

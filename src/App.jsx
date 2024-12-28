@@ -4,6 +4,7 @@ import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import ScrollToTop from './Utilities/ScrollToTop';
 import Loader from './Components/Loader';
+import BecomeCouseller from './Pages/BecomeCouseller';
 
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -48,6 +49,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<Forgotpassword />} />
+          <Route path="/become-couseller" element={<BecomeCouseller />} />
         </Routes>
       </Suspense>
       <Footer />

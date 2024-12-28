@@ -254,7 +254,7 @@ const Instituepage = () => {
 
              </div>
              <BestRated/>
-             <Events/>
+             <Events className="!w-full"/>
         </div>
     </>
   )

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import PageBanner from "../Ui components/PageBanner";
 import ConsellingBanner from "../Components/ConsellingBanner";
+import { useQuery } from "react-query";
+import { counsellers } from "../ApiFunctions/api";
 
 const counselors = [
     {
@@ -100,6 +102,18 @@ const tabs = [
 const Counselingpage = () => {
   const [selectedTab, setSelectedTab] = useState(0); // Default to the first tab
 
+  const { data: counselingData, isLoading, isError, error } = useQuery(
+          ['blogs'], 
+          () => counsellers(),
+          { enabled: true }
+        );
+        console.log(counselingData);
+  
+        
+      
+        if (isLoading) return <p>Loading...</p>;
+        if (isError) return <p>Error: {error.message}</p>;
+
   return (
     <>
       <PageBanner pageName="Counseling" currectPage="Counseling" />
@@ -174,7 +188,7 @@ const Counselingpage = () => {
           </div>
         </div>
       </div>
-      <ConsellingBanner/>
+      <ConsellingBanner className="!w-full"/>
     </>
   );
 };

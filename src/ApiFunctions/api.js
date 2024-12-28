@@ -54,15 +54,51 @@ export const createReview= async (formData) => {
   }
 };
 
+
 export const getReviews= async () => {
   try {
     const response = await axios.get(`${baseURL}/review`);
     return response.data;
   } catch (error) {
     console.error(error);
+
+export const adds= async () => {
+  try {
+    const response = await axios.get(`${baseURL}/promotions`);
+    return response.data;
+    
+    // return response.data;
+  } catch (error) {
+    console.error(`Error fetching adds `, error);
     throw error;
   }
 };
+export const homeBanner= async () => {
+  try {
+    const response = await axios.get(`${baseURL}/media`);
+    return response.data;
+    
+    
+    // return response.data;
+  } catch (error) {
+    console.error(`Error fetching banner `, error);
+    throw error;
+  }
+};
+export const blogs= async () => {
+  try {
+    const response = await axios.get(`${baseURL}/blogs`);
+    return response.data;
+    
+    
+    // return response.data;
+  } catch (error) {
+    console.error(`Error fetching banner `, error);
+
+    throw error;
+  }
+};
+
 
 export const createQuery= async (formData) => {
   try {
@@ -70,6 +106,29 @@ export const createQuery= async (formData) => {
     return response.data;
   } catch (error) {
     console.error(`Error fetching institute with ID :`, error);
+
+export const careers= async () => {
+  try {
+    const response = await axios.get(`${baseURL}/careers`);
+    return response.data;
+    
+    
+    // return response.data;
+  } catch (error) {
+    console.error(`Error fetching banner `, error);
+    throw error;
+  }
+};
+export const counsellers= async () => {
+  try {
+    const response = await axios.get(`${baseURL}/counselors`);
+    return response.data;
+    
+    
+    // return response.data;
+  } catch (error) {
+    console.error(`Error fetching banner `, error);
+
     throw error;
   }
 };
