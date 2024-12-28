@@ -51,7 +51,7 @@ const Homepage = () => {
          <BlogComponent/>
       </div>
          <Reviews/>
-         <Events/>
+         <Events className = "!w-full"/>
     </>
   )
 }

@@ -188,7 +188,7 @@ const Counselingpage = () => {
           </div>
         </div>
       </div>
-      <ConsellingBanner/>
+      <ConsellingBanner className="!w-full"/>
     </>
   );
 };

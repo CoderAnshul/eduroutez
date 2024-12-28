@@ -30,6 +30,9 @@ const Careerspage = () => {
     { enabled: true }
   );
 
+  console.log(careerData);
+  
+
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
