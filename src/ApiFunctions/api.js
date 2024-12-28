@@ -61,6 +61,8 @@ export const getReviews= async () => {
     return response.data;
   } catch (error) {
     console.error(error);
+  }
+}
 
 export const adds= async () => {
   try {
@@ -106,6 +108,7 @@ export const createQuery= async (formData) => {
     return response.data;
   } catch (error) {
     console.error(`Error fetching institute with ID :`, error);
+  }}
 
 export const careers= async () => {
   try {
