@@ -5,7 +5,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CustomButton from '../Ui components/CustomButton';
 
-const Faqs = () => {
+const Faqs = ({id}) => {
   const faqs = [
     { question: "What is the college admission process?", answer: "The admission process involves filling out an online application, submitting transcripts, and completing an entrance exam." },
     { question: "Is there an entrance exam for this college?", answer: "Yes, the college conducts an entrance exam for specific courses. Make sure to check the course requirements." },
@@ -23,23 +23,16 @@ const Faqs = () => {
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4">
-     {/* <div className='mb-8 w-full rounded-xl bg-[#FAFAFA] shadow-md p-3'>
-      <h4 className="font-medium text-md opacity-75 mb-1">Need guidance on career and education? Ask our experts</h4>
-      <input type="text" name="question" id="question" placeholder='Type your Question' className='py-2 px-3 text-md border-2 border-opacity-55 rounded-xl w-full' />
-      <div className='flex justify-end mt-2'>
-        <CustomButton text='Submit' className='!font-medium'/>
-      </div>
-    </div> */}
       <div className='mb-8 flex items-center justify-between'>
         <div>
-        <h3 className="text-xl font-bold">Questions & Answer</h3>
-        <h4 className="font-semibold opacity-75">({faqs.length} Questions)</h4>
+          <h3 className="text-xl font-bold">Questions & Answers</h3>
+          <h4 className="font-semibold opacity-75">({faqs.length} Questions)</h4>
         </div>
         <CustomButton
-            text='Ask our experts'
-            className="!bg-red-500 !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg"
-            to="/questionandAnswer"
-          />
+          text='Ask our experts'
+          className="!bg-red-500 !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg"
+          to={`/questionandAnswer/${id}`}
+        />
       </div>
 
       <div

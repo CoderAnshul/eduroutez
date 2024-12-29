@@ -199,10 +199,7 @@ const Instituepage = () => {
     return <div>Error: {error.message}</div>; // Show error if request fails
   }
 
-  
-
-
-
+// console.log('hi',instituteData?.data?._id);
   return (
     <>
         <div className='px-[4vw] py-[2vw] flex flex-col items-start'>
@@ -242,7 +239,7 @@ const Instituepage = () => {
                           <RecruitersSlider/>
                       </div>
                       <div ref={sectionRefs[7]} className="min-h-24 py-4">
-                          <Faqs/>
+                          <Faqs id={instituteData?.data?._id}/>
                       </div>
                       {/* <div ref={sectionRefs[3]} className="min-h-screen p-4 bg-gray-50">
                           <Placements />

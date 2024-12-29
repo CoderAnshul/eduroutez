@@ -1,10 +1,14 @@
+import { useParams } from 'react-router-dom';
 import React, { useState } from 'react';
+import { postQuestion } from '../ApiFunctions/api';
+import { useMutation } from 'react-query';
+import axiosInstance from '../ApiFunctions/axios';
 
 const QuestionandAnswer = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [expandedQuestion, setExpandedQuestion] = useState(null); // Track which question is expanded
-
+  const apiUrl = import.meta.env.VITE_BASE_URL;
   // Static array of options for Select Your Interest
   const options = [
     'Computer Science',
@@ -73,7 +77,52 @@ const QuestionandAnswer = () => {
     console.log(`Answering question ${questionId}`);
   };
 
+  const [form, setForm] = useState({});
+
+  const handleChange = (e) => {
+    setForm({...form, [e.target.name]: e.target.value})
+  };
+  const { id } = useParams();
+  console.log('hiii', id);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const updatedForm = { ...form, instituteId: id,askedBy:localStorage.getItem('email') };
+      console.log(updatedForm);
+      mutate(updatedForm);
+    } catch (error) {
+      alert('some error occured!!');
+    }
+  }
+
+  const { mutate, isPending: isSubmitting } = useMutation({
+    mutationFn: async (formData) => {
+      const endpoint =`${apiUrl}//question-answer`;
+      const response = await axiosInstance({
+        url: `${endpoint}`,
+        method:'post',
+        data: formData,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    },
+
+    onSuccess: () => {
+      alert('Question submitted successfully!');
+      document.getElementById('questionForm').reset();
+      // setPreviewUrl(null);
+      // router.push('/dashboard/counselor');
+    },
+    onError: () => {
+      alert('Something went wrong');
+    }
+  });
+  
+
   return (
+
     <div className="flex flex-col lg:flex-row gap-4 p-4 relative">
       {/* Toggle Button for Sidebar (Small Screens) */}
       <div className="block lg:hidden mb-4">
@@ -157,7 +206,7 @@ const QuestionandAnswer = () => {
       {/* Main Content */}
       <main className="w-full lg:w-1/2 relative">
         {/* Search Section */}
-        <div className="mb-6 bg-white shadow-lg rounded-lg p-4">
+        <form id="questionForm" className="mb-6 bg-white shadow-lg rounded-lg p-4" onSubmit={handleSubmit}>
           <h2 className="text-lg font-semibold mb-2">
             Need guidance on career and education? Ask our experts
           </h2>
@@ -165,17 +214,17 @@ const QuestionandAnswer = () => {
             <div className="flex flex-col gap-2 mb-4">
               <input
                 type="text"
+                name='question'
                 placeholder="Type Your Question"
                 className="flex-1 px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+                onChange={handleChange}
               />
 
               {/* ------ changes should be done here --------- */}
               <div className="flex flex-col gap-2 mb-4">
-                <select
+                <select name="label"
                   className="flex-1 px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-                  onChange={(event) => {
-                    document.getElementById('selectedQuestionInput').value = event.target.value;
-                  }}
+                  onChange={handleChange}
                 >
                   <option value="" disabled selected>
                     Select an option
@@ -186,11 +235,9 @@ const QuestionandAnswer = () => {
                     </option>
                   ))}
                 </select>
-                <select
+                <select name="grade"
                   className="flex-1 px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-                  onChange={(event) => {
-                    document.getElementById('selectedQuestionInput').value = event.target.value;
-                  }}
+                  onChange={handleChange}
                 >
                   <option value="" disabled selected>
                     Select Education Level
@@ -204,11 +251,11 @@ const QuestionandAnswer = () => {
               </div>
               {/* ------ changes should be done here --------- */}
             </div>
-            <button className="px-4 py-2 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600">
+            <button type="submit" className="px-4 py-2 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600">
               Submit
             </button>
           </div>
-        </div>
+        </form>
 
         {/* Question and Answer Section */}
         <div className="space-y-4 max-h-[470px] overflow-y-scroll scrollbar-thumb-red">

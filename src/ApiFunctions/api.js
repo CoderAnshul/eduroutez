@@ -108,7 +108,17 @@ export const createQuery= async (formData) => {
     return response.data;
   } catch (error) {
     console.error(`Error fetching institute with ID :`, error);
-  }}
+  }
+}
+
+export const postQuestion= async (formData) => {
+  try {
+    const response = await axios.post(`${baseURL}/question-answer`, formData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching institute with ID :`, error);
+  }
+}
 
 export const careers= async () => {
   try {
