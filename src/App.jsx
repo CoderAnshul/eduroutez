@@ -1,12 +1,22 @@
 import React, { Suspense } from 'react';
-import {Route, Routes, BrowserRouter } from 'react-router-dom';
+import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import ScrollToTop from './Utilities/ScrollToTop';
 import Loader from './Components/Loader';
 import BecomeCouseller from './Pages/BecomeCouseller';
+
 import Counselling from './Pages/counselling';
 
+import DashboardLayout from './Layout/DashboardLayout'; // Import the dashboard layout
+import Dashboard from './Pages/Dashboard'; // Dashboard page
+import ProfilePage from './Pages/ProfilePage';
+import StudentDocument from './Pages/StudentDocument';
+import CounselorListPage from './Pages/CounselorListPage';
+import SettingsPage from './Pages/SettingsPage';
+
+
+// Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
 const Instituepage = React.lazy(() => import('./Pages/Instituepage'));
@@ -25,16 +35,14 @@ const Signup = React.lazy(() => import('./Pages/Signup'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
 const counselling = React.lazy(() => import('./Pages/counselling'));
 
-
-
-
 const App = () => {
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <BrowserRouter>
       <ScrollToTop />
       <Navbar />
       <Suspense fallback={<Loader />}>
         <Routes>
+          {/* Existing Routes */}
           <Route path="/" element={<Homepage />} />
           <Route path="*" element={<PageNotFound />} />
           <Route path="/institute/:id" element={<Instituepage />} />
@@ -53,6 +61,15 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<Forgotpassword />} />
           <Route path="/become-couseller" element={<BecomeCouseller />} />
+
+          {/* Dashboard Routes */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} /> 
+            <Route path="profile-page" element={<ProfilePage />} />
+            <Route path="documents" element={<StudentDocument />} />
+            <Route path="counselor" element={<CounselorListPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
         </Routes>
       </Suspense>
       <Footer />
