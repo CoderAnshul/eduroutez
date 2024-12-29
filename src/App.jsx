@@ -5,6 +5,7 @@ import Footer from './Components/Footer';
 import ScrollToTop from './Utilities/ScrollToTop';
 import Loader from './Components/Loader';
 import BecomeCouseller from './Pages/BecomeCouseller';
+import Counselling from './Pages/counselling';
 
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -22,6 +23,7 @@ const Writereview = React.lazy(() => import('./Pages/Writereview'));
 const Login = React.lazy(() => import('./Pages/Login'));
 const Signup = React.lazy(() => import('./Pages/Signup'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
+const counselling = React.lazy(() => import('./Pages/counselling'));
 
 
 
@@ -42,7 +44,8 @@ const App = () => {
           <Route path="/contactuspage" element={<Contactuspage />} />
           <Route path="/aboutus" element={<Aboutus />} />
           <Route path="/counselingpage" element={<Counselingpage />} />
-          <Route path="/questionandAnswer/:id" element={<QuestionandAnswer />} />
+          <Route path="/questionandAnswer/:email" element={<QuestionandAnswer />} />
+          <Route path="/counselling/:email" element={<Counselling />} />
           <Route path="/careerspage" element={<Careerspage />} />
           <Route path="/detailpage" element={<Detailpage />} />
           <Route path="/writereview" element={<Writereview />} />

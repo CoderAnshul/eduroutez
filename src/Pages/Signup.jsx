@@ -53,6 +53,10 @@ const Signup = () => {
         'refreshToken',
         JSON.stringify(data.data.refreshToken)
       );
+      localStorage.setItem(
+        "email",
+        JSON.stringify(formData?.email)
+      )
       navigate('/');
     },
     onError: (error) => {
