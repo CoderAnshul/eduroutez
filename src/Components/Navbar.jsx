@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { Link, useLocation } from 'react-router-dom';
 import logo from '../assets/Images/logo.png';
 import searchImg from '../assets/Images/searchLogo.png';
 import edit from '../assets/Images/editBtn.png';
@@ -11,9 +11,10 @@ import SecondMenu from './SubNavbar';
 import MobileNavbar from './MobileNavbar';
 import categories from '../DataFiles/categories';
 
-
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // For hover menu
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -31,55 +32,121 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
+  if (location.pathname.startsWith('/dashboard')) {
+    return null;
+  }
+
   return (
     <>
-      <div className='sticky top-0 z-[999] bg-white'>
-        <div className='h-16 w-full p-5 flex items-center justify-between '>
+      <div className="sticky top-0 z-[999] bg-white">
+        <div className="h-16 w-full p-5 flex items-center justify-between">
           <Link to="/">
-            <img className='h-6 md:h-8' src={logo} alt="mainLogo" />
+            <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
           </Link>
 
           <div className="search ml-5 bg-white border-[1.5px] border-gray-500 px-4 py-2 rounded-lg items-center gap-2 w-[40%] overflow-hidden hidden sm:flex">
             <button>
-              <img className='hover:scale-105 transition-all' src={searchImg} alt="search" />
+              <img
+                className="hover:scale-105 transition-all"
+                src={searchImg}
+                alt="search"
+              />
             </button>
             <input
-              className='text-sm w-full'
+              className="text-sm w-full"
               type="text"
               name="search"
               id="search"
-              placeholder='Search for Colleges, Institutes, and more...'
+              placeholder="Search for Colleges, Institutes, and more..."
             />
           </div>
 
-          <div className='CustomFlex gap-3 opacity-80'>
-            <Link to="/writereview" className='CustomFlex gap-1 group hover:text-red-500 hover:scale-95 transform transition-all font-medium cursor-pointer text-sm hidden lg:flex'>
+          <div className="CustomFlex gap-3 opacity-80">
+            <Link
+              to="/writereview"
+              className="CustomFlex gap-1 group hover:text-red-500 hover:scale-95 transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
+            >
               <button>
-                <img className='h-4 group-hover:rotate-[360deg] transition-all' src={edit} alt="editBtn" />
+                <img
+                  className="h-4 group-hover:rotate-[360deg] transition-all"
+                  src={edit}
+                  alt="editBtn"
+                />
               </button>
               <h4>Write a Review</h4>
             </Link>
 
-            <Link to="/searchpage" className='CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex'>
-              <img className='h-4 group-hover:rotate-180 transition-all' src={explore} alt="exploreBtn" />
+            <Link
+              to="/searchpage"
+              className="CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
+            >
+              <img
+                className="h-4 group-hover:rotate-180 transition-all"
+                src={explore}
+                alt="exploreBtn"
+              />
               <span>Explore</span>
             </Link>
-
-            <button
-              onClick={toggleMenu}
-              className='CustomFlex gap-1 font-medium cursor-pointer text-sm md:hidden'
+            <Link
+              to="/login"
+              className="CustomFlex gap-1 bg-red-500 px-4 py-2 rounded-sm text-white text-xs  hover:scale-95 group transform transition-all font-medium cursor-pointer"
             >
-              <img className='h-6' src={menubar} alt="menu" />
-            </button>
+              <span>LOGIN</span>
+            </Link>
 
-            <div className='CustomFlex relative gap-1 font-medium cursor-pointer text-sm'>
-              <span className='bg-red-500 h-2 w-2 rounded-full absolute top-0 right-0'></span>
-              <img className='h-5' src={notification} alt="notification" />
-            </div>
+            {/* <div className="CustomFlex relative gap-1 font-medium cursor-pointer text-sm">
+              <span className="bg-red-500 h-2 w-2 rounded-full absolute top-0 right-0"></span>
+              <img className="h-5" src={notification} alt="notification" />
+            </div> */}
 
-            <div className='CustomFlex relative gap-1 font-medium  text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl'>
-              <img className='h-3 opacity-75 cursor-pointer' src={menu} alt="menu" />
-              <Link to='/login' className='bg-gray-500 cursor-pointer hover:scale-105 transition-all h-5 w-5 rounded-full'></Link>
+            {/* Menu with hover functionality */}
+            <div
+              className="relative"
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}
+            >
+              <div className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer">
+                <img
+                  className="h-3 opacity-75"
+                  src={menu}
+                  alt="menu"
+                />
+                <Link
+                  to="/"
+                  className="secondMenu bg-gray-500 hover:scale-105 transition-all h-5 w-5 rounded-full"
+                ></Link>
+              </div>
+
+              {/* Dropdown menu */}
+              {isDropdownOpen && (
+                <div className="absolute z-[1000] right-0 top-[34px] w-48 bg-gray-50 backdrop-blur-sm border transition-all border-gray-300 rounded-lg shadow-lg">
+                  <Link
+                    to="/dashboard/profile-page"
+                    className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/dashboard/settings"
+                    className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                  >
+                    Settings
+                  </Link>
+                  <Link
+                    to="/dashboard/"
+                    className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => console.log('Logout clicked')}
+                    className="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+
             </div>
           </div>
         </div>
@@ -96,36 +163,44 @@ const Navbar = () => {
             isMenuOpen ? 'translate-x-0' : '-translate-x-full'
           } transition-transform duration-300`}
         >
+          <div className="flex items-center justify-between">
+            <Link to="/">
+              <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
+            </Link>
 
-          <div className='flex items-center justify-between'>
-              <Link to="/">
-                <img className='h-6 md:h-8' src={logo} alt="mainLogo" />
-              </Link>
-
-              <button
-                onClick={toggleMenu}
-                className="  text-white font-semibold hover:font-semibold text-md px-2  rounded-full hover:bg-red-200 transition-all bg-red-500 hover:text-red-800"
-              >
-                X
-              </button>
+            <button
+              onClick={toggleMenu}
+              className="text-white font-semibold hover:font-semibold text-md px-2 rounded-full hover:bg-red-200 transition-all bg-red-500 hover:text-red-800"
+            >
+              X
+            </button>
           </div>
-          
-          
-          
-          <ul className="mt-12  space-y-4">
-            
-            <li><Link to="/" onClick={toggleMenu}>Home</Link></li>
-            <li><Link to="/searchpage" onClick={toggleMenu}>Explore</Link></li>
-            <li><Link to="/writereview" onClick={toggleMenu}>Write a Review</Link></li>
-            <div className='md:hidden overflow-y-scroll scrollbar-thumb-transparent'>
-              <MobileNavbar categories={categories}/>
+
+          <ul className="mt-12 space-y-4">
+            <li>
+              <Link to="/" onClick={toggleMenu}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/searchpage" onClick={toggleMenu}>
+                Explore
+              </Link>
+            </li>
+            <li>
+              <Link to="/writereview" onClick={toggleMenu}>
+                Write a Review
+              </Link>
+            </li>
+            <div className="md:hidden overflow-y-scroll scrollbar-thumb-transparent">
+              <MobileNavbar categories={categories} />
             </div>
           </ul>
         </div>
       </div>
 
-      <div className='hidden md:flex'>
-      <SecondMenu categories={categories}/>
+      <div className="hidden md:flex">
+        <SecondMenu categories={categories} />
       </div>
     </>
   );
