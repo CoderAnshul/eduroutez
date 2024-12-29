@@ -1,15 +1,79 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { useMutation } from "react-query";
+import axiosInstance from "../ApiFunctions/axios";
+import { useNavigate } from 'react-router-dom';
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
-import { Link } from "react-router-dom";
 
 const Signup = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    contact_number: "",
+    city: "",
+    state: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+  
+  const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+  const mutation = useMutation({
+    mutationFn: async (credentials) => {
+      try {
+        const response = await axiosInstance.post(
+          `${apiUrl}/signup`,
+          credentials,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        return response.data;
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || "Failed to sign up";
+        throw new Error(errorMessage);
+      }
+    },
+    onSuccess: (data) => {
+      alert("Signed Up Successfully! You can now log in.");
+      localStorage.setItem(
+        'accessToken',
+        JSON.stringify(data.data.accessToken)
+      );
+      localStorage.setItem(
+        'refreshToken',
+        JSON.stringify(data.data.refreshToken)
+      );
+      navigate('/');
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+
+  const handleSubmit = () => {
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    const { confirmPassword, ...signupData } = formData;
+    mutation.mutate(signupData);
+  };
+
   return (
     <div className="flex h-screen">
       {/* Left Section */}
       <div className="w-1/2 bg-red-700 hidden text-white sm:flex flex-col justify-center items-center px-10">
-        <h1 className="text-4xl lg:text-[45px] lg:font-semibold font-bold mb-4  w-11/12 text-start">
+        <h1 className="text-4xl lg:text-[45px] lg:font-semibold font-bold mb-4 w-11/12 text-start">
           Join Us
         </h1>
         <p className="text-lg mb-6 w-11/12">
@@ -23,108 +87,46 @@ const Signup = () => {
       </div>
 
       {/* Right Section */}
-      <div className="w-full sm:w-1/2 flex py-10 md:py-4 scrollbar-thumb-transparent flex-col justify-start overflow-y-scroll items-center px-10">
+      <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-start overflow-y-scroll items-center px-10">
         <h1 className="text-[50px] font-bold text-start opacity-80 leading-[50px]">Register Now</h1>
         <p className="text-gray-500 mb-8">
           Please fill in the form to create an account
         </p>
-        <form className="w-full max-w-sm">
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1" htmlFor="name">
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              placeholder="Enter your full name"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1" htmlFor="email">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1" htmlFor="phone">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              placeholder="Enter your phone number"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1" htmlFor="city">
-              City
-            </label>
-            <input
-              type="text"
-              id="city"
-              placeholder="Enter your city"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1" htmlFor="state">
-              State
-            </label>
-            <select
-              id="state"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              <option value="">Select your state</option>
-              <option value="maharashtra">Maharashtra</option>
-              <option value="delhi">Delhi</option>
-              <option value="karnataka">Karnataka</option>
-              {/* Add more states as needed */}
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1" htmlFor="password">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Create a password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              className="block text-sm font-medium mb-1"
-              htmlFor="confirmPassword"
-            >
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              placeholder="Confirm your password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
+        <form className="w-full max-w-sm" onSubmit={(e) => e.preventDefault()}>
+          {[
+            { label: "Full Name", id: "name", type: "text", placeholder: "Enter your full name" },
+            { label: "Email", id: "email", type: "email", placeholder: "Enter your email" },
+            { label: "Phone Number", id: "contact_number", type: "tel", placeholder: "Enter your phone number" },
+            { label: "City", id: "city", type: "text", placeholder: "Enter your city" },
+            { label: "State", id: "state", type: "text", placeholder: "Enter your state" },
+            { label: "Password", id: "password", type: "password", placeholder: "Create a password" },
+            { label: "Confirm Password", id: "confirmPassword", type: "password", placeholder: "Confirm your password" },
+          ].map((field) => (
+            <div className="mb-4" key={field.id}>
+              <label className="block text-sm font-medium mb-1" htmlFor={field.id}>
+                {field.label}
+              </label>
+              <input
+                type={field.type}
+                id={field.id}
+                placeholder={field.placeholder}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                value={formData[field.id] || ""}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
           <button
-            type="submit"
+            type="button"
             className="w-full bg-red-700 text-white py-2 rounded-lg font-semibold hover:bg-red-800"
+            onClick={handleSubmit}
           >
             Sign Up
           </button>
         </form>
         <div className="my-6 flex items-center">
           <span className="w-1/2 h-px bg-gray-300"></span>
-          <span className="mx-2 text-gray-500 whitespace-nowrap text-sm">
-            Or Sign Up with
-          </span>
+          <span className="mx-2 text-gray-500 whitespace-nowrap text-sm">Or Sign Up with</span>
           <span className="w-1/2 h-px bg-gray-300"></span>
         </div>
         <div className="flex justify-center gap-4">
@@ -136,8 +138,8 @@ const Signup = () => {
           </button>
         </div>
         <p className="text-sm text-gray-500 mt-6">
-          Already have an account?{" "}
-          <Link to='/login' className="text-red-500 font-medium hover:underline">
+          Already have an account?{' '}
+          <Link to="/login" className="text-red-500 font-medium hover:underline">
             Log in
           </Link>
         </p>
