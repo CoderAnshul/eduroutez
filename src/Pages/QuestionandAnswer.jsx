@@ -82,12 +82,12 @@ const QuestionandAnswer = () => {
   const handleChange = (e) => {
     setForm({...form, [e.target.name]: e.target.value})
   };
-  const { id } = useParams();
-  console.log('hiii', id);
+  const { email } = useParams();
+  console.log('hiii', email);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updatedForm = { ...form, instituteId: id,askedBy:localStorage.getItem('email') };
+      const updatedForm = { ...form, instituteEmail: email, askedBy: localStorage.getItem('email')?.replace(/^"|"$/g, '') };
       console.log(updatedForm);
       mutate(updatedForm);
     } catch (error) {

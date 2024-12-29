@@ -5,12 +5,16 @@ import Footer from './Components/Footer';
 import ScrollToTop from './Utilities/ScrollToTop';
 import Loader from './Components/Loader';
 import BecomeCouseller from './Pages/BecomeCouseller';
+
+import Counselling from './Pages/counselling';
+
 import DashboardLayout from './Layout/DashboardLayout'; // Import the dashboard layout
 import Dashboard from './Pages/Dashboard'; // Dashboard page
 import ProfilePage from './Pages/ProfilePage';
 import StudentDocument from './Pages/StudentDocument';
 import CounselorListPage from './Pages/CounselorListPage';
 import SettingsPage from './Pages/SettingsPage';
+
 
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
@@ -29,6 +33,7 @@ const Writereview = React.lazy(() => import('./Pages/Writereview'));
 const Login = React.lazy(() => import('./Pages/Login'));
 const Signup = React.lazy(() => import('./Pages/Signup'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
+const counselling = React.lazy(() => import('./Pages/counselling'));
 
 const App = () => {
   return (
@@ -47,7 +52,8 @@ const App = () => {
           <Route path="/contactuspage" element={<Contactuspage />} />
           <Route path="/aboutus" element={<Aboutus />} />
           <Route path="/counselingpage" element={<Counselingpage />} />
-          <Route path="/questionandAnswer/:id" element={<QuestionandAnswer />} />
+          <Route path="/questionandAnswer/:email" element={<QuestionandAnswer />} />
+          <Route path="/counselling/:email" element={<Counselling />} />
           <Route path="/careerspage" element={<Careerspage />} />
           <Route path="/detailpage" element={<Detailpage />} />
           <Route path="/writereview" element={<Writereview />} />

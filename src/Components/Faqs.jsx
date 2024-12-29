@@ -5,7 +5,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CustomButton from '../Ui components/CustomButton';
 
-const Faqs = ({id}) => {
+const Faqs = ({email}) => {
   const faqs = [
     { question: "What is the college admission process?", answer: "The admission process involves filling out an online application, submitting transcripts, and completing an entrance exam." },
     { question: "Is there an entrance exam for this college?", answer: "Yes, the college conducts an entrance exam for specific courses. Make sure to check the course requirements." },
@@ -31,7 +31,7 @@ const Faqs = ({id}) => {
         <CustomButton
           text='Ask our experts'
           className="!bg-red-500 !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg"
-          to={`/questionandAnswer/${id}`}
+          to={`/questionandAnswer/${email}`}
         />
       </div>
 
