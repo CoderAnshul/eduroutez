@@ -97,7 +97,7 @@ const QuestionandAnswer = () => {
 
   const { mutate, isPending: isSubmitting } = useMutation({
     mutationFn: async (formData) => {
-      const endpoint =`${apiUrl}//question-answer`;
+      const endpoint =`${apiUrl}/question-answer`;
       const response = await axiosInstance({
         url: `${endpoint}`,
         method:'post',
