@@ -1,29 +1,64 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import detail from "../assets/Images/detail.png";
+import { useParams } from "react-router-dom";
+import { CarrerDetail } from "../ApiFunctions/api";
 
 const Detailpage = () => {
-  // State to track the active tab
+  // State to manage data and active tab
+  const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
 
-  // Create refs for each section
-  const overviewRef = useRef(null);
-  const eligibilityRef = useRef(null);
-  const jobsRolesRef = useRef(null);
-  const careerOpportunityRef = useRef(null);
-  const topCollegesRef = useRef(null);
+  const { id } = useParams();
 
-  // Function to handle scroll and set active tab
-  const scrollToSection = (sectionRef, tabName) => {
-    setActiveTab(tabName); // Update active tab
-    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Refs for each section - initialized outside render
+  const refs = {
+    overview: useRef(null),
+    eligibility: useRef(null),
+    jobsRoles: useRef(null),
+    careerOpportunity: useRef(null),
+    topColleges: useRef(null),
   };
 
+  useEffect(() => {
+    const fetchCareer = async () => {
+      try {
+        const response = await CarrerDetail(id);
+        console.log("API Response:", response.data);
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching career:", error);
+      }
+    };
+
+    fetchCareer();
+  }, [id]);
+
+  // Scroll to section and set active tab
+  const scrollToSection = (sectionRef, tabName) => {
+    setActiveTab(tabName);
+    sectionRef?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
+  // Define the tabs with corresponding refs
   const tabs = [
-    { name: "Overview", ref: overviewRef },
-    { name: "Eligibility", ref: eligibilityRef },
-    { name: "Jobs Roles", ref: jobsRolesRef },
-    { name: "Career Opportunity", ref: careerOpportunityRef },
-    { name: "Top Colleges", ref: topCollegesRef },
+    { name: "Overview", ref: refs.overview },
+    { name: "Eligibility", ref: refs.eligibility },
+    { name: "Jobs Roles", ref: refs.jobsRoles },
+    { name: "Career Opportunity", ref: refs.careerOpportunity },
+    { name: "Top Colleges", ref: refs.topColleges },
+  ];
+
+  // Define the sections with corresponding ids and content
+  const sections = [
+    { id: "overview", title: "Overview", content: data.description, type: "html" },
+    { id: "eligibility", title: "Eligibility", content: data.eligibility || [], type: "list" },
+    { id: "jobsRoles", title: "Jobs Roles", content: data.jobsRoles || [], type: "list" },
+    { id: "careerOpportunity", title: "Career Opportunity", content: data.careerOpportunity || [], type: "list" },
+    { id: "topColleges", title: "Top Colleges", content: data.topColleges || [], type: "list" },
   ];
 
   return (
@@ -32,25 +67,24 @@ const Detailpage = () => {
       <div className="h-80 w-full rounded-md">
         <img
           className="h-full w-full object-cover"
-          src={detail}
+          src={`http://localhost:4001/uploads/${data.image}`}
           alt="bannerdetailimg"
         />
       </div>
 
       {/* Tabs */}
       <div className="w-full md:px-4 py-6 sticky top-0 bg-white z-100">
-        <h1 className="text-2xl font-bold mb-4">Digital Marketing Course</h1>
+        <h1 className="text-2xl font-bold mb-4">{data.title || "Career Details"}</h1>
         <div className="w-full overflow-x-auto">
           <div className="border-2 rounded-lg border-gray-300">
             <ul className="flex justify-evenly items-center whitespace-nowrap">
               {tabs.map((tab) => (
                 <li
                   key={tab.name}
-                  className={`cursor-pointer  px-8 py-2 text-sm font-medium 
-                    ${
-                      activeTab === tab.name
-                        ? "bg-red-600 py-2 rounded-full m-1 px-4 text-white border-red-600"
-                        : "text-gray-700 hover:text-black"
+                  className={`cursor-pointer px-8 py-2 text-sm font-medium 
+                    ${activeTab === tab.name
+                      ? "bg-red-600 py-2 rounded-full m-1 px-4 text-white border-red-600"
+                      : "text-gray-700 hover:text-black"
                     }`}
                   onClick={() => scrollToSection(tab.ref, tab.name)}
                 >
@@ -62,241 +96,33 @@ const Detailpage = () => {
         </div>
       </div>
 
-
-
       {/* Sections */}
       <div className="mt-10 space-y-10">
-        <div ref={overviewRef}>
-          <h3 className="text-lg font-semibold mb-2">Overview</h3>
-          <p className="text-gray-700">
-            Digital Marketing refers to the use of digital channels, such as
-            search engines, social media platforms, email, websites, and mobile
-            apps, to promote products, services, or brands. It encompasses a
-            wide range of strategies and techniques, including search engine
-            optimization (SEO), content marketing, social media marketing,
-            pay-per-click (PPC) advertising, and email campaigns. Unlike
-            traditional marketing, digital marketing allows businesses to target
-            specific audiences with precision, track performance metrics in real
-            time, and adjust campaigns for better results. It has become an
-            essential tool for businesses in the modern era, enabling them to
-            engage with a global audience, build strong brand awareness, and
-            drive measurable growth in an increasingly digital-first world.
-          </p>
-        </div>
-
-        <div ref={eligibilityRef}>
-          <h3 className="text-lg font-semibold mb-2">
-            Eligibility to Become a Doctor
-          </h3>
-          <ul className="list-disc list-inside space-y-2 text-gray-800">
-            <li>
-              <span className="font-medium">Educational Qualifications:</span> A
-              bachelor’s degree in any field is typically enough to enter digital
-              marketing, though degrees in Marketing, Business Administration,
-              Mass Communication, or IT are beneficial.
-            </li>
-            <li>
-              <span className="font-medium">
-                Specialized Digital Marketing Courses:
-              </span>{" "}
-              Many institutes offer digital marketing certifications and diploma
-              courses that cover various aspects of the field. Common
-              certifications include Google Analytics, Google Ads, HubSpot
-              Content Marketing, and Facebook Blueprint.
-            </li>
-            <li>
-              <span className="font-medium">Skills Needed:</span>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>
-                  <span className="font-medium">
-                    Analytical and Technical Skills:
-                  </span>{" "}
-                  Proficiency in using tools like Google Analytics, SEMrush, Moz,
-                  and social media analytics.
-                </li>
-                <li>
-                  <span className="font-medium">SEO and SEM Knowledge:</span>{" "}
-                  Understanding of on-page and off-page SEO, keyword research,
-                  and search engine marketing.
-                </li>
-                <li>
-                  <span className="font-medium">Content Creation Skills:</span>{" "}
-                  Ability to create engaging content that resonates with target
-                  audiences.
-                </li>
-                <li>
-                  <span className="font-medium">Social Media Marketing:</span>{" "}
-                  Familiarity with platforms like Instagram, Facebook, LinkedIn,
-                  and YouTube for brand promotion.
-                </li>
-                <li>
-                  <span className="font-medium">Basic Coding and Design Skills:</span>{" "}
-                  Knowledge of HTML/CSS and tools like Canva or Adobe Creative
-                  Suite is advantageous.
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-
-        <div ref={jobsRolesRef}>
-          <h3 className="text-lg font-semibold mb-2">Types of job</h3>
-          <ul className="list-disc list-inside space-y-2 text-gray-800">
-            <li>
-              <span className="font-medium">Educational Qualifications:</span> A
-              bachelor’s degree in any field is typically enough to enter digital
-              marketing, though degrees in Marketing, Business Administration,
-              Mass Communication, or IT are beneficial.
-            </li>
-            <li>
-              <span className="font-medium">
-                Specialized Digital Marketing Courses:
-              </span>{" "}
-              Many institutes offer digital marketing certifications and diploma
-              courses that cover various aspects of the field. Common
-              certifications include Google Analytics, Google Ads, HubSpot
-              Content Marketing, and Facebook Blueprint.
-            </li>
-            <li>
-              <span className="font-medium">Skills Needed:</span>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>
-                  <span className="font-medium">
-                    Analytical and Technical Skills:
-                  </span>{" "}
-                  Proficiency in using tools like Google Analytics, SEMrush, Moz,
-                  and social media analytics.
-                </li>
-                <li>
-                  <span className="font-medium">SEO and SEM Knowledge:</span>{" "}
-                  Understanding of on-page and off-page SEO, keyword research,
-                  and search engine marketing.
-                </li>
-                <li>
-                  <span className="font-medium">Content Creation Skills:</span>{" "}
-                  Ability to create engaging content that resonates with target
-                  audiences.
-                </li>
-                <li>
-                  <span className="font-medium">Social Media Marketing:</span>{" "}
-                  Familiarity with platforms like Instagram, Facebook, LinkedIn,
-                  and YouTube for brand promotion.
-                </li>
-                <li>
-                  <span className="font-medium">Basic Coding and Design Skills:</span>{" "}
-                  Knowledge of HTML/CSS and tools like Canva or Adobe Creative
-                  Suite is advantageous.
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-
-        <div ref={careerOpportunityRef}>
-          <h3 className="text-lg font-semibold mb-2">Career Opportunity</h3>
-          <ul className="list-disc list-inside space-y-2 text-gray-800">
-            <li>
-              <span className="font-medium">Educational Qualifications:</span> A
-              bachelor’s degree in any field is typically enough to enter digital
-              marketing, though degrees in Marketing, Business Administration,
-              Mass Communication, or IT are beneficial.
-            </li>
-            <li>
-              <span className="font-medium">
-                Specialized Digital Marketing Courses:
-              </span>{" "}
-              Many institutes offer digital marketing certifications and diploma
-              courses that cover various aspects of the field. Common
-              certifications include Google Analytics, Google Ads, HubSpot
-              Content Marketing, and Facebook Blueprint.
-            </li>
-            <li>
-              <span className="font-medium">Skills Needed:</span>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>
-                  <span className="font-medium">
-                    Analytical and Technical Skills:
-                  </span>{" "}
-                  Proficiency in using tools like Google Analytics, SEMrush, Moz,
-                  and social media analytics.
-                </li>
-                <li>
-                  <span className="font-medium">SEO and SEM Knowledge:</span>{" "}
-                  Understanding of on-page and off-page SEO, keyword research,
-                  and search engine marketing.
-                </li>
-                <li>
-                  <span className="font-medium">Content Creation Skills:</span>{" "}
-                  Ability to create engaging content that resonates with target
-                  audiences.
-                </li>
-                <li>
-                  <span className="font-medium">Social Media Marketing:</span>{" "}
-                  Familiarity with platforms like Instagram, Facebook, LinkedIn,
-                  and YouTube for brand promotion.
-                </li>
-                <li>
-                  <span className="font-medium">Basic Coding and Design Skills:</span>{" "}
-                  Knowledge of HTML/CSS and tools like Canva or Adobe Creative
-                  Suite is advantageous.
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-
-        <div ref={topCollegesRef}>
-          <h3 className="text-lg font-semibold mb-2">Top Colleges</h3>
-          <ul className="list-disc list-inside space-y-2 text-gray-800">
-            <li>
-              <span className="font-medium">Educational Qualifications:</span> A
-              bachelor’s degree in any field is typically enough to enter digital
-              marketing, though degrees in Marketing, Business Administration,
-              Mass Communication, or IT are beneficial.
-            </li>
-            <li>
-              <span className="font-medium">
-                Specialized Digital Marketing Courses:
-              </span>{" "}
-              Many institutes offer digital marketing certifications and diploma
-              courses that cover various aspects of the field. Common
-              certifications include Google Analytics, Google Ads, HubSpot
-              Content Marketing, and Facebook Blueprint.
-            </li>
-            <li>
-              <span className="font-medium">Skills Needed:</span>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>
-                  <span className="font-medium">
-                    Analytical and Technical Skills:
-                  </span>{" "}
-                  Proficiency in using tools like Google Analytics, SEMrush, Moz,
-                  and social media analytics.
-                </li>
-                <li>
-                  <span className="font-medium">SEO and SEM Knowledge:</span>{" "}
-                  Understanding of on-page and off-page SEO, keyword research,
-                  and search engine marketing.
-                </li>
-                <li>
-                  <span className="font-medium">Content Creation Skills:</span>{" "}
-                  Ability to create engaging content that resonates with target
-                  audiences.
-                </li>
-                <li>
-                  <span className="font-medium">Social Media Marketing:</span>{" "}
-                  Familiarity with platforms like Instagram, Facebook, LinkedIn,
-                  and YouTube for brand promotion.
-                </li>
-                <li>
-                  <span className="font-medium">Basic Coding and Design Skills:</span>{" "}
-                  Knowledge of HTML/CSS and tools like Canva or Adobe Creative
-                  Suite is advantageous.
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
+        {sections.map((section) => {
+          return (
+            <div ref={refs[section.id]} key={section.id}>
+              <h3 className="text-lg font-semibold mb-2">{section.title}</h3>
+              {section.type === "list" ? (
+                // Check if content is an array before using .map()
+                Array.isArray(section.content) ? (
+                  <ul className="list-disc list-inside space-y-2 text-gray-800">
+                    {section.content.map((item, idx) => (
+                      <li key={idx} dangerouslySetInnerHTML={{ __html: item }} />
+                    ))}
+                  </ul>
+                ) : <p
+                className="text-gray-700"
+                dangerouslySetInnerHTML={{ __html: section.content }}
+              />
+              ) : (
+                <p
+                  className="text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: section.content }}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -24,6 +24,27 @@ export const getInstitutes = async (state = null, city = null, organisationType 
   }
 };
 
+export const blogById= async (id) => {
+  try {
+    const response = await axios.get(`${baseURL}/blog/${id}`);
+    return response.data;
+  }
+  catch(error){
+    console.error(`Error fetching blog with ID :`, error);
+    throw error;
+  }
+}
+
+export const CarrerDetail= async (id) => {
+  try {
+    const response = await axios.get(`${baseURL}/career/${id}`);
+    return response.data;
+  }
+  catch(error){
+    console.error(`Error fetching blog with ID :`, error);
+    throw error;
+  }
+}
 
 export const getInstituteById = async (id) => {
   try {

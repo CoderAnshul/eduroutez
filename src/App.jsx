@@ -29,6 +29,7 @@ const Counselingpage = React.lazy(() => import('./Pages/Counselingpage'));
 const QuestionandAnswer = React.lazy(() => import('./Pages/QuestionandAnswer'));
 const Careerspage = React.lazy(() => import('./Pages/Careerspage'));
 const Detailpage = React.lazy(() => import('./Pages/Detailpage'));
+const BlogDetailPage= React.lazy(() => import('./Pages/BlogDetailPage'));
 const Writereview = React.lazy(() => import('./Pages/Writereview'));
 const Login = React.lazy(() => import('./Pages/Login'));
 const Signup = React.lazy(() => import('./Pages/Signup'));
@@ -55,7 +56,8 @@ const App = () => {
           <Route path="/questionandAnswer/:email" element={<QuestionandAnswer />} />
           <Route path="/counselling/:email" element={<Counselling />} />
           <Route path="/careerspage" element={<Careerspage />} />
-          <Route path="/detailpage" element={<Detailpage />} />
+          <Route path="/blogdetailpage/:id" element={<BlogDetailPage />} />
+          <Route path="/detailpage/:id" element={<Detailpage />} />
           <Route path="/writereview" element={<Writereview />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import EditProfile from '../Components/DashboardComponent/EditProfile';
 import Security from '../Components/DashboardComponent/Security';
 import BankDetails from '../Components/DashboardComponent/BankDetails';
+import EducationalDetail from '../Components/DashboardComponent/EducationalDetail';
+
 
 
 const SettingsPage = () => {
@@ -103,7 +105,7 @@ const SettingsPage = () => {
 const EditProfileSection = () => <div><EditProfile/></div>;
 const SecuritySection = () => <div><Security/></div>;
 const BankDetailsSection = () => <div><BankDetails/></div>;
-const EducationsSection = () => <div>Educations Content</div>;
+const EducationsSection = () => <div><EducationalDetail></EducationalDetail></div>;
 const ExperiencesSection = () => <div>Experiences Content</div>;
 const SkillsExpertiseSection = () => <div>Skills & Expertise Content</div>;
 

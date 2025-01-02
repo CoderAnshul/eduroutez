@@ -26,17 +26,19 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
               {blog.title}
             </h3>
             <p className="text-sm text-gray-600 mt-2">
-              {blog.description}
-            </p>
+  {blog.description.split(" ").slice(0, 30).join(" ")}
+  {blog.description.split(" ").length > 30 && "........"}
+</p>
+
             <div className="inline-block !mx-auto !mt-2">
-              <CustomButton text="Read More" to={`/detailpage/${blog._id}`} />
+              <CustomButton text="Read More" to={`/blogdetailpage/${blog._id}`} />
             </div>
           </div>
         </div>
       ))}
 
       {/* Render boxData if any */}
-      {boxData.map((box, index) => (
+    { /** } {boxData.map((box, index) => (
         <div
           key={index}
           className="max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
@@ -63,6 +65,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
           </div>
         </div>
       ))}
+        **/}
     </div>
   );
 };

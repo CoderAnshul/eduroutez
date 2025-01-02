@@ -21,11 +21,8 @@ const SearchPage = () => {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [contentVisibility, setContentVisibility] = useState({});
-  // const [city, setCity] = useState("");
-  // const [state, setState] = useState("");
-  // const [organisationType, setOrganisationType] = useState("");
-  const [title, settitle] = useState(null)
-  const [value, setvalue] = useState(null)
+  const [title, settitle] = useState(null);
+  const [value, setvalue] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -38,29 +35,39 @@ const SearchPage = () => {
       enabled:true,
     }
   );
-  console.log(data);
 
   const [content, setcontent] = useState([]);
   const [filteredContent, setfilteredContent] = useState([]);
 
   useEffect(() => {
-    const result=data?.data?.result;
-    setcontent(result);
-    setfilteredContent(result);
-  }, [data])
+    if (data) {
+      const result = data?.data?.result;
+      setcontent(result);
+      setfilteredContent(result);
+    }
+  }, [data]);
 
-  // useEffect(() => {
-  //   for(let i=0;i<content.length;i++){
-  //     filterSections[1].items.push(content[i]?.state);
-  //     //same for specialization
-  //   }
-  //   console.log(filterSections[1]);
-  // }, [content])
-  
-  
-  
+  useEffect(() => {
+    if (title && value && content.length > 0) {
+      const filteredArray = content.filter(item => {
+        const hasKey = item.hasOwnProperty(title);
+        if (hasKey) {
+          const fieldValue = item[title];
+          if (Array.isArray(fieldValue)) {
+            return fieldValue.includes(value);
+          } else {
+            return fieldValue === value;
+          }
+        }
+        return false;
+      });
+      setfilteredContent(filteredArray);
+    } else {
+      setfilteredContent(content);
+    }
+  }, [title, value, content]);
 
-  const toggleFilter = () => {                                             
+  const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen);
   };
 
@@ -96,7 +103,6 @@ const SearchPage = () => {
       content: `IIT Bombay offers diverse postgraduate programs, including M.Tech, MBA, MSc, and Ph.D. The admissions for M.Tech programs are primarily based on GATE (Graduate Aptitude Test in Engineering) scores, while MBA admissions are conducted through CAT (Common Admission Test). The institute is also renowned for its research opportunities, providing a world-class platform for innovation and exploration.`,
     },
   ];
-  
 
   const filterSections = [
     {
@@ -162,46 +168,6 @@ const SearchPage = () => {
     },
   ];
 
-
-
-
-  useEffect(() => {
-    console.log("Title:", title);
-    console.log("Value:", value);
-    console.log("Initial filteredContent:", filteredContent);
-    
-    if (title && value && filteredContent.length > 0) {
-      const filteredArray = filteredContent.filter(item => {
-        const hasKey = item.hasOwnProperty(title);
-        
-        if (hasKey) {
-          const fieldValue = item[title];
-          
-          // Check if the field value is an array
-          if (Array.isArray(fieldValue)) {
-            // Check if the array includes the specified value
-            return fieldValue.includes(value);
-          } else {
-            // Otherwise, perform a direct equality check
-            return fieldValue === value;
-          }
-        }
-        
-        return false;
-      });
-  
-      console.log("Filtered Array:", filteredArray);
-      setfilteredContent(filteredArray);
-    }
-  
-    if (title === null || value === null) {
-      setfilteredContent(content);
-    }
-  }, [title, value]); // Dependencies
-  
-  
-  
-
   return (
     <>
       <PageBanner pageName="Search" currectPage="Search" />
@@ -216,21 +182,6 @@ const SearchPage = () => {
             <Filter filterSections={filterSections} settitle={settitle} setvalue={setvalue} />
           </div>
 
-          {/* {isFilterOpen && (
-            <div
-              className="md:hidden fixed top-0 left-0 w-[75%] h-full bg-white z-[1000] shadow-lg p-4 overflow-y-auto transition-transform transform ease-in-out duration-300"
-              style={{ transform: 'translateX(0)' }}
-            >
-              <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Filters</h3>
-                <button onClick={toggleFilter} className="text-red-500">
-                  Close
-                </button>
-              </div>
-              <Filter filterSections={filterSections} onFilterChange={handleFilterChange} />
-            </div>
-          )} */}
-
           <div className={`filterResult w-full ${isFilterOpen ? 'lg:w-[75%]' : 'lg:w-[75%]'}`}>
             <div className="flex flex-col py-4 px-2 border-b">
               <button
@@ -242,7 +193,7 @@ const SearchPage = () => {
               <div className="flex items-center justify-between mt-3 flex-wrap whitespace-nowrap w-full">
                 <div className="text-sm text-gray-700">
                   <span className="font-semibold text-red-500">
-                    {content?.length || "0"}
+                    {filteredContent?.length || "0"}
                   </span>{" "}
                   Institutes
                 </div>
@@ -278,5 +229,3 @@ const SearchPage = () => {
 };
 
 export default SearchPage;
-
-

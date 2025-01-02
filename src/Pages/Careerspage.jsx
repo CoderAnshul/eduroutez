@@ -12,26 +12,14 @@ import img2 from "../assets/Images/img2.png";
 import img3 from "../assets/Images/img3.png";
 import img4 from "../assets/Images/img4.png";
 
-const boxData = [
-  { title: "Agriculture", imgSrc: img1, category: "Agriculture", description: "Lorem ipsum...", link: "/detailpage" },
-  { title: "Technology", imgSrc: img2, category: "Technology", description: "Lorem ipsum...", link: "/detailpage" },
-  { title: "Business", imgSrc: img3, category: "Business", description: "Lorem ipsum...", link: "/detailpage" },
-  { title: "Healthcare", imgSrc: img4, category: "Healthcare", description: "Lorem ipsum...", link: "/detailpage" },
-  { title: "Engineering", imgSrc: img1, category: "Engineering", description: "Lorem ipsum...", link: "/detailpage" },
-  { title: "Design", imgSrc: img1, category: "Design", description: "Lorem ipsum...", link: "/detailpage" },
-  { title: "Education", imgSrc: img1, category: "Education", description: "Lorem ipsum...", link: "/detailpage" },
-  { title: "Marketing", imgSrc: img1, category: "Marketing", description: "Lorem ipsum...", link: "/detailpage" },
-];
-
 const Careerspage = () => {
   const { data: careerData, isLoading, isError, error } = useQuery(
-    ["blogs"],
+    ["careers"],
     () => careers(),
     { enabled: true }
   );
 
   console.log(careerData);
-  
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -46,10 +34,10 @@ const Careerspage = () => {
 
   const filteredData =
     selectedCategories.length > 0
-      ? boxData.filter((box) =>
-          selectedCategories.includes(box.category)
+      ? careerData?.data.result.filter((career) =>
+          selectedCategories.includes(career.category)
         )
-      : boxData;
+      : careerData?.data.result;
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error: {error.message}</p>;
@@ -124,11 +112,11 @@ const Careerspage = () => {
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
                 setSelectedCategories(
-                  boxData
-                    .filter((box) =>
-                      box.title.toLowerCase().includes(searchTerm)
+                  careerData?.data.result
+                    .filter((career) =>
+                      career.title.toLowerCase().includes(searchTerm)
                     )
-                    .map((box) => box.category)
+                    .map((career) => career.category)
                 );
               }}
             />
@@ -163,23 +151,31 @@ const Careerspage = () => {
         {/* Content */}
         <div className="w-full md:w-3/4 px-6">
           <div className="flex flex-wrap justify-start gap-6">
-            {filteredData.map((box, index) => (
+            {filteredData?.map((career, index) => (
               <div
                 key={index}
                 className="max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
               >
                 <div className="relative">
                   <img
-                    src={box.imgSrc}
-                    alt={box.title}
+                    src={`/assets/Images/${career.image}`} // Assuming image is stored in public folder
+                    alt={career.title}
                     className="w-full h-48 rounded-xl object-cover"
                   />
                 </div>
                 <div className="p-4 text-center">
-                  <h3 className="text-lg font-semibold text-gray-800">{box.title}</h3>
-                  <p className="text-sm text-gray-600 mt-2">{box.description}</p>
+                  <h3 className="text-lg font-semibold text-gray-800">{career.title}</h3>
+                      <p
+                      className="text-sm text-gray-600 mt-2"
+                      dangerouslySetInnerHTML={{
+                        __html: career.description
+                          .split(" ")
+                          .slice(0, 25)
+                          .join(" ") + (career.description.split(" ").length > 25 ? "..." : "")
+                      }}
+                    />
                   <div className="inline-block !mx-auto !mt-2">
-                    <CustomButton text="View More" to={box.link} />
+                    <CustomButton text="View More" to={`/detailpage/${career._id}`} />
                   </div>
                 </div>
               </div>

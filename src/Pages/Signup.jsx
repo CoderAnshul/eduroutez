@@ -28,6 +28,7 @@ const Signup = () => {
   const mutation = useMutation({
     mutationFn: async (credentials) => {
       try {
+        console.log("Credentials", credentials);
         const response = await axiosInstance.post(
           `${apiUrl}/signup`,
           credentials,
@@ -66,7 +67,7 @@ const Signup = () => {
 
   const handleSubmit = () => {
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
+      console.log("Passwords do not match");
       return;
     }
     const { confirmPassword, ...signupData } = formData;
