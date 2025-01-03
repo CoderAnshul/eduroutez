@@ -1,7 +1,20 @@
-import React, { useState } from "react";
-import { useMutation } from "react-query";
+import React, { useState, useEffect } from "react";
+import { useMutation, useQuery } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 import Cookies from "js-cookie";
+import axios from "axios";
+
+// Fetch the user data
+const fetchUserData = async () => {
+  const userId = Cookies.get('userId');
+  if (!userId) {
+    throw new Error("User ID not found in cookies");
+  }
+  const response = await axios.get("http://localhost:4001/api/v1/user/", {
+    withCredentials: true,
+  });
+  return response.data.data;
+};
 
 const ProfilePage = () => {
   const [formData, setFormData] = useState({
@@ -14,9 +27,28 @@ const ProfilePage = () => {
     address: "",
     country: "",
   });
+
   const apiUrl = import.meta.env.VITE_BASE_URL;
 
-  // Handle input change
+  // Fetch user data
+  const { data: userData, isLoading } = useQuery("userData", fetchUserData, {
+    onSuccess: (data) => {
+      setFormData({
+        name: data.name,
+        phone: data.contact_number,
+        dateOfBirth: data.dateOfBirth,
+        gender: data.gender,
+        designation: data.designation,
+        about: data.about,
+        address: data.address,
+        country: data.country,
+      });
+    },
+    onError: (error) => {
+      alert("Error fetching user data: " + error.message);
+    },
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -25,38 +57,34 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updatedForm = {...formData,email: Cookies.get('email')?.replace(/^"|"$/g, '') };
-      console.log(updatedForm);
-      mutate(updatedForm);
+      const userId = Cookies.get('userId');
+      if (!userId) {
+        throw new Error("User ID not found in cookies");
+      }
+      const updatedForm = { ...formData, email: Cookies.get('email')?.replace(/^"|"$/g, '') };
+      mutate({ userId, updatedForm });
     } catch (error) {
-      alert('some error occured!!');
+      alert("Some error occurred!");
     }
-  }
+  };
 
-  const { mutate, isPending: isSubmitting } = useMutation({
-    mutationFn: async (formData) => {
-      const endpoint =`${apiUrl}/student`;
-      const response = await axiosInstance({
-        url: `${endpoint}`,
-        method:'post',
-        data: formData,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+  const { mutate, isLoading: isSubmitting } = useMutation({
+    mutationFn: async ({ userId, updatedForm }) => {
+      const endpoint = `${apiUrl}/user/${userId}`; // PATCH request URL
+      const response = await axiosInstance.patch(endpoint, updatedForm, { // Use PATCH here
+        withCredentials: true,
       });
       return response.data;
     },
-
     onSuccess: () => {
-      alert('Profile Updated successfully!');
-      // document.getElementById('questionForm').reset();
-      // setPreviewUrl(null);
-      // router.push('/dashboard/counselor');
+      alert("Profile updated successfully!");
     },
     onError: () => {
-      alert('Something went wrong');
-    }
+      alert("Something went wrong");
+    },
   });
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="p-2 md:p-2 rounded-lg">
