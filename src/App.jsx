@@ -9,12 +9,13 @@ import AuthRoute from './AuthRoute';
 
 import Counselling from './Pages/counselling';
 
-import DashboardLayout from './Layout/DashboardLayout'; // Import the dashboard layout
-import Dashboard from './Pages/Dashboard'; // Dashboard page
+import DashboardLayout from './Layout/DashboardLayout'; 
+import Dashboard from './Pages/Dashboard'; 
 import ProfilePage from './Pages/ProfilePage';
 import StudentDocument from './Pages/StudentDocument';
 import CounselorListPage from './Pages/CounselorListPage';
 import SettingsPage from './Pages/SettingsPage';
+import { ToastContainer } from 'react-toastify';
 
 
 // Lazy-loaded components
@@ -40,6 +41,7 @@ const counselling = React.lazy(() => import('./Pages/counselling'));
 const App = () => {
   return (
     <BrowserRouter>
+      <ToastContainer />
       <ScrollToTop />
       <Navbar />
       <Suspense fallback={<Loader />}>

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
+import Cookies from "js-cookie";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -46,15 +47,15 @@ const Signup = () => {
     },
     onSuccess: (data) => {
       alert("Signed Up Successfully! You can now log in.");
-      localStorage.setItem(
+       Cookies.set(
         'accessToken',
         JSON.stringify(data.data.accessToken)
       );
-      localStorage.setItem(
+       Cookies.set(
         'refreshToken',
         JSON.stringify(data.data.refreshToken)
       );
-      localStorage.setItem(
+       Cookies.set(
         "email",
         JSON.stringify(formData?.email)
       )

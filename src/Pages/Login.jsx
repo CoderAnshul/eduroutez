@@ -5,6 +5,9 @@ import google from "../assets/Images/google.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import Cookies from 'js-cookie';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -39,23 +42,14 @@ const Login = () => {
       }
     },
     onSuccess: (data) => {
-      alert("Logged in successfully!");
-      localStorage.setItem(
-        "accessToken",
-        JSON.stringify(data.data.accessToken)
-      );
-      localStorage.setItem(
-        "refreshToken",
-        JSON.stringify(data.data.refreshToken)
-      );
-      localStorage.setItem(
-        "email",
-        JSON.stringify(formData?.email)
-      )
+      toast.success("Logged in successfully!");
+      Cookies.set('accessToken', data.data.accessToken, { expires: 30 });
+      Cookies.set('refreshToken', data.data.refreshToken, { expires: 30 });
+      Cookies.set('email', formData.email, { expires: 30 });
       navigate("/");
     },
     onError: (error) => {
-      alert(error.message);
+      toast.error(error.message);
     },
   });
 
@@ -66,6 +60,7 @@ const Login = () => {
 
   return (
     <div className="flex h-auto">
+      <ToastContainer />
       {/* Left Section */}
       <div className="w-1/2 bg-red-700 hidden text-white sm:flex flex-col justify-center items-center px-10">
         <h1 className="text-4xl lg:text-[45px] lg:font-semibold font-bold mb-4 w-11/12 text-start">
@@ -94,7 +89,7 @@ const Login = () => {
           <div className="mb-4">
             <label
               className="block text-sm font-medium mb-1"
-              htmlFor="emailOrPhone"
+              htmlFor="email"
             >
               Email 
             </label>
@@ -103,7 +98,7 @@ const Login = () => {
               id="email"
               placeholder="Enter your email "
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.emailOrPhone}
+              value={formData.email}
               onChange={handleChange}
             />
           </div>

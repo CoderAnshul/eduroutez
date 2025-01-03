@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { postQuestion } from '../ApiFunctions/api';
 import { useMutation } from 'react-query';
 import axiosInstance from '../ApiFunctions/axios';
-
+import Cookies from 'js-cookie';
 const QuestionandAnswer = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
@@ -87,7 +87,7 @@ const QuestionandAnswer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updatedForm = { ...form, instituteEmail: email, askedBy: localStorage.getItem('email')?.replace(/^"|"$/g, '') };
+      const updatedForm = { ...form, instituteEmail: email, askedBy: Cookies.get('email')?.replace(/^"|"$/g, '') };
       console.log(updatedForm);
       mutate(updatedForm);
     } catch (error) {

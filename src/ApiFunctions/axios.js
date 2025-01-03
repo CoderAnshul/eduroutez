@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const axiosInstance = axios.create({
     baseURL: typeof window !== 'undefined' ? window.VITE_BASE_URL : process.env.VITE_BASE_URL
@@ -8,11 +9,11 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     // Add authentication header if token exists
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = Cookies.get('accessToken');
     if (accessToken) {
       config.headers['x-access-token'] = accessToken;
     }
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = Cookies.get('refreshToken');
     if (refreshToken) {
       config.headers['x-refresh-token'] = refreshToken;
     }

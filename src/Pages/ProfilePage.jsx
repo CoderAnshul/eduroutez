@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
+import Cookies from "js-cookie";
 
 const ProfilePage = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updatedForm = {...formData,email: localStorage.getItem('email')?.replace(/^"|"$/g, '') };
+      const updatedForm = {...formData,email: Cookies.get('email')?.replace(/^"|"$/g, '') };
       console.log(updatedForm);
       mutate(updatedForm);
     } catch (error) {

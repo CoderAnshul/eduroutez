@@ -10,6 +10,7 @@ import menubar from '../assets/Images/secondMenu.png';
 import SecondMenu from './SubNavbar';
 import MobileNavbar from './MobileNavbar';
 import categories from '../DataFiles/categories';
+import Cookies from 'js-cookie';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,7 +18,7 @@ const Navbar = () => {
   const location = useLocation();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = Cookies.get('accessToken');
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

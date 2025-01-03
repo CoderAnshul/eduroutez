@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../ApiFunctions/axios';
 import { useQuery } from 'react-query';
-
+import Cookies from 'js-cookie';
 const Counselling = () => {
   const { email } = useParams();
   const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -71,7 +71,7 @@ const Counselling = () => {
   };
 
   const handleClick=(slot)=>{
-    const studentEmail = JSON.parse(localStorage.getItem('email'));
+    const studentEmail = JSON.parse(Cookies.get('email'));
     const selectedSlot = {
         slot,
         date,
