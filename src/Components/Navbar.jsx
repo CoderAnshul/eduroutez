@@ -15,9 +15,23 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // For hover menu
   const location = useLocation();
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+  const accessToken = localStorage.getItem('accessToken');
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleReviewClick = (e) => {
+    if (!accessToken) {
+      e.preventDefault();
+      setShowLoginPopup(true);
+    }
+  };
+
+  const handleLoginPopupClose = () => {
+    setShowLoginPopup(false);
   };
 
   // Prevent scrolling on background when menu is open
@@ -65,6 +79,7 @@ const Navbar = () => {
             <Link
               to="/writereview"
               className="CustomFlex gap-1 group hover:text-red-500 hover:scale-95 transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
+              onClick={handleReviewClick}
             >
               <button>
                 <img
@@ -87,67 +102,61 @@ const Navbar = () => {
               />
               <span>Explore</span>
             </Link>
-            <Link
-              to="/login"
-              className="CustomFlex gap-1 bg-red-500 px-4 py-2 rounded-sm text-white text-xs  hover:scale-95 group transform transition-all font-medium cursor-pointer"
-            >
-              <span>LOGIN</span>
-            </Link>
-
-            {/* <div className="CustomFlex relative gap-1 font-medium cursor-pointer text-sm">
-              <span className="bg-red-500 h-2 w-2 rounded-full absolute top-0 right-0"></span>
-              <img className="h-5" src={notification} alt="notification" />
-            </div> */}
+            {!accessToken && (
+              <Link
+                to="/login"
+                className="CustomFlex gap-1 bg-red-500 px-4 py-2 rounded-sm text-white text-xs  hover:scale-95 group transform transition-all font-medium cursor-pointer"
+              >
+                <span>LOGIN</span>
+              </Link>
+            )}
 
             {/* Menu with hover functionality */}
-            <div
-              className="relative"
-              onMouseEnter={() => setIsDropdownOpen(true)}
-              onMouseLeave={() => setIsDropdownOpen(false)}
-            >
-              <div className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer">
-                <img
-                  className="h-3 opacity-75"
-                  src={menu}
-                  alt="menu"
-                />
-                <Link
-                  to="/"
-                  className="secondMenu bg-gray-500 hover:scale-105 transition-all h-5 w-5 rounded-full"
-                ></Link>
-              </div>
-
-              {/* Dropdown menu */}
-              {isDropdownOpen && (
-                <div className="absolute z-[1000] right-0 top-[34px] w-48 bg-gray-50 backdrop-blur-sm border transition-all border-gray-300 rounded-lg shadow-lg">
+            {accessToken && (
+              <div
+                className="relative"
+                onMouseEnter={() => setIsDropdownOpen(true)}
+                onMouseLeave={() => setIsDropdownOpen(false)}
+              >
+                <div className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer">
+                  <img className="h-3 opacity-75" src={menu} alt="menu" />
                   <Link
-                    to="/dashboard/profile-page"
-                    className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    to="/dashboard/settings"
-                    className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
-                  >
-                    Settings
-                  </Link>
-                  <Link
-                    to="/dashboard/"
-                    className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={() => console.log('Logout clicked')}
-                    className="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
-                  >
-                    Logout
-                  </button>
+                    to="/"
+                    className="secondMenu bg-gray-500 hover:scale-105 transition-all h-5 w-5 rounded-full"
+                  ></Link>
                 </div>
-              )}
 
-            </div>
+                {/* Dropdown menu */}
+                {isDropdownOpen && (
+                  <div className="absolute z-[1000] right-0 top-[34px] w-48 bg-gray-50 backdrop-blur-sm border transition-all border-gray-300 rounded-lg shadow-lg">
+                    <Link
+                      to="/dashboard/profile-page"
+                      className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      to="/dashboard/settings"
+                      className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                    >
+                      Settings
+                    </Link>
+                    <Link
+                      to="/dashboard/"
+                      className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => console.log('Logout clicked')}
+                      className="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -188,7 +197,7 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/writereview" onClick={toggleMenu}>
+              <Link to="/writereview" onClick={handleReviewClick}>
                 Write a Review
               </Link>
             </li>
@@ -198,6 +207,32 @@ const Navbar = () => {
           </ul>
         </div>
       </div>
+{showLoginPopup && (
+  <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
+    <div className="popup bg-white p-12 m-20s rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100  w-1/3">
+    <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
+  Hey there! We’d love to hear your thoughts. Please log in to share your review with us and help others make informed decisions.
+</h3>
+      <div className="flex justify-center space-x-6">
+        <button
+          onClick={handleLoginPopupClose}
+          className="bg-gray-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-gray-700 focus:outline-none"
+        >
+          Close
+        </button>
+        <Link
+          to="/login"
+          onClick={handleLoginPopupClose}
+          className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+        >
+          Log In
+        </Link>
+      </div>
+    </div>
+  </div>
+)}
+
+
 
       <div className="hidden md:flex">
         <SecondMenu categories={categories} />

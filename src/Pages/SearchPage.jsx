@@ -26,18 +26,17 @@ const SearchPage = () => {
 
   const queryClient = useQueryClient();
 
-  // console.log( state);
-
-  const { data, isLoading, isError, error  } = useQuery(
+  const { data, isLoading, isError, error } = useQuery(
     ["institutes"],
     () => getInstitutes(),
     {
-      enabled:true,
+      enabled: true,
     }
   );
 
   const [content, setcontent] = useState([]);
   const [filteredContent, setfilteredContent] = useState([]);
+  const [visibleItems, setVisibleItems] = useState(5);  // State for visible items in pagination
 
   useEffect(() => {
     if (data) {
@@ -83,6 +82,14 @@ const SearchPage = () => {
       ...prevState,
       [index]: !prevState[index],
     }));
+  };
+
+  const loadMore = () => {
+    setVisibleItems((prevItems) => prevItems + 5);
+  };
+
+  const loadLess = () => {
+    setVisibleItems(5);
   };
 
   const contentData = [
@@ -202,13 +209,7 @@ const SearchPage = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveFilter(tab.id)}
-                      className={`text-xs md:text-sm py-2 px-3 ${
-                        tab.id !== tabs[tabs.length - 1].id ? 'border-r-2' : ''
-                      } border-opacity-15 font-medium transition-colors ${
-                        activeFilter === tab.id
-                          ? 'text-red-500 border-red-500 font-semibold'
-                          : 'text-gray-700'
-                      }`}
+                      className={`text-xs md:text-sm py-2 px-3 ${tab.id !== tabs[tabs.length - 1].id ? 'border-r-2' : ''} border-opacity-15 font-medium transition-colors ${activeFilter === tab.id ? 'text-red-500 border-red-500 font-semibold' : 'text-gray-700'}`}
                     >
                       {tab.label}
                     </button>
@@ -216,9 +217,25 @@ const SearchPage = () => {
                 </div>
               </div>
             </div>
-            {filteredContent?.map((institute, index) => (
+            {filteredContent?.slice(0, visibleItems).map((institute, index) => (
               <SearchResultBox key={institute._id || index} institute={institute} />
             ))}
+            {filteredContent?.length > visibleItems && (
+              <button
+                onClick={loadMore}
+                className="bg-red-500 text-white px-6 mt-8 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+                >
+                See More
+              </button>
+            )}
+            {visibleItems > 5  && (
+              <button
+                onClick={loadLess}
+                className="bg-red-500 text-white px-6 mt-8 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+                >
+                See Less
+              </button>
+            )}
           </div>
         </div>
       </div>

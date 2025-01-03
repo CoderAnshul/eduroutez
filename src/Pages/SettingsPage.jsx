@@ -19,10 +19,6 @@ const SettingsPage = () => {
         return <BankDetailsSection/>;
       case 'educations':
         return <EducationsSection/>;
-      case 'experiences':
-        return <ExperiencesSection/>;
-      case 'skillsExpertise':
-        return <SkillsExpertiseSection/>;
       default:
         return <div>Select a tab to view content</div>;
     }
@@ -73,26 +69,7 @@ const SettingsPage = () => {
         >
           <i className="fa fa-book mr-2"></i>Educations
         </button>
-        <button
-          onClick={() => setActiveTab('experiences')}
-          className={`px-4 py-2 rounded-md ${
-            activeTab === 'experiences'
-              ? 'bg-red-100 text-red-600 border border-red-600'
-              : 'bg-gray-100 text-gray-600'
-          }`}
-        >
-          <i className="fa fa-briefcase mr-2"></i>Experiences
-        </button>
-        <button
-          onClick={() => setActiveTab('skillsExpertise')}
-          className={`px-4 py-2 rounded-md ${
-            activeTab === 'skillsExpertise'
-              ? 'bg-red-100 text-red-600 border border-red-600'
-              : 'bg-gray-100 text-gray-600'
-          }`}
-        >
-          <i className="fa fa-tools mr-2"></i>Skills & Expertise
-        </button>
+       
       </div>
 
       {/* Content Section */}
@@ -106,7 +83,6 @@ const EditProfileSection = () => <div><EditProfile/></div>;
 const SecuritySection = () => <div><Security/></div>;
 const BankDetailsSection = () => <div><BankDetails/></div>;
 const EducationsSection = () => <div><EducationalDetail></EducationalDetail></div>;
-const ExperiencesSection = () => <div>Experiences Content</div>;
-const SkillsExpertiseSection = () => <div>Skills & Expertise Content</div>;
+
 
 export default SettingsPage;

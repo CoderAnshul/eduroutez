@@ -5,6 +5,7 @@ import Footer from './Components/Footer';
 import ScrollToTop from './Utilities/ScrollToTop';
 import Loader from './Components/Loader';
 import BecomeCouseller from './Pages/BecomeCouseller';
+import AuthRoute from './AuthRoute';
 
 import Counselling from './Pages/counselling';
 
@@ -64,9 +65,16 @@ const App = () => {
           <Route path="/forgotpassword" element={<Forgotpassword />} />
           <Route path="/become-couseller" element={<BecomeCouseller />} />
 
-          {/* Dashboard Routes */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<Dashboard />} /> 
+           {/* Protected Dashboard Routes */}
+          <Route
+            path="/dashboard/*"
+            element={
+              <AuthRoute>
+                <DashboardLayout />
+              </AuthRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
             <Route path="profile-page" element={<ProfilePage />} />
             <Route path="documents" element={<StudentDocument />} />
             <Route path="counselor" element={<CounselorListPage />} />

@@ -1,71 +1,82 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import CustomButton from './CustomButton';
+import React, { useState } from "react";
+import CustomButton from "./CustomButton";
 
 const BlogandCareerBox = ({ boxData, blogData }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
 
-  console.log(blogData);
-  
+  const handleSeeMore = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
+  const handleSeeLess = () => {
+    if (currentPage > 1) {
+      setCurrentPage(1);
+    }
+  };
+
+  const displayedBlogs = blogData?.data?.result?.slice(
+    0,
+    currentPage * itemsPerPage
+  );
+
   return (
-    <div className="flex flex-wrap justify-start gap-6">
-      {/* Render blogs */}
-      {blogData?.data?.result?.map((blog, index) => (
-        <div
-          key={blog._id}
-          className="max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
-        >
-          <div className="relative">
-            <img
-              src={`http://localhost:4001/uploads/${blog.image}`}
-              alt={blog.title}
-              className="w-full h-48 rounded-xl object-cover"
-            />
-          </div>
-          <div className="p-4 text-center">
-            <h3 className="text-lg font-semibold text-gray-800">
-              {blog.title}
-            </h3>
-            <p className="text-sm text-gray-600 mt-2">
-  {blog.description.split(" ").slice(0, 30).join(" ")}
-  {blog.description.split(" ").length > 30 && "........"}
-</p>
-
-            <div className="inline-block !mx-auto !mt-2">
-              <CustomButton text="Read More" to={`/blogdetailpage/${blog._id}`} />
+    <div className="w-full p-6 bg-gray-50">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {/* Render blogs */}
+        {displayedBlogs?.map((blog) => (
+          <div
+            key={blog._id}
+            className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+          >
+            <div className="relative">
+              <img
+                src={`http://localhost:4001/uploads/${blog.image}`}
+                alt={blog.title}
+                className="w-full h-48 object-cover"
+              />
             </div>
-          </div>
-        </div>
-      ))}
-
-      {/* Render boxData if any */}
-    { /** } {boxData.map((box, index) => (
-        <div
-          key={index}
-          className="max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
-        >
-          <div className="relative">
-            <img
-              src={box.imgSrc}
-              alt={box.title}
-              className="w-full h-48 rounded-xl object-cover"
-            />
-          </div>
-          <div className="p-4 text-center flex flex-col justify-between ">
-            <div >  
-              <h3 className="text-lg font-semibold text-gray-800">
-                {box.title}
+            <div className="p-4">
+              <h3 className="text-lg font-semibold text-gray-800 truncate">
+                {blog.title}
               </h3>
-              <p className="text-sm text-gray-600 mt-2">
-                {box.description}
+              <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+                {blog.description
+                  ? blog.description.split(" ").slice(0, 30).join(" ")
+                  : ""}
+                {blog.description &&
+                  blog.description.split(" ").length > 30 &&
+                  "........"}
               </p>
-            </div>
-            <div className="inline-block !mx-auto !mt-2">
-              <CustomButton text="View More" to={box.link} />
+              <div className="mt-4">
+                <CustomButton
+                  text="Read More"
+                  to={`/blogdetailpage/${blog._id}`}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-        **/}
+        ))}
+      </div>
+
+      <div className="w-full flex justify-center gap-4 mt-24">
+        {displayedBlogs.length < blogData?.data?.result?.length && (
+          <button
+            className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+            onClick={handleSeeMore}
+          >
+            See More
+          </button>
+        )}
+        {currentPage > 1 && (
+          <button
+            className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+            onClick={handleSeeLess}
+          >
+            See Less
+          </button>
+        )}
+      </div>
     </div>
   );
 };

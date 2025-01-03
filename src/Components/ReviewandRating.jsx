@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
 import InstituteReviewBox from '../Ui components/InstituteReviewBox';
@@ -6,6 +7,20 @@ import CustomButton from "../Ui components/CustomButton";
 
 const ReviewandRating = ({ ratings, reviews, instituteData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const accessToken = localStorage.getItem("accessToken");
+
+  const handleReviewClick = (e) => {
+    console.log('clicked')
+    if (!accessToken) {
+      e.preventDefault();
+      setShowLoginPopup(true);
+    }
+  };
+
+  const handleLoginPopupClose = () => {
+    setShowLoginPopup(false);
+  };
 
   // Memoize average rating calculation for the first 6 reviews
   const averageRating = useMemo(() => {
@@ -84,10 +99,37 @@ const ReviewandRating = ({ ratings, reviews, instituteData }) => {
           <CustomButton
             text='Write a Review'
             className="!bg-red-500 !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg"
-            to="/writereview"
+            onClick={handleReviewClick}
+            to="/writereview" 
           />
         </div>
       </div>
+
+      {/* Login Popup */}
+      {showLoginPopup && (
+        <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
+          <div className="popup bg-white p-12 rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
+            <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
+              Hey there! We’d love to hear your thoughts. Please log in to share your review with us and help others make informed decisions.
+            </h3>
+            <div className="flex justify-center space-x-6">
+              <button
+                onClick={handleLoginPopupClose}
+                className="bg-gray-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-gray-700 focus:outline-none"
+              >
+                Close
+              </button>
+              <Link
+                to="/login"
+                onClick={handleLoginPopupClose}
+                className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+              >
+                Log In
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       {isModalOpen && (

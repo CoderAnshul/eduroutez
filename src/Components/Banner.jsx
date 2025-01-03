@@ -1,44 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { useQuery } from "react-query";
-import searchImg from "../assets/Images/searchLogo.png";
-import CustomButton from "../Ui components/CustomButton";
-import { homeBanner } from "../ApiFunctions/api";
+import React, { useState, useEffect } from 'react';
+import mainBanner from '../assets/Images/mainBanner.jpg';
+import banner3 from '../assets/Images/pageBanner.png';
+import banner2 from '../assets/Images/img3.png';
 
 
 const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fetch banner data using useQuery
-  const { data, isLoading, isError, error } = useQuery("homeBanner", homeBanner);
-
-  // Extract banners from API response
-  const banners = data?.data?.result || [];
-  const baseURL = "http://localhost:4001/uploads/";
+  const banners = [
+    {
+      id: 1,
+      imageUrl: mainBanner
+    },
+    {
+      id: 2,
+      imageUrl: banner3
+    },
+    {
+      id: 3,
+      imageUrl: banner2
+    }
+  ];
 
   useEffect(() => {
-    if (!banners.length) return;
-
-    // Automatically cycle through images every 5 seconds
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) =>
         prevIndex === banners.length - 1 ? 0 : prevIndex + 1
       );
     }, 5000);
 
-    return () => clearInterval(interval); // Cleanup interval on unmount
-  }, [banners]);
-
-  // if (isLoading) {
-  //   return <div className="h-[480px] w-full flex justify-center items-center">Loading...</div>;
-  // }
-
-  // if (isError) {
-  //   return (
-  //     <div className="h-[480px] w-full flex justify-center items-center text-red-500">
-  //       Error fetching banners: {error.message}
-  //     </div>
-  //   );
-  // }
+    return () => clearInterval(interval); 
+  }, []);
 
   return (
     <div className="h-[480px] w-full relative">
@@ -46,12 +38,12 @@ const Banner = () => {
       <div className="h-full w-full absolute top-0 left-0 z-0">
         {banners.map((banner, index) => (
           <div
-            key={index}
+            key={banner.id}
             className={`h-full w-full absolute top-0 left-0 transition-opacity duration-1000 ${
               index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
             style={{
-              backgroundImage: `url(${baseURL}${banner.images[0]})`,
+              backgroundImage: `url(${banner.imageUrl})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
@@ -67,7 +59,17 @@ const Banner = () => {
         <div className="search ml-5 mr-5 h-12 bg-white border-[1.5px] relative border-gray-500 rounded-lg items-center gap-2 max-w-[800px] w-full overflow-hidden flex">
           <div className="flex items-center w-4/5 pl-4 py-2 gap-3">
             <button className="hover:scale-105 transition-all">
-              <img src={searchImg} alt="search" />
+              <svg
+                className="w-5 h-5 text-gray-500"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </button>
             <input
               className="text-sm w-1/2"
@@ -77,13 +79,12 @@ const Banner = () => {
               placeholder="Search for Colleges, institute and more..."
             />
           </div>
-          <CustomButton
-            text="Search"
-            to="/searchpage"
+          <button 
             className="!h-full right-0 !rounded-sm w-1/5 absolute top-0 bg-red-500 min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white"
+            onClick={() => window.location.href = '/searchpage'}
           >
             Search
-          </CustomButton>
+          </button>
         </div>
       </div>
     </div>
