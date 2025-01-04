@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PageBanner from "../Ui components/PageBanner";
 import CustomButton from "../Ui components/CustomButton";
 import { useQuery } from "react-query";
@@ -7,22 +7,71 @@ import PopularCourses from "../Components/PopularCourses";
 import BlogComponent from "../Components/BlogComponent";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
-import img1 from "../assets/Images/img1.png";
-import img2 from "../assets/Images/img2.png";
-import img3 from "../assets/Images/img3.png";
-import img4 from "../assets/Images/img4.png";
+import axios from "axios";
+
+const fetchImage = async (imagePath) => {
+  try {
+    const response = await axios.get(`http://localhost:4001/api/uploads/${imagePath}`, {
+      responseType: 'blob'
+    });
+    // Create URL immediately and store it
+    const imageUrl = URL.createObjectURL(response.data);
+    return imageUrl;
+  } catch (error) {
+    console.error('Error fetching image:', error);
+    return null;
+  }
+};
 
 const Careerspage = () => {
+  const [imageUrls, setImageUrls] = useState({});
+
   const { data: careerData, isLoading, isError, error } = useQuery(
     ["careers"],
     () => careers(),
     { enabled: true }
   );
 
-  console.log(careerData);
-
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const filteredData =
+    selectedCategories.length > 0
+      ? careerData?.data.result.filter((career) =>
+          selectedCategories.includes(career.category)
+        )
+      : careerData?.data.result;
+
+  // Use effect to handle image loading
+  useEffect(() => {
+    const loadImages = async () => {
+      if (filteredData) {
+        const imagePromises = filteredData.map(async (career) => {
+          if (!imageUrls[career.image]) {  // Only fetch if we don't have the URL already
+            const url = await fetchImage(career.image);
+            return { [career.image]: url };
+          }
+          return null;
+        });
+
+        const results = await Promise.all(imagePromises);
+        const newUrls = results.reduce((acc, result) => {
+          return result ? { ...acc, ...result } : acc;
+        }, {});
+
+        setImageUrls(prev => ({ ...prev, ...newUrls }));
+      }
+    };
+
+    loadImages();
+
+    // Cleanup function to revoke object URLs
+    return () => {
+      Object.values(imageUrls).forEach(url => {
+        if (url) URL.revokeObjectURL(url);
+      });
+    };
+  }, [filteredData]); // Add filteredData as dependency
 
   const handleCategoryChange = (category) => {
     setSelectedCategories((prev) =>
@@ -31,13 +80,6 @@ const Careerspage = () => {
         : [...prev, category]
     );
   };
-
-  const filteredData =
-    selectedCategories.length > 0
-      ? careerData?.data.result.filter((career) =>
-          selectedCategories.includes(career.category)
-        )
-      : careerData?.data.result;
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error: {error.message}</p>;
@@ -151,29 +193,35 @@ const Careerspage = () => {
         {/* Content */}
         <div className="w-full md:w-3/4 px-6">
           <div className="flex flex-wrap justify-start gap-6">
-            {filteredData?.map((career, index) => (
+            {filteredData?.map((career) => (
               <div
-                key={index}
+                key={career._id}
                 className="max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
               >
-                <div className="relative">
-                  <img
-                    src={`/assets/Images/${career.image}`} // Assuming image is stored in public folder
-                    alt={career.title}
-                    className="w-full h-48 rounded-xl object-cover"
-                  />
+                <div className="relative h-48">
+                  {!imageUrls[career.image] ? (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                      <p>Loading image...</p>
+                    </div>
+                  ) : (
+                    <img
+                      src={imageUrls[career.image]}
+                      alt={career.title}
+                      className="w-full h-full rounded-xl object-cover"
+                    />
+                  )}
                 </div>
                 <div className="p-4 text-center">
                   <h3 className="text-lg font-semibold text-gray-800">{career.title}</h3>
-                      <p
-                      className="text-sm text-gray-600 mt-2"
-                      dangerouslySetInnerHTML={{
-                        __html: career.description
-                          .split(" ")
-                          .slice(0, 25)
-                          .join(" ") + (career.description.split(" ").length > 25 ? "..." : "")
-                      }}
-                    />
+                  <p
+                    className="text-sm text-gray-600 mt-2"
+                    dangerouslySetInnerHTML={{
+                      __html: career.description
+                        .split(" ")
+                        .slice(0, 25)
+                        .join(" ") + (career.description.split(" ").length > 25 ? "..." : "")
+                    }}
+                  />
                   <div className="inline-block !mx-auto !mt-2">
                     <CustomButton text="View More" to={`/detailpage/${career._id}`} />
                   </div>
