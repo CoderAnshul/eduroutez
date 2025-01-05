@@ -1,3 +1,4 @@
+// filepath: /c:/eduroutez/src/Ui components/SearchResultBox.jsx
 import React, { useState } from "react";
 import CustomButton from "./CustomButton";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
@@ -5,9 +6,8 @@ import rupee from "../assets/Images/rupee.png";
 import badge from "../assets/Images/badge.png";
 import cashhand from "../assets/Images/cashhand.png";
 import checklist from "../assets/Images/checklist.png";
-const imageURL = import.meta.env.IMAGE_BASE_URL;
 import Cookies from 'js-cookie';
-import { addToWishlist, removeFromWishlist } from '../ApiFunctions/api'; // Assuming you have the removeFromWishlist function
+import { addToWishlist } from '../ApiFunctions/api';
 
 const SearchResultBox = ({ institute }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -15,20 +15,14 @@ const SearchResultBox = ({ institute }) => {
   const handleAddToWishlist = async () => {
     try {
       const userId = Cookies.get('userId');
-      await addToWishlist(userId, institute._id);
-      setIsWishlisted(true);
+      const response = await addToWishlist(userId, institute._id, null); // Assuming courseId is null for now
+      if (response.message.includes('removed')) {
+        setIsWishlisted(false);
+      } else if (response.message.includes('added')) {
+        setIsWishlisted(true);
+      }
     } catch (error) {
       console.error('Error adding to wishlist:', error);
-    }
-  };
-
-  const handleRemoveFromWishlist = async () => {
-    try {
-      const userId = Cookies.get('userId');
-      await removeFromWishlist(userId, institute._id); // API call to remove
-      setIsWishlisted(false);
-    } catch (error) {
-      console.error('Error removing from wishlist:', error);
     }
   };
 
@@ -45,7 +39,7 @@ const SearchResultBox = ({ institute }) => {
           <button
             className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md"
             aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-            onClick={isWishlisted ? handleRemoveFromWishlist : handleAddToWishlist}
+            onClick={handleAddToWishlist}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

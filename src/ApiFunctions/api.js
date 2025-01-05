@@ -35,18 +35,6 @@ export const addToWishlist = async (userId, instituteId) => {
   }
 };
 
-export const removeFromWishlist = async (userId, instituteId) => {
-  try {
-    const response = await axios.delete(`${baseURL}/wishlist/${instituteId}`, {
-      data: { userId }, // Send userId in the body, if needed
-      withCredentials: true
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting from wishlist:', error);
-    throw error;
-  }
-};
 
 export const blogById= async (id) => {
   try {
