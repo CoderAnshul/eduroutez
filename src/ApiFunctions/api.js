@@ -24,6 +24,29 @@ export const getInstitutes = async (state = null, city = null, organisationType 
   }
 };
 
+export const addToWishlist = async (userId, itemId) => {
+  try {
+    const response = await axios.post(`${baseURL}/wishlist/`, { userId, itemId },{withCredentials: true});
+    return response.data;
+  } catch (error) {
+    console.error('Error adding to wishlist:', error);
+    throw error;
+  }
+};
+
+export const removeFromWishlist = async (userId, itemId) => {
+  try {
+    const response = await axios.delete(`${baseURL}/wishlist/${itemId}`, {
+      data: { userId }, // Send userId in the body, if needed
+      withCredentials: true
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting from wishlist:', error);
+    throw error;
+  }
+};
+
 
 export const blogById= async (id) => {
   try {
