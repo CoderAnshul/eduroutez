@@ -24,9 +24,9 @@ export const getInstitutes = async (state = null, city = null, organisationType 
   }
 };
 
-export const addToWishlist = async (userId, itemId) => {
+export const addToWishlist = async (userId, instituteId) => {
   try {
-    const response = await axios.post(`${baseURL}/wishlist/`, { userId, itemId },{withCredentials: true});
+    const response = await axios.post(`${baseURL}/wishlist/`, { userId, instituteId },{withCredentials: true});
     return response.data;
   } catch (error) {
     console.error('Error adding to wishlist:', error);
@@ -34,9 +34,9 @@ export const addToWishlist = async (userId, itemId) => {
   }
 };
 
-export const removeFromWishlist = async (userId, itemId) => {
+export const removeFromWishlist = async (userId, instituteId) => {
   try {
-    const response = await axios.delete(`${baseURL}/wishlist/${itemId}`, {
+    const response = await axios.delete(`${baseURL}/wishlist/${instituteId}`, {
       data: { userId }, // Send userId in the body, if needed
       withCredentials: true
     });
