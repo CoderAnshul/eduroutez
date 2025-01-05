@@ -4,10 +4,9 @@ import SearchResultInfo from '../Ui components/SearchResultInfo';
 import ExpandedBox from '../Ui components/ExpandedBox';
 import Filter from '../Ui components/Filter';
 import SearchResultBox from '../Ui components/SearchResultBox';
-import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { getInstitutes } from '../ApiFunctions/api';
 
 const SearchPage = () => {
@@ -20,31 +19,27 @@ const SearchPage = () => {
   const [activeFilter, setActiveFilter] = useState(tabs[0].id);
   const [selectedFilters, setSelectedFilters] = useState({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [contentVisibility, setContentVisibility] = useState({});
-  const [title, settitle] = useState(null);
-  const [value, setvalue] = useState(null);
+  const [title, setTitle] = useState(null);
+  const [value, setValue] = useState(null);
+  const [content, setContent] = useState([]);
+  const [filteredContent, setFilteredContent] = useState([]);
+  const [visibleItems, setVisibleItems] = useState(10); // Initially show 10 items
+  const [totalDocuments, setTotalDocuments] = useState(0);
 
-  const queryClient = useQueryClient();
-
-  const { data, isLoading, isError, error } = useQuery(
+  const { data, isLoading, isError } = useQuery(
     ["institutes"],
     () => getInstitutes(),
     {
       enabled: true,
+      onSuccess: (data) => {
+        const { result, totalDocuments } = data.data;
+        setContent(result);
+        setFilteredContent(result);
+        console.log('result',result);
+        setTotalDocuments(totalDocuments);
+      }
     }
   );
-
-  const [content, setcontent] = useState([]);
-  const [filteredContent, setfilteredContent] = useState([]);
-  const [visibleItems, setVisibleItems] = useState(5);  // State for visible items in pagination
-
-  useEffect(() => {
-    if (data) {
-      const result = data?.data?.result;
-      setcontent(result);
-      setfilteredContent(result);
-    }
-  }, [data]);
 
   useEffect(() => {
     if (title && value && content.length > 0) {
@@ -60,9 +55,9 @@ const SearchPage = () => {
         }
         return false;
       });
-      setfilteredContent(filteredArray);
+      setFilteredContent(filteredArray);
     } else {
-      setfilteredContent(content);
+      setFilteredContent(content);
     }
   }, [title, value, content]);
 
@@ -71,43 +66,36 @@ const SearchPage = () => {
   };
 
   const handleFilterChange = (filterCategory, filterValue) => {
-    setSelectedFilters((prevFilters) => ({
+    setSelectedFilters(prevFilters => ({
       ...prevFilters,
       [filterCategory]: filterValue,
     }));
   };
 
-  const toggleContentVisibility = (index) => {
-    setContentVisibility((prevState) => ({
-      ...prevState,
-      [index]: !prevState[index],
-    }));
-  };
-
   const loadMore = () => {
-    setVisibleItems((prevItems) => prevItems + 5);
+    setVisibleItems(prevVisibleItems => prevVisibleItems + 10); // Show 10 more items
   };
 
   const loadLess = () => {
-    setVisibleItems(5);
+    setVisibleItems(10); // Reset to initial 10 items
   };
 
   const contentData = [
     {
       title: "Introduction",
-      content: `The Indian Institute of Technology Bombay (IIT Bombay), established in 1958, is one of India's premier engineering and research institutions. Known for its academic excellence and vibrant campus life, IIT Bombay has consistently been ranked among the top institutions in India and globally. The institute offers a dynamic environment that fosters innovation, creativity, and entrepreneurship.`,
+      content: `The Indian Institute of Technology Bombay (IIT Bombay), established in 1958, is one of India's premier engineering and research institutions.`,
     },
     {
       title: "Undergraduate Programs",
-      content: `IIT Bombay offers a range of undergraduate programs, primarily in engineering, science, and design. Admissions to these programs are based on the Joint Entrance Examination Advanced (JEE Advanced), one of the toughest engineering entrance exams in the world. The Bachelor of Technology (B.Tech) program remains the most sought-after course at IIT Bombay.`,
+      content: `IIT Bombay offers a range of undergraduate programs, primarily in engineering, science, and design.`,
     },
     {
       title: "Admission Cutoffs",
-      content: `The admission cutoffs for IIT Bombay are highly competitive. For instance, in 2023, the JEE Advanced cutoff for the Computer Science and Engineering program was among the lowest ranks in the country, typically under 70 in the general category. Cutoffs vary significantly for other branches like Electrical, Mechanical, and Civil Engineering.`,
+      content: `The admission cutoffs for IIT Bombay are highly competitive.`,
     },
     {
       title: "Postgraduate Programs",
-      content: `IIT Bombay offers diverse postgraduate programs, including M.Tech, MBA, MSc, and Ph.D. The admissions for M.Tech programs are primarily based on GATE (Graduate Aptitude Test in Engineering) scores, while MBA admissions are conducted through CAT (Common Admission Test). The institute is also renowned for its research opportunities, providing a world-class platform for innovation and exploration.`,
+      content: `IIT Bombay offers diverse postgraduate programs, including M.Tech, MBA, MSc, and Ph.D.`,
     },
   ];
 
@@ -175,6 +163,14 @@ const SearchPage = () => {
     },
   ];
 
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (isError) {
+    return <div className="flex justify-center items-center h-screen">Error loading institutes</div>;
+  }
+
   return (
     <>
       <PageBanner pageName="Search" currectPage="Search" />
@@ -186,7 +182,11 @@ const SearchPage = () => {
 
         <div className="flex gap-4 w-full mt-14 relative">
           <div className="filters w-[25%] mt-14 hidden lg:block">
-            <Filter filterSections={filterSections} settitle={settitle} setvalue={setvalue} />
+            <Filter 
+              filterSections={filterSections} 
+              settitle={setTitle} 
+              setvalue={setValue} 
+            />
           </div>
 
           <div className={`filterResult w-full ${isFilterOpen ? 'lg:w-[75%]' : 'lg:w-[75%]'}`}>
@@ -200,7 +200,7 @@ const SearchPage = () => {
               <div className="flex items-center justify-between mt-3 flex-wrap whitespace-nowrap w-full">
                 <div className="text-sm text-gray-700">
                   <span className="font-semibold text-red-500">
-                    {filteredContent?.length || "0"}
+                    {totalDocuments || "0"}
                   </span>{" "}
                   Institutes
                 </div>
@@ -209,7 +209,13 @@ const SearchPage = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveFilter(tab.id)}
-                      className={`text-xs md:text-sm py-2 px-3 ${tab.id !== tabs[tabs.length - 1].id ? 'border-r-2' : ''} border-opacity-15 font-medium transition-colors ${activeFilter === tab.id ? 'text-red-500 border-red-500 font-semibold' : 'text-gray-700'}`}
+                      className={`text-xs md:text-sm py-2 px-3 ${
+                        tab.id !== tabs[tabs.length - 1].id ? 'border-r-2' : ''
+                      } border-opacity-15 font-medium transition-colors ${
+                        activeFilter === tab.id 
+                          ? 'text-red-500 border-red-500 font-semibold' 
+                          : 'text-gray-700'
+                      }`}
                     >
                       {tab.label}
                     </button>
@@ -217,24 +223,35 @@ const SearchPage = () => {
                 </div>
               </div>
             </div>
+
+            {/* Display institutes */}
             {filteredContent?.slice(0, visibleItems).map((institute, index) => (
               <SearchResultBox key={institute._id || index} institute={institute} />
             ))}
-            {filteredContent?.length > visibleItems && (
-              <button
-                onClick={loadMore}
-                className="bg-red-500 text-white px-6 mt-8 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+
+            {/* "See More" button - show if there are more items to display */}
+            {visibleItems < filteredContent.length && (
+              
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={loadMore}
+                  className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
                 >
-                See More
-              </button>
+                  See More
+                </button>
+              </div>
             )}
-            {visibleItems > 5  && (
-              <button
-                onClick={loadLess}
-                className="bg-red-500 text-white px-6 mt-8 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+
+            {/* "See Less" button - show if expanded and there are more than 10 items */}
+            {visibleItems > 10 && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={loadLess}
+                  className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
                 >
-                See Less
-              </button>
+                  See Less
+                </button>
+              </div>
             )}
           </div>
         </div>

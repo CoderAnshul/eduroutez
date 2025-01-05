@@ -11,11 +11,11 @@ export const getInstitutes = async (state = null, city = null, organisationType 
       ...(organisationType && { organisationType }),
     };
 
-    const response = await axios.get(`${baseURL}/institutes`, {
-      params: {
-        filters: JSON.stringify(filters),
-      },
-    });
+    const endpoint = `${baseURL}/institutes`;
+
+    const params = Object.keys(filters).length > 0 ? { filters: JSON.stringify(filters) } : null;
+
+    const response = await axios.get(endpoint, { params });
 
     return response.data;
   } catch (error) {
@@ -23,6 +23,7 @@ export const getInstitutes = async (state = null, city = null, organisationType 
     throw error;
   }
 };
+
 
 export const blogById= async (id) => {
   try {
