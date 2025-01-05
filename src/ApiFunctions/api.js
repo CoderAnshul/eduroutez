@@ -11,11 +11,11 @@ export const getInstitutes = async (state = null, city = null, organisationType 
       ...(organisationType && { organisationType }),
     };
 
-    const endpoint = `${baseURL}/institutes`;
-
-    const params = Object.keys(filters).length > 0 ? { filters: JSON.stringify(filters) } : null;
-
-    const response = await axios.get(endpoint, { params });
+    const response = await axios.get(`${baseURL}/institutes`, {
+      params: {
+        filters: JSON.stringify(filters),
+      },
+    });
 
     return response.data;
   } catch (error) {
@@ -23,6 +23,7 @@ export const getInstitutes = async (state = null, city = null, organisationType 
     throw error;
   }
 };
+
 
 export const addToWishlist = async (userId, instituteId) => {
   try {
@@ -46,7 +47,6 @@ export const removeFromWishlist = async (userId, instituteId) => {
     throw error;
   }
 };
-
 
 export const blogById= async (id) => {
   try {
