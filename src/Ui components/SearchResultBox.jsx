@@ -10,6 +10,7 @@ import Cookies from 'js-cookie';
 import { addToWishlist } from '../ApiFunctions/api';
 
 const SearchResultBox = ({ institute }) => {
+  console.log('Institute:', institute);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   const handleAddToWishlist = async () => {
@@ -78,14 +79,14 @@ const SearchResultBox = ({ institute }) => {
           {/* Pricing and Info */}
           <div className="flex items-center space-x-4 mt-5 mb-2">
             <span className="text-gray-700 font-medium md:text-xl text-xs sm:text-sm flex items-center gap-1" >
-              <img src={rupee} className="h-4 opacity-75 mt-1" alt="rupee" />5,000 - 2,00,000
+              <img src={rupee} className="h-4 opacity-75 mt-1" alt="rupee" />{institute.minFees ||'300000'}-{institute.maxFees||'onwards'}
             </span>
             <span className="flex items-center font-medium md:text-xl text-xs sm:text-sm space-x-1">
               <img src={badge} alt="AICTE" className="h-4 opacity-75 mt-1" />
-              <span>AICTE</span>
+              <span>{institute.affiliation || 'AICTE'}</span>
             </span>
             <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl">
-              <img src={cashhand} alt="cash" className="h-4 opacity-75 mt-1" />9 Lacs
+              <img src={cashhand} alt="cash" className="h-4 opacity-75 mt-1" />{institute.highestPackage || '10LPA'}
             </span>
             <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl">
               <img src={checklist} alt="checklist" className="h-4 opacity-75 mt-1" />CAT
@@ -93,9 +94,9 @@ const SearchResultBox = ({ institute }) => {
           </div>
 
           {/* Description */}
-          <p className="text-sm text-gray-600 line-clamp-3">
-            {institute.about}
-          </p>
+        {/* Description */}
+<p className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{ __html: institute.about }} />
+
 
           {/* Footer Buttons */}
           <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">

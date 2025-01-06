@@ -20,6 +20,7 @@ import Addmissioninfo from '../Components/Addmissioninfo'
 import Placementinfo from '../Components/Placementinfo'
 import CampusInfo from '../Components/CampusInfo'
 import ScholarshipInfo from '../Components/ScholarshipInfo'
+import GalleryInfo from '../Components/GalleryInfo'
 
 const tabs = [
   "College Info",
@@ -228,6 +229,9 @@ const Instituepage = () => {
                       </div>
                       <div ref={sectionRefs[5]} className="min-h-24 pt-4">
                           <ScholarshipInfo instituteData={instituteData}/>
+                      </div>
+                      <div ref={sectionRefs[5]} className="min-h-24 pt-4">
+                          <GalleryInfo instituteData={instituteData}/>
                       </div>
                       <div ref={sectionRefs[8]} className="min-h-24 pt-4">
                           <ReviewandRating ratings={ratings} reviews={reviews} instituteData={instituteData}/>

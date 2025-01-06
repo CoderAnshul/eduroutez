@@ -37,6 +37,7 @@ const Login = React.lazy(() => import('./Pages/Login'));
 const Signup = React.lazy(() => import('./Pages/Signup'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
 const counselling = React.lazy(() => import('./Pages/counselling'));
+const Wishlist = React.lazy(() => import('./Pages/Wishlist'));
 
 const App = () => {
   return (
@@ -81,6 +82,7 @@ const App = () => {
             <Route path="documents" element={<StudentDocument />} />
             <Route path="counselor" element={<CounselorListPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="wishlist" element={<Wishlist/>} />
           </Route>
         </Routes>
       </Suspense>
