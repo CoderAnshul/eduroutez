@@ -9,6 +9,7 @@ const Sidebar = () => {
     { name: 'Wishlist', path: '/dashboard/wishlist', icon: '🏫' },
     { name: 'My Documents', path: '/dashboard/documents', icon: '📄' },
     { name: 'Talk to Counselor', path: '/dashboard/counselor', icon: '👤' },
+    { name: 'Redeem', path: '/dashboard/redeem', icon: '👤' },
     { name: 'Settings', path: '/dashboard/settings', icon: '⚙️' },
     { name: 'Logout', path: '/logout', icon: '🚪' },
   ];
