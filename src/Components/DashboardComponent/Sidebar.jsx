@@ -6,7 +6,7 @@ const Sidebar = () => {
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: '🏠' },
     { name: 'My Profile', path: '/dashboard/profile-page', icon: '👤' },
-    { name: 'Collages', path: '/dashboard/collages', icon: '🏫' },
+    { name: 'Wishlist', path: '/dashboard/wishlist', icon: '🏫' },
     { name: 'My Documents', path: '/dashboard/documents', icon: '📄' },
     { name: 'Talk to Counselor', path: '/dashboard/counselor', icon: '👤' },
     { name: 'Settings', path: '/dashboard/settings', icon: '⚙️' },
