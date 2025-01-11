@@ -105,7 +105,7 @@ const GalleryInfo = ({ instituteData }) => {
               aria-label="Close gallery"
             >
               <span className="text-gray-800 text-xl">&times;</span>
-            </button>
+            </button>-
 
             {/* Header */}
             <div className="sticky top-0 z-40 bg-white shadow-sm px-6 py-3">

@@ -16,6 +16,7 @@ import StudentDocument from './Pages/StudentDocument';
 import CounselorListPage from './Pages/CounselorListPage';
 import SettingsPage from './Pages/SettingsPage';
 import { ToastContainer } from 'react-toastify';
+import ReferAndEarn from './Pages/Refer-and-earn';
 
 
 // Lazy-loaded components
@@ -38,6 +39,7 @@ const Signup = React.lazy(() => import('./Pages/Signup'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
 const counselling = React.lazy(() => import('./Pages/counselling'));
 const Wishlist = React.lazy(() => import('./Pages/Wishlist'));
+const Question=React.lazy(()=>import('./Pages/Question-Answer'))
 const Redeem = React.lazy(()=> import('./Pages/Redeem'))
 const App = () => {
   return (
@@ -58,6 +60,7 @@ const App = () => {
           <Route path="/aboutus" element={<Aboutus />} />
           <Route path="/counselingpage" element={<Counselingpage />} />
           <Route path="/questionandAnswer/:email" element={<QuestionandAnswer />} />
+          <Route path='/question-&-answers' element={<Question/>}></Route>
           <Route path="/counselling/:email" element={<Counselling />} />
           <Route path="/careerspage" element={<Careerspage />} />
           <Route path="/blogdetailpage/:id" element={<BlogDetailPage />} />
@@ -84,6 +87,7 @@ const App = () => {
             <Route path="settings" element={<SettingsPage />} />
             <Route path="wishlist" element={<Wishlist/>} />
             <Route path="redeem" element={<Redeem/>} />
+            < Route path='refer&earn' element={<ReferAndEarn></ReferAndEarn>}></Route>
 
           </Route>
         </Routes>

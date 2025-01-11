@@ -11,6 +11,7 @@ import SecondMenu from './SubNavbar';
 import MobileNavbar from './MobileNavbar';
 import categories from '../DataFiles/categories';
 import Cookies from 'js-cookie';
+import { ContactPageSharp } from '@mui/icons-material';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,6 +20,8 @@ const Navbar = () => {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   const accessToken = Cookies.get('accessToken');
+  console.log('accessToken', accessToken);
+
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
