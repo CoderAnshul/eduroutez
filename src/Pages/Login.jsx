@@ -43,10 +43,10 @@ const Login = () => {
     },
     onSuccess: (data) => {
       toast.success("Logged in successfully!");
-      Cookies.set('accessToken', data.data.accessToken, { expires: 30 });
-      Cookies.set('refreshToken', data.data.refreshToken, { expires: 30 });
-      Cookies.set('email', formData.email, { expires: 30 });
-      Cookies.set('userId',  data.data.user._id, { expires: 30 });
+      Cookies.set('accessToken',data.data.accessToken, { expires: 30 });
+      Cookies.set('refreshToken',data.data.refreshToken, { expires: 30 });
+      Cookies.set('email',formData.email, { expires: 30 });
+      Cookies.set('userId',data.data.user._id, { expires: 30 });
 
 
       navigate("/");

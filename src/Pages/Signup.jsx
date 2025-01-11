@@ -47,18 +47,11 @@ const Signup = () => {
     },
     onSuccess: (data) => {
       alert("Signed Up Successfully! You can now log in.");
-       Cookies.set(
-        'accessToken',
-        JSON.stringify(data.data.accessToken)
-      );
-       Cookies.set(
-        'refreshToken',
-        JSON.stringify(data.data.refreshToken)
-      );
-       Cookies.set(
-        "email",
-        JSON.stringify(formData?.email)
-      )
+            Cookies.set('accessToken',data.data.accessToken, { expires: 30 });
+            Cookies.set('refreshToken',data.data.refreshToken, { expires: 30 });
+            Cookies.set('email',formData.email, { expires: 30 });
+            Cookies.set('userId',data.data.user._id, { expires: 30 });
+      
       navigate('/');
     },
     onError: (error) => {
