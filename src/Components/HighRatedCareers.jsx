@@ -27,7 +27,7 @@ const HighRatedCareers = () => {
         }
       
         if (isError) {
-          return <div className="flex justify-center items-center h-screen">Error loading best rated</div>;
+          return <div className="flex justify-center items-center h-screen">Error loading career</div>;
         }
   // const boxData = [
   //   {

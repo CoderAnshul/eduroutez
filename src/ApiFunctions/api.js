@@ -226,3 +226,15 @@ export const career = async () => {
     throw error;
   }
 };
+export const category = async () => {
+  try {
+    const response = await axios.get(`${baseURL}streams?limit=3`);
+    return response.data;
+
+    // return response.data;
+  } catch (error) {
+    console.error(`Error fetching category `, error);
+
+    throw error;
+  }
+};
