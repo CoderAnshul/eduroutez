@@ -1,9 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { getInstitutes } from "../../ApiFunctions/api";
+import { useDispatch } from "react-redux";
+import { setAllFieldsTrue,setAllFieldsFalse } from "../../config/inputSlice";
 
 const PersonalInfo = ({ setFormData, setIsSubmit }) => {
   const [colleges, setcolleges] = useState([]);
+  const [email,setEmail]=useState("")
+  const [name,setName]=useState("")
+  const [mobile,setMobile]=useState("")
+  const dispatch = useDispatch()
+  console.log(email)
+  console.log(name)
+  console.log(mobile)
+
+  if(email != "" || name != "" || mobile != ""){
+    dispatch(setAllFieldsTrue())
+  }
+  if(email === "" || name ==="" || mobile===""){
+    dispatch(setAllFieldsFalse())
+  }
 
   const { data, isLoading, isError, error } = useQuery(
     ["institutes"],
@@ -25,6 +41,15 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
+    if(id === "email"){
+      setEmail(value)
+    }
+    if(id === "fullName"){
+      setName(value)
+    }
+    if(id === "mobileNumber"){
+      setMobile(value)
+    }
     setFormData((prevData) => ({
       ...prevData,
       [id]: value, // Update the key-value pair dynamically
@@ -51,7 +76,8 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
             <input
               type="email"
               id="email"
-              placeholder="Enter your email"
+             
+              placeholder="Enter your email" 
               className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
               onChange={handleInputChange}
             />

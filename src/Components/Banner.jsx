@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import mainBanner from '../assets/Images/mainBanner.jpg';
 import banner3 from '../assets/Images/pageBanner.png';
 import banner2 from '../assets/Images/img3.png';
+import { useNavigate } from 'react-router-dom';
+import {useDispatch} from "react-redux"
+import { setInput } from '../config/inputSlice';
 
 
 const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [inputField,setInputField]=useState("")
+  const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const banners = [
     {
@@ -31,6 +37,18 @@ const Banner = () => {
 
     return () => clearInterval(interval); 
   }, []);
+  const handleInputChange = (e)=>{
+    setInputField(e.target.value)
+  }
+  const handleBtnClick = ()=>{
+    if(inputField == ""){
+      alert("Pleade enter something")
+    }else{
+      dispatch(setInput(inputField))
+      navigate("/searchpage")
+    }
+   
+  }
 
   return (
     <div className="h-[480px] w-full relative">
@@ -75,13 +93,15 @@ const Banner = () => {
               className="text-sm w-1/2"
               type="text"
               name="search"
+              value={inputField}
+              onChange={(e)=>handleInputChange(e)}
               id="search"
               placeholder="Search for Colleges, institute and more..."
             />
           </div>
           <button 
             className="!h-full right-0 !rounded-sm w-1/5 absolute top-0 bg-red-500 min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white"
-            onClick={() => window.location.href = '/searchpage'}
+            onClick={handleBtnClick}
           >
             Search
           </button>
