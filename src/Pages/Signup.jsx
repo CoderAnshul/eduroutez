@@ -18,6 +18,7 @@ const Signup = () => {
     state: "",
     password: "",
     confirmPassword: "",
+    referal_Code: ""
   });
 
   const handleChange = (e) => {
@@ -100,6 +101,7 @@ const Signup = () => {
             { label: "State", id: "state", type: "text", placeholder: "Enter your state" },
             { label: "Password", id: "password", type: "password", placeholder: "Create a password" },
             { label: "Confirm Password", id: "confirmPassword", type: "password", placeholder: "Confirm your password" },
+            {label: "Referral Code", id: "referal_Code", type: "text", placeholder: "Enter your Referral Code"}
           ].map((field) => (
             <div className="mb-4" key={field.id}>
               <label className="block text-sm font-medium mb-1" htmlFor={field.id}>
