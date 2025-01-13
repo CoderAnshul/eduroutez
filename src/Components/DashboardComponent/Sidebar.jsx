@@ -14,6 +14,19 @@ const Sidebar = () => {
     { name: 'Settings', path: '/dashboard/settings', icon: '⚙️' },
     { name: 'Logout', path: '/dashboard/logout', icon: '🚪' },
   ];
+  const handleLogout = async (name)=>{
+    if(name === "Logout"){
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/logout`,{
+        method: 'POST', // HTTP method
+        headers: {
+          'Content-Type': 'application/json', // Specify JSON format
+        },
+        credentials: 'include', // Ensures cookies are sent
+      })
+      const json = await response.json()
+      console.log(json)
+    }
+  }
 
   return (
     <>
@@ -36,6 +49,7 @@ const Sidebar = () => {
                       isActive ? 'bg-red-500 text-white' : 'hover:bg-gray-200'
                     }`
                   }
+                  onClick={()=>handleLogout(item.name)}
                 >
                   <span>{item.icon}</span>
                   {item.name}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import PageBanner from '../Ui components/PageBanner';
 import SearchResultInfo from '../Ui components/SearchResultInfo';
 import ExpandedBox from '../Ui components/ExpandedBox';
@@ -8,6 +8,7 @@ import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
 import { useQuery } from 'react-query';
 import { getInstitutes } from '../ApiFunctions/api';
+import { useSelector } from 'react-redux';
 
 const SearchPage = () => {
   const tabs = [
@@ -25,10 +26,12 @@ const SearchPage = () => {
   const [filteredContent, setFilteredContent] = useState([]);
   const [visibleItems, setVisibleItems] = useState(10); // Initially show 10 items
   const [totalDocuments, setTotalDocuments] = useState(0);
+  const inputField = useSelector(store => store.input.inputField)
+
 
   const { data, isLoading, isError } = useQuery(
     ["institutes"],
-    () => getInstitutes(),
+    () => getInstitutes(inputField,inputField),
     {
       enabled: true,
       onSuccess: (data) => {

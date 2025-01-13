@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import PersonalInfo from "../Components/Stepperparts/PersonalInfo";
-import VerifyDetails from "../Components/Stepperparts/VerifyDetails";
+// import VerifyDetails from "../Components/Stepperparts/VerifyDetails";
 import InputReview from "../Components/Stepperparts/InputReview";
 import UploadDocument from "../Components/Stepperparts/UploadDocument";
 import SocialLinks from "../Components/Stepperparts/SocialLinks";
@@ -8,6 +8,7 @@ import Feedback from "../Components/Stepperparts/Feedback";
 import { Link } from "react-router-dom";
 import {createReview} from '../ApiFunctions/api';
 import { useQuery } from "react-query";
+import { useSelector } from 'react-redux';
 // import { useMutation, useQuery } from '@tanstack/react-query';
 
 const Writereview = () => {
@@ -15,6 +16,9 @@ const Writereview = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const [formData,setFormData]=useState({});
   const [isSubmit,setIsSubmit]=useState(false);
+
+  const submit = useSelector(store=> store.input.allFields)
+  // console.log("submit" + submit)
 
 
   // Total Steps
@@ -30,7 +34,12 @@ const Writereview = () => {
   // Move to the next step
   const nextStep = () => {
     if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
+      if(!submit){
+        alert("All fields are required")
+      }else{
+        setCurrentStep(currentStep + 1);
+      }
+       
     } else {
       handleSubmit(formData);
       setIsModalOpen(true); // Open modal when "Submit" is clicked
@@ -83,15 +92,15 @@ if (data) {
     switch (currentStep) {
       case 1:
         return <PersonalInfo setFormData={setFormData} setIsSubmit={setIsSubmit} />;
+      // case 2:
+      //   return <VerifyDetails />;
       case 2:
-        return <VerifyDetails />;
-      case 3:
         return <InputReview setFormData={setFormData} setIsSubmit={setIsSubmit}/>;
-      case 4:
+      case 3:
         return <UploadDocument setFormData={setFormData} setIsSubmit={setIsSubmit}/>;
-      case 5:
+      case 4:
         return <SocialLinks setFormData={setFormData} setIsSubmit={setIsSubmit}/>;
-      case 6:
+      case 5:
         return <Feedback setFormData={setFormData} setIsSubmit={setIsSubmit}/>;
       default:
         return null;

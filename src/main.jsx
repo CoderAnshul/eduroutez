@@ -9,11 +9,16 @@ import {
   QueryClient,
   QueryClientProvider,
 } from 'react-query'
+import { Provider } from "react-redux";
+import appStore from './config/appStore.js'
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    <Provider store={appStore}>
     <QueryClientProvider client={new QueryClient()}>
       <App />
     </QueryClientProvider>
+    </Provider>
   </StrictMode>,
 )

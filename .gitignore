@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+node_modules_old/@esbuild/win32-x64/esbuild.exe
+node_modules_old/@rollup/rollup-win32-x64-msvc/rollup.win32-x64-msvc.node
