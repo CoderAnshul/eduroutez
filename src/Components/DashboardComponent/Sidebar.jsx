@@ -12,7 +12,7 @@ const Sidebar = () => {
     {name:'Refer & Earn',path:'/dashboard/refer&earn',icon:'🏫'},
     { name: 'Redeem', path: '/dashboard/redeem', icon: '👤' },
     { name: 'Settings', path: '/dashboard/settings', icon: '⚙️' },
-    { name: 'Logout', path: '/dashboard', icon: '🚪' },
+    { name: 'Logout', path: '/dashboard/logout', icon: '🚪' },
   ];
   const handleLogout = async (name)=>{
     if(name === "Logout"){

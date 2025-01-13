@@ -143,18 +143,7 @@ const WelcomeBanner = () => {
               {user.points || 0}
             </p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-600 text-sm">Next Level</p>
-            <p className="text-gray-900 font-semibold">
-              {levelDetails.nextTarget ? `${levelDetails.nextTarget}+ Points` : "Max Level"}
-            </p>
-          </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-600 text-sm">Next Level</p>
-            <p className="text-gray-900 font-semibold">
-              "Bronze Certificate"
-            </p>
-          </div>
+
         </div>
       </div>
     </div>

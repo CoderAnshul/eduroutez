@@ -41,6 +41,7 @@ const counselling = React.lazy(() => import('./Pages/counselling'));
 const Wishlist = React.lazy(() => import('./Pages/Wishlist'));
 const Question=React.lazy(()=>import('./Pages/Question-Answer'))
 const Redeem = React.lazy(()=> import('./Pages/Redeem'))
+const Logout = React.lazy(()=> import('./Pages/Logout'))
 const App = () => {
   return (
     <BrowserRouter>
@@ -88,6 +89,7 @@ const App = () => {
             <Route path="wishlist" element={<Wishlist/>} />
             <Route path="redeem" element={<Redeem/>} />
             < Route path='refer&earn' element={<ReferAndEarn></ReferAndEarn>}></Route>
+            <Route path="logout" element={<Logout/>} />
 
           </Route>
         </Routes>
