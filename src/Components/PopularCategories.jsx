@@ -13,6 +13,7 @@ import cat11 from '../assets/Images/categories/cat11.png'
 import cat12 from '../assets/Images/categories/cat12.png'
 import { Link } from 'react-router-dom'
 import { useQuery } from 'react-query'
+import { category } from '../ApiFunctions/api'
 
 const categories = [
   { img: cat1, title: 'Digital Marketing' },
@@ -30,15 +31,17 @@ const categories = [
 ]
 
 const PopularCategories = () => {
+  
   const [content, setContent] = useState([]);
+  console.log('categories');
           const { data, isLoading, isError } = useQuery(
-            ["career"],
+            ["category"],
             () => category(),
             {
               enabled: true,
               onSuccess: (data) => {
                 const { result } = data.data;
-                // console.log(data.data)
+                console.log('category data',data)
                setContent(result) 
               }
             }

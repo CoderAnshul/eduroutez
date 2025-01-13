@@ -12,7 +12,7 @@ const PopularCourses = () => {
    const [content, setContent] = useState([]);
    const imageBaseURL = import.meta.env.VITE_BASE_URL;
   const { data, isLoading, isError } = useQuery(
-    ["institute"],
+    ["popularCourses"],
     () => popularCourses(),
     {
       enabled: true,

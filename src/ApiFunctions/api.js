@@ -228,7 +228,8 @@ export const career = async () => {
 };
 export const category = async () => {
   try {
-    const response = await axios.get(`${baseURL}streams?limit=3`);
+    const response = await axios.get(`${baseURL}/streams?limit=8`);
+    console.log("response", response);
     return response.data;
 
     // return response.data;

@@ -9,17 +9,19 @@ const WelcomeBanner = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:4001/api/v1/user/", {
+        const response = await axios.get("http://localhost:4001/api/v1/user", {
           withCredentials: true,
         });
-
+        alert(response);
+        console.log(response);
         if (response.data.success) {
           setUser(response.data.data);
         } else {
           console.error("Failed to fetch user profile");
         }
       } catch (error) {
-        console.error("Error fetching user profile", error);
+        
+        console.error("Error fetching user profileB VG", error.message);
       } finally {
         setLoading(false);
       }
