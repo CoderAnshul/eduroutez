@@ -1,16 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { Trophy, Gift, History } from 'lucide-react';
 
 const Redeem = () => {
-    const userPoints = 750; // User's available points
+    const [userPoints, setUserPoints] = useState(0); // User's available points
     const [redeemPoints, setRedeemPoints] = useState('');
     const [message, setMessage] = useState('');
     const [history, setHistory] = useState([]);
 
-    const handleRedeem = (e) => {
-        e.preventDefault();
-        const points = parseInt(redeemPoints, 10);
+    // Fetch user points from the backend
+    useEffect(() => {
+        const fetchUserPoints = async () => {
+            try {
+                const userId = Cookies.get('userId'); // Get user ID from cookies
+                if (!userId) throw new Error("User ID not found in cookies");
 
+                const response = await axios.get("http://localhost:4001/api/v1/user/", {
+                    withCredentials: true,
+                });
+
+                setUserPoints(response.data.data.points || 0); // Set points from the response
+            } catch (error) {
+                console.error("Error fetching user points:", error);
+                setMessage("Failed to fetch points.");
+            }
+        };
+
+        fetchUserPoints();
+    }, []);
+
+    // Handle point redemption
+    const handleRedeem = async (e) => {
+        e.preventDefault();
+
+        const points = parseInt(redeemPoints, 10);
         if (isNaN(points) || points <= 0) {
             setMessage("Please enter a valid number of points.");
             return;
@@ -18,15 +42,32 @@ const Redeem = () => {
 
         if (points > userPoints) {
             setMessage("You don't have enough points.");
-        } else {
-            const timestamp = new Date().toLocaleString();
-            const newEntry = { points, timestamp };
-
-            setHistory([newEntry, ...history]); // Add to history
-            setMessage(`Successfully redeemed ${points} points!`);
+            return;
         }
 
-        setRedeemPoints(''); // Reset the input field
+        try {
+            const response = await axios.post(
+                "http://localhost:4001/api/v1/redeem-points",
+                { points },
+                { withCredentials: true }
+            );
+console.log("Response", response);
+            if (response.data.success) {
+                const timestamp = new Date().toLocaleString();
+                const newEntry = { points, timestamp };
+
+                setHistory([newEntry, ...history]); // Add to history
+                setUserPoints(userPoints - points); // Deduct points
+                setMessage(`Successfully redeemed ${points} points!`);
+            } else {
+                setMessage(response.data.message || "Redemption failed.");
+            }
+        } catch (error) {
+            console.error("Error redeeming points:", error);
+            setMessage("An error occurred while redeeming points.");
+        }
+
+        setRedeemPoints(''); // Reset input
     };
 
     return (
