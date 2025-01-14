@@ -9,7 +9,7 @@ export const getInstitutes = async (state, city) => {
       ...(state && { state }),
       ...(city && { city }),
     };
-    console.log("Search Fields:", searchFields);
+    // console.log("Search Fields:", searchFields);
 
     const response = await axios.get(`${baseURL}/institutes`, {
       params: {
