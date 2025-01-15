@@ -13,7 +13,7 @@ const fetchUserData = async () => {
     throw new Error("User ID not found in cookies");
   }
   const response = await axios.get(`${VITE_BASE_URL}/user/`, {
-    withCredentials: true,
+    withCredentials: 'include',
   });
   return response.data.data;
 };
