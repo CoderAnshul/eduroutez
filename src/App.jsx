@@ -17,7 +17,7 @@ import CounselorListPage from './Pages/CounselorListPage';
 import SettingsPage from './Pages/SettingsPage';
 import { ToastContainer } from 'react-toastify';
 import ReferAndEarn from './Pages/Refer-and-earn';
-
+import ReviewActivity from './Pages/ReviewActivity';
 
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
@@ -87,6 +87,7 @@ const App = () => {
             <Route path="counselor" element={<CounselorListPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="wishlist" element={<Wishlist/>} />
+            <Route path='reviews' element={<ReviewActivity/>}></Route>
             <Route path="redeem" element={<Redeem/>} />
             < Route path='refer&earn' element={<ReferAndEarn></ReferAndEarn>}></Route>
             <Route path="logout" element={<Logout/>} />

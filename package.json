@@ -29,6 +29,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.28.0",
     "react-toastify": "^11.0.2",
+    "recharts": "^2.15.0",
     "sonner": "^1.7.1",
     "swiper": "^11.1.15"
   },

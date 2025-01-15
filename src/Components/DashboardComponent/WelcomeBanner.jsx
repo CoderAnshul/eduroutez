@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Crown, Award, Medal, Star, MessageCircle, Share2, UserPlus, MessageSquare, HelpCircle } from "lucide-react";
 import axios from "axios";
-import { Crown, Award, Medal, Star } from "lucide-react";
 
 const WelcomeBanner = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -12,16 +14,13 @@ const WelcomeBanner = () => {
         const response = await axios.get("http://localhost:4001/api/v1/user", {
           withCredentials: true,
         });
-        alert(response);
-        console.log(response);
         if (response.data.success) {
           setUser(response.data.data);
         } else {
           console.error("Failed to fetch user profile");
         }
       } catch (error) {
-        
-        console.error("Error fetching user profileB VG", error.message);
+        console.error("Error fetching user profile", error.message);
       } finally {
         setLoading(false);
       }
@@ -31,119 +30,170 @@ const WelcomeBanner = () => {
   }, []);
 
   const getLevelDetails = (points) => {
-    if (points >= 5001) {
-      return {
+    const levels = [
+      {
+        threshold: 5001,
         name: "Platinum Certificate",
         icon: Crown,
-        color: "bg-gradient-to-r from-slate-300 to-zinc-300",
+        color: "from-slate-300 to-zinc-300",
+        textColor: "text-slate-900",
         progress: 100,
         currentRange: "5001+",
-        nextTarget: null
-      };
-    }
-    if (points >= 1001) {
-      return {
+        description: "Elite Level Achievement"
+      },
+      {
+        threshold: 1001,
         name: "Gold Certificate",
         icon: Award,
-        color: "bg-gradient-to-r from-yellow-400 to-yellow-300",
+        color: "from-yellow-400 to-yellow-300",
+        textColor: "text-yellow-900",
         progress: 80,
         currentRange: "1001-5000",
-        nextTarget: 5001
-      };
-    }
-    if (points >= 501) {
-      return {
+        description: "Advanced Expert Status"
+      },
+      {
+        threshold: 501,
         name: "Silver Certificate",
         icon: Medal,
-        color: "bg-gradient-to-r from-gray-300 to-gray-200",
+        color: "from-gray-300 to-gray-200",
+        textColor: "text-gray-900",
         progress: 60,
         currentRange: "501-1000",
-        nextTarget: 1001
-      };
-    }
-    if (points >= 11) {
-      return {
+        description: "Intermediate Level"
+      },
+      {
+        threshold: 11,
         name: "Bronze Certificate",
         icon: Medal,
-        color: "bg-gradient-to-r from-orange-700 to-orange-600",
+        color: "from-orange-700 to-orange-600",
+        textColor: "text-orange-100",
         progress: 40,
         currentRange: "11-500",
-        nextTarget: 501
-      };
-    }
-    return {
-      name: "Well Wisher",
-      icon: Star,
-      color: "bg-gradient-to-r from-blue-400 to-blue-300",
-      progress: 20,
-      currentRange: "0-10",
-      nextTarget: 11
-    };
+        description: "Getting Started"
+      },
+      {
+        threshold: 0,
+        name: "Well Wisher",
+        icon: Star,
+        color: "from-blue-400 to-blue-300",
+        textColor: "text-blue-900",
+        progress: 20,
+        currentRange: "0-10",
+        description: "New Member"
+      }
+    ];
+
+    return levels.find(level => points >= level.threshold) || levels[levels.length - 1];
   };
+
+  const ActionCard = ({ icon: Icon, title, onClick, color }) => (
+    <div className="bg-white rounded-lg shadow-md group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1" onClick={onClick}>
+      <div className="p-6 flex flex-col items-center text-center space-y-2">
+        <div className={`p-3 rounded-full ${color} group-hover:scale-110 transition-transform duration-300`}>
+          <Icon className="h-6 w-6 text-white" />
+        </div>
+        <h3 className="font-semibold">{title}</h3>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
-      <div className="animate-pulse bg-gray-100 p-6 rounded-lg">
-        <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+      <div className="w-full p-6 bg-white rounded-lg shadow-lg animate-pulse">
+        <div className="space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-24 bg-gray-200 rounded"></div>
+          <div className="grid grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-20 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="bg-red-50 border border-red-200 p-6 rounded-lg text-red-600">
-        <p className="text-lg">Error loading user data. Please try again later.</p>
+      <div className="w-full p-6 bg-red-50 border border-red-200 rounded-lg">
+        <p className="text-red-600">Error loading user data. Please try again later.</p>
       </div>
     );
   }
 
   const levelDetails = getLevelDetails(user.points);
   const LevelIcon = levelDetails.icon;
-  const pointsToNext = levelDetails.nextTarget ? levelDetails.nextTarget - user.points : 0;
+
+  const actions = [
+    { icon: MessageCircle, title: "Ask a Question", color: "bg-blue-500", route: "/question-&-answers" },
+    { icon: Share2, title: "Refer Friends", color: "bg-purple-500", route: "/dashboard/refer&earn" },
+    { icon: UserPlus, title: "Become Counselor", color: "bg-red-500", route: "/become-couseller" },
+    { icon: MessageSquare, title: "Feedback", color: "bg-indigo-500", route: "/dashboard/reviews" },
+    { icon: HelpCircle, title: "Talk to Expert", color: "bg-pink-500", route: "/dashboard/counselor" },
+  ];
+
+  const handleActionClick = (route) => {
+    navigate(route);
+  };
 
   return (
-    <div className="bg-white shadow-xl rounded-xl overflow-hidden">
-      <div className="bg-gradient-to-r from-red-600 to-red-600 p-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Welcome back, {user.name}!
-            </h1>
-            <p className="text-purple-100">
-              You've earned {user.points || 0} points so far
-            </p>
-          </div>
-          <div className="flex items-center justify-center">
-            <LevelIcon size={48} className="text-white" />
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-red-600 to-red-500 p-8">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-white">
+                Welcome back, {user.name}! 👋
+              </h1>
+              <p className="text-red-100">
+                You've earned {user.points || 0} points on your journey
+              </p>
+            </div>
+            <LevelIcon className="h-16 w-16 text-white opacity-90" />
           </div>
         </div>
-      </div>
-
-      <div className="p-6">
-        <div className={`${levelDetails.color} rounded-lg p-6 flex items-center space-x-4`}>
-          <LevelIcon size={32} className="text-white" />
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold text-white mb-2">
-              {levelDetails.name}
-            </h2>
-            <div className="w-full bg-black bg-opacity-10 rounded-full h-2">
-              <div
-                className="bg-white rounded-full h-2 transition-all duration-500"
-                style={{ width: `${levelDetails.progress}%` }}
-              ></div>
+        
+        <div className="p-6 space-y-6">
+          <div className={`bg-gradient-to-r ${levelDetails.color} rounded-lg shadow-md`}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="space-y-1">
+                  <h2 className={`text-xl font-bold ${levelDetails.textColor}`}>
+                    {levelDetails.name}
+                  </h2>
+                  <p className={`${levelDetails.textColor} opacity-80`}>
+                    {levelDetails.description}
+                  </p>
+                </div>
+                <LevelIcon className={`h-8 w-8 ${levelDetails.textColor}`} />
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className={`${levelDetails.textColor}`}>Current Range: {levelDetails.currentRange} points</span>
+                  <span className={`${levelDetails.textColor} font-medium`}>{levelDetails.progress}%</span>
+                </div>
+                <div className="w-full bg-black bg-opacity-10 rounded-full h-2">
+                  <div
+                    className="bg-white rounded-full h-2 transition-all duration-500"
+                    style={{ width: `${levelDetails.progress}%` }}
+                  ></div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="mt-6 grid grid-cols-3 gap-4 text-center">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-600 text-sm">Current Points</p>
-            <p className="text-gray-900 font-semibold">
-              {user.points || 0}
-            </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {actions.map((action, index) => (
+              <ActionCard
+                key={index}
+                icon={action.icon}
+                title={action.title}
+                color={action.color}
+                onClick={() => handleActionClick(action.route)}
+              />
+            ))}
           </div>
-
         </div>
       </div>
     </div>

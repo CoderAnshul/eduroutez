@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React ,{useState} from 'react';
 import axios from 'axios';
-
+import Cookies from 'js-cookie';
 const Logout = () => {
+    const [showPopup, setShowPopup] = useState(true);
     const apiUrl = import.meta.env.VITE_BASE_URL;
 
     const handleLogout = async () => {
         try {
-            const token = Cookies.get('authToken'); // Assuming the token is stored in the cookie
+            const token = Cookies.get('accessToken'); // Assuming the token is stored in the cookie
     
             if (!token) {
                 throw new Error("No token found in cookies");
@@ -22,10 +23,13 @@ const Logout = () => {
                     withCredentials: true, // Make sure credentials (cookies) are included with the request
                 }
             );
-    
-            // Optional: Clear the token after logging out (if needed)
-            Cookies.remove('authToken');
+
+            Cookies.remove('accessToken');
+            Cookies.remove('refreshToken');
+            Cookies.remove('userId');
+            Cookies.remove('email');
             console.log('Logged out successfully!');
+            window.location.href = '/login'; // Redirect to login page
         } catch (error) {
             console.error("Logout failed:", error);
         }
