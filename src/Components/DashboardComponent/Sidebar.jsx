@@ -20,7 +20,11 @@ const Sidebar = () => {
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/logout`,{
         method: 'POST', // HTTP method
         headers: {
-          'Content-Type': 'application/json', // Specify JSON format
+          'Content-Type': 'application/json',
+          
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')
+           // Specify JSON format
         },
         credentials: 'include', // Ensures cookies are sent
       })

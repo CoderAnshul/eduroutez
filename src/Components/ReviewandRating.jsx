@@ -4,12 +4,11 @@ import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
 import InstituteReviewBox from '../Ui components/InstituteReviewBox';
 import CustomButton from "../Ui components/CustomButton";
-import Cookies from 'js-cookie';
 
 const ReviewandRating = ({ ratings, reviews, instituteData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
-  const accessToken = Cookies.get("accessToken");
+  const accessToken = localStorage.getItem("accessToken");
 
   const handleReviewClick = (e) => {
     console.log('clicked')

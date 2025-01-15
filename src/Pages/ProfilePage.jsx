@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useMutation, useQuery } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
-import Cookies from "js-cookie";
-import axios from "axios";
 
-const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // Fetch the user data
 const fetchUserData = async () => {
-  const userId = Cookies.get('userId');
+  const userId = localStorage.getItem('userId');
   if (!userId) {
-    throw new Error("User ID not found in cookies");
+    throw new Error("User ID not found in localStorage");
   }
-  const response = await axios.get(`${VITE_BASE_URL}/user/`, {
-    withCredentials: 'include',
+  const response = await axiosInstance.get(`${VITE_BASE_URL}/user/`, {
+    headers: {
+      headers: {
+        'Content-Type': 'application/json',
+        
+        'x-access-token': localStorage.getItem('accessToken'),
+        'x-refresh-token': localStorage.getItem('refreshToken')
+      }    }
   });
   return response.data.data;
 };
@@ -59,11 +63,11 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userId = Cookies.get('userId');
+      const userId = localStorage.getItem('userId');
       if (!userId) {
-        throw new Error("User ID not found in cookies");
+        throw new Error("User ID not found in localStorage");
       }
-      const updatedForm = { ...formData, email: Cookies.get('email')?.replace(/^"|"$/g, '') };
+      const updatedForm = { ...formData, email: localStorage.getItem('email')?.replace(/^"|"$/g, '') };
       mutate({ userId, updatedForm });
     } catch (error) {
       alert("Some error occurred!");
@@ -73,8 +77,11 @@ const ProfilePage = () => {
   const { mutate, isLoading: isSubmitting } = useMutation({
     mutationFn: async ({ userId, updatedForm }) => {
       const endpoint = `${apiUrl}/user/${userId}`; // PATCH request URL
-      const response = await axiosInstance.patch(endpoint, updatedForm, { // Use PATCH here
-        withCredentials: true,
+      const response = await axiosInstance.patch(endpoint, updatedForm, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')        }
       });
       return response.data;
     },

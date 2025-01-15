@@ -4,10 +4,9 @@ import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
-import axiosInstance from "../ApiFunctions/axios";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import Cookies from 'js-cookie';
+import axios from "axios";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -26,48 +25,52 @@ const Login = () => {
   const mutation = useMutation({
     mutationFn: async (credentials) => {
       try {
-        const response = await axiosInstance.post(
+        const response = await axios.post(
           `${apiUrl}/login`,
           credentials,
           {
             headers: {
               "Content-Type": "application/json",
+              
+            'x-access-token': localStorage.getItem('accessToken'),
+            'x-refresh-token': localStorage.getItem('refreshToken')
             },
           }
         );
+        console.log('respomse',response.data.data)
         return response.data;
+        
       } catch (error) {
+        console.error('dfghjbn',error.message);
         const errorMessage =
           error.response?.data?.message || "Login failed. Please try again.";
         throw new Error(errorMessage);
       }
     },
     onSuccess: (data) => {
+      console.log("Data", data);
       toast.success("Logged in successfully!");
-      Cookies.set('accessToken', data.data.accessToken, {
-        expires: 30,
-        secure: true,
-        sameSite: "None",
-      });
-      
-      Cookies.set('refreshToken', data.data.refreshToken, {
-        expires: 30,
-        secure: true,
-        sameSite: "None",
-      });
-      
-      Cookies.set('email', formData.email, {
-        expires: 30,
-        secure: true,
-        sameSite: "None",
-      });
-      
-      Cookies.set('userId', data.data.user._id, {
-        expires: 30,
-        secure: true,
-        sameSite: "None",
-      });
-      
+ localStorage.setItem(
+        'accessToken',
+        JSON.stringify(data.data.accessToken)
+      );
+      localStorage.setItem(
+        'userId',
+        data?.data?.user?._id
+      );
+      localStorage.setItem(
+        'role',
+        data?.data?.user?.role
+      );
+      localStorage.setItem(
+        'email',
+        data?.data?.user?.email
+      );      
+      localStorage.setItem(
+        'refreshToken',
+        JSON.stringify(data.data.refreshToken)
+      );
+      console.log("LocalStorage set with tokens and user info");
 
 
       navigate("/");

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../ApiFunctions/axios';
 import { useQuery } from 'react-query';
-import Cookies from 'js-cookie';
+
 const Counselling = () => {
   const { email } = useParams();
   const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -70,53 +70,64 @@ const Counselling = () => {
     }
   };
 
-  const handleClick=(slot)=>{
-    const studentEmail = JSON.parse(Cookies.get('email'));
+  const handleClick = (slot) => {
+    const studentEmail = localStorage.getItem('email');
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
     const selectedSlot = {
-        slot,
-        date,
-        studentEmail,
-        email
+      slot,
+      date,
+      studentEmail,
+      email,
     };
-    console.log(selectedSlot)
-    axiosInstance.post(`${apiUrl}/bookslot`, selectedSlot)
-      .then(response => {
+    console.log(selectedSlot);
+    axiosInstance
+      .post(`${apiUrl}/bookslot`, selectedSlot, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Student-Email': studentEmail,
+          'x-access-token': accessToken,
+          'x-refresh-token': refreshToken
+        },
+      })
+      .then((response) => {
         console.log('Slot booked successfully:', response.data);
         alert('Slot booked successfully!');
       })
-      .catch(error => {
-        console.error('Error booking slot:', error);
+      .catch((error) => {
+        console.error('Error booking slot:', error.message);
         alert('Failed to book slot. Please try again.');
       });
-  }
+  };
+
   if (isLoading) return <div>Loading...</div>;
 
-return (
+  return (
     <div className='w-full h-full flex flex-col items-center justify-center justify-col'>
-        <h2 className='text-2xl font-bold mb-4 text-gray-800'>Select the Date of Counselling</h2>
-        <input
-            className='w-[10rem] bg-slate-200 rounded-lg p-2 text-center'
-            type='date'
-            onChange={handleDateChange}
-        />
-        <div className='mt-4 flex flex-wrap gap-2'>
-            <h1 className='text-lg font-semibold text-gray-700'>Available Slots:</h1>
-            {timeSlots.length > 0 ? (
-                timeSlots.map((slot, index) => (
-                    <button
-                        key={index}
-                        className='px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600'
-                        onClick={() => handleClick(slot)}
-                    >
-                        {slot}
-                    </button>
-                ))
-            ) : (
-                date && <p>No available slots for the selected date.</p>
-            )}
-        </div>
+      <h2 className='text-2xl font-bold mb-4 text-gray-800'>Select the Date of Counselling</h2>
+      <input
+        className='w-[10rem] bg-slate-200 rounded-lg p-2 text-center'
+        type='date'
+        onChange={handleDateChange}
+      />
+      <div className='mt-4 flex flex-wrap gap-2'>
+        <h1 className='text-lg font-semibold text-gray-700'>Available Slots:</h1>
+        {timeSlots.length > 0 ? (
+          timeSlots.map((slot, index) => (
+            <button
+              key={index}
+              className='px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600'
+              onClick={() => handleClick(slot)}
+            >
+              {slot}
+            </button>
+          ))
+        ) : (
+          date && <p>No available slots for the selected date.</p>
+        )}
+      </div>
     </div>
-);
+  );
 };
 
 export default Counselling;

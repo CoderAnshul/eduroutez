@@ -4,7 +4,6 @@ import ConsellingBanner from "../Components/ConsellingBanner";
 import { useQuery } from "react-query";
 import { counsellers } from "../ApiFunctions/api";
 import { Link } from "react-router-dom";
-import Cookies from "js-cookie";
 
 const counselors = [
   {
@@ -93,6 +92,7 @@ const counselors = [
   },
 ];
 
+
 const tabs = [
   "Best Rated Counseling",
   "Highly recommended",
@@ -116,7 +116,7 @@ const Counselingpage = () => {
   const imageURL = import.meta.env.IMAGE_BASE_URL;
 
   const handleConnectClick = (email) => {
-    const userEmail = Cookies.get("email");
+    const userEmail = localStorage.getItem("email");
     if (userEmail) {
       window.location.href = `/counselling/${email}`;
     } else {

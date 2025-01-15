@@ -1,4 +1,3 @@
-// filepath: /c:/eduroutez/src/Ui components/SearchResultBox.jsx
 import React, { useState } from "react";
 import CustomButton from "./CustomButton";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
@@ -6,7 +5,6 @@ import rupee from "../assets/Images/rupee.png";
 import badge from "../assets/Images/badge.png";
 import cashhand from "../assets/Images/cashhand.png";
 import checklist from "../assets/Images/checklist.png";
-import Cookies from 'js-cookie';
 import { addToWishlist } from '../ApiFunctions/api';
 
 const SearchResultBox = ({ institute }) => {
@@ -15,8 +13,13 @@ const SearchResultBox = ({ institute }) => {
 
   const handleAddToWishlist = async () => {
     try {
-      const userId = Cookies.get('userId');
-      const response = await addToWishlist(userId, institute._id, null); // Assuming courseId is null for now
+      const userId = localStorage.getItem('userId');
+      const response = await addToWishlist(userId, institute._id, null, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')     }
+      }); // Assuming courseId is null for now
       if (response.message.includes('removed')) {
         setIsWishlisted(false);
       } else if (response.message.includes('added')) {
@@ -94,9 +97,7 @@ const SearchResultBox = ({ institute }) => {
           </div>
 
           {/* Description */}
-        {/* Description */}
-<p className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{ __html: institute.about }} />
-
+          <p className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{ __html: institute.about }} />
 
           {/* Footer Buttons */}
           <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">

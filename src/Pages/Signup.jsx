@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-// import { toast } from "sonner";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 import { useNavigate } from 'react-router-dom';
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
-import Cookies from "js-cookie";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -26,7 +24,8 @@ const Signup = () => {
   };
   
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_BASE_URL;
+  const apiUrl =  import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
+  console.log(apiUrl);
   const mutation = useMutation({
     mutationFn: async (credentials) => {
       try {
@@ -36,22 +35,25 @@ const Signup = () => {
           credentials,
           {
             headers: {
-              'Content-Type': 'application/json'
-            }
+              'Content-Type': 'application/json',
+              'x-access-token': localStorage.getItem('accessToken'),
+              'x-refresh-token': localStorage.getItem('refreshToken')            }
           }
         );
+        console.log("Response", response);
         return response.data;
       } catch (error) {
         const errorMessage = error.response?.data?.message || "Failed to sign up";
+        console.error(error.message);
         throw new Error(errorMessage);
       }
     },
     onSuccess: (data) => {
       alert("Signed Up Successfully! You can now log in.");
-            Cookies.set('accessToken',data.data.accessToken, { expires: 30 });
-            Cookies.set('refreshToken',data.data.refreshToken, { expires: 30 });
-            Cookies.set('email',formData.email, { expires: 30 });
-            Cookies.set('userId',data.data.user._id, { expires: 30 });
+      localStorage.setItem('accessToken', data.data.accessToken);
+      localStorage.setItem('refreshToken', data.data.refreshToken);
+      localStorage.setItem('email', formData.email);
+      localStorage.setItem('userId', data.data.user._id);
       
       navigate('/');
     },

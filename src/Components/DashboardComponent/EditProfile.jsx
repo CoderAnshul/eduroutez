@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import axios from "axios";
 import { useMutation } from "react-query";
 
@@ -15,17 +14,22 @@ const EditProfile = () => {
     country: ''
   });
   const [message, setMessage] = useState('');
-const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+  const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
   // Fetch user points and initial profile data
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userId = Cookies.get('userId'); // Get user ID from cookies
-        if (!userId) throw new Error("User ID not found in cookies");
+        const userId = localStorage.getItem('userId'); // Get user ID from localStorage
+        if (!userId) throw new Error("User ID not found in localStorage");
 
         const response = await axios.get(`${VITE_BASE_URL}/user`, {
-          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+            
+            'x-access-token': localStorage.getItem('accessToken'),
+            'x-refresh-token': localStorage.getItem('refreshToken')
+          } 
         });
 
         setUserData({
@@ -53,9 +57,10 @@ const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
       const endpoint = `${apiUrl}/student`;
       const response = await axios.post(endpoint, finalFormData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true,
+          'Content-Type': 'multipart/form-data'   ,
+        
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')    }
       });
       return response.data;
     },

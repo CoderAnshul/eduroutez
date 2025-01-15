@@ -1,36 +1,58 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
-import axios from "axios";
-import Cookies from "js-cookie";
+import { ArrowRight } from "lucide-react"; // Import ArrowRight icon from lucide-react
+import axiosInstance from "../../ApiFunctions/axios";
+import { useNavigate } from 'react-router-dom';
 
 const DashboardNav = () => {
   const [userName, setUserName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userId = Cookies.get('userId');
+        const userId = localStorage.getItem('userId');
         if (!userId) {
-          throw new Error("User ID not found in cookies");
+          navigate('/');
+          return;
         }
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/`, {
-          withCredentials: true,
+
+        setIsLoading(true);
+        const response = await axiosInstance.get('/user/', {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': localStorage.getItem('accessToken'),
+            'x-refresh-token': localStorage.getItem('refreshToken')
+          }
         });
-        setUserName(response.data.data.name);
+console.log('response',response.data)
+        if (response.data?.name) {
+          setUserName(response.data.data.name);
+        }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.log("Error fetching user data:", error.message);
+        if (error.response?.status === 401) {
+         console.log("User not logged in");
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [navigate]);
 
   const handleBecomeCounselor = () => {
-    window.location.href = "/become-couseller";
+    navigate("/become-couseller");
   };
 
   const handleQuestion = () => {
-    window.location.href = '/question-&-answers';
+    navigate('/question-&-answers');
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
   };
 
   return (
@@ -52,10 +74,26 @@ const DashboardNav = () => {
           Ask Question
           <ArrowRight className="h-4 w-4" />
         </button>
-
+        
         <div className="border px-4 py-2 rounded-md flex items-center gap-2">
-          <h3>{userName}</h3>
-          <div className="h-7 w-7 bg-gray-500 rounded-full"></div>
+          {isLoading ? (
+            <span className="text-gray-500">Loading...</span>
+          ) : (
+            <>
+              <h3>{userName || 'Guest'}</h3>
+              <div 
+                className="h-7 w-7 rounded-full cursor-pointer hover:bg-gray-100 flex items-center justify-center"
+                onClick={handleLogout}
+                title="Click to logout"
+              >
+<img
+  src="https://randomuser.me/api/portraits/v4/lego/1.jpg" 
+  alt="User profile"
+  className="h-6 w-6 rounded-full"  
+/>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </header>
