@@ -25,8 +25,11 @@ const EditProfile = () => {
 
         const response = await axios.get(`${VITE_BASE_URL}/user`, {
           headers: {
-            'Authorization': `Bearer ${userId}`
-          }
+            'Content-Type': 'application/json',
+            
+            'x-access-token': localStorage.getItem('accessToken'),
+            'x-refresh-token': localStorage.getItem('refreshToken')
+          } 
         });
 
         setUserData({
@@ -54,9 +57,10 @@ const EditProfile = () => {
       const endpoint = `${apiUrl}/student`;
       const response = await axios.post(endpoint, finalFormData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${localStorage.getItem('userId')}`
-        }
+          'Content-Type': 'multipart/form-data'   ,
+        
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')    }
       });
       return response.data;
     },

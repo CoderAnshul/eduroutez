@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react"; // Import ArrowRight icon from lucide-react
 import axiosInstance from "../../ApiFunctions/axios";
 import { useNavigate } from 'react-router-dom';
 
@@ -7,9 +7,6 @@ const DashboardNav = () => {
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const apiUrl = typeof window !== 'undefined' 
-    ? window.VITE_BASE_URL 
-    : import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -28,15 +25,14 @@ const DashboardNav = () => {
             'x-refresh-token': localStorage.getItem('refreshToken')
           }
         });
-
-        if (response.data?.data?.name) {
+console.log('response',response.data)
+        if (response.data?.name) {
           setUserName(response.data.data.name);
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.log("Error fetching user data:", error.message);
         if (error.response?.status === 401) {
-          localStorage.clear();
-          navigate('/');
+         console.log("User not logged in");
         }
       } finally {
         setIsLoading(false);
@@ -86,10 +82,16 @@ const DashboardNav = () => {
             <>
               <h3>{userName || 'Guest'}</h3>
               <div 
-                className="h-7 w-7 bg-gray-500 rounded-full cursor-pointer hover:bg-gray-600"
+                className="h-7 w-7 rounded-full cursor-pointer hover:bg-gray-100 flex items-center justify-center"
                 onClick={handleLogout}
                 title="Click to logout"
-              />
+              >
+<img
+  src="https://randomuser.me/api/portraits/v4/lego/1.jpg" 
+  alt="User profile"
+  className="h-6 w-6 rounded-full"  
+/>
+              </div>
             </>
           )}
         </div>

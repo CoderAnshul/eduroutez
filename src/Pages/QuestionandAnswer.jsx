@@ -103,7 +103,9 @@ const QuestionandAnswer = () => {
         method:'post',
         data: formData,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')
         }
       });
       return response.data;

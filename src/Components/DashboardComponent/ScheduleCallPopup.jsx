@@ -34,9 +34,12 @@ const ScheduleCallPopup = ({ isOpen, onClose,counselor }) => {
       const response = await axios.post(
        `${apiUrl}/bookslot`,
         { date: formData.date, slot: formData.timeSlot, email:formData.email,studentEmail:formData.studentEmail },
-        {
-         withCredentials:true,
-        }
+        {headers: {
+          
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')
+        } 
+      }
       );
 console.log(response);
       if (response.status === 200) {

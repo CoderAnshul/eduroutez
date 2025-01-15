@@ -24,7 +24,8 @@ const Signup = () => {
   };
   
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_BASE_URL;
+  const apiUrl =  import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
+  console.log(apiUrl);
   const mutation = useMutation({
     mutationFn: async (credentials) => {
       try {
@@ -34,13 +35,16 @@ const Signup = () => {
           credentials,
           {
             headers: {
-              'Content-Type': 'application/json'
-            }
+              'Content-Type': 'application/json',
+              'x-access-token': localStorage.getItem('accessToken'),
+              'x-refresh-token': localStorage.getItem('refreshToken')            }
           }
         );
+        console.log("Response", response);
         return response.data;
       } catch (error) {
         const errorMessage = error.response?.data?.message || "Failed to sign up";
+        console.error(error.message);
         throw new Error(errorMessage);
       }
     },

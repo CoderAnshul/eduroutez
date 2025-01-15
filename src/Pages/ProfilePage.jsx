@@ -12,8 +12,12 @@ const fetchUserData = async () => {
   }
   const response = await axiosInstance.get(`${VITE_BASE_URL}/user/`, {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-    }
+      headers: {
+        'Content-Type': 'application/json',
+        
+        'x-access-token': localStorage.getItem('accessToken'),
+        'x-refresh-token': localStorage.getItem('refreshToken')
+      }    }
   });
   return response.data.data;
 };
@@ -75,8 +79,9 @@ const ProfilePage = () => {
       const endpoint = `${apiUrl}/user/${userId}`; // PATCH request URL
       const response = await axiosInstance.patch(endpoint, updatedForm, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')        }
       });
       return response.data;
     },

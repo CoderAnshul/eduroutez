@@ -45,8 +45,9 @@ const CombinedQuestionsPage = () => {
                 askedBy: userEmail,
             }, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                }
+                        'Content-Type': 'application/json',
+                        'x-access-token': localStorage.getItem('accessToken'),
+                        'x-refresh-token': localStorage.getItem('refreshToken')                }
             });
             return response.data;
         },

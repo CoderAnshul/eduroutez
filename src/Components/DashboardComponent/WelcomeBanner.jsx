@@ -14,8 +14,12 @@ const WelcomeBanner = () => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(`${VITE_BASE_URL}/user`, {
-          withCredentials: true,
-        });
+          headers: {
+            'Content-Type': 'application/json',
+            
+            'x-access-token': localStorage.getItem('accessToken'),
+            'x-refresh-token': localStorage.getItem('refreshToken')
+          }        });
         if (response.data.success) {
           setUser(response.data.data);
         } else {

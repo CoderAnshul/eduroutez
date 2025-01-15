@@ -16,8 +16,9 @@ const SearchResultBox = ({ institute }) => {
       const userId = localStorage.getItem('userId');
       const response = await addToWishlist(userId, institute._id, null, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')     }
       }); // Assuming courseId is null for now
       if (response.message.includes('removed')) {
         setIsWishlisted(false);

@@ -40,8 +40,9 @@ const ReferAndEarn = () => {
             try {
                 const response = await axios.get(`${VITE_BASE_URL}/my-refferal`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    }
+                        'Content-Type': 'application/json',
+                        'x-access-token': localStorage.getItem('accessToken'),
+                        'x-refresh-token': localStorage.getItem('refreshToken')                    }
                 });
                 console.log("Referral History:", response.data.data);
                 setReferrals(response.data.data.result || []);
@@ -59,8 +60,9 @@ const ReferAndEarn = () => {
                 }
                 const response = await axios.get(`${VITE_BASE_URL}/user/`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    }
+                        'Content-Type': 'application/json',
+                        'x-access-token': localStorage.getItem('accessToken'),
+                        'x-refresh-token': localStorage.getItem('refreshToken')                    }
                 });
                 setReferralCode(response.data.data.referalCode || "No Code Available");
             } catch (error) {

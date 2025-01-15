@@ -17,7 +17,8 @@ const ReviewActivity = () => {
                 const response = await axios.get(`${apiUrl}/reviews-by-user/${email}`, {
                     headers: {
                         'Content-Type': 'application/json',
-                    },
+                        'x-access-token': localStorage.getItem('accessToken'),
+                        'x-refresh-token': localStorage.getItem('refreshToken')                    },
                 });
                 console.log(response.data.data);
                 setReviews(response.data.data || []);

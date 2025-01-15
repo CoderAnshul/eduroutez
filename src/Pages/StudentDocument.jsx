@@ -35,6 +35,8 @@ const StudentDocument = () => {
         data: finalFormData,
         headers: {
           'Content-Type': 'multipart/form-data',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken'),
         },
         withCredentials: true,
       });

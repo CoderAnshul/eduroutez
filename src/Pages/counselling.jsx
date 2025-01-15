@@ -71,7 +71,9 @@ const Counselling = () => {
   };
 
   const handleClick = (slot) => {
-    const studentEmail = JSON.parse(localStorage.getItem('email'));
+    const studentEmail = localStorage.getItem('email');
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
     const selectedSlot = {
       slot,
       date,
@@ -84,6 +86,8 @@ const Counselling = () => {
         headers: {
           'Content-Type': 'application/json',
           'Student-Email': studentEmail,
+          'x-access-token': accessToken,
+          'x-refresh-token': refreshToken
         },
       })
       .then((response) => {
@@ -91,7 +95,7 @@ const Counselling = () => {
         alert('Slot booked successfully!');
       })
       .catch((error) => {
-        console.error('Error booking slot:', error);
+        console.error('Error booking slot:', error.message);
         alert('Failed to book slot. Please try again.');
       });
   };

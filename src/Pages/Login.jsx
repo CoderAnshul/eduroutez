@@ -31,10 +31,15 @@ const Login = () => {
           {
             headers: {
               "Content-Type": "application/json",
+              
+            'x-access-token': localStorage.getItem('accessToken'),
+            'x-refresh-token': localStorage.getItem('refreshToken')
             },
           }
         );
+        console.log('respomse',response.data.data)
         return response.data;
+        
       } catch (error) {
         console.error('dfghjbn',error.message);
         const errorMessage =
@@ -43,11 +48,30 @@ const Login = () => {
       }
     },
     onSuccess: (data) => {
+      console.log("Data", data);
       toast.success("Logged in successfully!");
-      localStorage.setItem('accessToken', data.data.accessToken);
-      localStorage.setItem('refreshToken', data.data.refreshToken);
-      localStorage.setItem('email', formData.email);
-      localStorage.setItem('userId', data.data.user._id);
+ localStorage.setItem(
+        'accessToken',
+        JSON.stringify(data.data.accessToken)
+      );
+      localStorage.setItem(
+        'userId',
+        data?.data?.user?._id
+      );
+      localStorage.setItem(
+        'role',
+        data?.data?.user?.role
+      );
+      localStorage.setItem(
+        'email',
+        data?.data?.user?.email
+      );      
+      localStorage.setItem(
+        'refreshToken',
+        JSON.stringify(data.data.refreshToken)
+      );
+      console.log("LocalStorage set with tokens and user info");
+
 
       navigate("/");
     },

@@ -18,8 +18,9 @@ const Redeem = () => {
 
                 const response = await axios.get(`${VITE_BASE_URL}/user/`, {
                     headers: {
-                        'Authorization': `Bearer ${userId}`
-                    }
+                        'Content-Type': 'application/json',
+                        'x-access-token': localStorage.getItem('accessToken'),
+                        'x-refresh-token': localStorage.getItem('refreshToken')                    }
                 });
 
                 setUserPoints(response.data.data.points || 0); // Set points from the response
@@ -54,8 +55,9 @@ const Redeem = () => {
                 { points },
                 {
                     headers: {
-                        'Authorization': `Bearer ${userId}`
-                    }
+                        'Content-Type': 'application/json',
+                        'x-access-token': localStorage.getItem('accessToken'),
+                        'x-refresh-token': localStorage.getItem('refreshToken')                    }
                 }
             );
 

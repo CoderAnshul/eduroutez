@@ -19,8 +19,9 @@ const Logout = () => {
                 {},
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-                    },
+
+                        'x-access-token': localStorage.getItem('accessToken'),
+                        'x-refresh-token': localStorage.getItem('refreshToken')                    },
                     withCredentials: true, // Make sure credentials (cookies) are included with the request
                 }
             );
