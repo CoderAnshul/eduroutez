@@ -9,6 +9,7 @@ import Events from '../Components/Events';
 import { useQuery } from 'react-query';
 import { getInstitutes } from '../ApiFunctions/api';
 import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const SearchPage = () => {
   const tabs = [
@@ -27,10 +28,12 @@ const SearchPage = () => {
   const [visibleItems, setVisibleItems] = useState(10); // Initially show 10 items
   const [totalDocuments, setTotalDocuments] = useState(0);
   const inputField = useSelector(store => store.input.inputField)
+  // console.log("input field " + inputField)
+  // console.log(content)
 
 
   const { data, isLoading, isError } = useQuery(
-    ["institutes"],
+    ["institute"],
     () => getInstitutes(inputField,inputField),
     {
       enabled: true,
@@ -38,11 +41,13 @@ const SearchPage = () => {
         const { result, totalDocuments } = data.data;
         setContent(result);
         setFilteredContent(result);
-        console.log('result',result);
+        // console.log('result',result);
         setTotalDocuments(totalDocuments);
       }
     }
   );
+
+  
 
   useEffect(() => {
     if (title && value && content.length > 0) {
@@ -167,7 +172,7 @@ const SearchPage = () => {
   ];
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">{console.log("calling api")}</div>;
   }
 
   if (isError) {
@@ -233,7 +238,7 @@ const SearchPage = () => {
             ))}
 
             {/* "See More" button - show if there are more items to display */}
-            {visibleItems < filteredContent.length && (
+            {/* {visibleItems < filteredContent && (
               
               <div className="flex justify-center mt-8">
                 <button
@@ -243,7 +248,7 @@ const SearchPage = () => {
                   See More
                 </button>
               </div>
-            )}
+            )} */}
 
             {/* "See Less" button - show if expanded and there are more than 10 items */}
             {visibleItems > 10 && (
