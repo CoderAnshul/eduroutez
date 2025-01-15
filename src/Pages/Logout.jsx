@@ -7,6 +7,7 @@ const Logout = () => {
 
     const handleLogout = async () => {
         try {
+            window.location.reload();
             const token = Cookies.get('accessToken'); // Assuming the token is stored in the cookie
     
             if (!token) {
@@ -23,6 +24,8 @@ const Logout = () => {
                     withCredentials: true, // Make sure credentials (cookies) are included with the request
                 }
             );
+            window.location.reload();
+
 
             Cookies.remove('accessToken');
             Cookies.remove('refreshToken');
