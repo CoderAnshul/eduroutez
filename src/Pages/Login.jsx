@@ -4,9 +4,9 @@ import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
-import axiosInstance from "../ApiFunctions/axios";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import axios from "axios";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -25,8 +25,9 @@ const Login = () => {
   const mutation = useMutation({
     mutationFn: async (credentials) => {
       try {
-        const response = await axiosInstance.post(
+        const response = await axios.post(
           `${apiUrl}/login`,
+          credentials,
           {
             headers: {
               "Content-Type": "application/json",

@@ -19,7 +19,7 @@ const Navbar = () => {
   const location = useLocation();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  const accessToken = Cookies.get('accessToken');
+  const accessToken = localStorage.getItem('accessToken');
   console.log('accessToken', accessToken);
 
 

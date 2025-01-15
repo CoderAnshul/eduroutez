@@ -1,38 +1,62 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import axios from "axios";
+import axiosInstance from "../../ApiFunctions/axios";
+import { useNavigate } from 'react-router-dom';
 
 const DashboardNav = () => {
   const [userName, setUserName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const apiUrl = typeof window !== 'undefined' 
+    ? window.VITE_BASE_URL 
+    : import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const userId = localStorage.getItem('userId');
         if (!userId) {
-          throw new Error("User ID not found in localStorage");
+          navigate('/');
+          return;
         }
-        const accessToken = localStorage.getItem('accessToken');
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/`, {
+
+        setIsLoading(true);
+        const response = await axiosInstance.get('/user/', {
           headers: {
-            'Authorization': `Bearer ${accessToken}`
+            'Content-Type': 'application/json',
+            'x-access-token': localStorage.getItem('accessToken'),
+            'x-refresh-token': localStorage.getItem('refreshToken')
           }
         });
-        setUserName(response.data.data.name);
+
+        if (response.data?.data?.name) {
+          setUserName(response.data.data.name);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
+        if (error.response?.status === 401) {
+          localStorage.clear();
+          navigate('/');
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [navigate]);
 
   const handleBecomeCounselor = () => {
-    window.location.href = "/become-couseller";
+    navigate("/become-couseller");
   };
 
   const handleQuestion = () => {
-    window.location.href = '/question-&-answers';
+    navigate('/question-&-answers');
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
   };
 
   return (
@@ -54,10 +78,20 @@ const DashboardNav = () => {
           Ask Question
           <ArrowRight className="h-4 w-4" />
         </button>
-
+        
         <div className="border px-4 py-2 rounded-md flex items-center gap-2">
-          <h3>{userName}</h3>
-          <div className="h-7 w-7 bg-gray-500 rounded-full"></div>
+          {isLoading ? (
+            <span className="text-gray-500">Loading...</span>
+          ) : (
+            <>
+              <h3>{userName || 'Guest'}</h3>
+              <div 
+                className="h-7 w-7 bg-gray-500 rounded-full cursor-pointer hover:bg-gray-600"
+                onClick={handleLogout}
+                title="Click to logout"
+              />
+            </>
+          )}
         </div>
       </div>
     </header>
