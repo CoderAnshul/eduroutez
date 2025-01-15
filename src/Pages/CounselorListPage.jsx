@@ -9,6 +9,8 @@ const CounselorListPage = () => {
   const [counselors, setCounselors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCounselor, setSelectedCounselor] = useState(null);
+  const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+
 
   useEffect(() => {
     fetchCounselors();
@@ -17,7 +19,7 @@ const CounselorListPage = () => {
   const fetchCounselors = async () => {
     try {
       setLoading(true);
-      const response =  await axios.get("http://localhost:4001/api/v1/counselors");
+      const response =  await axios.get(`${VITE_BASE_URL}/counselors`);
       setCounselors(response.data.data.result || []);
     } catch (error) {
       console.error('Error fetching counselors:', error);

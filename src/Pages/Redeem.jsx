@@ -8,6 +8,8 @@ const Redeem = () => {
     const [redeemPoints, setRedeemPoints] = useState('');
     const [message, setMessage] = useState('');
     const [history, setHistory] = useState([]);
+    const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+
 
     // Fetch user points from the backend
     useEffect(() => {
@@ -16,7 +18,7 @@ const Redeem = () => {
                 const userId = Cookies.get('userId'); // Get user ID from cookies
                 if (!userId) throw new Error("User ID not found in cookies");
 
-                const response = await axios.get("http://localhost:4001/api/v1/user/", {
+                const response = await axios.get(`${VITE_BASE_URL}/user/`, {
                     withCredentials: true,
                 });
 
@@ -47,7 +49,7 @@ const Redeem = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:4001/api/v1/redeem-points",
+                `${VITE_BASE_URL}/redeem-points`,
                 { points },
                 { withCredentials: true }
             );

@@ -15,6 +15,8 @@ const BecomeCounselor = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+  const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,7 +31,7 @@ const BecomeCounselor = () => {
     
     try {
       // Make POST request to /counselor API
-      const response = await axios.post("http://localhost:4001/api/v1/counselor", formData);
+      const response = await axios.post(`${VITE_BASE_URL}/counselor`, formData);
       console.log("Response", response);
 
         toast.success("Your application has been submitted successfully!");

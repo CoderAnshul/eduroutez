@@ -15,6 +15,7 @@ const EditProfile = () => {
     country: ''
   });
   const [message, setMessage] = useState('');
+const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
 
   // Fetch user points and initial profile data
   useEffect(() => {
@@ -23,7 +24,7 @@ const EditProfile = () => {
         const userId = Cookies.get('userId'); // Get user ID from cookies
         if (!userId) throw new Error("User ID not found in cookies");
 
-        const response = await axios.get("http://localhost:4001/api/v1/user/", {
+        const response = await axios.get(`${VITE_BASE_URL}/user`, {
           withCredentials: true,
         });
 

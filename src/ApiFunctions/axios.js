@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const axiosInstance = axios.create({
-    baseURL: typeof window !== 'undefined' ? window.VITE_BASE_URL : process.env.VITE_BASE_URL
+    baseURL: typeof window !== 'undefined' ? window.VITE_BASE_URL : import.meta.env.VITE_BASE_URL
 });
 
 // Request interceptor

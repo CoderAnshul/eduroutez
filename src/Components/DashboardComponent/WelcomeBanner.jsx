@@ -8,10 +8,12 @@ const WelcomeBanner = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:4001/api/v1/user", {
+        const response = await axios.get(`${VITE_BASE_URL}/user`, {
           withCredentials: true,
         });
         if (response.data.success) {

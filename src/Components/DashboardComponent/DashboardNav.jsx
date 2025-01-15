@@ -1,14 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const DashboardNav = () => {
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = Cookies.get('userId');
+        if (!userId) {
+          throw new Error("User ID not found in cookies");
+        }
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/`, {
+          withCredentials: true,
+        });
+        setUserName(response.data.data.name);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handleBecomeCounselor = () => {
     window.location.href = "/become-couseller";
   };
 
-  const handleQuestion=()=>{
-    window.location.href='/question-&-answers'
-  }
+  const handleQuestion = () => {
+    window.location.href = '/question-&-answers';
+  };
 
   return (
     <header className="flex justify-between items-center p-4 bg-white shadow">
@@ -31,7 +54,7 @@ const DashboardNav = () => {
         </button>
 
         <div className="border px-4 py-2 rounded-md flex items-center gap-2">
-          <h3>Anshul Sharma</h3>
+          <h3>{userName}</h3>
           <div className="h-7 w-7 bg-gray-500 rounded-full"></div>
         </div>
       </div>

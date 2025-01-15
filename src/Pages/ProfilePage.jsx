@@ -4,13 +4,15 @@ import axiosInstance from "../ApiFunctions/axios";
 import Cookies from "js-cookie";
 import axios from "axios";
 
+const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+
 // Fetch the user data
 const fetchUserData = async () => {
   const userId = Cookies.get('userId');
   if (!userId) {
     throw new Error("User ID not found in cookies");
   }
-  const response = await axios.get("http://localhost:4001/api/v1/user/", {
+  const response = await axios.get(`${VITE_BASE_URL}/user/`, {
     withCredentials: true,
   });
   return response.data.data;

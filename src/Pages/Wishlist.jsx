@@ -13,7 +13,7 @@ const Wishlist = () => {
   useEffect(() => {
     const fetchWishlists = async () => {
       try {
-        const response = await axios.get('http://localhost:4001/api/v1/wishlists', { withCredentials: true });
+        const response = await axios.get(`${VITE_BASE_URL}/wishlists`, { withCredentials: true });
         if (response.data.success) {
           setWishlists(response.data.data.college_wishlist || []);
         }
@@ -91,7 +91,7 @@ const Wishlist = () => {
                 <div className="relative">
                   <img
                     src={college.thumbnailImage
-                      ? `http://localhost:4001/api/v1/uploads/${college.thumbnailImage}`
+                      ? `${VITE_BASE_URL}/uploads/${college.thumbnailImage}`
                       : searchBoximg}
                     alt={college.instituteName}
                     className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"

@@ -33,12 +33,14 @@ const ReferAndEarn = () => {
     const [rewards, setRewards] = useState(0);
     const [referralCode, setReferralCode] = useState("");
     const [copied, setCopied] = useState(false);
+    const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+
 
     // Fetch Referral History
     useEffect(() => {
         const fetchReferralHistory = async () => {
             try {
-                const response = await axios.get("http://localhost:4001/api/v1/my-refferal", {
+                const response = await axios.get(`${VITE_BASE_URL}/my-refferal`, {
                     withCredentials: true, // Include credentials like cookies
                 });
                 console.log("Referral History:", response.data.data);
@@ -55,7 +57,7 @@ const ReferAndEarn = () => {
                 if (!userId) {
                     throw new Error("User ID not found in cookies");
                 }
-                const response = await axios.get("http://localhost:4001/api/v1/user/", {
+                const response = await axios.get(`${VITE_BASE_URL}/user/`, {
                     withCredentials: true,
                 });
                 setReferralCode(response.data.data.referalCode || "No Code Available");
