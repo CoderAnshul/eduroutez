@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import axios from "axios";
-import Cookies from "js-cookie";
 
 const DashboardNav = () => {
   const [userName, setUserName] = useState("");
@@ -9,12 +8,15 @@ const DashboardNav = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userId = Cookies.get('userId');
+        const userId = localStorage.getItem('userId');
         if (!userId) {
-          throw new Error("User ID not found in cookies");
+          throw new Error("User ID not found in localStorage");
         }
+        const accessToken = localStorage.getItem('accessToken');
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/`, {
-          withCredentials: true,
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
         });
         setUserName(response.data.data.name);
       } catch (error) {

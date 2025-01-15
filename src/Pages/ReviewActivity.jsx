@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import { Star, ThumbsUp, Calendar, Book, Trophy, Users, Activity } from 'lucide-react';
 
 const ReviewActivity = () => {
@@ -14,8 +13,12 @@ const ReviewActivity = () => {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const email = Cookies.get('email');
-                const response = await axios.get(`${apiUrl}/reviews-by-user/${email}`);
+                const email = localStorage.getItem('email');
+                const response = await axios.get(`${apiUrl}/reviews-by-user/${email}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
                 console.log(response.data.data);
                 setReviews(response.data.data || []);
             } catch (err) {

@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-// import { toast } from "sonner";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 import { useNavigate } from 'react-router-dom';
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
-import Cookies from "js-cookie";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -48,10 +46,10 @@ const Signup = () => {
     },
     onSuccess: (data) => {
       alert("Signed Up Successfully! You can now log in.");
-            Cookies.set('accessToken',data.data.accessToken, { expires: 30 });
-            Cookies.set('refreshToken',data.data.refreshToken, { expires: 30 });
-            Cookies.set('email',formData.email, { expires: 30 });
-            Cookies.set('userId',data.data.user._id, { expires: 30 });
+      localStorage.setItem('accessToken', data.data.accessToken);
+      localStorage.setItem('refreshToken', data.data.refreshToken);
+      localStorage.setItem('email', formData.email);
+      localStorage.setItem('userId', data.data.user._id);
       
       navigate('/');
     },

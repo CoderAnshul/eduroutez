@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Share2, Gift, Users, Trophy, ChevronRight, Copy, CheckCircle } from 'lucide-react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 
 // Card Components
 const Card = ({ children, className = "" }) => (
@@ -33,15 +32,16 @@ const ReferAndEarn = () => {
     const [rewards, setRewards] = useState(0);
     const [referralCode, setReferralCode] = useState("");
     const [copied, setCopied] = useState(false);
-    const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
-
+    const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
     // Fetch Referral History
     useEffect(() => {
         const fetchReferralHistory = async () => {
             try {
                 const response = await axios.get(`${VITE_BASE_URL}/my-refferal`, {
-                    withCredentials: true, // Include credentials like cookies
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
                 });
                 console.log("Referral History:", response.data.data);
                 setReferrals(response.data.data.result || []);
@@ -53,12 +53,14 @@ const ReferAndEarn = () => {
         // Fetch Referral Code
         const fetchReferralCode = async () => {
             try {
-                const userId = Cookies.get('userId');
+                const userId = localStorage.getItem('userId');
                 if (!userId) {
-                    throw new Error("User ID not found in cookies");
+                    throw new Error("User ID not found in localStorage");
                 }
                 const response = await axios.get(`${VITE_BASE_URL}/user/`, {
-                    withCredentials: true,
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    }
                 });
                 setReferralCode(response.data.data.referalCode || "No Code Available");
             } catch (error) {
@@ -77,6 +79,7 @@ const ReferAndEarn = () => {
     };
 
     return (
+        <>
         <div className="p-6 max-w-6xl mx-auto space-y-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen">
             <div className="flex items-center justify-between mb-8">
                 <div>
@@ -145,6 +148,7 @@ const ReferAndEarn = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

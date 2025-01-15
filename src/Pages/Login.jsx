@@ -7,7 +7,6 @@ import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import Cookies from 'js-cookie';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -28,7 +27,6 @@ const Login = () => {
       try {
         const response = await axiosInstance.post(
           `${apiUrl}/login`,
-          credentials,
           {
             headers: {
               "Content-Type": "application/json",
@@ -37,6 +35,7 @@ const Login = () => {
         );
         return response.data;
       } catch (error) {
+        console.error('dfghjbn',error.message);
         const errorMessage =
           error.response?.data?.message || "Login failed. Please try again.";
         throw new Error(errorMessage);
@@ -44,31 +43,10 @@ const Login = () => {
     },
     onSuccess: (data) => {
       toast.success("Logged in successfully!");
-      Cookies.set('accessToken', data.data.accessToken, {
-        expires: 30,
-        secure: true,
-        sameSite: "None",
-      });
-      
-      Cookies.set('refreshToken', data.data.refreshToken, {
-        expires: 30,
-        secure: true,
-        sameSite: "None",
-      });
-      
-      Cookies.set('email', formData.email, {
-        expires: 30,
-        secure: true,
-        sameSite: "None",
-      });
-      
-      Cookies.set('userId', data.data.user._id, {
-        expires: 30,
-        secure: true,
-        sameSite: "None",
-      });
-      
-
+      localStorage.setItem('accessToken', data.data.accessToken);
+      localStorage.setItem('refreshToken', data.data.refreshToken);
+      localStorage.setItem('email', formData.email);
+      localStorage.setItem('userId', data.data.user._id);
 
       navigate("/");
     },

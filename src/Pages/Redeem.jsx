@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import { Trophy, Gift, History } from 'lucide-react';
 
 const Redeem = () => {
@@ -8,18 +7,19 @@ const Redeem = () => {
     const [redeemPoints, setRedeemPoints] = useState('');
     const [message, setMessage] = useState('');
     const [history, setHistory] = useState([]);
-    const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
-
+    const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
     // Fetch user points from the backend
     useEffect(() => {
         const fetchUserPoints = async () => {
             try {
-                const userId = Cookies.get('userId'); // Get user ID from cookies
-                if (!userId) throw new Error("User ID not found in cookies");
+                const userId = localStorage.getItem('userId'); // Get user ID from localStorage
+                if (!userId) throw new Error("User ID not found in localStorage");
 
                 const response = await axios.get(`${VITE_BASE_URL}/user/`, {
-                    withCredentials: true,
+                    headers: {
+                        'Authorization': `Bearer ${userId}`
+                    }
                 });
 
                 setUserPoints(response.data.data.points || 0); // Set points from the response
@@ -48,12 +48,17 @@ const Redeem = () => {
         }
 
         try {
+            const userId = localStorage.getItem('userId'); // Get user ID from localStorage
             const response = await axios.post(
                 `${VITE_BASE_URL}/redeem-points`,
                 { points },
-                { withCredentials: true }
+                {
+                    headers: {
+                        'Authorization': `Bearer ${userId}`
+                    }
+                }
             );
-console.log("Response", response);
+
             if (response.data.success) {
                 const timestamp = new Date().toLocaleString();
                 const newEntry = { points, timestamp };
