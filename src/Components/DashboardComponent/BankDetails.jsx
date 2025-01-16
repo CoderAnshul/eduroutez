@@ -30,10 +30,10 @@ const BankDetails = () => {
 
         if (response.data.data) {
           setBankData({
-            bankName: response.data.data.bank_name || '',
-            accountNumber: response.data.data.account_number || '',
-            accountHolderName: response.data.data.account_holder_name || '',
-            ifscCode: response.data.data.ifsc_code || ''
+            bankName: response.data.data.bankName || '',
+            accountNumber: response.data.data.accountNumber || '',
+            accountHolderName: response.data.data.accountHolderName || '',
+            ifscCode: response.data.data.ifscCode || ''
           });
         }
       } catch (error) {
