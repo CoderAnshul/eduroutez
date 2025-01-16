@@ -50,10 +50,26 @@ const Signup = () => {
     },
     onSuccess: (data) => {
       alert("Signed Up Successfully! You can now log in.");
-      localStorage.setItem('accessToken', data.data.accessToken);
-      localStorage.setItem('refreshToken', data.data.refreshToken);
-      localStorage.setItem('email', formData.email);
-      localStorage.setItem('userId', data.data.user._id);
+      localStorage.setItem(
+        'accessToken',
+        JSON.stringify(data.data.accessToken)
+      );
+      localStorage.setItem(
+        'userId',
+        data?.data?.user?._id
+      );
+      localStorage.setItem(
+        'role',
+        data?.data?.user?.role
+      );
+      localStorage.setItem(
+        'email',
+        data?.data?.user?.email
+      );      
+      localStorage.setItem(
+        'refreshToken',
+        JSON.stringify(data.data.refreshToken)
+      );
       
       navigate('/');
     },
