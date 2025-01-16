@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 
@@ -37,7 +37,7 @@ const ProfilePage = () => {
   const apiUrl = import.meta.env.VITE_BASE_URL;
 
   // Fetch user data
-  const { data: userData, isLoading } = useQuery("userData", fetchUserData, {
+  const { isLoading } = useQuery("userData", fetchUserData, {
     onSuccess: (data) => {
       setFormData({
         name: data.name,
@@ -69,12 +69,13 @@ const ProfilePage = () => {
       }
       const updatedForm = { ...formData, email: localStorage.getItem('email')?.replace(/^"|"$/g, '') };
       mutate({ userId, updatedForm });
+      console.log(updatedForm);
     } catch (error) {
       alert("Some error occurred!");
     }
   };
 
-  const { mutate, isLoading: isSubmitting } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: async ({ userId, updatedForm }) => {
       const endpoint = `${apiUrl}/user/${userId}`; // PATCH request URL
       const response = await axiosInstance.patch(endpoint, updatedForm, {
@@ -83,6 +84,7 @@ const ProfilePage = () => {
           'x-access-token': localStorage.getItem('accessToken'),
           'x-refresh-token': localStorage.getItem('refreshToken')        }
       });
+      console.log('cfgvhjk',response.data);
       return response.data;
     },
     onSuccess: () => {
@@ -210,7 +212,7 @@ const ProfilePage = () => {
                   onChange={handleChange}
                   className="w-full border rounded px-4 py-2"
                 >
-                  <option>Select Country...</option>
+                  <option value="">Select Country...</option>
                   <option>India</option>
                   <option>USA</option>
                   <option>UK</option>
