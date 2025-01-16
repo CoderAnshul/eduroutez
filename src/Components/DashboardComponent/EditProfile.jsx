@@ -23,7 +23,7 @@ const EditProfile = () => {
         const userId = localStorage.getItem('userId'); // Get user ID from localStorage
         if (!userId) throw new Error("User ID not found in localStorage");
 
-        const response = await axios.get(`${VITE_BASE_URL}/user`, {
+        const response = await axios.get(`${VITE_BASE_URL}/student/${userId}`, {
           headers: {
             'Content-Type': 'application/json',
             
@@ -38,6 +38,7 @@ const EditProfile = () => {
           dob: response.data.data.dob,
           gender: response.data.data.gender,
           designation: response.data.data.designation,
+          phone: response.data.data.phone,
           about: response.data.data.about,
           address: response.data.data.address,
           country: response.data.data.country,
@@ -166,15 +167,6 @@ const EditProfile = () => {
                   className="w-full border rounded px-4 py-2"
                   rows="4"
                 />
-              </div>
-              <div>
-                <label className="block font-medium mb-2">Profile Image</label>
-                <div className="border-2 border-dashed border-gray-300 rounded w-full h-32 flex items-center justify-center">
-                  <div className="text-gray-500">Upload Image</div>
-                </div>
-                <p className="text-sm text-gray-400 mt-2">
-                  NB: Profile size will 100px x 100px and not more than 1MB.
-                </p>
               </div>
             </div>
           </div>

@@ -1,96 +1,197 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useMutation } from 'react-query';
 
 const BankDetails = () => {
-  const [bankName, setBankName] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [accountHolderName, setAccountHolderName] = useState('');
-  const [ifscCode, setIfscCode] = useState('');
+  const [bankData, setBankData] = useState({
+    bankName: '',
+    accountNumber: '',
+    accountHolderName: '',
+    ifscCode: ''
+  });
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    // Add your logic to update bank details here
-    console.log('Bank Name:', bankName);
-    console.log('Account Number:', accountNumber);
-    console.log('Account Holder Name:', accountHolderName);
-    console.log('IFSC Code:', ifscCode);
-    alert('Bank details updated successfully!');
+  // Fetch bank details
+  useEffect(() => {
+    const fetchBankDetails = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) throw new Error("User ID not found in localStorage");
+
+        const response = await axios.get(`${VITE_BASE_URL}/student/${userId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': localStorage.getItem('accessToken'),
+            'x-refresh-token': localStorage.getItem('refreshToken')
+          }
+        });
+
+        if (response.data.data) {
+          setBankData({
+            bankName: response.data.data.bank_name || '',
+            accountNumber: response.data.data.account_number || '',
+            accountHolderName: response.data.data.account_holder_name || '',
+            ifscCode: response.data.data.ifsc_code || ''
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching bank details:", error);
+        setMessage("Failed to fetch bank details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBankDetails();
+  }, []);
+
+  // Update bank details mutation
+  const { mutate, isPending: isSubmitting } = useMutation({
+    mutationFn: async (formData) => {
+      const response = await axios.post(`${VITE_BASE_URL}/student/`, formData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')
+        }
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      setMessage('Bank details updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    },
+    onError: (error) => {
+      setMessage(error.response?.data?.message || 'Failed to update bank details');
+      setTimeout(() => setMessage(''), 3000);
+    }
+  });
+
+  const validateForm = () => {
+    if (!bankData.bankName.trim()) return "Bank name is required";
+    if (!bankData.accountNumber.trim()) return "Account number is required";
+    if (!bankData.accountHolderName.trim()) return "Account holder name is required";
+    if (!bankData.ifscCode.trim()) return "IFSC code is required";
+    if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(bankData.ifscCode)) {
+      return "Invalid IFSC code format";
+    }
+    return null;
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const error = validateForm();
+    if (error) {
+      setMessage(error);
+      return;
+    }
+
+    const payload = {
+      bankName: bankData.bankName,
+      accountNumber: bankData.accountNumber,
+      accountHolderName: bankData.accountHolderName,
+      ifscCode: bankData.ifscCode
+    };
+
+    mutate(payload);
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6 bg-gray-50 border border-gray-300 rounded-lg shadow-md">
+        Loading bank details...
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-50 border border-gray-300 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4 text-gray-700">Update Bank Details</h2>
-      <form onSubmit={handleUpdate}>
-        {/* Bank Name */}
-        <div className="mb-4">
-          <label htmlFor="bankName" className="block text-sm font-medium text-gray-700">
-            Bank Name
-          </label>
-          <input
-            type="text"
-            id="bankName"
-            value={bankName}
-            onChange={(e) => setBankName(e.target.value)}
-            className="mt-1 block max-w-2/5 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-red-300 focus:border-red-600"
-            placeholder="Enter bank name"
-            required
-          />
+      <h2 className="text-xl font-bold mb-4 text-gray-700">Bank Details</h2>
+
+      {message && (
+        <div className={`p-4 mb-4 rounded-md ${
+          message.includes('success') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+        }`}>
+          {message}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Bank Name */}
+          <div>
+            <label htmlFor="bankName" className="block text-sm font-medium text-gray-700">
+              Bank Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="bankName"
+              value={bankData.bankName}
+              onChange={(e) => setBankData({ ...bankData, bankName: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-red-300 focus:border-red-600"
+              placeholder="Enter bank name"
+              required
+            />
+          </div>
+
+          {/* Account Number */}
+          <div>
+            <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700">
+              Account Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="accountNumber"
+              value={bankData.accountNumber}
+              onChange={(e) => setBankData({ ...bankData, accountNumber: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-red-300 focus:border-red-600"
+              placeholder="Enter account number"
+              required
+            />
+          </div>
+
+          {/* Account Holder Name */}
+          <div>
+            <label htmlFor="accountHolderName" className="block text-sm font-medium text-gray-700">
+              Account Holder Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="accountHolderName"
+              value={bankData.accountHolderName}
+              onChange={(e) => setBankData({ ...bankData, accountHolderName: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-red-300 focus:border-red-600"
+              placeholder="Enter account holder name"
+              required
+            />
+          </div>
+
+          {/* IFSC Code */}
+          <div>
+            <label htmlFor="ifscCode" className="block text-sm font-medium text-gray-700">
+              IFSC Code <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="ifscCode"
+              value={bankData.ifscCode}
+              onChange={(e) => setBankData({ ...bankData, ifscCode: e.target.value.toUpperCase() })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-red-300 focus:border-red-600"
+              placeholder="Enter IFSC code"
+              required
+            />
+          </div>
         </div>
 
-        {/* Account Number */}
-        <div className="mb-4">
-          <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700">
-            Account Number
-          </label>
-          <input
-            type="text"
-            id="accountNumber"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
-            className="mt-1 block max-w-2/5 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-red-300 focus:border-red-600"
-            placeholder="Enter account number"
-            required
-          />
-        </div>
-
-        {/* Account Holder Name */}
-        <div className="mb-4">
-          <label htmlFor="accountHolderName" className="block text-sm font-medium text-gray-700">
-            Account Holder Name
-          </label>
-          <input
-            type="text"
-            id="accountHolderName"
-            value={accountHolderName}
-            onChange={(e) => setAccountHolderName(e.target.value)}
-            className="mt-1 block max-w-2/5 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-red-300 focus:border-red-600"
-            placeholder="Enter account holder name"
-            required
-          />
-        </div>
-
-        {/* IFSC Code */}
-        <div className="mb-4">
-          <label htmlFor="ifscCode" className="block text-sm font-medium text-gray-700">
-            IFSC Code
-          </label>
-          <input
-            type="text"
-            id="ifscCode"
-            value={ifscCode}
-            onChange={(e) => setIfscCode(e.target.value)}
-            className="mt-1 block max-w-2/5 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-red-300 focus:border-red-600"
-            placeholder="Enter IFSC code"
-            required
-          />
-        </div>
-
-        {/* Update Button */}
-        <div>
+        <div className="flex items-center justify-end space-x-4">
           <button
             type="submit"
-            className="max-w-2/5 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50"
+            disabled={isSubmitting}
+            className="bg-red-600 text-white py-2 px-6 rounded-md hover:bg-red-700 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Update
+            {isSubmitting ? 'Updating...' : 'Update Details'}
           </button>
         </div>
       </form>

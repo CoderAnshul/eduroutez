@@ -8,6 +8,9 @@ const DashboardNav = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  const apiUrl =  import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
+
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -18,15 +21,15 @@ const DashboardNav = () => {
         }
 
         setIsLoading(true);
-        const response = await axiosInstance.get('/user/', {
+        const response = await axiosInstance.get(`${apiUrl}/user/`, {
           headers: {
             'Content-Type': 'application/json',
             'x-access-token': localStorage.getItem('accessToken'),
             'x-refresh-token': localStorage.getItem('refreshToken')
           }
         });
-console.log('response',response.data)
-        if (response.data?.name) {
+console.log('responsrftgyhuje',response.data)
+        if (response.data?.data.name) {
           setUserName(response.data.data.name);
         }
       } catch (error) {
@@ -86,11 +89,7 @@ console.log('response',response.data)
                 onClick={handleLogout}
                 title="Click to logout"
               >
-<img
-  src="https://randomuser.me/api/portraits/v4/lego/1.jpg" 
-  alt="User profile"
-  className="h-6 w-6 rounded-full"  
-/>
+                <i className="fa fa-sign-out-alt text-red-500"></i>
               </div>
             </>
           )}
