@@ -9,6 +9,7 @@ const Wishlist = () => {
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 6;
+  const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     const fetchWishlists = async () => {
