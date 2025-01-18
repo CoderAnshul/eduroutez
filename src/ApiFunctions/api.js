@@ -120,6 +120,21 @@ export const homeBanner = async () => {
 };
 export const blogs = async () => {
   try {
+    console.log("blogs");
+    const response = await axios.get(`${baseURL}/blogs`);
+    return response.data;
+
+    // return response.data;
+  } catch (error) {
+    console.error(`Error fetching banner `, error);
+
+    throw error;
+  }
+};
+
+export const getBlogs = async () => {
+  try {
+    console.log("blogs");
     const response = await axios.get(`${baseURL}/blogs`);
     return response.data;
 
@@ -186,6 +201,23 @@ export const popularCourses = async () => {
     throw error;
   }
 };
+
+export const AllpopularCourses = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/courses?filters={"isCoursePopular":true}`
+    );
+    return response.data;
+
+    // return response.data;
+  } catch (error) {
+    console.error(`Error fetching Popular courses `, error);
+
+    throw error;
+  }
+};
+
+
 export const bestRatedInstitute = async () => {
   try {
     const response = await axios.get(
@@ -200,6 +232,19 @@ export const bestRatedInstitute = async () => {
     throw error;
   }
 };
+
+
+
+export const allbestRatedInstitute = async () => {  
+  try {
+    const response = await axios.get(`${baseURL}/best-rated-institute`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching best-rated-institute `, error);
+    throw error;
+  }
+};
+
 export const trendingInstitute = async () => {
   try {
     const response = await axios.get(
@@ -214,6 +259,23 @@ export const trendingInstitute = async () => {
     throw error;
   }
 };
+
+export const alltrendingInstitute = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/institutes?filters={"isTrending":true}`
+    );
+    return response.data;
+
+    // return response.data;
+  } catch (error) {
+    console.error(`Error fetching trending institute `, error);
+
+    throw error;
+  }
+};
+
+
 export const career = async () => {
   try {
     const response = await axios.get(`${baseURL}/careers?limit=3`);

@@ -67,8 +67,11 @@ const TrendingInstitute = () => {
         {/* <button className='viewmorebtn text-sm w-24 whitespace-nowrap '>
           View more
         </button> */}
-        <CustomButton text='View more'/>
-      </div>
+ <Link to="/trending-institute">
+          <button className='bg-red-500 text-white py-2 px-4 rounded'>
+            View more
+          </button>
+        </Link>        </div>
 
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
         {content.map((institute, index) => {
@@ -76,7 +79,7 @@ const TrendingInstitute = () => {
             return <Link to={`/institute/${institute._id}`} key={institute._id || index} className="box lg:max-w-[500px] shadow-lg">
             <div className="imageContainer">
               <img className='h-full w-full object-cover' 
-              src={institute.thumbnailImage? `http://localhost:4001/uploads/${institute.thumbnailImage}` : cardPhoto}
+              src={institute.thumbnailImage? `http://localhost:4001/api/uploads/${institute.thumbnailImage}` : cardPhoto}
               alt="boxphoto" />
             </div>
             <div className="textContainer">

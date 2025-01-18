@@ -67,7 +67,7 @@ const Detailpage = () => {
       <div className="h-80 w-full rounded-md">
         <img
           className="h-full w-full object-cover"
-          src={`http://localhost:4001/uploads/${data.image}`}
+          src={`http://localhost:4001/api/uploads/${data.image}`}
           alt="bannerdetailimg"
         />
       </div>

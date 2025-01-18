@@ -1,155 +1,91 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import CoursesName from '../Ui components/CoursesName'
-import TabSlider from '../Ui components/TabSlider';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import CoursesName from '../Ui components/CoursesName';
 import QueryForm from '../Ui components/QueryForm';
-import ExpandedBox from '../Ui components/ExpandedBox';
 import ProsandCons from '../Ui components/ProsandCons';
 import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
 import { getCoursesById } from '../ApiFunctions/api';
 import { useQuery } from 'react-query';
 
-
-const tabs = [
-    "Overview",
-    "Eligibility",
-    "Course Curriculum",
-    "Fees",
-    "Career"
-  ];
-
-
-  const contentData = [
-    {
-      title: "B.Sc. Research",
-      content: `The B.Sc. Research program at IISc is a research-focused undergraduate course in science and technology. It offers students an opportunity to engage in cutting-edge research from the early stages of their academic journey. Admission to this program is highly competitive and is based on performance in competitive exams such as JEE Advanced and KVPY (Kishore Vaigyanik Protsahan Yojana). The program is designed to provide in-depth knowledge in various scientific fields, preparing students for research-oriented careers or further studies in academia or industry.`
-    },
-    {
-      title: "M.Tech",
-      content: `The M.Tech (Master of Technology) program at IISc is designed for students who wish to pursue advanced studies in various engineering disciplines. This program focuses on both theoretical knowledge and practical application, with an emphasis on innovation and research. Students can specialize in fields like Mechanical Engineering, Civil Engineering, Electrical Engineering, and more. Admission is based on the Graduate Aptitude Test in Engineering (GATE), and it attracts some of the brightest minds in the country. The program equips students with the skills needed to tackle complex engineering problems and contribute to technological advancements.`
-    },
-    {
-      title: "M.Sc",
-      content: `The M.Sc (Master of Science) program at IISc provides a comprehensive education in various science disciplines, such as Physics, Chemistry, Mathematics, and more. This program is research-oriented, with students encouraged to explore cutting-edge scientific topics and engage in laboratory work. The admission process is through IISc's own entrance exam, and students who are selected get access to some of the most prestigious faculty and research opportunities in the country. Graduates of this program are well-equipped to pursue careers in research, teaching, or industry.`
-    },
-    {
-      title: "Ph.D.",
-      content: `The Ph.D. program at IISc is designed for individuals who wish to make significant contributions to their field of study through original research. The program is open to students from various disciplines, including science, engineering, and technology. Admission is based on performance in the entrance exam and subsequent interviews. The Ph.D. program at IISc offers an excellent environment for research, with state-of-the-art facilities and mentorship from leading experts. Graduates of the Ph.D. program often go on to work in academia, research institutions, or industry, contributing to innovations and advancements in their respective fields.`
-    }
-  ];
-  
-
-  
-
 const Coursesinfopage = () => {
-  const [content, setcontent] = useState()
-  const { id } = useParams(); 
+  const [content, setContent] = useState();
+  const { id } = useParams();
 
-  const { data: CourseData, isLoading, isError, error } = useQuery(
+  const { data: CourseData, isLoading, isError } = useQuery(
     ['course', id],
     () => getCoursesById(id),
-    {
-      enabled: Boolean(id), // Ensures that the query is only triggered if 'id' is truthy
-    }
+    { enabled: Boolean(id) }
   );
 
   useEffect(() => {
-    setcontent(CourseData?.data);
+    if (CourseData?.data) {
+      setContent(CourseData.data);
+    }
   }, [CourseData]);
-  console.log(content);
-    
 
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
 
-    const sectionRefs = tabs.map(() => useRef(null));
+  if (isError || !content) {
+    return <div className="flex justify-center items-center h-screen">Error loading course data.</div>;
+  }
+
   return (
-    <div className='px-[4vw] py-[2vw] flex flex-col items-start'>
-        <CoursesName content={content?.courseTitle}/>
-        {/* <div className='w-full overflow-scroll'> */}
-        <TabSlider tabs={tabs} sectionRefs={sectionRefs}  />
-        {/* </div> */}
+    <div className="px-8 py-6 flex flex-col items-start bg-gray-50">
+      {/* Course Title */}
+      <CoursesName content={content.courseTitle} />
 
-        <div className='w-full flex gap-4'>
-
-        {/* -------------main content of college and ads section ------------------- */}
-        <div className='w-full lg:w-4/5'>
-            <div className='w-full min-h-24'>
-                <div ref={sectionRefs[0]} className="min-h-24 pt-4 ">
-                    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 pb-5 p-2 pt-3'>
-                        {/* <ExpandedBox contentData={contentData}/> */}
-                        {/* {contentData.map((data,index) =>
-                            <div key={index} className="mb-4">
-                                <h3 className="text-lg font-bold">{data.title}</h3>
-                                <p className="text-base">{data.content}</p>
-                                </div>
-                                )} */}
-                           {/* <p className="text-base"
-                              dangerouslySetInnerHTML={{
-                                __html: content.courseOverview || "N/A",
-                              }}
-                           /> */}
-                           {/* {content?.courseOverview} */}
-
-                           <h4 className=' font-semibold text-red-500'>Overview</h4>
-
-                           <div className='flex mb-3 gap-6 flex-wrap'>
-                            <p className=' text-xs font-mono'> Instructor : {content?.instructor || "Not available"}</p>
-                            <p className=' text-xs font-mono'> Language : {content?.language || "Not available"}</p>
-                           </div>
-
-                           <p className="text-base"
-                              dangerouslySetInnerHTML={{
-                                __html: content?.courseOverview || "N/A",
-                              }}
-                            />
-
-                        
-                    </div>
-                </div>
-                <div ref={sectionRefs[1]} className="min-h-24 pt-4 ">
-                    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 pt-3'>
-                        {/* <ExpandedBox contentData={contentData}/> */}
-                        {contentData.map((data,index) =>
-                            <div key={index} className="mb-4">
-                                <h3 className="text-lg font-bold">{data.title}</h3>
-                                <p className="text-base">{data.content}</p>
-                            </div>
-                        )}
-                        {/* <h4 className=' font-semibold text-red-500 mb-3'>Course Curriculum</h4>  
-                              <p className="text-base"
-                                dangerouslySetInnerHTML={{
-                                  __html: content?.courseOverview || "N/A",
-                                }}
-                              /> */}
-                    </div>
-                </div>
-                <div ref={sectionRefs[1]} className="min-h-24 pt-4 ">
-                    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 pt-3 pb-5'>
-                        {/* <ExpandedBox contentData={contentData}/> */}
-                        {/* {contentData.map((data,index) =>
-                            <div key={index} className="mb-4">
-                                <h3 className="text-lg font-bold">{data.title}</h3>
-                                <p className="text-base">{data.content}</p>
-                            </div>
-                        )} */}
-                        <h4 className=' font-semibold text-red-500 mb-3'>Course Curriculum</h4>  
-                              <p className="text-base"
-                                dangerouslySetInnerHTML={{
-                                  __html: content?.courseOverview || "N/A",
-                                }}
-                              />
-                    </div>
-                </div>
-                <ProsandCons/>
+      {/* Main Content */}
+      <div className="w-full flex flex-wrap gap-8">
+        {/* Course Details */}
+        <div className="w-full lg:w-3/4">
+          <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h4 className="text-2xl font-semibold text-red-500 mb-4">Overview</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <p><strong>Type:</strong> {content.courseType || 'N/A'}</p>
+              <p><strong>Instructor:</strong> {content.instructor || 'N/A'}</p>
+              <p><strong>Language:</strong> {content.language || 'N/A'}</p>
+              <p><strong>Level:</strong> {content.courseLevel || 'N/A'}</p>
+              <p><strong>Duration:</strong> 
+                {content.courseDurationYears && `${content.courseDurationYears} years`} 
+                {content.courseDurationMonths && ` ${content.courseDurationMonths} months`}
+              </p>
+              <p><strong>Cost:</strong> {content.isCourseFree === 'free' ? 'Free' : 'Paid'}</p>
+              <p><strong>Category:</strong> {content.category || 'N/A'}</p>
+              <p><strong>Institute:</strong> {content.instituteCategory || 'N/A'}</p>
             </div>
-        </div>
-        <QueryForm/>
+          </div>
 
+          <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h4 className="text-2xl font-semibold text-red-500 mb-4">Eligibility</h4>
+            <p className="text-gray-700">{content.eligibility || 'Eligibility criteria not available'}</p>
+          </div>
+
+          <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h4 className="text-2xl font-semibold text-red-500 mb-4">Exams Accepted</h4>
+            <p className="text-gray-700">{content.examAccepted || 'No exams mentioned'}</p>
+          </div>
+
+          <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h4 className="text-2xl font-semibold text-red-500 mb-4">Application Dates</h4>
+            <p><strong>Start Date:</strong> {new Date(content.applicationStartDate).toLocaleDateString()}</p>
+            <p><strong>End Date:</strong> {new Date(content.applicationEndDate).toLocaleDateString()}</p>
+          </div>
+
+          <ProsandCons />
         </div>
-        <BestRated/>
-        <Events/>
+
+        {/* Query Form */}
+        <QueryForm />
+      </div>
+
+      {/* Additional Sections */}
+      <BestRated />
+      <Events />
     </div>
-  )
-}
+  );
+};
 
-export default Coursesinfopage
+export default Coursesinfopage;

@@ -18,7 +18,9 @@ import SettingsPage from './Pages/SettingsPage';
 import { ToastContainer } from 'react-toastify';
 import ReferAndEarn from './Pages/Refer-and-earn';
 import ReviewActivity from './Pages/ReviewActivity';
-
+import PopularCourses from './Pages/PopularCoursePage';
+import BestRatedInstitute from './Pages/Best-Rated-Institute';
+import TrendingInstitute from './Pages/TrendingInstitute';
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -58,6 +60,7 @@ const App = () => {
           <Route path="/coursesinfopage/:id" element={<Coursesinfopage />} />
           <Route path="/blogpage" element={<Blogpage />} />
           <Route path="/contactuspage" element={<Contactuspage />} />
+          <Route path="/popularcourses" element={<PopularCourses />} />
           <Route path="/aboutus" element={<Aboutus />} />
           <Route path="/counselingpage" element={<Counselingpage />} />
           <Route path="/questionandAnswer/:email" element={<QuestionandAnswer />} />
@@ -71,6 +74,8 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<Forgotpassword />} />
           <Route path="/become-couseller" element={<BecomeCouseller />} />
+          <Route path="/institute" element={<BestRatedInstitute/>} />
+          <Route path="/trending-institute" element={<TrendingInstitute/>} />
 
            {/* Protected Dashboard Routes */}
           <Route

@@ -31,7 +31,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
           >
             <div className="relative">
               <img
-                src={`http://localhost:4001/uploads/${blog.image}`}
+                src={`http://localhost:4001/api/uploads/${blog.image}`}
                 alt={blog.title}
                 className="w-full h-48 object-cover"
               />

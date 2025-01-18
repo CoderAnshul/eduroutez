@@ -54,8 +54,11 @@ const BestRated = () => {
     <div className='w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto'>
       <div className='flex items-center justify-between mb-10'>
         <h3 className='text-xl font-bold'>Best Rated Institute</h3>
-        <CustomButton text='View more'/>
-      </div>
+ <Link to="/institute">
+          <button className='bg-red-500 text-white py-2 px-4 rounded'>
+            View more
+          </button>
+        </Link>      </div>
 
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
         {content.map((box, index) => {

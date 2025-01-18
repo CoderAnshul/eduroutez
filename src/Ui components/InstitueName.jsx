@@ -8,7 +8,7 @@ const InstitueName = ({instituteData}) => {
   return (
     <div className="min-h-20 w-full py-4 flex flex-col sm:flex-row gap-2 px-2 relative">
       <div className="instituteLogo absolute h-28 w-28 sm:h-32 sm:w-32 md:h-40 md:w-40 xl:h-48 xl:w-48 bg-white rounded-lg shadow-lg -top-[60px] sm:-top-[60px] md:-top-[80px] xl:-top-[100px] flex items-center justify-center ">
-        <img className="h-full w-4/5 object-contain" src={instituteData.thumbnailImage? `http://localhost:4001/uploads/${instituteData.thumbnailImage}` : serachBoximg} alt="instituteLogo"/>
+        <img className="h-full w-4/5 object-contain" src={instituteData.thumbnailImage? `http://localhost:4001/api/uploads/${instituteData.thumbnailImage}` : serachBoximg} alt="instituteLogo"/>
       </div>
 
       {/* -------------filler--------------- */}

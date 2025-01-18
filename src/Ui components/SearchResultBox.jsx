@@ -36,7 +36,7 @@ const SearchResultBox = ({ institute }) => {
       <div className="flex justify-between flex-col md:flex-row gap-3">
         <div className="relative w-full md:w-2/6">
           <img
-            src={institute.thumbnailImage ? `http://localhost:4001/uploads/${institute.thumbnailImage}` : serachBoximg}
+            src={institute.thumbnailImage ? `http://localhost:4001/api/uploads/${institute.thumbnailImage}` : serachBoximg}
             alt="Institute Thumbnail"
             className="rounded-lg object-cover w-full h-44"
           />

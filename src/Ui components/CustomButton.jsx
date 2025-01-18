@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const CustomButton = ({ text, className = '', to = '#', onClick }) => {
+const CustomButton = ({ text, className = '', to = '', onClick }) => {
   return (
     <Link to={to}>
       <button

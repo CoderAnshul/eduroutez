@@ -57,12 +57,15 @@ const HighRatedCareers = () => {
         {/* <button className='viewmorebtn text-sm w-24 whitespace-nowrap '>
           View more
         </button> */}
-        <CustomButton text='View more' to='/careerspage'/>
-      </div>
+ <Link to="/careerspage">
+          <button className='bg-red-500 text-white py-2 px-4 rounded'>
+            View more
+          </button>
+        </Link>        </div>
 
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
         {content.map((box, index) => (
-          <Link to="/detailpage" key={index} className="box lg:max-w-[500px] shadow-lg">
+          <Link to={`/detailpage/${box._id}`} key={index} className="box lg:max-w-[500px] shadow-lg">
             <div className="imageContainer">
               <img className='h-full w-full object-cover' src={box.image} alt="boxphoto" />
             </div>

@@ -51,7 +51,7 @@ const ImageSlider = ({ instituteData }) => {
           {galleryImages.map((src, index) => (
             <img
               key={index}
-              src={`http://localhost:4001/uploads/${src}`}
+              src={`http://localhost:4001/api/uploads/${src}`}
               alt={`Slide ${index + 1}`}
               className={`absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 ease-in-out ${
                 index === currentIndex
@@ -108,7 +108,7 @@ const ImageSlider = ({ instituteData }) => {
       {isFullscreen && (
         <div className="fixed inset-0 bg-black/90 z-[1000] flex items-center justify-center">
           <img
-            src={`http://localhost:4001/uploads/${galleryImages[fullscreenIndex]}`}
+            src={`http://localhost:4001/api/uploads/${galleryImages[fullscreenIndex]}`}
             alt={`Fullscreen view of slide ${fullscreenIndex + 1}`}
             className="max-w-full max-h-full object-contain"
           />

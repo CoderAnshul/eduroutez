@@ -13,6 +13,21 @@ const ProsandCons = () => {
     setShowOverlay(false);
   };
 
+  const course = {
+    pros: [
+      "Effective communication skills.",
+      "Strong problem-solving abilities.",
+      "Ability to work well in a team.",
+      "Adaptability and flexibility."
+    ],
+    cons: [
+      "Limited experience in certain areas.",
+      "Occasional difficulty with time management.",
+      "Tendency to overcommit to tasks.",
+      "Need for further development in technical skills."
+    ]
+  };
+
   return (
     <div className="container !mt-4">
       <h2 className="text-2xl font-semibold mb-4">Pros and Cons</h2>
@@ -23,8 +38,9 @@ const ProsandCons = () => {
             <h3 className="ml-2 font-bold">Dislikes</h3>
           </div>
           <ul className="list-disc pl-5 text-sm text-gray-700">
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+            {course.cons.map((con, index) => (
+              <li key={index}>{con}</li>
+            ))}
           </ul>
           <div className="flex justify-center">
             <button className="text-blue-500 mt-2" onClick={handleMoreClick}>More</button>
@@ -37,8 +53,9 @@ const ProsandCons = () => {
             <h3 className="ml-2 font-bold">Likes</h3>
           </div>
           <ul className="list-disc pl-5 text-sm text-gray-700">
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+            {course.pros.map((pro, index) => (
+              <li key={index}>{pro}</li>
+            ))}
           </ul>
           <div className="flex justify-center">
             <button className="text-blue-500 mt-2" onClick={handleMoreClick}>More</button>
