@@ -12,6 +12,7 @@ import MobileNavbar from './MobileNavbar';
 import categories from '../DataFiles/categories';
 import Cookies from 'js-cookie';
 import { ContactPageSharp } from '@mui/icons-material';
+import axiosInstance from '../ApiFunctions/axios'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,6 +37,27 @@ const Navbar = () => {
 
   const handleLoginPopupClose = () => {
     setShowLoginPopup(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await axiosInstance(`${import.meta.env.VITE_BASE_URL}/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')
+        },
+        credentials: 'true',
+      });
+
+if(response)    {  
+  localStorage.clear();
+      window.location.reload();
+}
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   // Prevent scrolling on background when menu is open
@@ -152,7 +174,7 @@ const Navbar = () => {
                       Dashboard
                     </Link>
                     <button
-                      onClick={() => console.log('Logout clicked')}
+                      onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
                     >
                       Logout

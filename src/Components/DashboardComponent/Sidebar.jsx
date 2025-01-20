@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import logo from '../../assets/Images/logo.png';
-
+import axiosInstance from '../../ApiFunctions/axios';
 const Sidebar = () => {
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: '🏠' },
@@ -15,23 +15,32 @@ const Sidebar = () => {
     { name: 'Settings', path: '/dashboard/settings', icon: '⚙️' },
     { name: 'Logout', path: '/dashboard/logout', icon: '🚪' },
   ];
-  const handleLogout = async (name)=>{
+
+
+  const handleLogout = async () => {
     if(name === "Logout"){
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/logout`,{
-        method: 'POST', // HTTP method
+
+    try {
+
+      const response = await axiosInstance(`${import.meta.env.VITE_BASE_URL}/logout`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          
           'x-access-token': localStorage.getItem('accessToken'),
           'x-refresh-token': localStorage.getItem('refreshToken')
-           // Specify JSON format
         },
-        credentials: 'include', // Ensures cookies are sent
-      })
-      const json = await response.json()
-      console.log(json)
+        credentials: 'true',
+      });
+
+if(response)    {  
+  localStorage.clear();
+      window.location.reload();
+}
+    } catch (error) {
+      console.error('Error during logout:', error);
     }
   }
+  };
 
   return (
     <>
