@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import Rating from '@mui/material/Rating';
-import Stack from '@mui/material/Stack';
 import { Link } from 'react-router-dom';
 import cardPhoto from '../assets/Images/teacher.jpg';
 import rupee from '../assets/Images/rupee.png';
-import CustomButton from '../Ui components/CustomButton';
 import { useQuery } from 'react-query';
 import { popularCourses } from '../ApiFunctions/api';
 
 const PopularCourses = () => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
-  const imageBaseURL = import.meta.env.VITE_BASE_URL;
+  
   const { data, isLoading, isError } = useQuery(
     ["popularCourses"],
     () => popularCourses(),
@@ -27,15 +24,24 @@ const PopularCourses = () => {
   useEffect(() => {
     const fetchImages = async () => {
       const imagePromises = content.map(async (box) => {
-        const response = await fetch(`${import.meta.env.VITE_IMAGE_BASE_URL}/${box.coursePreviewThumbnail}`);
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        return { id: box.id, url };
+        try {
+          // Fetch both thumbnail and cover images
+          const coverResponse = await fetch(
+            `${import.meta.env.VITE_IMAGE_BASE_URL}/${box.coursePreviewCover}`
+          );
+          if (!coverResponse.ok) throw new Error('Cover image not found');
+          
+          const blob = await coverResponse.blob();
+          return URL.createObjectURL(blob);
+        } catch (error) {
+          console.error('Error loading image:', error);
+          return null;
+        }
       });
 
       const imageResults = await Promise.all(imagePromises);
-      const imageMap = imageResults.reduce((acc, image) => {
-        acc[image.id] = image.url;
+      const imageMap = imageResults.reduce((acc, url, index) => {
+        if (url) acc[content[index]._id] = url;
         return acc;
       }, {});
 
@@ -45,6 +51,11 @@ const PopularCourses = () => {
     if (content.length > 0) {
       fetchImages();
     }
+
+    // Cleanup function to revoke object URLs
+    return () => {
+      Object.values(images).forEach(url => URL.revokeObjectURL(url));
+    };
   }, [content]);
 
   if (isLoading) {
@@ -56,30 +67,44 @@ const PopularCourses = () => {
   }
 
   return (
-    <div className='w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto'>
-      <div className='flex items-center justify-between mb-10'>
-        <h3 className='text-xl font-bold'>Popular Courses</h3>
+    <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
+      <div className="flex items-center justify-between mb-10">
+        <h3 className="text-xl font-bold">Popular Courses</h3>
         <Link to="/popularcourses">
-          <button className='bg-red-500 text-white py-2 px-4 rounded'>
+          <button className="bg-red-500 text-white py-2 px-4 rounded">
             View more
           </button>
         </Link>
       </div>
 
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
-        {content.map((box, index) => (
-          <Link to={`/coursesinfopage/${box._id}`} key={index} className="box lg:max-w-[500px] shadow-lg">
-            <div className="imageContainer">
-              <img className='h-full w-full object-cover' src={images[box.id] || cardPhoto} alt="boxphoto" />
+        {content.map((box) => (
+          <Link
+            to={`/coursesinfopage/${box._id}`}
+            key={box._id}
+            className="box lg:max-w-[500px] shadow-lg rounded-lg overflow-hidden"
+          >
+            <div className="imageContainer h-48 relative">
+              <img
+                className="h-full w-full object-cover"
+                src={images[box._id] || cardPhoto}
+                alt={box.courseTitle}
+                onError={(e) => {
+                  e.target.src = cardPhoto;
+                }}
+              />
             </div>
-            <div className="textContainer">
-              <h3 className='text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]'>
+            <div className="textContainer p-4">
+              <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A] line-clamp-2">
                 {box.courseTitle}
               </h3>
-              <p className='text-sm mt-2' dangerouslySetInnerHTML={{ __html: box.longDescription }} ></p>
-              <h3 className='flex items-center mt-2 text-2xl font-bold text-[#000000c4]'>
-                <img className='h-5 mt-1 opacity-70' src={rupee} alt="rupee" />
-                {box.isCourseFree ? "0" : box.price}
+              <div 
+                className="text-sm mt-2 line-clamp-3 text-gray-600"
+                dangerouslySetInnerHTML={{ __html: box.longDescription }}
+              />
+              <h3 className="flex items-center mt-4 text-2xl font-bold text-[#000000c4]">
+                <img className="h-5 mt-1 opacity-70" src={rupee} alt="rupee" />
+                {box.isCourseFree === "free" ? "0" : box.price}
               </h3>
             </div>
           </Link>
@@ -87,6 +112,6 @@ const PopularCourses = () => {
       </div>
     </div>
   );
-}
+};
 
 export default PopularCourses;
