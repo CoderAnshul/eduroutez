@@ -14,7 +14,7 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
     };
 
     useEffect(() => {
-        checkOverflow(); // Check if content overflows on mount
+        checkOverflow(); // Check if content overflows on institutesmount
         window.addEventListener("resize", checkOverflow); // Recheck on window resize
 
         return () => {

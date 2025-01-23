@@ -8,6 +8,7 @@ import checklist from "../assets/Images/checklist.png";
 import { addToWishlist } from '../ApiFunctions/api';
 
 const SearchResultBox = ({ institute }) => {
+  
   console.log('Institute:', institute);
   const [isWishlisted, setIsWishlisted] = useState(false);
 

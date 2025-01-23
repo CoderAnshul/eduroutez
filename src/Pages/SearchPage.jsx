@@ -34,7 +34,7 @@ const SearchPage = () => {
 
   const { data, isLoading, isError } = useQuery(
     ["institute"],
-    () => getInstitutes(inputField,inputField),
+    () => getInstitutes(inputField,inputField,inputField),
     {
       enabled: true,
       onSuccess: (data) => {
