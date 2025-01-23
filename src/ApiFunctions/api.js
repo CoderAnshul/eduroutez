@@ -30,8 +30,12 @@ export const addToWishlist = async (userId, instituteId) => {
     const response = await axios.post(
       `${baseURL}/wishlist/`,
       { userId, instituteId },
-      { withCredentials: true }
-    );
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')  }
+        }    );
     return response.data;
   } catch (error) {
     console.error("Error adding to wishlist:", error);
