@@ -55,7 +55,7 @@ const BestRated = () => {
             if (index < 3 && box) {
               return (
                 <Link
-                  to="/institute"
+                  to={`/institute/${box._id}`}
                   key={index}
                   className="box w-full max-w-sm lg:max-w-[500px] shadow-lg"
                 >

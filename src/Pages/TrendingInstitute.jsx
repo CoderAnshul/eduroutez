@@ -40,7 +40,6 @@ const TrendingInstitute = () => {
         <div className='w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto'>
             <div className='flex items-center justify-between mb-10'>
                 <h3 className='text-xl font-bold'>Trending institute</h3>
-                <CustomButton text='View more'/>
             </div>
 
             <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">

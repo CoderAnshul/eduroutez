@@ -6,10 +6,13 @@ import { getBlogs, blogById } from '../ApiFunctions/api'; // Import blogById
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 
+const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+
 const BlogComponent = () => {
   const [content, setContent] = useState([]);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [imageUrls, setImageUrls] = useState({});
   const [error, setError] = useState(null);
+  const [datas, setData] = useState(null);
 
   const { data, isLoading, isError } = useQuery(
     ["blog"],
@@ -39,7 +42,7 @@ const BlogComponent = () => {
           const imageResponse = await fetch(`${Images}/${response.data.image}`);
           const imageBlob = await imageResponse.blob();
           const imageObjectURL = URL.createObjectURL(imageBlob);
-          setImageUrl(imageObjectURL);
+          setImageUrls(prevState => ({ ...prevState, [id]: imageObjectURL }));
         }
       } catch (error) {
         console.error('Error fetching blog:', error);
@@ -50,11 +53,8 @@ const BlogComponent = () => {
     // Fetch blog data for each blog in content
     content.forEach(blog => fetchBlog(blog._id));
 
-    // Cleanup function to revoke object URL
     return () => {
-      if (imageUrl) {
-        URL.revokeObjectURL(imageUrl);
-      }
+      Object.values(imageUrls).forEach(url => URL.revokeObjectURL(url));
     };
   }, [content]);
 
@@ -89,8 +89,8 @@ const BlogComponent = () => {
               {/* Image */}
               <div className="h-56 w-full overflow-hidden">
                 <img
-                  className="w-full h-full object-cover object-center rounded-t-xl"
-                  src={imageUrl || agricultureImg} // Fallback image
+                  className="w-full h-full object-contain object-center rounded-t-xl"
+                  src={imageUrls[blog._id] || agricultureImg} // Use the correct image URL for each blog
                   alt={blog.title}
                 />
               </div>

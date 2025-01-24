@@ -12,6 +12,9 @@ const HighRatedCareers = () => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
 
+  const Images=import.meta.env.VITE_IMAGE_BASE_URL;
+
+
   const { data, isLoading, isError } = useQuery(
     ["career"],
     () => career(),
