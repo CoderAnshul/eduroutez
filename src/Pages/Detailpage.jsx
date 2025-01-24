@@ -7,6 +7,8 @@ const Detailpage = () => {
   // State to manage data and active tab
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
+  const Images=import.meta.env.VITE_IMAGE_BASE_URL;
+
 
   const { id } = useParams();
 
@@ -67,7 +69,7 @@ const Detailpage = () => {
       <div className="h-80 w-full rounded-md">
         <img
           className="h-full w-full object-cover"
-          src={`http://localhost:4001/api/uploads/${data.image}`}
+          src={`${Images}/${data.image}`}
           alt="bannerdetailimg"
         />
       </div>

@@ -9,9 +9,12 @@ import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import axios from "axios";
 
+const Images=import.meta.env.VITE_IMAGE_BASE_URL;
+
+
 const fetchImage = async (imagePath) => {
   try {
-    const response = await axios.get(`http://localhost:4001/api/uploads/${imagePath}`, {
+    const response = await axios.get(`${Images}/${imagePath}`, {
       responseType: 'blob'
     });
     // Create URL immediately and store it

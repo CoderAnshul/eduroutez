@@ -8,6 +8,8 @@ const ImageSlider = ({ instituteData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fullscreenIndex, setFullscreenIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const Images=import.meta.env.VITE_IMAGE_BASE_URL;
+
 
   const galleryImages = useMemo(() => instituteData.data.gallery, [instituteData]);
 
@@ -51,7 +53,7 @@ const ImageSlider = ({ instituteData }) => {
           {galleryImages.map((src, index) => (
             <img
               key={index}
-              src={`http://localhost:4001/api/uploads/${src}`}
+              src={`${Images}/${src}`}
               alt={`Slide ${index + 1}`}
               className={`absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 ease-in-out ${
                 index === currentIndex
@@ -108,7 +110,7 @@ const ImageSlider = ({ instituteData }) => {
       {isFullscreen && (
         <div className="fixed inset-0 bg-black/90 z-[1000] flex items-center justify-center">
           <img
-            src={`http://localhost:4001/api/uploads/${galleryImages[fullscreenIndex]}`}
+            src={`${Images}/${galleryImages[fullscreenIndex]}`}
             alt={`Fullscreen view of slide ${fullscreenIndex + 1}`}
             className="max-w-full max-h-full object-contain"
           />
