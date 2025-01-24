@@ -80,9 +80,24 @@ if(response)    {
     <>
       <div className="sticky top-0 z-[999] bg-white">
         <div className="h-16 w-full p-5 flex items-center justify-between">
-          <Link to="/">
+          {/* <Link to="/">
             <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
-          </Link>
+          </Link> */}
+          <div className='flex items-center gap-2'>
+          <button
+                      onClick={toggleMenu}
+                      className="md:hidden"
+                    >
+                      <img
+                        className="h-6"
+                        src={menubar}
+                        alt="open menu"
+                      />
+                    </button>
+            <Link to="/">
+              <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
+            </Link>
+        </div>
 
           <div className="search ml-5 bg-white border-[1.5px] border-gray-500 px-4 py-2 rounded-lg items-center gap-2 w-[40%] overflow-hidden hidden sm:flex">
             <button>
@@ -141,8 +156,15 @@ if(response)    {
             {accessToken && (
               <div
                 className="relative"
-                onMouseEnter={() => setIsDropdownOpen(true)}
-                onMouseLeave={() => setIsDropdownOpen(false)}
+                // onMouseEnter={() => setIsDropdownOpen(true)}
+                // onMouseLeave={() => setIsDropdownOpen(false)}
+                onClick={() => {
+                  if (isDropdownOpen) {
+                    setIsDropdownOpen(false);
+                  } else {
+                    setIsDropdownOpen(true);
+                  }
+                }}
               >
                 <div className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer">
                   <img className="h-3 opacity-75" src={menu} alt="menu" />
