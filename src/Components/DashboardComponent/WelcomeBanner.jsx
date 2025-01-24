@@ -160,7 +160,7 @@ const WelcomeBanner = () => {
           </div>
         </div>
         
-        <div className="p-6 space-y-6">
+        <div className="py-5 px-2 sm:py-6 sm:px-6 space-y-6">
           <div className={`bg-gradient-to-r ${levelDetails.color} rounded-lg shadow-md`}>
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
