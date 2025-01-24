@@ -38,7 +38,6 @@ const EditProfile = () => {
           dob: response.data.data.dob,
           gender: response.data.data.gender,
           designation: response.data.data.designation,
-          phone: response.data.data.phone,
           about: response.data.data.about,
           address: response.data.data.address,
           country: response.data.data.country,

@@ -8,15 +8,17 @@ import { popularCourses } from '../ApiFunctions/api';
 const PopularCourses = () => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
-  
+
   const { data, isLoading, isError } = useQuery(
     ["popularCourses"],
     () => popularCourses(),
     {
       enabled: true,
       onSuccess: (data) => {
-        const { result } = data.data;
-        setContent(result);
+        const { result } = data?.data || {}; // safely access result
+        if (result) {
+          setContent(result);
+        }
       }
     }
   );
@@ -25,12 +27,11 @@ const PopularCourses = () => {
     const fetchImages = async () => {
       const imagePromises = content.map(async (box) => {
         try {
-          // Fetch both thumbnail and cover images
           const coverResponse = await fetch(
             `${import.meta.env.VITE_IMAGE_BASE_URL}/${box.coursePreviewCover}`
           );
           if (!coverResponse.ok) throw new Error('Cover image not found');
-          
+
           const blob = await coverResponse.blob();
           return URL.createObjectURL(blob);
         } catch (error) {
@@ -41,22 +42,21 @@ const PopularCourses = () => {
 
       const imageResults = await Promise.all(imagePromises);
       const imageMap = imageResults.reduce((acc, url, index) => {
-        if (url) acc[content[index]._id] = url;
+        if (url) acc[content[index]?._id] = url;
         return acc;
       }, {});
 
       setImages(imageMap);
     };
 
-    if (content.length > 0) {
+    if (content?.length > 0) {
       fetchImages();
     }
 
-    // Cleanup function to revoke object URLs
     return () => {
       Object.values(images).forEach(url => URL.revokeObjectURL(url));
     };
-  }, [content]);
+  }, [content, images]);
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -78,17 +78,17 @@ const PopularCourses = () => {
       </div>
 
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
-        {content.map((box) => (
+        {(content?.length > 0) ? content.map((box) => (
           <Link
-            to={`/coursesinfopage/${box._id}`}
-            key={box._id}
+            to={`/coursesinfopage/${box?._id}`}
+            key={box?._id}
             className="box lg:max-w-[500px] shadow-lg rounded-lg overflow-hidden"
           >
             <div className="imageContainer h-48 relative">
               <img
                 className="h-full w-full object-cover"
-                src={images[box._id] || cardPhoto}
-                alt={box.courseTitle}
+                src={images[box?._id] || cardPhoto}
+                alt={box?.courseTitle || "Course Image"}
                 onError={(e) => {
                   e.target.src = cardPhoto;
                 }}
@@ -96,19 +96,23 @@ const PopularCourses = () => {
             </div>
             <div className="textContainer p-4">
               <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A] line-clamp-2">
-                {box.courseTitle}
+                {box?.courseTitle || 'Untitled Course'}
               </h3>
-              <div 
+              <div
                 className="text-sm mt-2 line-clamp-3 text-gray-600"
-                dangerouslySetInnerHTML={{ __html: box.longDescription }}
+                dangerouslySetInnerHTML={{
+                  __html: box?.longDescription?.slice(0, 80) + "..." || "No description available"
+                }}
               />
               <h3 className="flex items-center mt-4 text-2xl font-bold text-[#000000c4]">
                 <img className="h-5 mt-1 opacity-70" src={rupee} alt="rupee" />
-                {box.isCourseFree === "free" ? "0" : box.price}
+                {box?.isCourseFree === "free" ? "0" : box?.price || "N/A"}
               </h3>
             </div>
           </Link>
-        ))}
+        )) : (
+          <div className="w-full text-center">No popular courses available.</div>
+        )}
       </div>
     </div>
   );
