@@ -14,7 +14,14 @@ const Wishlist = () => {
   useEffect(() => {
     const fetchWishlists = async () => {
       try {
-        const response = await axios.get(`${VITE_BASE_URL}/wishlists`, { withCredentials: true });
+        const response = await axios.get(`${VITE_BASE_URL}/wishlists`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': localStorage.getItem('accessToken'),
+              'x-refresh-token': localStorage.getItem('refreshToken')  }
+            }
+        );
         if (response.data.success) {
           setWishlists(response.data.data.college_wishlist || []);
         }

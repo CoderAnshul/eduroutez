@@ -17,7 +17,7 @@ const BestRated = () => {
     {
       enabled: true,
       onSuccess: (data) => {
-        setContent(data.data || []); // Ensure content is set even if data is null or undefined
+        setContent(data.data || []);
       },
     }
   );
