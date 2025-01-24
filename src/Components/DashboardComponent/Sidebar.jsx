@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import logo from '../../assets/Images/logo.png';
+import favicon from '../../assets/Images/favicon.png';
 import axiosInstance from '../../ApiFunctions/axios';
 const Sidebar = () => {
   const menuItems = [
@@ -77,7 +78,8 @@ if(response)    {
       {/* Navbar for small screens */}
       <nav className="w-14 bg-gray-100 p-4 flex flex-col gap-14 items-center md:hidden">
         <Link to="/">
-          <img className="h-6" src={logo} alt="mainLogo" />
+          <img className="h-6 hidden md:flex" src={logo} alt="mainLogo" />
+          <img className="h-6 mt-3 md:hidden" src={favicon} alt="mainLogo" />
         </Link>
         <ul className="flex flex-col gap-4">
           {menuItems.map((item, index) => (
