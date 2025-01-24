@@ -8,6 +8,8 @@ import CustomButton from '../Ui components/CustomButton';
 import {alltrendingInstitute,allbestRatedInstitute, getInstituteById, trendingInstitute } from '../ApiFunctions/api';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
+const Images=import.meta.env.VITE_IMAGE_BASE_URL;
+
 
 const TrendingInstitute = () => {
     const [content, setContent] = useState([]);
@@ -48,7 +50,7 @@ const TrendingInstitute = () => {
                             <Link to={`/institute/${institute._id}`} key={institute._id || index} className="box lg:max-w-[500px] shadow-lg">
                                 <div className="imageContainer">
                                     <img className='h-full w-full object-cover' 
-                                        src={institute.thumbnailImage ? `http://localhost:4001/api/uploads/${institute.thumbnailImage}` : cardPhoto}
+                                        src={institute.thumbnailImage ? `${Images}/${institute.thumbnailImage}` : cardPhoto}
                                         alt="boxphoto" />
                                 </div>
                                 <div className="textContainer">

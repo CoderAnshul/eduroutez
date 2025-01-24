@@ -4,6 +4,7 @@ import CustomButton from "./CustomButton";
 const BlogandCareerBox = ({ boxData, blogData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
+  const Images=import.meta.env.VITE_IMAGE_BASE_URL;
 
   const handleSeeMore = () => {
     setCurrentPage(currentPage + 1);
@@ -31,7 +32,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
           >
             <div className="relative">
               <img
-                src={`http://localhost:4001/api/uploads/${blog.image}`}
+                src={`${Images}/${blog.image}`}
                 alt={blog.title}
                 className="w-full h-48 object-cover"
               />

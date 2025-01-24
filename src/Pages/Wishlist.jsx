@@ -99,7 +99,7 @@ const Wishlist = () => {
                 <div className="relative">
                   <img
                     src={college.thumbnailImage
-                      ? `${VITE_BASE_URL}/uploads/${college.thumbnailImage}`
+                      ? `${VITE_BASE_URL}/${college.thumbnailImage}`
                       : searchBoximg}
                     alt={college.instituteName}
                     className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"

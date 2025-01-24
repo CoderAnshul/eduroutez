@@ -6,6 +6,8 @@ const GalleryInfo = ({ instituteData }) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
+  const Images=import.meta.env.VITE_IMAGE_BASE_URL;
+
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -18,7 +20,7 @@ const GalleryInfo = ({ instituteData }) => {
         const imageUrls = await Promise.all(
           instituteData.data.gallery.map(async (imageFilename) => {
             const imageResponse = await axios.get(
-              `http://localhost:4001/api/uploads/${imageFilename}`,
+              `${Images}/${imageFilename}`,
               { responseType: 'blob' }
             );
             return URL.createObjectURL(imageResponse.data);

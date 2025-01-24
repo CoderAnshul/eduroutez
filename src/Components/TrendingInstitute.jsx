@@ -4,6 +4,7 @@ import cardPhoto from '../assets/Images/teacher.jpg';
 import rupee from '../assets/Images/rupee.png';
 import { useQuery } from 'react-query';
 import { trendingInstitute } from '../ApiFunctions/api';
+const Images=import.meta.env.VITE_IMAGE_BASE_URL;
 
 const TrendingInstitute = () => {
   const [content, setContent] = useState([]);
@@ -68,7 +69,7 @@ const TrendingInstitute = () => {
                     className="h-full w-full object-cover"
                     src={
                       institute.thumbnailImage
-                        ? `http://localhost:4001/api/uploads/${institute.thumbnailImage}`
+                        ? `${Images}/${institute.thumbnailImage}`
                         : cardPhoto
                     }
                     alt="Institute"
