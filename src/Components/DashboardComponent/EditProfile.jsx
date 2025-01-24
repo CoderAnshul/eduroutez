@@ -34,8 +34,8 @@ const EditProfile = () => {
 
         setUserData({
           name: response.data.data.name,
-          phone: response.data.data.contact_number,
-          dob: response.data.data.dob,
+          phone: response.data.data.phone,
+          dob: response.data.data.dob ? new Date(response.data.data.dateOfBirth).toISOString().split('T')[0] : '',
           gender: response.data.data.gender,
           designation: response.data.data.designation,
           about: response.data.data.about,

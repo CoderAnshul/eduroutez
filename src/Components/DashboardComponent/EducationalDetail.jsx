@@ -16,7 +16,6 @@ const EducationalDetail = () => {
     const [message, setMessage] = useState('');
     const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    // Fetch educational details
     useEffect(() => {
         const fetchEducationData = async () => {
             try {
@@ -51,7 +50,6 @@ const EducationalDetail = () => {
         fetchEducationData();
     }, []);
 
-    // Update education details mutation
     const { mutate, isPending: isSubmitting } = useMutation({
         mutationFn: async (finalFormData) => {
             const endpoint = `${VITE_BASE_URL}/student`;
@@ -74,13 +72,37 @@ const EducationalDetail = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+      
+        // Construct the education payload
+        const payload = {
+          educations: [
+            {
+              institute: educationData.institute,
+              degree: educationData.degree,
+              program: educationData.program,
+              startDate: educationData.startDate,
+              currentlyEnrolled: educationData.currentlyEnrolled,
+              endDate: educationData.currentlyEnrolled ? null : educationData.endDate || '',
+              description: educationData.description,
+              certificateImage: educationData.certificateImage ? educationData.certificateImage.name : null,
+            },
+          ],
+        };
+      
+        // Create FormData
         const finalFormData = new FormData();
-        Object.keys(educationData).forEach(key => {
-            finalFormData.append(key, educationData[key]);
-        });
-
+      
+        // Append educations JSON string
+        finalFormData.append('educations', JSON.stringify(payload.educations));
+      
+        // Append certificate image file if it exists
+        if (educationData.certificateImage) {
+          finalFormData.append('certificateImage', educationData.certificateImage);
+        }
+      
+        // Submit FormData using the mutate function
         mutate(finalFormData);
-    };
+      };
 
     return (
         <div className="p-2 md:p-2 border border-gray-300 rounded-lg">
@@ -165,7 +187,8 @@ const EducationalDetail = () => {
                             checked={educationData.currentlyEnrolled}
                             onChange={(e) => setEducationData({
                                 ...educationData,
-                                currentlyEnrolled: e.target.checked
+                                currentlyEnrolled: e.target.checked,
+                                endDate: e.target.checked ? '' : educationData.endDate
                             })}
                             className="w-full max-w-2/5 border rounded px-4 py-2"
                         />

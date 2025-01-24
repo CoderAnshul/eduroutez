@@ -10,7 +10,7 @@ const fetchUserData = async () => {
   if (!userId) {
     throw new Error("User ID not found in localStorage");
   }
-  const response = await axiosInstance.get(`${VITE_BASE_URL}/user/`, {
+  const response = await axiosInstance.get(`${VITE_BASE_URL}/student/${userId}`, {
     headers: {
       headers: {
         'Content-Type': 'application/json',
@@ -41,8 +41,8 @@ const ProfilePage = () => {
     onSuccess: (data) => {
       setFormData({
         name: data.name,
-        phone: data.contact_number,
-        dateOfBirth: data.dateOfBirth,
+        phone: data.phone,
+        dateOfBirth: new Date(data.dateOfBirth).toISOString().split('T')[0],
         gender: data.gender,
         designation: data.designation,
         about: data.about,
@@ -77,8 +77,8 @@ const ProfilePage = () => {
 
   const { mutate } = useMutation({
     mutationFn: async ({ userId, updatedForm }) => {
-      const endpoint = `${apiUrl}/user/${userId}`; // PATCH request URL
-      const response = await axiosInstance.patch(endpoint, updatedForm, {
+      const endpoint = `${apiUrl}/student`; // PATCH request URL
+      const response = await axiosInstance.post(endpoint, updatedForm, {
         headers: {
           'Content-Type': 'application/json',
           'x-access-token': localStorage.getItem('accessToken'),

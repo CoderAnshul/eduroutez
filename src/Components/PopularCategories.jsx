@@ -63,27 +63,23 @@ const PopularCategories = () => {
       </p>
 
       <div className='mt-6 flex flex-wrap gap-2 lg:max-w-[1100px] justify-center'>
-        {content.length > 0 ? (
-          content.map((category, index) => (
-            <Link
-              key={index}
-              className='h-12 py-2 px-2 md:px-3 md:max-w-auto flex flex-1 max-w-fit gap-1 whitespace-nowrap items-center rounded-full bg-white'
-            >
-              {/* You can replace the commented code below with actual image handling if needed */}
-              {/* 
-                <div className="catImg border-4 flex items-center justify-center overflow-hidden border-sky-200 rounded-full h-10 w-10">
-                  <img className='h-6 w-6 object-contain' src={category.img || defaultImage} alt={category.title} />
-                </div> 
-              */}
-              <h4 className='text-xs md:text-md'>
-                {category.name || 'Category Name Not Available'}
-              </h4>
-            </Link>
-          ))
-        ) : (
-          <p>No categories available</p>
-        )}
-      </div>
+  {content.length > 0 ? (
+    content
+      .filter(category => category.status === true)
+      .map((category, index) => (
+        <Link
+          key={index}
+          className='h-12 py-2 px-2 md:px-3 md:max-w-auto flex flex-1 max-w-fit gap-1 whitespace-nowrap items-center rounded-full bg-white'
+        >
+          <h4 className='text-xs md:text-md'>
+            {category.name || 'Category Name Not Available'}
+          </h4>
+        </Link>
+      ))
+  ) : (
+    <p>No categories available</p>
+  )}
+</div>
     </div>
   );
 };
