@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react"; // Import ArrowRight icon from lucide-react
 import axiosInstance from "../../ApiFunctions/axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';;
 
 const DashboardNav = () => {
   const [userName, setUserName] = useState("");
@@ -65,17 +65,19 @@ console.log('responsrftgyhuje',response.data)
       <div className="flex items-center gap-4">
         <button
           onClick={handleBecomeCounselor}
-          className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition-colors"
+          className="lg:flex hidden items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition-colors"
         >
           Become a Counselor
-          <ArrowRight className="h-4 w-4" />
+          {/* <span className="hidden md:flex">Become a Counselor</span> */}
+          <ArrowRight className="h-4 w-4 hidden md:flex" />
         </button>
         <button
           onClick={handleQuestion}
-          className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition-colors"
+          className="md:flex hidden items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition-colors"
         >
           Ask Question
-          <ArrowRight className="h-4 w-4" />
+          {/* <span className="hidden md:flex">Ask Question</span> */}
+          <ArrowRight className="h-4 w-4 hidden md:flex" />
         </button>
         
         <div className="border px-4 py-2 rounded-md flex items-center gap-2">
@@ -85,7 +87,7 @@ console.log('responsrftgyhuje',response.data)
             <>
               <h3>{userName || 'Guest'}</h3>
               <div 
-                className="h-7 w-7 rounded-full cursor-pointer hover:bg-gray-100 flex items-center justify-center"
+                className="h-7 w-7 rounded-full hidden cursor-pointer hover:bg-gray-100 flex items-center justify-center"
                 onClick={handleLogout}
                 title="Click to logout"
               >
