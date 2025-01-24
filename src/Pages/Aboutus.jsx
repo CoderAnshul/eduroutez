@@ -4,6 +4,7 @@ import aboutimg from "../assets/Images/aboutimg.png"
 import { Link } from "react-router-dom";
 import Instructor from "../Components/Instructor";
 import Events from "../Components/Events";
+import ConsellingBanner from "../Components/ConsellingBanner";
 
 const Aboutus = () => {
   return (
@@ -19,10 +20,10 @@ const Aboutus = () => {
         </div>
         <div className="flex flex-wrap justify-center gap-8 px-4 md:px-8 lg:px-12">
           {[
-            { id: 1, title: "Expert Teacher", color: "bg-red-100", numberColor: "text-red-600" },
-            { id: 2, title: "Quality Education", color: "bg-blue-100", numberColor: "text-blue-600" },
-            { id: 3, title: "Remote Learning", color: "bg-pink-100", numberColor: "text-pink-600" },
-            { id: 4, title: "Life Time Support", color: "bg-teal-100", numberColor: "text-teal-600" },
+            { id: 1, title: "Expert Teacher", color: "bg-red-100", numberColor: "text-red-600" , para:"Learn from experienced and skilled instructors."},
+            { id: 2, title: "Quality Education", color: "bg-blue-100", numberColor: "text-blue-600" ,para:"Access top-notch resources for better learning."},
+            { id: 3, title: "Remote Learning", color: "bg-pink-100", numberColor: "text-pink-600" ,para:"Study anytime, anywhere with total ease."},
+            { id: 4, title: "Life Time Support", color: "bg-teal-100", numberColor: "text-teal-600" ,para:"Get lifelong guidance for your success journey."},
           ].map((item) => (
             <div
               key={item.id}
@@ -43,7 +44,8 @@ const Aboutus = () => {
                 ></h3>
               </div>
               <p className="text-gray-500 text-center">
-                Lorem ipsum dolor sit amet, consectetur notted adipisicing elit ut labore.
+                {/* Lorem ipsum dolor sit amet, consectetur notted adipisicing elit ut labore. */}
+                {item.para}
               </p>
             </div>
           ))}
@@ -66,33 +68,31 @@ const Aboutus = () => {
         {/* Right Content Section */}
         <div className="flex-1">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
-            Lorem ipsum dolor sit amet
+            Why Choose Us?
           </h2>
           <p className="text-gray-500 mb-4">
+          
+Eduroutez.com simplifies higher education navigation with accurate, up-to-date insights on colleges, courses, and admissions in India and abroad. Our user-friendly platform empowers students, parents, and educators to make informed decisions and achieve academic goals.
+          </p>
+          {/* <p className="text-gray-500 mb-6">
             We offer a brand new approach to the most basic learning paradigms.
             Choose from a wide range of learning options and gain new skills!
             Our school is known.
-          </p>
-          <p className="text-gray-500 mb-6">
-            We offer a brand new approach to the most basic learning paradigms.
-            Choose from a wide range of learning options and gain new skills!
-            Our school is known.
-          </p>
+          </p> */}
 
           {/* Bullet Points */}
           <ul className="space-y-3 mb-8">
             <li className="flex items-start gap-2 text-gray-600">
               <span className="text-blue-600 mt-[2px]">✔</span>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-              eiusmod tempor incididunt.
+              Find your perfect college fit with Eduroutez.com’s trusted insights and tools.
             </li>
             <li className="flex items-start gap-2 text-gray-600">
               <span className="text-blue-600 mt-[2px]">✔</span>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do.
+              Navigate higher education effortlessly with our user-friendly platform.
             </li>
             <li className="flex items-start gap-2 text-gray-600">
               <span className="text-blue-600 mt-[2px]">✔</span>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+              Empowering students and educators with accurate, up-to-date academic resources.
             </li>
           </ul>
 
@@ -108,7 +108,10 @@ const Aboutus = () => {
     </section>
 
     <Instructor/>
-    <Events/>
+    <div className="flex gap-2 items-center">
+      <Events/>
+      <ConsellingBanner/>
+      </div>
     </>
   );
 };
