@@ -141,29 +141,16 @@ if(response)    {
             {accessToken && (
               <div
                 className="relative"
-
+                onMouseEnter={() => setIsDropdownOpen(true)}
+                onMouseLeave={() => setIsDropdownOpen(false)}
               >
                 <div className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer">
-                  {/* <img className="h-3 opacity-75" src={menu} alt="menu" /> */}
-                  <button
-                    onClick={toggleMenu}
-                    className="lg:hidden"
-                  >
-                    <img
-                      className="h-6"
-                      src={menubar}
-                      alt="open menu"
-                    />
-                  </button>
+                  <img className="h-3 opacity-75" src={menu} alt="menu" />
 
                   <Link
                     to="/"
                     className="secondMenu bg-gray-500 hover:scale-105 transition-all h-5 w-5 rounded-full"
-                    onMouseEnter={() => setIsDropdownOpen(true)}
-                    onMouseLeave={() => setIsDropdownOpen(false)}
-                  >
-
-                  </Link>
+                  ></Link>
                 </div>
 
                 {/* Dropdown menu */}
