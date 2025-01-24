@@ -15,7 +15,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
     }
   };
 
-  const displayedBlogs = blogData?.data?.result?.slice(
+  const displayedBlogs = blogData?.data?.slice(
     0,
     currentPage * itemsPerPage
   );
@@ -60,7 +60,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
       </div>
 
       <div className="w-full flex justify-center gap-4 mt-24">
-        {displayedBlogs.length < blogData?.data?.result?.length && (
+        {displayedBlogs.length < blogData?.data?.length && (
           <button
             className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
             onClick={handleSeeMore}
