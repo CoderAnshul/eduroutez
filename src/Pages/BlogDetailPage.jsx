@@ -119,7 +119,10 @@ const BlogDetailPage = () => {
           {data.description && (
             <div ref={overviewRef} className="space-y-4">
               <h3 className="text-lg font-semibold border-b pb-2">Overview</h3>
-              <p className="text-gray-700">{data.description}</p>
+              <div
+                className="text-gray-700"
+                dangerouslySetInnerHTML={{ __html: data.description }}
+              />
             </div>
           )}
         </div>
