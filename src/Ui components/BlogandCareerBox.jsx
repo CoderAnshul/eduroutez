@@ -41,14 +41,18 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
               <h3 className="text-lg font-semibold text-gray-800 truncate">
                 {blog.title}
               </h3>
-              <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-                {blog.description
-                  ? blog.description.split(" ").slice(0, 30).join(" ")
-                  : ""}
-                {blog.description &&
-                  blog.description.split(" ").length > 30 &&
-                  "........"}
-              </p>
+              <p
+                className="text-sm text-gray-600 mt-2 line-clamp-3"
+                dangerouslySetInnerHTML={{
+                  __html: blog.description
+                    ? blog.description.split(" ").slice(0, 30).join(" ")
+                    : "",
+                }}
+              ></p>
+              {blog.description &&
+                blog.description.split(" ").length > 30 && (
+                  <span>........</span>
+                )}
               <div className="mt-4">
                 <CustomButton
                   text="Read More"

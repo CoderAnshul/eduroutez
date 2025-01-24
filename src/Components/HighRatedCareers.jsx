@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
 import { Link } from 'react-router-dom';
@@ -10,20 +10,48 @@ import { career } from '../ApiFunctions/api';
 
 const HighRatedCareers = () => {
   const [content, setContent] = useState([]);
+  const [images, setImages] = useState({});
 
   const { data, isLoading, isError } = useQuery(
     ["career"],
     () => career(),
     {
       enabled: true,
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         const { result } = data?.data || {}; // safely access result
         if (result) {
           setContent(result); // update content if result is not null or undefined
+
+          // Fetch images for each career
+          const imagePromises = result.map(async (career) => {
+            if (career.image) {
+              const imageResponse = await fetch(`${Images}/${career.image}`);
+              const imageBlob = await imageResponse.blob();
+              const imageObjectURL = URL.createObjectURL(imageBlob);
+              return { id: career._id, url: imageObjectURL };
+            }
+            return { id: career._id, url: cardPhoto };
+          });
+
+          const imageResults = await Promise.all(imagePromises);
+          const imageMap = imageResults.reduce((acc, image) => {
+            acc[image.id] = image.url;
+            return acc;
+          }, {});
+          setImages(imageMap);
         }
       },
     }
   );
+
+  useEffect(() => {
+    // Cleanup function to revoke object URLs
+    return () => {
+      Object.values(images).forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, [images]);
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -48,7 +76,7 @@ const HighRatedCareers = () => {
         {(content && content.length > 0) ? content.map((box, index) => (
           <Link to={`/detailpage/${box._id}`} key={index} className="box lg:max-w-[500px] shadow-lg">
             <div className="imageContainer">
-              <img className='h-full w-full object-cover' src={box?.image || cardPhoto} alt="boxphoto" />
+              <img className='h-full w-full object-cover' src={images[box._id] || cardPhoto} alt="boxphoto" />
             </div>
             <div className="textContainer">
               <h3 className='text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]'>
