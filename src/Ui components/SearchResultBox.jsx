@@ -61,7 +61,7 @@ const SearchResultBox = ({ institute }) => {
   };
 
   return (
-    <div className="border rounded-lg shadow-md p-4 flex flex-col space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2">
+    <div className="border rounded-lg shadow-md p-4 flex flex-col md:flex-row  space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2">
       {/* Left Section - Image */}
       <div className="flex justify-between flex-col md:flex-row gap-3"></div>
         <div className="relative w-full md:w-2/6">

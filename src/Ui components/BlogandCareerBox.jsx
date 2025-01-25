@@ -37,12 +37,13 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
                 className="w-full h-48 object-cover"
               />
             </div>
-            <div className="p-4">
+            <div className="p-4 flex flex-col justify-between h-[215px]">
+              <div>
               <h3 className="text-lg font-semibold text-gray-800 truncate">
                 {blog.title}
               </h3>
               <p
-                className="text-sm text-gray-600 mt-2 line-clamp-3"
+                className="text-sm h text-gray-600 mt-2 line-clamp-3"
                 dangerouslySetInnerHTML={{
                   __html: blog.description
                     ? blog.description.split(" ").slice(0, 30).join(" ")
@@ -53,6 +54,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
                 blog.description.split(" ").length > 30 && (
                   <span>........</span>
                 )}
+              </div>
               <div className="mt-4">
                 <CustomButton
                   text="Read More"
