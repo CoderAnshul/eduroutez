@@ -74,9 +74,9 @@ toast.success("Registered successfully");
       }
       else if (data?.data?.user?.role === 'institute') {
        
-        toast.success("Registered successfully. Please log in from the panel. https://admin.eduroutez.com/dashboard/");
+        alert("Registered successfully. Please log in from the panel. https://admin.eduroutez.com/dashboard/");
       } else if (data?.data?.user?.role === 'counsellor') {
-        toast.success("Registered successfully. Please log in from the panel. https://admin.eduroutez.com/dashboard/");
+        alert("Registered successfully. Please log in from the panel. https://admin.eduroutez.com/dashboard/");
 
       }
     },
