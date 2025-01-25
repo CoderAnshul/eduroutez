@@ -9,6 +9,7 @@ import CustomButton from "../Ui components/CustomButton";
 import { useQuery } from "react-query";
 import { allbestRatedInstitute } from "../ApiFunctions/api";
 
+
 const BestRated = () => {
         const [content, setContent] = useState([]);
 
