@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
+import { toast } from "react-toastify";
 
 const Signup = () => {
   const roleTypes = [
@@ -62,7 +63,7 @@ const Signup = () => {
       }
     },
     onSuccess: (data) => {
-      alert("Signed Up Successfully! You can now log in.");
+toast.success("Registered successfully");
       localStorage.setItem('accessToken', JSON.stringify(data.data.accessToken));
       localStorage.setItem('userId', data?.data?.user?._id);
       localStorage.setItem('role', data?.data?.user?.role);
@@ -72,9 +73,11 @@ const Signup = () => {
       navigate('/');
       }
       else if (data?.data?.user?.role === 'institute') {
-        window.location.href = 'https://admin.eduroutez.com/dashboard/';
+       
+        toast.success("Registered successfully. Please log in from the panel. https://admin.eduroutez.com/dashboard/");
       } else if (data?.data?.user?.role === 'counsellor') {
-        window.location.href = 'https://admin.eduroutez.com/dashboard/';
+        toast.success("Registered successfully. Please log in from the panel. https://admin.eduroutez.com/dashboard/");
+
       }
     },
     onError: (error) => {

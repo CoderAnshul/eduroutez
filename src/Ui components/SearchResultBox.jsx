@@ -39,26 +39,34 @@ const SearchResultBox = ({ institute }) => {
 
   const handleDownloadBrochure = async () => {
     try {
-      const response = await axiosInstance(`${baseURL}/${institute._id}`, {
-        method: 'GET',
+      const response = await axiosInstance.get(`${baseURL}/download-bruchure/${institute._id}`, {
         headers: {
-          'Content-Type': 'application/json',
           'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken')
-        }
+          'x-refresh-token': localStorage.getItem('refreshToken'),
+        },
+        responseType: 'blob', // Ensures the response is treated as binary data
       });
-      const blob = await response.blob();
+  
+      // Create a Blob from the image data
+      const blob = new Blob([response.data], { type: 'image/jpeg' }); // Adjust MIME type based on the actual format (e.g., image/png)
       const url = window.URL.createObjectURL(blob);
+  
+      // Trigger a download
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${institute.instituteName}_brochure.pdf`;
+      a.download = 'brochure.jpg'; // Change extension as needed (e.g., brochure.png)
       document.body.appendChild(a);
       a.click();
-      a.remove();
+      document.body.removeChild(a);
+  
+      // Cleanup
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading brochure:', error);
+      console.error('Download error:', error);
     }
   };
+  
+  
 
   return (
     <div className="border rounded-lg shadow-md p-4 flex flex-col md:flex-row  space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2">
