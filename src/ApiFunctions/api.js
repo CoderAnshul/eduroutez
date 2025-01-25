@@ -84,10 +84,14 @@ export const getCoursesById = async (id) => {
 
 export const createReview = async (formData) => {
   try {
-    const response = await axios.post(`${baseURL}/review`, formData);
+    const response = await axios.post(`${baseURL}/review`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
-    console.error(`Error fetching institute with ID ${id}:`, error);
+    console.error(`Error creating review:`, error.message);
     throw error;
   }
 };
