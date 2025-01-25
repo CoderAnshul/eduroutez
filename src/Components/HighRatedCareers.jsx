@@ -77,7 +77,7 @@ const HighRatedCareers = () => {
 
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
         {(content && content.length > 0) ? content.map((box, index) => (
-          <Link to={`/detailpage/${box._id}`} key={index} className="box lg:max-w-[500px] shadow-lg">
+          <Link to={`/detailpage/${box._id}`} key={index} className="box lg:max-w-[450px] shadow-lg">
             <div className="imageContainer">
               <img className='h-full w-full object-cover' src={images[box._id] || cardPhoto} alt="boxphoto" />
             </div>

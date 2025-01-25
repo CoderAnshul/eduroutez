@@ -70,7 +70,8 @@ const BlogComponent = () => {
     <div className='w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto'>
       {/* Section Header */}
       <div className='flex items-center justify-between mb-10'>
-        <h3 className='text-3xl font-semibold text-gray-900'>Latest Blogs</h3>
+        {/* <h3 className='text-3xl font-semibold text-gray-900'>Latest Blogs</h3> */}
+        <h3 className='text-xl font-bold'>Latest Blogs</h3>
         <Link to="/blogpage">
           <button className='bg-red-500 text-white py-2 px-4 rounded'>
             View more
@@ -87,9 +88,9 @@ const BlogComponent = () => {
               className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl overflow-hidden"
             >
               {/* Image */}
-              <div className="h-56 w-full overflow-hidden">
+              <div className="h-56 min-h-56 max-h-56 w-full overflow-hidden">
                 <img
-                  className="w-full h-full object-contain object-center rounded-t-xl"
+                  className="w-full h-full object-cover object-top rounded-t-xl"
                   src={imageUrls[blog._id] || agricultureImg} // Use the correct image URL for each blog
                   alt={blog.title}
                 />
@@ -97,8 +98,11 @@ const BlogComponent = () => {
 
               {/* Card Content */}
               <div className="p-6">
-                <h4 className="text-xl font-semibold text-gray-800">{blog.title}</h4>
-                <p className="text-sm text-gray-600 mt-3 line-clamp-3" dangerouslySetInnerHTML={{ __html: blog.description }}></p>
+                <h4 className="text-xl font-semibold text-gray-800">
+                  {blog.title.length > 30 ? `${blog.title.slice(0,35)}...` : blog.title}
+                  </h4>
+                {/* <h4 className="text-xl font-semibold text-gray-800">{blog.title}</h4> */}
+                <p className="text-sm h-16 text-gray-600 mt-3 line-clamp-3" dangerouslySetInnerHTML={{ __html: blog.description }}></p>
                 <div className="mt-4">
                   <Link to={`/blogdetailpage/${blog._id}`}>
                     <button className="bg-red-600 text-white mt-4 py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
