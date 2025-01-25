@@ -71,12 +71,11 @@ const Signup = () => {
       if(data?.data?.user?.role === 'student') {
       navigate('/');
       }
-      else if(data?.data?.user?.role === 'institute') {
-        navigate('https://admin.eduroutez.com/dashboard/');
+      else if (data?.data?.user?.role === 'institute') {
+        window.location.href = 'https://admin.eduroutez.com/dashboard/';
+      } else if (data?.data?.user?.role === 'counsellor') {
+        window.location.href = 'https://admin.eduroutez.com/dashboard/';
       }
-      else if(data?.data?.user?.role === 'counsellor') {
-        navigate('https://admin.eduroutez.com/dashboard/');
-    }
     },
     onError: (error) => {
       alert(error.message);
