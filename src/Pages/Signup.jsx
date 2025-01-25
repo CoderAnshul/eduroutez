@@ -8,6 +8,12 @@ import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 
 const Signup = () => {
+  const roleTypes = [
+    { value: 'institute', label: 'University/College Institute' },
+    { value: 'counsellor', label: 'Counsellor' },
+    { value: 'student', label: 'Student' },
+  ];
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,20 +22,28 @@ const Signup = () => {
     state: "",
     password: "",
     confirmPassword: "",
-    referal_Code: ""
+    referal_Code: "",
+    role: "" 
   });
 
+  const [role, setRole] = useState("");
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+    
+    // Special handling for role
+    if (id === 'role') {
+      setRole(value);
+    }
   };
   
   const navigate = useNavigate();
   const apiUrl =  import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
-  console.log(apiUrl);
+
   const mutation = useMutation({
     mutationFn: async (credentials) => {
       try {
-        console.log("Credentials", credentials);
         const response = await axiosInstance.post(
           `${apiUrl}/signup`,
           credentials,
@@ -37,41 +51,32 @@ const Signup = () => {
             headers: {
               'Content-Type': 'application/json',
               'x-access-token': localStorage.getItem('accessToken'),
-              'x-refresh-token': localStorage.getItem('refreshToken')            }
+              'x-refresh-token': localStorage.getItem('refreshToken')
+            }
           }
         );
-        console.log("Response", response);
         return response.data;
       } catch (error) {
         const errorMessage = error.response?.data?.message || "Failed to sign up";
-        console.error(error.message);
         throw new Error(errorMessage);
       }
     },
     onSuccess: (data) => {
       alert("Signed Up Successfully! You can now log in.");
-      localStorage.setItem(
-        'accessToken',
-        JSON.stringify(data.data.accessToken)
-      );
-      localStorage.setItem(
-        'userId',
-        data?.data?.user?._id
-      );
-      localStorage.setItem(
-        'role',
-        data?.data?.user?.role
-      );
-      localStorage.setItem(
-        'email',
-        data?.data?.user?.email
-      );      
-      localStorage.setItem(
-        'refreshToken',
-        JSON.stringify(data.data.refreshToken)
-      );
-      
+      localStorage.setItem('accessToken', JSON.stringify(data.data.accessToken));
+      localStorage.setItem('userId', data?.data?.user?._id);
+      localStorage.setItem('role', data?.data?.user?.role);
+      localStorage.setItem('email', data?.data?.user?.email);      
+      localStorage.setItem('refreshToken', JSON.stringify(data.data.refreshToken));
+      if(data?.data?.user?.role === 'student') {
       navigate('/');
+      }
+      else if(data?.data?.user?.role === 'institute') {
+        navigate('https://admin.eduroutez.com/dashboard/');
+      }
+      else if(data?.data?.user?.role === 'counsellor') {
+        navigate('https://admin.eduroutez.com/dashboard/');
+    }
     },
     onError: (error) => {
       alert(error.message);
@@ -80,12 +85,18 @@ const Signup = () => {
 
   const handleSubmit = () => {
     if (formData.password !== formData.confirmPassword) {
-      console.log("Passwords do not match");
+      alert("Passwords do not match");
       return;
     }
     const { confirmPassword, ...signupData } = formData;
     mutation.mutate(signupData);
   };
+
+  const roleSpecificLabel = role === 'institute'
+    ? 'Institute Name'
+    : role === 'counsellor'
+    ? 'Counsellor Name'
+    : 'Name';
 
   return (
     <div className="flex h-screen">
@@ -111,15 +122,52 @@ const Signup = () => {
           Please fill in the form to create an account
         </p>
         <form className="w-full max-w-sm" onSubmit={(e) => e.preventDefault()}>
+          {/* Role Dropdown */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="role">
+              Role
+            </label>
+            <select
+              id="role"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Your Role</option>
+              {roleTypes.map((roleType) => (
+                <option key={roleType.value} value={roleType.value}>
+                  {roleType.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Dynamic Name Field */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="name">
+              {roleSpecificLabel}
+            </label>
+            <input
+              type="text"
+              id="name"
+              placeholder={`Enter your ${roleSpecificLabel.toLowerCase()}`}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* Rest of the form fields */}
           {[
-            { label: "Full Name", id: "name", type: "text", placeholder: "Enter your full name" },
             { label: "Email", id: "email", type: "email", placeholder: "Enter your email" },
             { label: "Phone Number", id: "contact_number", type: "tel", placeholder: "Enter your phone number" },
             { label: "City", id: "city", type: "text", placeholder: "Enter your city" },
             { label: "State", id: "state", type: "text", placeholder: "Enter your state" },
             { label: "Password", id: "password", type: "password", placeholder: "Create a password" },
             { label: "Confirm Password", id: "confirmPassword", type: "password", placeholder: "Confirm your password" },
-            {label: "Referral Code", id: "referal_Code", type: "text", placeholder: "Enter your Referral Code"}
+            { label: "Referral Code", id: "referal_Code", type: "text", placeholder: "Enter your Referral Code" }
           ].map((field) => (
             <div className="mb-4" key={field.id}>
               <label className="block text-sm font-medium mb-1" htmlFor={field.id}>
@@ -132,6 +180,7 @@ const Signup = () => {
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 value={formData[field.id] || ""}
                 onChange={handleChange}
+                required={!['referal_Code'].includes(field.id)}
               />
             </div>
           ))}
