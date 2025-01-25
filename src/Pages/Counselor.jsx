@@ -68,7 +68,7 @@ const CounselorListPage = () => {
 
             setCounselors(prevCounselors => [...prevCounselors, ...newCounselors]);
         } catch (error) {
-            console.error('Error fetching counselors:', error);
+            console.error('Error fetching counselors:', error.message);
         } finally {
             setLoading(false);
         }
