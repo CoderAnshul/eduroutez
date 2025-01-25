@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios"; // Install axios if not already installed
 import { toast } from "react-toastify";
+import axiosInstance from "../../ApiFunctions/axios";
 
 const ScheduleCallPopup = ({ isOpen, onClose,counselor }) => {
   if (!isOpen) return null;
@@ -29,23 +30,25 @@ const ScheduleCallPopup = ({ isOpen, onClose,counselor }) => {
     }
 
     try {
-      console.log("Form data:", );
-      // Replace with your actual backend API URL
-      const response = await axios.post(
-       `${apiUrl}/bookslot`,
-        { date: formData.date, slot: formData.timeSlot, email:formData.email,studentEmail:formData.studentEmail },
-        {headers: {
-          
-          'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken')
-        } 
-      }
-      );
+console.log("Form data:", formData);
+const response = await axiosInstance.post(
+  `${apiUrl}/bookslot`,
+  { date: formData.date, slot: formData.timeSlot, email: formData.email, studentEmail: formData.studentEmail },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-access-token': localStorage.getItem('accessToken'),
+      'x-refresh-token': localStorage.getItem('refreshToken')
+    }
+  }
+);
 console.log(response);
-      if (response.status === 200) {
-        toast.success("Slot booked successfully!");
-        onClose();
-      }
+if (response.status === 200) {
+  toast.success("Slot booked successfully!");
+  onClose();
+} else if (response.status === 401) {
+  toast.error("Unauthorized. Please log in again.");
+}
     } catch (error) {
       console.error("Error booking slot:", error.message);
       alert("Failed to book the slot. Please try again.");

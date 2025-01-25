@@ -1,10 +1,17 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ScheduleCallPopup from '../Components/DashboardComponent/ScheduleCallPopup';
+import ReviewFeedbackPopup from '../Components/DashboardComponent/ReviewFeedbackPopup';
 
 const CounselorListPage = () => {
     const [counselors, setCounselors] = useState([]);
     const [loading, setLoading] = useState(true);
+    
+      const [isCallPopupOpen, setIsCallPopupOpen] = useState(false);
+      const [isReviewPopupOpen, setIsReviewPopupOpen] = useState(false);
+        const [selectedCounselor, setSelectedCounselor] = useState(null);
+      
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [limit] = useState(6);
@@ -40,15 +47,15 @@ const CounselorListPage = () => {
     const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
     useEffect(() => {
-        fetchCounselors();
-    }, []);
+        fetchCounselors(page);
+    }, [page]);
 
-    const fetchCounselors = async () => {
+    const fetchCounselors = async (page) => {
         try {
             setLoading(true);
             const response = await axios.get(`${VITE_BASE_URL}/counselors`, {
                 params: {
-                    page: 1,
+                    page,
                     limit,
                 }
             });
@@ -59,13 +66,27 @@ const CounselorListPage = () => {
                 setHasMore(false);
             }
 
-            setCounselors(newCounselors);
+            setCounselors(prevCounselors => [...prevCounselors, ...newCounselors]);
         } catch (error) {
             console.error('Error fetching counselors:', error);
         } finally {
             setLoading(false);
         }
     };
+
+    const loadMoreCounselors = () => {
+        setPage(prevPage => prevPage + 1);
+    };
+    
+    const handleScheduleCall = (counselor) => {
+        setSelectedCounselor(counselor || null);
+        setIsCallPopupOpen(true);
+      };
+    
+      const handleReviewFeedback = (counselor) => {
+        setSelectedCounselor(counselor);
+        setIsReviewPopupOpen(true);
+      };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -91,7 +112,7 @@ const CounselorListPage = () => {
                 </div>
 
                 {/* Counselors Grid */}
-                {loading ? (
+                {loading && page === 1 ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
@@ -150,11 +171,17 @@ const CounselorListPage = () => {
                                     </div>
 
                                     <div className="mt-6 flex space-x-4">
-                                        <button className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        <button 
+                                         onClick={() => handleScheduleCall(counselor)}
+
+                                        className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                             <i className="fa fa-phone mr-2"></i>
                                             Schedule Call
                                         </button>
-                                        <button className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        <button
+                                                            onClick={() => handleReviewFeedback(counselor)}
+
+                                        className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                             <i className="fa fa-comment mr-2"></i>
                                             Review Feedback
                                         </button>
@@ -170,12 +197,30 @@ const CounselorListPage = () => {
                     <div className="mt-12 text-center">
                         <button 
                             className="px-8 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-semibold shadow-md"
+                            onClick={loadMoreCounselors}
                         >
                             Load More Counselors
                         </button>
                     </div>
                 )}
             </div>
+              {/* Popups */}
+      <ScheduleCallPopup
+        isOpen={isCallPopupOpen}
+        onClose={() => {
+          setIsCallPopupOpen(false);
+          setSelectedCounselor(null);
+        }}
+        counselor={selectedCounselor}
+      />
+      <ReviewFeedbackPopup
+        isOpen={isReviewPopupOpen}
+        onClose={() => {
+          setIsReviewPopupOpen(false);
+          setSelectedCounselor(null);
+        }}
+        counselor={selectedCounselor}
+      />
         </div>
     );
 };
