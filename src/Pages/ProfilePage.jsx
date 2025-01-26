@@ -42,8 +42,9 @@ const ProfilePage = () => {
       setFormData({
         name: data.name,
         phone: data.phone,
-        dateOfBirth: new Date(data.dateOfBirth).toISOString().split('T')[0],
-        gender: data.gender,
+        dateOfBirth: data.dateOfBirth && !isNaN(new Date(data.dateOfBirth))
+        ? new Date(data.dateOfBirth).toISOString().split('T')[0]
+        : null,        gender: data.gender,
         designation: data.designation,
         about: data.about,
         address: data.address,

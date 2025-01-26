@@ -220,7 +220,7 @@ return (
                                                                                 </div>
                                                                                 {question.answer ? (
                                                                                         <div className="p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
-                                                                                                <p className="text-sm text-gray-700">{question.answer}</p>
+                                                                                                <p className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: question.answer }}></p>
                                                                                         </div>
                                                                                 ) : (
                                                                                         <div className="italic text-gray-500">No answer yet</div>

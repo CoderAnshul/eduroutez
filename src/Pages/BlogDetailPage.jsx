@@ -131,7 +131,7 @@ const BlogDetailPage = () => {
             )}
           </div>
 
-          {data.description && (
+          {data?.description && (
             <div ref={overviewRef} className="space-y-4">
              <div className="md:flex lg:space-x-6 mt-6">
                 {/* Main Content Section */}
@@ -149,7 +149,7 @@ const BlogDetailPage = () => {
                   <h3 className="text-lg font-semibold mb-4">Recently Uploaded Blogs</h3>
                   <div className="space-y-4">
                     {/* Blog Box */}
-                    {recentBlogs.map((blog) => (
+                    {recentBlogs?.map((blog) => (
                       <div key={blog.id} className="flex items-center p-3 bg-white rounded-lg shadow-md">
                         {/* Blog Image */}
                         <div className="w-1/3">
@@ -162,7 +162,7 @@ const BlogDetailPage = () => {
                         {/* Blog Details */}
                         <div className="w-2/3 ml-3">
                           <h4 className="text-md font-medium text-gray-800 truncate">{blog.title}</h4>
-                          <p className="text-sm text-gray-600 truncate" dangerouslySetInnerHTML={{ __html: blog.description }}></p>
+                          <p className="text-sm text-gray-600 truncate" dangerouslySetInnerHTML={{ __html: blog.description.split(' ').slice(0, 30).join(' ') + '...' }}></p>
                           <span className="text-xs text-gray-500">{new Date(blog.createdAt).toLocaleDateString()}</span>
                         </div>
                       </div>

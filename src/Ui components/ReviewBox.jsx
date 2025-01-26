@@ -11,8 +11,7 @@ const ReviewBox = ({ review }) => {
 
   // Truncate the review text to 30 words
   const splitText = (text, wordLimit) => {
-    const words = text.split(" ");
-    return words.length > wordLimit
+    const words = text ? text.split(" ") : [];    return words.length > wordLimit
       ? `${words.slice(0, wordLimit).join(" ")}...`
       : text;
   };

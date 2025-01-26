@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { 
     Star, ThumbsUp, Calendar, Book, Trophy, Activity, Edit, X, Save 
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const ReviewActivity = () => {
     const { userId } = useParams();
@@ -52,9 +53,11 @@ const ReviewActivity = () => {
             const updatedReviews = reviews.map(review => 
                 review._id === editingReview._id ? response.data.data : review
             );
+            toast.success('Review updated successfully');
             setReviews(updatedReviews);
             setEditingReview(null);
         } catch (err) {
+            toast.error('Error updating review');
             console.error('Error updating review:', err);
         }
     };

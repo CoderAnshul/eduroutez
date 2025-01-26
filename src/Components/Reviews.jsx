@@ -60,10 +60,7 @@ console.log(data);
             <div className=' w-full mx-auto min-h-44 max-w-[1420px] pl-[10px]  pr-[10px] pb-10'>
                 <div className='flex items-center justify-between mb-10'>
                     <h3 className='text-xl font-bold'>Reviews</h3>
-                    {/* <button className='viewmorebtn text-sm w-24 whitespace-nowrap '>
-                    View more
-                    </button> */}
-                    <CustomButton text='View more'/>
+                    
                 </div>
 
                 <div className="flex gap-3 flex-wrap justify-between">

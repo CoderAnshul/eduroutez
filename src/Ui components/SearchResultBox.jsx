@@ -13,7 +13,7 @@ const SearchResultBox = ({ institute }) => {
   console.log('Institute:', institute);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const baseURL = import.meta.env.VITE_BASE_URL;
-  const Image=import.meta.env.VITE_IMAGE_URL;
+  const Image=import.meta.env.VITE_IMAGE_BASE_URL;
 
 
   const handleAddToWishlist = async () => {
