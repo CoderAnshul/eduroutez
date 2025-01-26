@@ -1,17 +1,43 @@
-import React, { useState, useMemo, useCallback } from 'react';
+'use client';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
 import InstituteReviewBox from '../Ui components/InstituteReviewBox';
 import CustomButton from "../Ui components/CustomButton";
+import axios from 'axios'; // Make sure to install axios if not already present
 
-const ReviewandRating = ({ ratings, reviews, instituteData }) => {
+const ReviewandRating = ({ instituteId = '6793884fc7adb1b316b15c42' }) => {
+  const [ratings, setRatings] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const accessToken = localStorage.getItem("accessToken");
 
+  // Fetch reviews and ratings when component mounts
+  useEffect(() => {
+    const fetchReviewsAndRatings = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`http://localhost:4001/api/v1/review-by-institute/${instituteId}`);
+        console.log('hjk',response.data); // Assuming the API returns an object with ratings and reviews
+        // Assuming the API returns an object with ratings and reviews
+        setRatings(response.data.ratings || []);
+        setReviews(response.data.data || []);
+      } catch (err) {
+        console.error('Error fetching reviews:', err);
+        setError('Failed to load reviews. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReviewsAndRatings();
+  }, [instituteId]);
+
   const handleReviewClick = (e) => {
-    console.log('clicked')
     if (!accessToken) {
       e.preventDefault();
       setShowLoginPopup(true);
@@ -24,6 +50,7 @@ const ReviewandRating = ({ ratings, reviews, instituteData }) => {
 
   // Memoize average rating calculation for the first 6 reviews
   const averageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
     return reviews.slice(0, 6).reduce((total, review) => total + review.rating, 0) / Math.min(reviews.length, 6);
   }, [reviews]);
 
@@ -31,6 +58,44 @@ const ReviewandRating = ({ ratings, reviews, instituteData }) => {
   const toggleModal = useCallback(() => {
     setIsModalOpen(prev => !prev);
   }, []);
+
+  // Render loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-28 w-full flex items-center justify-center">
+        <p>Loading reviews...</p>
+      </div>
+    );
+  }
+
+  // Render error state
+  if (error) {
+    return (
+      <div className="min-h-28 w-full flex items-center justify-center text-red-500">
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  // Render no reviews state
+  if (reviews.length === 0) {
+    return (
+      <div className="min-h-28 w-full flex flex-col items-center justify-center">
+        <p>No reviews available for this institute.</p>
+        <CustomButton
+          text='Be the First to Write a Review'
+          className="!bg-red-500 !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg mt-4"
+          onClick={handleReviewClick}
+          to="/writereview" 
+        />
+      </div>
+    );
+  }
+
+  // Overall rating calculation
+  const overallRating = ratings.length > 0 
+    ? ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratings.length 
+    : 0;
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between rounded-xl sm:p-4">
@@ -40,10 +105,16 @@ const ReviewandRating = ({ ratings, reviews, instituteData }) => {
         {/* Overall Rating */}
         <div className="flex gap-5">
           <Box sx={{ '& > legend': { mt: 2 } }} className="flex items-center gap-2">
-            <Rating className="!text-lg" name="read-only" value={4.1} readOnly />
-            <h4 className="font-semibold opacity-75">4.1</h4>
+            <Rating 
+              className="!text-lg" 
+              name="read-only" 
+              value={overallRating} 
+              precision={0.1}
+              readOnly 
+            />
+            <h4 className="font-semibold opacity-75">{overallRating.toFixed(1)}</h4>
           </Box>
-          <h4 className="font-semibold opacity-75">(8 reviews)</h4>
+          <h4 className="font-semibold opacity-75">({reviews.length} reviews)</h4>
         </div>
 
         {/* Category-wise Ratings */}
@@ -90,7 +161,7 @@ const ReviewandRating = ({ ratings, reviews, instituteData }) => {
         {/* "See More" Button */}
         <div className='flex justify-between items-center mt-4'>
           <button
-            className=" text-blue-600 text-sm font-medium hover:underline "
+            className="text-blue-600 text-sm font-medium hover:underline"
             onClick={toggleModal}
           >
             See More
@@ -105,12 +176,12 @@ const ReviewandRating = ({ ratings, reviews, instituteData }) => {
         </div>
       </div>
 
-      {/* Login Popup */}
+      {/* Login Popup (unchanged from previous version) */}
       {showLoginPopup && (
         <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
           <div className="popup bg-white p-12 rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
             <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
-              Hey there! We’d love to hear your thoughts. Please log in to share your review with us and help others make informed decisions.
+              Hey there! We'd love to hear your thoughts. Please log in to share your review with us and help others make informed decisions.
             </h3>
             <div className="flex justify-center space-x-6">
               <button
@@ -131,7 +202,7 @@ const ReviewandRating = ({ ratings, reviews, instituteData }) => {
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modal (with updated review rendering) */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[1000] h-dvh flex items-center justify-center bg-black bg-opacity-50 p-3">
           <div className="bg-white relative rounded-lg shadow-lg p-6 max-w-4xl w-full overflow-y-auto max-h-[90vh]">
@@ -148,10 +219,16 @@ const ReviewandRating = ({ ratings, reviews, instituteData }) => {
             {/* Overall Rating in Modal */}
             <div className="flex gap-5 mb-6">
               <Box sx={{ '& > legend': { mt: 2 } }} className="flex items-center gap-2">
-                <Rating className="!text-lg" name="read-only" value={4.1} readOnly />
-                <h4 className="font-semibold opacity-75">4.1</h4>
+                <Rating 
+                  className="!text-lg" 
+                  name="read-only" 
+                  value={overallRating} 
+                  precision={0.1}
+                  readOnly 
+                />
+                <h4 className="font-semibold opacity-75">{overallRating.toFixed(1)}</h4>
               </Box>
-              <h4 className="font-semibold opacity-75">(8 reviews)</h4>
+              <h4 className="font-semibold opacity-75">({reviews.length} reviews)</h4>
             </div>
 
             {/* Category-wise Ratings in Modal */}
