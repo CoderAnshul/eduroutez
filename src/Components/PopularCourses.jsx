@@ -23,41 +23,6 @@ const PopularCourses = () => {
     }
   );
 
-  useEffect(() => {
-    const fetchImages = async () => {
-      const imagePromises = content.map(async (box) => {
-        try {
-          const coverResponse = await fetch(
-            `${import.meta.env.VITE_IMAGE_BASE_URL}/${box.coursePreviewCover}`
-          );
-          if (!coverResponse.ok) throw new Error('Cover image not found');
-
-          const blob = await coverResponse.blob();
-          return URL.createObjectURL(blob);
-        } catch (error) {
-          console.error('Error loading image:', error);
-          return null;
-        }
-      });
-
-      const imageResults = await Promise.all(imagePromises);
-      const imageMap = imageResults.reduce((acc, url, index) => {
-        if (url) acc[content[index]?._id] = url;
-        return acc;
-      }, {});
-
-      setImages(imageMap);
-    };
-
-    if (content?.length > 0) {
-      fetchImages();
-    }
-
-    return () => {
-      Object.values(images).forEach(url => URL.revokeObjectURL(url));
-    };
-  }, [content, images]);
-
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
@@ -87,7 +52,7 @@ const PopularCourses = () => {
             <div className="imageContainer h-48 relative">
               <img
                 className="h-full w-full object-cover"
-                src={images[box?._id] || cardPhoto}
+                src={images[box?._id] || `${import.meta.env.VITE_IMAGE_BASE_URL}/${box?.coursePreviewCover}`}
                 alt={box?.courseTitle || "Course Image"}
                 onError={(e) => {
                   e.target.src = cardPhoto;
