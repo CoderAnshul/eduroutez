@@ -7,7 +7,7 @@ import InstituteReviewBox from '../Ui components/InstituteReviewBox';
 import CustomButton from "../Ui components/CustomButton";
 import axios from 'axios'; // Make sure to install axios if not already present
 
-const ReviewandRating = ({ instituteId = '6793884fc7adb1b316b15c42' }) => {
+const ReviewandRating = ( {instituteData} ) => {
   const [ratings, setRatings] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,15 +15,17 @@ const ReviewandRating = ({ instituteId = '6793884fc7adb1b316b15c42' }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const accessToken = localStorage.getItem("accessToken");
+  console.log(reviews)
 
   // Fetch reviews and ratings when component mounts
   useEffect(() => {
     const fetchReviewsAndRatings = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`http://localhost:4001/api/v1/review-by-institute/${instituteId}`);
-        console.log('hjk',response.data); // Assuming the API returns an object with ratings and reviews
+        const response = await axios.get(`http://localhost:4001/api/v1/review-by-institute/${instituteData?.data?._id}`);
+        // console.log('hjk',response.data); // Assuming the API returns an object with ratings and reviews
         // Assuming the API returns an object with ratings and reviews
+        console.log(response)
         setRatings(response.data.ratings || []);
         setReviews(response.data.data || []);
       } catch (err) {
@@ -35,7 +37,7 @@ const ReviewandRating = ({ instituteId = '6793884fc7adb1b316b15c42' }) => {
     };
 
     fetchReviewsAndRatings();
-  }, [instituteId]);
+  }, [instituteData?.data._id]);
 
   const handleReviewClick = (e) => {
     if (!accessToken) {
@@ -93,9 +95,11 @@ const ReviewandRating = ({ instituteId = '6793884fc7adb1b316b15c42' }) => {
   }
 
   // Overall rating calculation
-  const overallRating = ratings.length > 0 
-    ? ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratings.length 
+  const overallRating = reviews.length > 0 
+    ? reviews.reduce((sum, review) => sum +( (typeof review?.placementStars === 'number' ? review.placementStars : 0) + (typeof review?.campusLifeStars === 'number' ? review.campusLifeStars : 0) + (typeof review?.facultyStars === 'number' ? review.facultyStars : 0) + (typeof review?.suggestionsStars === 'number' ? review.suggestionsStars : 0))/4, 0) /reviews.length 
     : 0;
+    console.log(overallRating)
+    
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between rounded-xl sm:p-4">
@@ -119,7 +123,8 @@ const ReviewandRating = ({ instituteId = '6793884fc7adb1b316b15c42' }) => {
 
         {/* Category-wise Ratings */}
         <div className="flex gap-[2vw] flex-wrap justify-between sm:justify-normal mt-10">
-          {ratings.map((item, index) => (
+          {
+          ratings.map((item, index) => (
             <div key={index} className="flex flex-col items-center">
               <h5 className="font-semibold text-gray-700">{item.category}</h5>
               <div className="flex items-center gap-2">
@@ -139,23 +144,31 @@ const ReviewandRating = ({ instituteId = '6793884fc7adb1b316b15c42' }) => {
         {/* Average Rating of Initial 6 Reviews */}
         <div className="flex gap-2 items-center mt-4">
           <h5 className="font-semibold">Average Rating of Initial 6 Reviews</h5>
-          <Rating className="!text-sm" name="read-only-avg" value={averageRating} readOnly />
-          <span className="text-sm font-medium text-gray-600">{averageRating.toFixed(1)}</span>
+          <Rating className="!text-sm" name="read-only-avg" value={overallRating} readOnly />
+          <span className="text-sm font-medium text-gray-600">{overallRating.toFixed(1)}</span>
         </div>
 
         {/* Initial 6 Reviews */}
         <div className="w-full h-auto bg-white mt-8 border-2 rounded-xl flex flex-wrap p-3 gap-2">
-          {reviews.slice(0, 6).map((review, index) => (
-            <InstituteReviewBox
+          {reviews.slice(0, 6).map((review, index) => {
+            // let rating =0;
+            // if(review.placementStars && review.facultyStars && review.campusLifeStars && review.suggestionsStars  ){
+
+            // }
+            return( <InstituteReviewBox
               key={index}
-              reviewerName={review.reviewerName}
-              designation={review.designation}
+              reviewerName={review.fullName}
+              designation={review.suggestionDescription}
               year={review.year}
-              rating={review.rating}
-              review={review.review}
-              courseRatings={review.courseRatings}
-            />
-          ))}
+              placementStars={review?.placementStars}
+              campusLifeStars={review?.campusLifeStars}
+              facultyStars={review?.facultyStars}
+              suggestionsStars={review?.suggestionsStars}
+              rating={review.placementStars + review.facultyStars + review.campusLifeStars + review.suggestionsStars}
+              review={review.reviewTitle}
+              courseRatings={[review.placementStars , review.facultyStars , review.campusLifeStars , review.suggestionsStars]}
+            />)
+})}
         </div>
 
         {/* "See More" Button */}

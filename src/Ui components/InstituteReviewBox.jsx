@@ -2,15 +2,19 @@ import React, { useState, useCallback, useMemo } from 'react';
 import Rating from '@mui/material/Rating';
 
 const InstituteReviewBox = ({ 
-  reviewerName = 'Anonymous', 
-  designation = 'Not Specified', 
-  year = '',
-  rating = 0, 
-  review = 'No review text available.',
-  courseRatings = {} 
+  reviewerName, 
+  designation , 
+  year ,
+  rating , 
+  review ,
+  courseRatings,
+  placementStars,
+  campusLifeStars,
+  facultyStars,
+  suggestionsStars
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+// console.log(rating)
   // Memoized modal toggle function
   const toggleModal = useCallback(() => {
     setIsModalOpen((prevState) => !prevState);
@@ -26,6 +30,25 @@ const InstituteReviewBox = ({
   const ratingCategories = useMemo(() => [
     'courseContent', 'faculty', 'placement', 'campus', 'fees'
   ], []);
+
+  const allRatings=[
+    {
+    name: 'faculty',
+    stars : facultyStars
+    },
+    {
+    name: 'placement',
+    stars : placementStars
+    },
+    {
+    name: 'campus',
+    stars : campusLifeStars
+    },
+    {
+    name: 'courseContent',
+    stars : suggestionsStars
+    },
+]
 
   // Format category name
   const formatCategoryName = useCallback((key) => 
@@ -51,12 +74,12 @@ const InstituteReviewBox = ({
             <Rating 
               className="!text-sm" 
               name="read-only" 
-              value={Number(rating) || 0} 
+              value={Number(rating/4) || 0} 
               precision={0.1} 
               readOnly 
             />
             <span className="text-sm font-medium text-gray-600">
-              {Number(rating).toFixed(1) || 'N/A'}
+              {Number(rating/4) || 0}
             </span>
           </div>
         </div>
@@ -88,36 +111,36 @@ const InstituteReviewBox = ({
             
             {/* Reviewer Info */}
             <h4 className="font-bold text-gray-800 mb-2">{reviewerName}</h4>
-            <p className="text-xs text-gray-500 mb-4">
+            {/* <p className="text-xs text-gray-500 mb-4">
               {designation} {year && `| ${year}`}
-            </p>
+            </p> */}
             <p className="text-sm text-gray-700 mb-4">{review}</p>
 
             {/* Course Ratings */}
-            {ratingCategories.some(category => courseRatings[category]) ? (
+            {/* {ratingCategories.some(category => courseRatings[category]) ? ( */}
               <>
                 <h5 className="font-semibold text-gray-800 mb-2">Course Ratings</h5>
                 <ul className="text-sm text-gray-700 space-y-1">
-                  {ratingCategories.map((key) => {
-                    const ratingValue = Number(courseRatings[key]) || 0;
-                    return ratingValue > 0 ? (
+                  {allRatings.map((key) => {
+                    
+                    return  (
                       <li key={key}>
-                        <span className="font-medium">{formatCategoryName(key)}: </span>
+                        <span className="font-medium">{key.name}: </span>
                         <Rating 
                           className="!text-sm" 
-                          name={key} 
-                          value={ratingValue} 
+                          name={key.stars} 
+                          value={key.stars} 
                           precision={0.1} 
                           readOnly 
                         />
                       </li>
-                    ) : null;
-                  }).filter(Boolean)}
+                    ) 
+                  })}
                 </ul>
               </>
-            ) : (
+            {/* ) : (
               <p className="text-sm text-gray-500">No course ratings available.</p>
-            )}
+            )} */}
           </div>
         </div>
       )}

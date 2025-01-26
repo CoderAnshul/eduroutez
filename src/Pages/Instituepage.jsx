@@ -162,7 +162,7 @@ const Instituepage = () => {
     }
   );
 
-  console.log(instituteData?.data?.email);
+  console.log(instituteData?.data);
 
   //fetching courses
   // const { data: coursesData, isLoadingCourses, isErrorCourses, errorCourses } = useQuery(
@@ -235,13 +235,13 @@ const Instituepage = () => {
                           <GalleryInfo instituteData={instituteData}/>
                       </div>
                       <div ref={sectionRefs[8]} className="min-h-24 pt-4">
-                          <ReviewandRating ratings={ratings} reviews={reviews} instituteData={instituteData}/>
+                          <ReviewandRating ratings={ratings} reviews={reviews} instituteId={instituteData._id} instituteData={instituteData}/>
                       </div>
                       <div className="min-h-24 py-4">
                           <InstituteFacilites instituteData={instituteData}/>
                       </div>
                       <div  className="min-h-24 py-4">
-                          <RecruitersSlider/>
+                          <RecruitersSlider instituteData={instituteData}/>
                       </div>
                       <div ref={sectionRefs[7]} className="min-h-24 py-4">
                           <Faqs instituteData={instituteData}/>
