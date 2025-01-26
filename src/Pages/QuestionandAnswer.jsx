@@ -1,133 +1,162 @@
 import { useParams } from 'react-router-dom';
 import React, { useState } from 'react';
-import { postQuestion } from '../ApiFunctions/api';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import axiosInstance from '../ApiFunctions/axios';
 
 const QuestionandAnswer = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
-  const [expandedQuestion, setExpandedQuestion] = useState(null); // Track which question is expanded
+  const [expandedQuestion, setExpandedQuestion] = useState(null);
   const apiUrl = import.meta.env.VITE_BASE_URL;
-  // Static array of options for Select Your Interest
+  const { email } = useParams();
+
   const options = [
-    'Computer Science',
-    'Electrical Engineering',
-    'Mathematics',
-    'Business Management',
-    'Architecture',
-    'Psychology',
-    'Physics',
-    'Economics',
-  ];
-  const Level = [
-    'School',
-    'Undergrad',
-    'Postgrad',
+    'Computer Science', 'Electrical Engineering', 'Mathematics', 
+    'Business Management', 'Architecture', 'Psychology', 
+    'Physics', 'Economics'
   ];
 
-  // Static array of questions and answers, with some unanswered questions
-  const questionsAndAnswers = [
-    {
-      id: 1,
-      question: "What is your favorite subject?",
-      answer: "My favorite subject is Computer Science, as it involves problem-solving and innovation.",
-      answered: true, // This question has an answer
+  const Level = ['School', 'Undergrad', 'Postgrad'];
+
+  const { 
+    data: questionsAndAnswers = [], 
+    isLoading, 
+    error, 
+    refetch 
+  } = useQuery(
+    ['questions', email],
+    async () => {
+      if (!email) throw new Error('No email provided');
+
+      const response = await axiosInstance.get(`${apiUrl}/question-answer/${email}`, {
+        headers: {
+          'x-access-token': localStorage.getItem('accessToken') || '',
+          'x-refresh-token': localStorage.getItem('refreshToken') || ''
+        }
+      });
+
+      // Handle API response structure
+      if (!response.data || !response.data.data) return [];
+
+      // Process questions, handle potential null/undefined cases
+      return (response.data.data || []).map(question => ({
+        id: question._id || null,
+        question: question.question || 'No question available',
+        grade: question.grade || 'Not Specified',
+        label: question.label || 'Uncategorized',
+        askedBy: question.askedBy || 'Anonymous',
+        instituteEmail: question.instituteEmail || '',
+        createdAt: question.createdAt || new Date().toISOString(),
+        answer: '', // No answer field in the current response
+        answered: false
+      }));
     },
     {
-      id: 2,
-      question: "What do you prefer to do in your free time?",
-      answer: "In my free time, I enjoy reading books, traveling, and learning new skills.",
-      answered: true, // This question has an answer
-    },
-    {
-      id: 3,
-      question: "Where do you see yourself in 5 years?",
-      answer: "", // No answer yet
-      answered: false, // This question doesn't have an answer
-    },
-    {
-      id: 4,
-      question: "What are your thoughts on the latest technology trends?",
-      answer: "", // No answer yet
-      answered: false, // This question doesn't have an answer
-    },
-  ];
+      enabled: !!email,
+      retry: 1,
+      onError: (error) => {
+        console.error('Question fetch error:', error);
+      }
+    }
+  );
 
   const handleApplyFilter = () => {
-    console.log("Filter Applied!");
-    // Logic to handle filter application
+    console.log("Selected Interests:", selectedInterests);
   };
 
   const handleInterestChange = (event) => {
     const { value, checked } = event.target;
-    if (checked) {
-      setSelectedInterests((prev) => [...prev, value]);
-    } else {
-      setSelectedInterests((prev) => prev.filter((interest) => interest !== value));
-    }
-  };
-
-  const handleExpandAnswer = (questionId) => {
-    setExpandedQuestion((prev) => (prev === questionId ? null : questionId)); // Toggle answer visibility
-  };
-
-  const handleAnswerQuestion = (questionId) => {
-    // Add logic here for answering the question (e.g., open a modal or show a text area)
-    console.log(`Answering question ${questionId}`);
+    setSelectedInterests(prev => 
+      checked 
+        ? [...prev, value]
+        : prev.filter(interest => interest !== value)
+    );
   };
 
   const [form, setForm] = useState({});
 
   const handleChange = (e) => {
-    setForm({...form, [e.target.name]: e.target.value})
+    const { name, value } = e.target;
+    setForm(prev => ({...prev, [name]: value}));
   };
-  const { email } = useParams();
-  console.log('hiii', email);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!form.question || !form.label || !form.grade) {
+      alert('Please fill all required fields');
+      return;
+    }
+
     try {
-      const updatedForm = { ...form, instituteEmail: email, askedBy: localStorage.getItem('email')?.replace(/^"|"$/g, '') };
-      console.log(updatedForm);
+      const updatedForm = { 
+        ...form, 
+        instituteEmail: email || '', 
+        askedBy: localStorage.getItem('email')?.replace(/^"|"$/g, '') || 'Anonymous'
+      };
+      
       mutate(updatedForm);
     } catch (error) {
-      alert('some error occured!!');
+      console.error('Submission error:', error);
+      alert('Failed to submit question');
     }
-  }
+  };
 
   const { mutate, isPending: isSubmitting } = useMutation({
     mutationFn: async (formData) => {
-      const endpoint =`${apiUrl}/question-answer`;
+      const endpoint = `${apiUrl}/question-answer`;
       const response = await axiosInstance({
-        url: `${endpoint}`,
-        method:'post',
+        url: endpoint,
+        method: 'post',
         data: formData,
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken')
+          'x-access-token': localStorage.getItem('accessToken') || '',
+          'x-refresh-token': localStorage.getItem('refreshToken') || ''
         }
       });
       return response.data;
     },
-
     onSuccess: () => {
       alert('Question submitted successfully!');
       document.getElementById('questionForm').reset();
-      // setPreviewUrl(null);
-      // router.push('/dashboard/counselor');
+      setForm({});
+      refetch();
     },
-    onError: () => {
-      alert('Something went wrong');
+    onError: (error) => {
+      console.error('Submission error:', error);
+      alert('Failed to submit question');
     }
   });
-  
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-2xl text-red-500 mb-4">Error Loading Questions</h2>
+        <p className="text-gray-600 mb-4">{error.message}</p>
+        <button 
+          onClick={() => refetch()} 
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
-
     <div className="flex flex-col lg:flex-row gap-4 p-4 relative">
-      {/* Toggle Button for Sidebar (Small Screens) */}
-      <div className="block lg:hidden mb-4">
+      {/* Sidebar and form components remain the same as in previous implementation */}
+       {/* Toggle Button for Sidebar (Small Screens) */}
+       <div className="block lg:hidden mb-4">
         <button
           onClick={() => setSidebarOpen(!isSidebarOpen)}
           className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
@@ -205,104 +234,94 @@ const QuestionandAnswer = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+      
       <main className="w-full lg:w-1/2 relative">
-        {/* Search Section */}
-        <form id="questionForm" className="mb-6 bg-white shadow-lg rounded-lg p-4" onSubmit={handleSubmit}>
+        {/* Question submission form */}
+        <form 
+          id="questionForm" 
+          className="mb-6 bg-white shadow-lg rounded-lg p-4" 
+          onSubmit={handleSubmit}
+        >
+          {/* Form inputs remain the same */}
           <h2 className="text-lg font-semibold mb-2">
             Need guidance on career and education? Ask our experts
           </h2>
-          <div className=" items-center space-x-2">
-            <div className="flex flex-col gap-2 mb-4">
-              <input
-                type="text"
-                name='question'
-                placeholder="Type Your Question"
-                className="flex-1 px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-                onChange={handleChange}
-              />
-
-              {/* ------ changes should be done here --------- */}
-              <div className="flex flex-col gap-2 mb-4">
-                <select name="label"
-                  className="flex-1 px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-                  onChange={handleChange}
-                >
-                  <option value="" disabled selected>
-                    Select an option
-                  </option>
-                  {options.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-                <select name="grade"
-                  className="flex-1 px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-                  onChange={handleChange}
-                >
-                  <option value="" disabled selected>
-                    Select Education Level
-                  </option>
-                  {Level.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {/* ------ changes should be done here --------- */}
-            </div>
-            <button type="submit" className="px-4 py-2 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600">
-              Submit
-            </button>
-          </div>
+        
+          <input
+            type="text"
+            name="question"
+            placeholder="Type Your Question"
+            required
+            className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+            onChange={handleChange}
+          />
+          
+          <select 
+            name="label" 
+            required
+            className="w-full mt-2 px-4 py-2 border border-gray-400 rounded-lg"
+            onChange={handleChange}
+          >
+            <option value="">Select Interest</option>
+            {options.map(item => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+          
+          <select 
+            name="grade" 
+            required
+            className="w-full mt-2 px-4 py-2 border border-gray-400 rounded-lg"
+            onChange={handleChange}
+          >
+            <option value="">Select Education Level</option>
+            {Level.map(item => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+          
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="mt-2 w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Question'}
+          </button>
         </form>
 
-        {/* Question and Answer Section */}
-        <div className="space-y-4 max-h-[470px] overflow-y-scroll scrollbar-thumb-red">
-          {questionsAndAnswers.map((item) => (
-            <div key={item.id} className="bg-red-100 shadow-lg rounded-lg p-4 space-y-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                <span className="text-sm font-semibold">Ayush Sharma</span>
-              </div>
-              <h3 className="font-bold text-lg">
-                Q: {item.question}
-              </h3>
-              {item.answered ? (
-                <p className="text-sm text-gray-500">
-                  Answered by: <span className="font-semibold">Ravi Jain</span>
-                </p>
-              ) : (
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => handleAnswerQuestion(item.id)}
-                    className="px-3 py-1 bg-blue-500 text-xs text-white font-medium rounded-sm hover:bg-blue-600"
-                  >
-                    Answer
-                  </button>
-                </div>
-              )}
-              {item.answered && (
-                <p className={`text-sm text-gray-700 ${expandedQuestion === item.id ? 'block' : 'hidden'}`}>
-                  {item.answer}
-                </p>
-              )}
-              {item.answered && (
-                <button
-                  onClick={() => handleExpandAnswer(item.id)}
-                  className="text-blue-500 hover:underline font-semibold"
-                >
-                  {expandedQuestion === item.id ? 'Read Less' : 'Read More'}
-                </button>
-              )}
+        {/* Question list */}
+        <div className="space-y-4 max-h-[470px] overflow-y-scroll">
+          {questionsAndAnswers.length === 0 ? (
+            <div className="text-center text-gray-500 p-6 bg-gray-100 rounded-lg">
+              No questions found for this email. Be the first to ask!
             </div>
-          ))}
+          ) : (
+            questionsAndAnswers.map((item) => (
+              <div 
+                key={item.id} 
+                className="bg-red-100 shadow-lg rounded-lg p-4 space-y-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                  <span className="text-sm font-semibold">{item.askedBy}</span>
+                </div>
+                <h3 className="font-bold text-lg">Q: {item.question}</h3>
+                
+                <div className="text-sm text-gray-500">
+                  <span>Label: {item.label}</span>
+                  <span className="ml-2">Grade: {item.grade}</span>
+                </div>
+                
+                <div className="flex justify-end text-xs text-gray-400">
+                  {new Date(item.createdAt).toLocaleString()}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </main>
 
-      {/* Ads Box */}
+      {/* Ads sidebar */}
       <aside className="w-full lg:w-1/4 bg-white shadow-lg rounded-lg p-4 lg:order-none order-last">
         <div className="h-full flex items-center justify-center">
           <span className="text-gray-500 font-semibold text-xl">Ads</span>

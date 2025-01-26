@@ -244,7 +244,7 @@ const Instituepage = () => {
                           <RecruitersSlider/>
                       </div>
                       <div ref={sectionRefs[7]} className="min-h-24 py-4">
-                          <Faqs email={instituteData?.data?.email}/>
+                          <Faqs instituteData={instituteData}/>
                       </div>
                       {/* <div ref={sectionRefs[3]} className="min-h-screen p-4 bg-gray-50">
                           <Placements />
