@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -7,16 +7,32 @@ import { ToastContainer, toast } from "react-toastify";
 const BecomeCounselor = () => {
   const [formData, setFormData] = useState({
     firstname: "",
+    lastname: "",
     email: "",
     contactno: "",
     password: "",
+    category: "", // Added category field
   });
 
+  const [streams, setStreams] = useState([]); // State to store streams
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+  const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
+  useEffect(() => {
+    // Fetch streams from API
+    const fetchStreams = async () => {
+      try {
+        const response = await axios.get(`${VITE_BASE_URL}/streams`);
+        setStreams(response.data?.data?.result);
+      } catch (err) {
+        console.error("Error fetching streams", err);
+      }
+    };
+
+    fetchStreams();
+  }, [VITE_BASE_URL]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,6 +53,9 @@ const BecomeCounselor = () => {
         toast.success("Your application has been submitted successfully!");
         setSuccess("Your application has been submitted successfully!");
         setError("");
+
+        // Redirect to admin page
+        window.location.href = "https://admin.eduroutez.com/";
       
     } catch (err) {
       setError("There was an error with your submission. Please try again.");
@@ -74,7 +93,7 @@ const BecomeCounselor = () => {
           {/* Name */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="firstname">
-              Full Name
+              First Name
             </label>
             <input
               type="text"
@@ -82,7 +101,23 @@ const BecomeCounselor = () => {
               name="firstname"
               value={formData.firstname}
               onChange={handleChange}
-              placeholder="Enter your full name"
+              placeholder="Enter your first name"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+          </div>
+
+          {/* Last Name */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="lastname">
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="lastname"
+              name="lastname"
+              value={formData.lastname}
+              onChange={handleChange}
+              placeholder="Enter your last name"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             />
           </div>
@@ -133,6 +168,27 @@ const BecomeCounselor = () => {
               placeholder="Create a password"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             />
+          </div>
+
+          {/* Category */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="category">
+              Category
+            </label>
+            <select
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              <option value="">Select a category</option>
+              {streams.map((stream) => (
+                <option key={stream.id} value={stream.name}>
+                  {stream.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Submit Button */}

@@ -53,6 +53,18 @@ export const blogById = async (id) => {
   }
 };
 
+//getRecentBlogs
+export const getRecentBlogs = async () => {
+  try {
+    const response = await axios.get(`${baseURL}/blogs?limit=5`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching recent blogs:`, error);
+    throw error;
+  }
+};
+
+
 export const CarrerDetail = async (id) => {
   try {
     const response = await axios.get(`${baseURL}/career/${id}`);
