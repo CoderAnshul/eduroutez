@@ -23,10 +23,7 @@ const CoursesName = ({content}) => {
         <div className="text-container flex justify-end items-center flex-wrap gap-2 mt-1">
 
           {/* --------------button----------------- */}
-            <div className="flex gap-3 ">
-            <CustomButton text='Download Brochure' className="!bg-red-500 !text-xs !rounded-none !px-[2.5vw] !py-3 !w-auto !h-auto" to="/coursesinfopage"/>
-            <CustomButton text='Apply Now' className="!bg-red-500 !text-xs !rounded-none !px-[2.5vw] !py-3 !w-auto !h-auto" to="/coursesinfopage"/>
-            </div>
+         
         </div>
       </div>
     </div>
