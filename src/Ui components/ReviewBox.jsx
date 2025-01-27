@@ -66,6 +66,7 @@ const ReviewBox = ({ review }) => {
         onClose={handleClose}
         aria-labelledby="review-modal-title"
         aria-describedby="review-modal-description"
+        className="flex justify-center items-center"
       >
         <div
           className="p-6 bg-white max-h-[450px] relative shadow-lg rounded-lg max-w-lg ml-2 mr-2 mx-auto mt-20"

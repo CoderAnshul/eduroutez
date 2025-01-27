@@ -69,10 +69,11 @@ const SearchResultBox = ({ institute }) => {
   
 
   return (
-    <div className="border rounded-lg shadow-md p-4 flex flex-col md:flex-row  space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2">
+    <div className="border rounded-lg shadow-md p-4 flex flex-col  space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2">
       {/* Left Section - Image */}
-      <div className="flex justify-between flex-col md:flex-row gap-3"></div>
-        <div className="relative w-full md:w-2/6">
+      <div className="flex justify-between flex-col gap-3"></div>
+        <div className="flex justify-between flex-col md:flex-row gap-3">
+        <div className="relative w-full md:w-2/6 !ml-0">
           <img
             src={institute.thumbnailImage ? `${Image}/${institute.thumbnailImage}` : serachBoximg}
             alt="Institute Thumbnail"
@@ -139,6 +140,8 @@ const SearchResultBox = ({ institute }) => {
           {/* Description */}
           <p className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{ __html: institute.about }} />
 
+      </div>
+        </div>
           {/* Footer Buttons */}
           <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">
             <div className="space-x-4">
@@ -155,7 +158,6 @@ const SearchResultBox = ({ institute }) => {
               </CustomButton>
           </div>
         </div>
-      </div>
     </div>
   );
 };
