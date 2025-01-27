@@ -85,8 +85,8 @@ const InstituteReviewBox = ({
         </div>
 
         {/* Review */}
-        <p className="text-gray-700 text-sm leading-5">
-          {truncateText(review, 100)}
+        <p className="text-gray-700 text-sm leading-5 break-words">
+          {truncateText(review, 140)}
         </p>
 
         {/* Read More */}
@@ -114,7 +114,7 @@ const InstituteReviewBox = ({
             {/* <p className="text-xs text-gray-500 mb-4">
               {designation} {year && `| ${year}`}
             </p> */}
-            <p className="text-sm text-gray-700 mb-4">{review}</p>
+            <p className="text-sm text-gray-700 mb-4 break-words">{review}</p>
 
             {/* Course Ratings */}
             {/* {ratingCategories.some(category => courseRatings[category]) ? ( */}
