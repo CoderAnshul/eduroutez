@@ -14,6 +14,8 @@ const InstitueName = ({ instituteData }) => {
     email: "",
     phone: "",
     message: "",
+    city: "",
+    queryRelatedTo: "",
   });
 
   const handleDownloadBrochure = async () => {
@@ -25,14 +27,13 @@ const InstitueName = ({ instituteData }) => {
             "x-access-token": localStorage.getItem("accessToken"),
             "x-refresh-token": localStorage.getItem("refreshToken"),
           },
-          responseType: "blob", // Ensures the response is treated as binary data
+          responseType: "blob",
         }
       );
 
       const blob = new Blob([response.data], { type: "image/jpeg" });
       const url = window.URL.createObjectURL(blob);
 
-      // Trigger a download
       const a = document.createElement("a");
       a.href = url;
       a.download = "brochure.jpg";
@@ -43,6 +44,7 @@ const InstitueName = ({ instituteData }) => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Download error:", error);
+      toast.error("Failed to download brochure");
     }
   };
 
@@ -51,16 +53,40 @@ const InstitueName = ({ instituteData }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    toast.success("Application submitted successfully!");
-    setIsPopupVisible(false);
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      message: "",
-    });
+    
+    try {
+      const queryPayload = {
+        name: formData.name,
+        email: formData.email,
+        phoneNo: formData.phone,
+        city: formData.city,
+        query: formData.message,
+        queryRelatedTo: formData.queryRelatedTo
+      };
+
+      await axiosInstance.post(`${baseURL}/query`, queryPayload, {
+        headers: {
+          "x-access-token": localStorage.getItem("accessToken"),
+          "x-refresh-token": localStorage.getItem("refreshToken"),
+        },
+      });
+
+      toast.success("Application submitted successfully!");
+      setIsPopupVisible(false);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+        city: "",
+        queryRelatedTo: "",
+      });
+    } catch (error) {
+      console.error("Submit error:", error);
+      toast.error("Failed to submit application");
+    }
   };
 
   return (
@@ -115,7 +141,6 @@ const InstitueName = ({ instituteData }) => {
         </div>
       </div>
 
-      {/* Popup Form */}
       {isPopupVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center backdrop-blur-sm z-[1000]">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -136,10 +161,7 @@ const InstitueName = ({ instituteData }) => {
                 />
               </div>
               <div className="mb-4">
-                <label
-                  className="block text-sm font-medium mb-1"
-                  htmlFor="email"
-                >
+                <label className="block text-sm font-medium mb-1" htmlFor="email">
                   Email
                 </label>
                 <input
@@ -153,10 +175,7 @@ const InstitueName = ({ instituteData }) => {
                 />
               </div>
               <div className="mb-4">
-                <label
-                  className="block text-sm font-medium mb-1"
-                  htmlFor="phone"
-                >
+                <label className="block text-sm font-medium mb-1" htmlFor="phone">
                   Phone
                 </label>
                 <input
@@ -170,10 +189,35 @@ const InstitueName = ({ instituteData }) => {
                 />
               </div>
               <div className="mb-4">
-                <label
-                  className="block text-sm font-medium mb-1"
-                  htmlFor="message"
-                >
+                <label className="block text-sm font-medium mb-1" htmlFor="city">
+                  City
+                </label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  className="w-full border rounded-lg px-3 py-2"
+                  value={formData.city}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="queryRelatedTo">
+                  Query Related To
+                </label>
+                <input
+                  type="text"
+                  id="queryRelatedTo"
+                  name="queryRelatedTo"
+                  className="w-full border rounded-lg px-3 py-2"
+                  value={formData.queryRelatedTo}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="message">
                   Message
                 </label>
                 <textarea
@@ -182,6 +226,7 @@ const InstitueName = ({ instituteData }) => {
                   className="w-full border rounded-lg px-3 py-2"
                   value={formData.message}
                   onChange={handleChange}
+                  required
                 ></textarea>
               </div>
               <div className="flex justify-end gap-2">
