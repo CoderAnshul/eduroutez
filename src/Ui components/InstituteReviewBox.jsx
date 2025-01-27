@@ -65,9 +65,9 @@ const InstituteReviewBox = ({
             <div className="w-12 h-12 rounded-full bg-gray-200"></div>
             <div>
               <h4 className="font-bold text-gray-800">{reviewerName}</h4>
-              <p className="text-xs text-gray-500">
+              {/* <p className="text-xs text-gray-500">
                 {designation} {year && `| ${year}`}
-              </p>
+              </p> */}
             </div>
           </div>
           <div className="flex items-center gap-1">
