@@ -87,10 +87,7 @@ const PopularCourses = () => {
           <p className="mt-4 text-lg">
             Learn new skills, elevate your career, and achieve your dreams. Explore our popular courses today!
           </p>
-          <CustomButton
-            text="Explore Now"
-            className="mt-6 bg-white text-red-800 px-8 py-3 rounded-lg shadow-md hover:bg-red-100 transition-all"
-          />
+       
         </div>
       </div>
 
