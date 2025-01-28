@@ -53,7 +53,7 @@ const Wishlist = () => {
   };
 
   const handleExploreColleges = () => {
-    window.location.href = '/colleges'; // Or use your routing method
+    window.location.href = '/searchpage'; // Or use your routing method
   };
 
   if (loading) {

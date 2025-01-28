@@ -1,20 +1,75 @@
-import React, { useState } from "react";
-import axios from "axios"; // Install axios if not already installed
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../ApiFunctions/axios";
 
-const ScheduleCallPopup = ({ isOpen, onClose,counselor }) => {
-  if (!isOpen) return null;
-
-  console.log('counselor.email',counselor);
+const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
   const [formData, setFormData] = useState({
     date: "",
     timeSlot: "",
-    email:counselor.email,
-    studentEmail:localStorage.getItem('email')
+    email: counselor?.email ?? "",
+    studentEmail: localStorage.getItem('email')
   });
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [counselorSchedule, setCounselorSchedule] = useState(null);
 
-  const apiUrl=import.meta.env.VITE_BASE_URL;
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+
+  // Fetch counselor's schedule
+  useEffect(() => {
+    const fetchCounselorSchedule = async () => {
+      try {
+        const response = await axiosInstance.get(`${apiUrl}/counselorslots/${counselor?.email ?? ""}`);
+        if (response.data?.data) {
+          setCounselorSchedule(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching counselor schedule:", error);
+        toast.error("Failed to fetch counselor's schedule");
+      }
+    };
+
+    if (isOpen) {
+      fetchCounselorSchedule();
+    }
+  }, [isOpen, counselor?.email, apiUrl]);
+
+  // Generate time slots based on selected date
+  useEffect(() => {
+    if (!formData.date || !counselorSchedule) return;
+
+    const generateTimeSlots = () => {
+      const date = new Date(formData.date);
+      const dayOfWeek = date.getDay();
+      const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const currentDay = days[dayOfWeek];
+
+      const startTime = counselorSchedule?.[`${currentDay}Start`] ?? "";
+      const endTime = counselorSchedule?.[`${currentDay}End`] ?? "";
+
+      if (!startTime || !endTime) {
+        setAvailableSlots([]);
+        return;
+      }
+
+      const slots = [];
+      let currentTime = new Date(`2000-01-01T${startTime}`);
+      const endDateTime = new Date(`2000-01-01T${endTime}`);
+
+      while (currentTime < endDateTime) {
+        const timeString = currentTime.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+        slots.push(timeString);
+        currentTime.setMinutes(currentTime.getMinutes() + 30);
+      }
+
+      setAvailableSlots(slots);
+    };
+
+    generateTimeSlots();
+  }, [formData.date, counselorSchedule]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,37 +80,43 @@ const ScheduleCallPopup = ({ isOpen, onClose,counselor }) => {
     e.preventDefault();
 
     if (!formData.date || !formData.timeSlot) {
-      alert("Please fill in all fields");
+      toast.error("Please fill in all fields");
       return;
     }
 
     try {
-console.log("Form data:", formData);
-const response = await axiosInstance.post(
-  `${apiUrl}/bookslot`,
-  { date: formData.date, slot: formData.timeSlot, email: formData.email, studentEmail: formData.studentEmail },
-  {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-access-token': localStorage.getItem('accessToken'),
-      'x-refresh-token': localStorage.getItem('refreshToken')
-    }
-  }
-);
-console.log(response);
-if (response.status === 200) {
-  toast.success("Slot booked successfully!");
-  onClose();
-} else if (response.status === 401) {
-  toast.error("Unauthorized. Please log in again.");
-}
+      const response = await axiosInstance.post(
+        `${apiUrl}/bookslot`,
+        {
+          date: formData.date,
+          slot: formData.timeSlot,
+          email:counselor.email,
+          studentEmail: formData.studentEmail
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': localStorage.getItem('accessToken'),
+            'x-refresh-token': localStorage.getItem('refreshToken')
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Slot booked successfully!");
+        onClose();
+      } else if (response.status === 401) {
+        toast.error("Unauthorized. Please log in again.");
+      }
     } catch (error) {
-      console.error("Error booking slot:", error.message);
-      alert("Failed to book the slot. Please try again.");
+      console.error("Error booking slot:", error);
+      toast.error("Failed to book the slot. Please try again.");
     }
   };
 
   if (!isOpen) return null;
+
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <div className="fixed p-4 inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -76,6 +137,7 @@ if (response.status === 200) {
               name="date"
               value={formData.date}
               onChange={handleChange}
+              min={today}
               className="w-full border border-gray-300 rounded px-3 py-2"
               required
             />
@@ -84,46 +146,43 @@ if (response.status === 200) {
             <label className="block text-sm font-medium mb-2">
               Time Slots <span className="text-red-500">*</span>
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                "15:39",
-                "16:09",
-                "17:09",
-                "17:39",
-                "18:09",
-                "18:39",
-                "19:09",
-                "19:39",
-                "20:09",
-                "20:39",
-                "21:09",
-              ].map((time) => (
-                <label key={time} className="flex items-center">
-                  <input
-                    type="radio"
-                    name="timeSlot"
-                    value={time}
-                    checked={formData.timeSlot === time}
-                    onChange={handleChange}
-                    className="mr-2"
-                    required
-                  />
-                  {time}
-                </label>
-              ))}
-            </div>
+            {availableSlots.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                {availableSlots.map((time) => (
+                  <label key={time} className="flex items-center">
+                    <input
+                      type="radio"
+                      name="timeSlot"
+                      value={time}
+                      checked={formData.timeSlot === time}
+                      onChange={handleChange}
+                      className="mr-2"
+                      required
+                    />
+                    {time}
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">
+                {formData.date 
+                  ? "No slots available for selected date" 
+                  : "Please select a date to view available slots"}
+              </p>
+            )}
           </div>
           <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded"
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
             >
               Discard
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-red-600 text-white rounded"
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              disabled={!formData.date || !formData.timeSlot}
             >
               Submit
             </button>
