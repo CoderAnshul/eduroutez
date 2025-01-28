@@ -36,11 +36,10 @@ const tabs = [
   "Scholarship",
   "Cut-offs",
   "Ranking",
+  "Gallery",
   "Review",
   "Facilities",
-  "Recruiters",
   "Q & A",
-  "Gallery",
   
 
 ];
@@ -247,7 +246,7 @@ const Instituepage = () => {
                           <Ranking instituteData={instituteData}/>
                       </div>
                       
-                      <div ref={sectionRefs[13]} className="min-h-24 pt-4">
+                      <div ref={sectionRefs[9]} className="min-h-24 pt-4">
                           <GalleryInfo instituteData={instituteData}/>
                       </div>
                       <div ref={sectionRefs[10]} className="min-h-24 pt-4">
