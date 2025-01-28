@@ -22,6 +22,7 @@ import PopularCourses from './Pages/PopularCoursePage';
 import BestRatedInstitute from './Pages/Best-Rated-Institute';
 import TrendingInstitute from './Pages/TrendingInstitute';
 import Counselor from './Pages/Counselor';
+import NewsDetail from './Pages/NewsDetail';
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -78,6 +79,7 @@ const App = () => {
           <Route path="/institute" element={<BestRatedInstitute/>} />
           <Route path="/trending-institute" element={<TrendingInstitute/>} />
           <Route path='/counselor' element={<Counselor />}></Route>
+            <Route path="/news/:id" element={<NewsDetail />} />
 
            {/* Protected Dashboard Routes */}
           <Route
