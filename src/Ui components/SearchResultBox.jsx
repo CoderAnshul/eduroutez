@@ -145,9 +145,9 @@ const SearchResultBox = ({ institute }) => {
           {/* Footer Buttons */}
           <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">
             <div className="space-x-4">
-              <a href="#fees" className="hover:underline">Fees and Courses</a>
-              <a href="#admission" className="hover:underline">Admission</a>
-              <a href="#placement" className="hover:underline">Placement</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Admission</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a>
             </div>
             <div className="flex space-x-4 justify-end">
               <button className="bg-red-600 text-white px-4 py-2 rounded-lg" onClick={handleDownloadBrochure}>

@@ -32,14 +32,17 @@ const tabs = [
   "Admissions",
   "Placements",
   "Campus",
-  "Scholarship",
-  "Gallery",
-  "Q & A",
-  "Review",
   "Fees",
+  "Scholarship",
   "Cut-offs",
-  "Facilities",
   "Ranking",
+  "Review",
+  "Facilities",
+  "Recruiters",
+  "Q & A",
+  "Gallery",
+  
+
 ];
 
 
@@ -240,23 +243,23 @@ const Instituepage = () => {
                       <div ref={sectionRefs[7]} className="min-h-24 pt-4">
                           <CutTOffInfo instituteData={instituteData}/>
                       </div>
-                      <div ref={sectionRefs[7]} className="min-h-24 pt-4">
+                      <div ref={sectionRefs[8]} className="min-h-24 pt-4">
                           <Ranking instituteData={instituteData}/>
                       </div>
                       
-                      <div ref={sectionRefs[7]} className="min-h-24 pt-4">
+                      <div ref={sectionRefs[13]} className="min-h-24 pt-4">
                           <GalleryInfo instituteData={instituteData}/>
                       </div>
-                      <div ref={sectionRefs[9]} className="min-h-24 pt-4">
+                      <div ref={sectionRefs[10]} className="min-h-24 pt-4">
                           <ReviewandRating ratings={ratings} reviews={reviews} instituteId={instituteData._id} instituteData={instituteData}/>
                       </div>
-                      <div className="min-h-24 py-4">
+                      <div ref={sectionRefs[11]} className="min-h-24 py-4">
                           <InstituteFacilites instituteData={instituteData}/>
                       </div>
                       <div  className="min-h-24 py-4">
                           <RecruitersSlider instituteData={instituteData}/>
                       </div>
-                      <div ref={sectionRefs[7]} className="min-h-24 py-4">
+                      <div ref={sectionRefs[12]} className="min-h-24 py-4">
                           <Faqs instituteData={instituteData}/>
                       </div>
                       {/* <div ref={sectionRefs[3]} className="min-h-screen p-4 bg-gray-50">
