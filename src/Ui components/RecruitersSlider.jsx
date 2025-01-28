@@ -14,36 +14,60 @@ import com7 from '../assets/Images/brand7.png';
 import "../assets/swipers/RecruitersSlider.css";
 
 import { Navigation, Mousewheel, Autoplay } from 'swiper/modules';
-import { data } from 'autoprefixer';
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
 const RecruitersSlider = ({instituteData}) => {
-  const[image,setImage]=useState([]);
+  const [recruiters, setRecruiters] = useState([]);
   const [imageUrls, setImageUrls] = useState({});
-  // Array of imported images
-  const images = [com1, com2, com3, com4, com5, com6, com7];
-  // console.log(instituteData?.data?._id)
-  useEffect(()=>{
-      fetchData()
-  },[])
-
-  const fetchData= async ()=>{
+  
+  // Fetch recruiters data
+  useEffect(() => {
+    const fetchRecruiters = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/recruiters-by-institute/${instituteData?.data?._id}`);
+        const json = await response.json();
+        setRecruiters(json?.data || []);
+      } catch (error) {
+        console.error('Error fetching recruiters:', error);
+      }
+    };
     
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/recruiters-by-institute/${instituteData?.data?._id}`)
-    const json = await response.json()
-    setImage(json?.data)
-  }
-  // console.log(image)
-  const fetchImages = async (image,id)=>{
-    const imageResponse = await fetch(`${Images}/${image}`);
-    const imageBlob = await imageResponse.blob();
-    const imageObjectURL = URL.createObjectURL(imageBlob);
-    setImageUrls(prevState => ({ ...prevState, [id]: imageObjectURL }));
-  }
+    if (instituteData?.data?._id) {
+      fetchRecruiters();
+    }
+  }, [instituteData?.data?._id]);
+
+  // Fetch images for all recruiters
+  useEffect(() => {
+    const loadImages = async () => {
+      const newImageUrls = {};
+      
+      for (const recruiter of recruiters) {
+        if (recruiter.image && !imageUrls[recruiter._id]) {
+          try {
+            const imageResponse = await fetch(`${Images}/${recruiter.image}`);
+            const imageBlob = await imageResponse.blob();
+            newImageUrls[recruiter._id] = URL.createObjectURL(imageBlob);
+          } catch (error) {
+            console.error(`Error loading image for recruiter ${recruiter._id}:`, error);
+          }
+        }
+      }
+      
+      setImageUrls(prev => ({...prev, ...newImageUrls}));
+    };
+
+    loadImages();
+    
+    // Cleanup function to revoke object URLs
+    return () => {
+      Object.values(imageUrls).forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [recruiters]);
 
   return (
-    <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4 ">
+    <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4">
       <h3 className="text-xl font-bold">{`Top Recruiters At ${instituteData?.data?.instituteName}`}</h3>
       <Swiper
         slidesPerView={'auto'}
@@ -52,23 +76,22 @@ const RecruitersSlider = ({instituteData}) => {
         loop={true}
         mousewheel={true}
         autoplay={{
-          delay: 1, // Slight delay to avoid conflicts (imperceptible to users)
-          disableOnInteraction: false, // Continue autoplay after interaction
+          delay: 1,
+          disableOnInteraction: false,
         }}
-        speed={3000} // Reasonable speed for smooth transitions
+        speed={3000}
         modules={[Navigation, Mousewheel, Autoplay]}
         className="myRecruitersSwiper"
       >
-        {image.map((image, index) => {
-          const imageSrc = fetchImages(image?.image, image?._id)
-          return <SwiperSlide key={index}>
+        {recruiters.map((recruiter, index) => (
+          <SwiperSlide key={recruiter._id || index}>
             <img
-              src={imageUrls[image._id]}
+              src={imageUrls[recruiter._id]}
               alt={`Recruiter ${index + 1} at ${instituteData?.data?.name}`}
               className="w-full h-auto object-contain"
             />
           </SwiperSlide>
-        })}
+        ))}
       </Swiper>
     </div>
   );

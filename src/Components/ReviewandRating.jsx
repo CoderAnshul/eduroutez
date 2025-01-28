@@ -7,6 +7,10 @@ import InstituteReviewBox from '../Ui components/InstituteReviewBox';
 import CustomButton from "../Ui components/CustomButton";
 import axios from 'axios'; // Make sure to install axios if not already present
 
+
+const baseURL = import.meta.env.VITE_BASE_URL;
+
+
 const ReviewandRating = ( {instituteData} ) => {
   const [ratings, setRatings] = useState([]);
   const [reviews, setReviews] = useState([]);
@@ -22,7 +26,7 @@ const ReviewandRating = ( {instituteData} ) => {
     const fetchReviewsAndRatings = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`http://localhost:4001/api/v1/review-by-institute/${instituteData?.data?._id}`);
+        const response = await axios.get(`${baseURL}/review-by-institute/${instituteData?.data?._id}`);
         // console.log('hjk',response.data); // Assuming the API returns an object with ratings and reviews
         // Assuming the API returns an object with ratings and reviews
         console.log(response)
