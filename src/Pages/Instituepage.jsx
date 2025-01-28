@@ -21,6 +21,10 @@ import Placementinfo from '../Components/Placementinfo'
 import CampusInfo from '../Components/CampusInfo'
 import ScholarshipInfo from '../Components/ScholarshipInfo'
 import GalleryInfo from '../Components/GalleryInfo'
+import FeeInfo from '../Components/FeeInfo'
+import CutTOffInfo from '../Components/CutTOffInfo'
+import Ranking from '../Components/Ranking'
+import { Feed } from '@mui/icons-material'
 
 const tabs = [
   "College Info",
@@ -33,7 +37,6 @@ const tabs = [
   "Q & A",
   "Review",
   "Fees",
-  "News",
   "Cut-offs",
   "Facilities",
   "Ranking",
@@ -229,12 +232,22 @@ const Instituepage = () => {
                           <CampusInfo instituteData={instituteData}/>
                       </div>
                       <div ref={sectionRefs[5]} className="min-h-24 pt-4">
+                        <FeeInfo ref={sectionRefs[5]} instituteData={instituteData}/>
+                      </div>
+                      <div ref={sectionRefs[6]} className="min-h-24 pt-4">
                           <ScholarshipInfo instituteData={instituteData}/>
                       </div>
-                      <div ref={sectionRefs[5]} className="min-h-24 pt-4">
+                      <div ref={sectionRefs[7]} className="min-h-24 pt-4">
+                          <CutTOffInfo instituteData={instituteData}/>
+                      </div>
+                      <div ref={sectionRefs[7]} className="min-h-24 pt-4">
+                          <Ranking instituteData={instituteData}/>
+                      </div>
+                      
+                      <div ref={sectionRefs[7]} className="min-h-24 pt-4">
                           <GalleryInfo instituteData={instituteData}/>
                       </div>
-                      <div ref={sectionRefs[8]} className="min-h-24 pt-4">
+                      <div ref={sectionRefs[9]} className="min-h-24 pt-4">
                           <ReviewandRating ratings={ratings} reviews={reviews} instituteId={instituteData._id} instituteData={instituteData}/>
                       </div>
                       <div className="min-h-24 py-4">

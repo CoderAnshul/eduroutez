@@ -44,7 +44,7 @@ const RecruitersSlider = ({instituteData}) => {
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4 ">
-      <h3 className="text-xl font-bold">Top Recruiters At IISC Bangalore</h3>
+      <h3 className="text-xl font-bold">{`Top Recruiters At ${instituteData?.data?.instituteName}`}</h3>
       <Swiper
         slidesPerView={'auto'}
         navigation={true}
@@ -61,15 +61,14 @@ const RecruitersSlider = ({instituteData}) => {
       >
         {image.map((image, index) => {
           const imageSrc = fetchImages(image?.image, image?._id)
-          // console.log(imageSrc)
           return <SwiperSlide key={index}>
             <img
               src={imageUrls[image._id]}
-              alt={`Recruiter ${index + 1}`}
-              className="w-full h-auto  object-contain"
+              alt={`Recruiter ${index + 1} at ${instituteData?.data?.name}`}
+              className="w-full h-auto object-contain"
             />
           </SwiperSlide>
-})}
+        })}
       </Swiper>
     </div>
   );
