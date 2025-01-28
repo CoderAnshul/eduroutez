@@ -49,6 +49,14 @@ const Login = () => {
     },
     onSuccess: (data) => {
       console.log("Data", data);
+      if(data?.data?.user?.role === 'institute') {
+       
+        window.location.href = "https://admin.eduroutez.com/dashboard/";
+      } else if (data?.data?.user?.role === 'counsellor') {
+        window.location.href = "https://admin.eduroutez.com/dashboard/";
+
+      }
+
       toast.success("Logged in successfully!");
  localStorage.setItem(
         'accessToken',
@@ -72,8 +80,9 @@ const Login = () => {
       );
       console.log("LocalStorage set with tokens and user info");
 
-
+      if(data?.data?.user?.role === 'student'){
       navigate("/");
+      }
     },
     onError: (error) => {
       toast.error(error.message);
