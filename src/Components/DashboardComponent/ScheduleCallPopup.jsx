@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../ApiFunctions/axios";
+import loadRazorpayScript from "../../loadRazorpayScript"
 
 const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
   const [formData, setFormData] = useState({
@@ -78,40 +79,67 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!formData.date || !formData.timeSlot) {
       toast.error("Please fill in all fields");
       return;
     }
-
-    try {
-      const response = await axiosInstance.post(
-        `${apiUrl}/bookslot`,
-        {
-          date: formData.date,
-          slot: formData.timeSlot,
-          email:counselor.email,
-          studentEmail: formData.studentEmail
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': localStorage.getItem('accessToken'),
-            'x-refresh-token': localStorage.getItem('refreshToken')
-          }
-        }
-      );
-
-      if (response.status === 200) {
-        toast.success("Slot booked successfully!");
-        onClose();
-      } else if (response.status === 401) {
-        toast.error("Unauthorized. Please log in again.");
-      }
-    } catch (error) {
-      console.error("Error booking slot:", error);
-      toast.error("Failed to book the slot. Please try again.");
+  
+    const scriptLoaded = await loadRazorpayScript();
+    if (!scriptLoaded) {
+      toast.error("Failed to load payment gateway. Please try again.");
+      return;
     }
+  
+    const options = {
+      key:"rzp_test_1DP5mmOlF5G5ag", // Replace with your Razorpay Key
+      amount: 50000, // 500 Rs in paise
+      currency: "INR",
+      name: "Your App Name",
+      description: "Slot Booking Fee",
+      handler: async function (response) {
+        // Payment successful - Proceed with booking
+        try {
+          const bookingResponse = await axiosInstance.post(
+            `${apiUrl}/bookslot`,
+            {
+              date: formData.date,
+              slot: formData.timeSlot,
+              email: counselor.email,
+              studentEmail: formData.studentEmail,
+              paymentId: response.razorpay_payment_id, // Store payment details
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                "x-access-token": localStorage.getItem("accessToken"),
+                "x-refresh-token": localStorage.getItem("refreshToken"),
+              },
+            }
+          );
+  
+          if (bookingResponse.status === 200) {
+            toast.success("Slot booked successfully!");
+            onClose();
+          } else {
+            toast.error("Failed to book slot after payment.");
+          }
+        } catch (error) {
+          console.error("Error booking slot:", error);
+          toast.error("Booking failed. Please contact support.");
+        }
+      },
+      prefill: {
+        email: formData.studentEmail,
+        contact: formData.phone, // Ensure phone number is available
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+  
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
   };
 
   if (!isOpen) return null;
