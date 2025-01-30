@@ -1,12 +1,17 @@
 import React from "react";
 import { createQuery } from "../ApiFunctions/api";
 
-const QueryForm = () => {
+const QueryForm = ({instituteData}) => {
+  console.log('data',instituteData.data)
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent form default submission behavior
     console.log("Form submission initiated");
 
+
+
     const formData = new FormData(e.target);
+    formData.append("instituteId", instituteData?.data?._id);
+
     const data = {
       name: formData.get("name"),
       email: formData.get("email"),
@@ -14,7 +19,7 @@ const QueryForm = () => {
       city: formData.get("city"),
       queryRelatedTo: formData.get("relatedTopic"),
       query: formData.get("query"),
-    };
+      instituteId: formData.get("instituteId")    };
 
     e.target.reset(); // Reset the form fields after submission
 

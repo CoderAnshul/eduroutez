@@ -7,6 +7,7 @@ import PopularCourses from "../Components/PopularCourses";
 import BlogComponent from "../Components/BlogComponent";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
+i
 import axios from "axios";
 
 const Images=import.meta.env.VITE_IMAGE_BASE_URL;

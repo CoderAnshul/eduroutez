@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import CustomButton from "./CustomButton";
 
 const BlogandCareerBox = ({ boxData, blogData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
-  const Images=import.meta.env.VITE_IMAGE_BASE_URL;
+  const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
   const handleSeeMore = () => {
     setCurrentPage(currentPage + 1);
@@ -26,8 +27,9 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {/* Render blogs */}
         {displayedBlogs?.map((blog) => (
-          <div
+          <Link
             key={blog._id}
+            to={`/blogdetailpage/${blog._id}`}
             className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
           >
             <div className="relative">
@@ -39,21 +41,21 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
             </div>
             <div className="p-4 flex flex-col justify-between h-[215px]">
               <div>
-              <h3 className="text-lg font-semibold text-gray-800 truncate">
-                {blog.title}
-              </h3>
-              <p
-                className="text-sm h text-gray-600 mt-2 line-clamp-3"
-                dangerouslySetInnerHTML={{
-                  __html: blog.description
-                    ? blog.description.split(" ").slice(0, 30).join(" ")
-                    : "",
-                }}
-              ></p>
-              {blog.description &&
-                blog.description.split(" ").length > 30 && (
-                  <span>........</span>
-                )}
+                <h3 className="text-lg font-semibold text-gray-800 truncate">
+                  {blog.title}
+                </h3>
+                <p
+                  className="text-sm h text-gray-600 mt-2 line-clamp-3"
+                  dangerouslySetInnerHTML={{
+                    __html: blog.description
+                      ? blog.description.split(" ").slice(0, 30).join(" ")
+                      : "",
+                  }}
+                ></p>
+                {blog.description &&
+                  blog.description.split(" ").length > 30 && (
+                    <span>........</span>
+                  )}
               </div>
               <div className="mt-4">
                 <CustomButton
@@ -62,7 +64,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
                 />
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 

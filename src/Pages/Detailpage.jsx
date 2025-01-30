@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { CarrerDetail } from "../ApiFunctions/api";
-
+import BestRated from "../Components/BestRated";
+import Events from "../Components/Events";
+import ConsellingBanner from "../Components/ConsellingBanner";
 const DetailPage = () => {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
@@ -126,6 +128,13 @@ const DetailPage = () => {
           );
         })}
       </div>
+
+         {/* Additional Sections */}
+        <div className="w-full flex flex-row items-start gap-8">
+      <Events />
+      <ConsellingBanner />
+      </div>
+
     </div>
   );
 };

@@ -83,10 +83,7 @@ const BlogComponent = () => {
       <div className="blogCont grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {Array.isArray(content) && content.length > 0 ? (
           content.slice(0, 3).map((blog, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl overflow-hidden"
-            >
+            <Link to={`/blogdetailpage/${blog._id}`} key={index} className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl overflow-hidden">
               {/* Image */}
               <div className="h-56 min-h-56 max-h-56 w-full overflow-hidden">
                 <img
@@ -100,18 +97,15 @@ const BlogComponent = () => {
               <div className="p-6">
                 <h4 className="text-xl font-semibold text-gray-800">
                   {blog.title.length > 30 ? `${blog.title.slice(0,35)}...` : blog.title}
-                  </h4>
-                {/* <h4 className="text-xl font-semibold text-gray-800">{blog.title}</h4> */}
+                </h4>
                 <p className="text-sm h-16 text-gray-600 mt-3 line-clamp-3" dangerouslySetInnerHTML={{ __html: blog.description }}></p>
                 <div className="mt-4">
-                  <Link to={`/blogdetailpage/${blog._id}`}>
-                    <button className="bg-red-600 text-white mt-4 py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
-                      Read More
-                    </button>
-                  </Link>
+                  <button className="bg-red-600 text-white mt-4 py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
+                    Read More
+                  </button>
                 </div>
               </div>
-            </div>
+            </Link>
           ))
         ) : (
           <div className="text-center w-full">No blogs available.</div>

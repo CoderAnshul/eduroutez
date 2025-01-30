@@ -272,7 +272,7 @@ const Instituepage = () => {
                       
                   </div>
                 </div>
-                <QueryForm/>
+                <QueryForm instituteData={instituteData}/>
 
              </div>
              <BestRated/>

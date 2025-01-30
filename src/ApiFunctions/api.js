@@ -169,6 +169,7 @@ export const getBlogs = async () => {
 
 export const createQuery = async (formData) => {
   try {
+    
     const response = await axios.post(`${baseURL}/query`, formData);
     return response.data;
   } catch (error) {
