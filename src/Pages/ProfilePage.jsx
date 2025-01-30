@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import { useMutation, useQuery } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 
 const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
+  
 
 // Fetch the user data
 const fetchUserData = async () => {
@@ -32,9 +33,13 @@ const ProfilePage = () => {
     about: "",
     address: "",
     country: "",
+    state: "",
+    city: "",
   });
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
 
   // Fetch user data
   const { isLoading } = useQuery("userData", fetchUserData, {
@@ -49,6 +54,8 @@ const ProfilePage = () => {
         about: data.about,
         address: data.address,
         country: data.country,
+        state: data.state,
+        city: data.city,  
       });
     },
     onError: (error) => {
@@ -60,6 +67,40 @@ const ProfilePage = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+
+      // Fetch all states on component mount
+      useEffect(() => {
+        const fetchStates = async () => {
+        try {
+          const res = await axiosInstance.get(`${apiUrl}/states`);
+          console.log(res.data);
+          setStates(res.data?.data);
+        } catch (err) {
+          console.error("Failed to fetch states:", err);
+        }
+        };
+        fetchStates();
+      }, []);
+      
+      // Fetch cities when a state is selected
+      useEffect(() => {
+        const fetchCities = async () => {
+          console.log('state',formData.state);
+        if (formData.state) {
+          try {
+          const res = await axiosInstance.get(`${apiUrl}/cities-by-state/${formData.state}`);
+          console.log('drftgyhujik',res.data.data);
+          setCities(res.data?.data);
+          } catch (err) {
+          console.error("Failed to fetch cities:", err);
+          }
+        } else {
+          setCities([]); // Reset cities when no state is selected
+        }
+        };
+        fetchCities();
+      }, [formData.state]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -204,7 +245,56 @@ const ProfilePage = () => {
                   placeholder="Enter Your Address"
                   className="w-full border rounded px-4 py-2"
                 />
+
+
+                  {/* Address Section */}
+  <div className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* State Dropdown */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">State</label>
+                <select
+                  name="state"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  value={formData.state}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select a State</option>
+                  {states.map((state) => (
+                    <option key={state.id} value={state.id}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+
+              {/* City Dropdown */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">City</label>
+                <select
+                  name="city"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  value={formData.city}
+                  onChange={handleChange}
+                  required
+                  disabled={!formData.state}
+                >
+                  <option value="">Select a City</option>
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.id}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+              </div>
+
+
+
+
               <div>
                 <label className="block font-medium mb-2">Country</label>
                 <select

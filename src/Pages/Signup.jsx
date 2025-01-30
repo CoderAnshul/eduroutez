@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
@@ -28,6 +28,43 @@ const Signup = () => {
   });
 
   const [role, setRole] = useState("");
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+
+    // Fetch all states on component mount
+    useEffect(() => {
+      const fetchStates = async () => {
+      try {
+        const res = await axiosInstance.get(`${apiUrl}/states`);
+        console.log(res.data);
+        setStates(res.data?.data);
+      } catch (err) {
+        console.error("Failed to fetch states:", err);
+      }
+      };
+      fetchStates();
+    }, []);
+    
+    // Fetch cities when a state is selected
+    useEffect(() => {
+      const fetchCities = async () => {
+      if (formData.state) {
+        try {
+        const res = await axiosInstance.get(`${apiUrl}/cities-by-state/${formData.state}`);
+        setCities(res.data?.data);
+        } catch (err) {
+        console.error("Failed to fetch cities:", err);
+        }
+      } else {
+        setCities([]); // Reset cities when no state is selected
+      }
+      };
+      fetchCities();
+    }, [formData.state]);
+    
+  
+  
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -163,12 +200,52 @@ toast.success("Registered successfully");
             />
           </div>
 
+
+            {/* State Dropdown */}
+            <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">State</label>
+            <select
+              id="state"
+              className="w-full px-4 py-2 border rounded-lg"
+              value={formData.state}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select a State</option>
+              {states?.map((state) => (
+                <option key={state.id} value={state.id}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* City Dropdown */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">City</label>
+            <select
+              id="city"
+              className="w-full px-4 py-2 border rounded-lg"
+              value={formData.city}
+              onChange={handleChange}
+              required
+              disabled={!formData.state}
+            >
+              <option value="">Select a City</option>
+              {cities?.map((city) => (
+                <option key={city.id} value={city.id}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+
+
           {/* Rest of the form fields */}
           {[
             { label: "Email", id: "email", type: "email", placeholder: "Enter your email" },
             { label: "Phone Number", id: "contact_number", type: "tel", placeholder: "Enter your phone number" },
-            { label: "City", id: "city", type: "text", placeholder: "Enter your city" },
-            { label: "State", id: "state", type: "text", placeholder: "Enter your state" },
             { label: "Password", id: "password", type: "password", placeholder: "Create a password" },
             { label: "Confirm Password", id: "confirmPassword", type: "password", placeholder: "Confirm your password" },
             { label: "Referral Code", id: "referal_Code", type: "text", placeholder: "Enter your Referral Code" }
