@@ -64,6 +64,7 @@ const DetailPage = () => {
   };
 
   return (
+    <>
     <div className="px-[4vw] py-[2vw] flex flex-col items-start">
       {/* Banner Image */}
       {/* Banner Image */}
@@ -129,13 +130,14 @@ const DetailPage = () => {
         })}
       </div>
 
-         {/* Additional Sections */}
-        <div className="w-full flex flex-row items-start gap-8 mt-10">
-      <Events />
-      <ConsellingBanner />
-      </div>
 
     </div>
+         {/* Additional Sections */}
+         <div className="flex gap-2 flex-col sm:flex-row items-center">
+          <Events />
+          <ConsellingBanner />
+          </div>
+    </>
   );
 };
 

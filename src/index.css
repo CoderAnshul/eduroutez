@@ -166,6 +166,31 @@ a{
     position: -webkit-sticky; /* Safari */
     position: sticky;
   }
+
+  /* ............ new changes .............. */
+
+  p{
+    overflow-wrap:break-word;
+  }
+  
+
+  .text-base table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .text-base table th,
+  .text-base table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .text-base table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
   
 
   /* Loader styles */

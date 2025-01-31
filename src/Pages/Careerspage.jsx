@@ -238,7 +238,7 @@ const Careerspage = () => {
 
       <PopularCourses />
       <BlogComponent />
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 flex-col sm:flex-row items-center">
         <Events />
         <ConsellingBanner />
       </div>

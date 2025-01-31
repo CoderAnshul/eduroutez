@@ -53,7 +53,7 @@ const Homepage = () => {
       </div>
          <Reviews/>
          {/* <Events className = "!w-full"/> */}
-         <div className="w-full flex flex-row items-start gap-8 mt-10">
+         <div className="flex gap-2 flex-col sm:flex-row items-center">
           <Events />
           <ConsellingBanner />
           </div>
