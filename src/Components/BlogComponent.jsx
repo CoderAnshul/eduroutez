@@ -21,7 +21,7 @@ const BlogComponent = () => {
       enabled: true,
       onSuccess: (data) => {
         console.log("Received data:", data); // Check the response structure
-        const blogs = data?.data || []; // Directly access the data array
+        const blogs = data?.data?.result || []; // Directly access the data array
         setContent(blogs); // Set the blogs directly
       }
     }
