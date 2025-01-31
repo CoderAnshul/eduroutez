@@ -92,6 +92,7 @@ const News = ({ instituteData }) => {
 
     return (
         <div className="w-full p-6 bg-gray-50">
+            <h3 className="text-xl font-bold mb-3">Latest News</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {displayedNews.map((news) => (
                     <div

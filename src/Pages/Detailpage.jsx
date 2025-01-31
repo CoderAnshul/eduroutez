@@ -130,7 +130,7 @@ const DetailPage = () => {
       </div>
 
          {/* Additional Sections */}
-        <div className="w-full flex flex-row items-start gap-8">
+        <div className="w-full flex flex-row items-start gap-8 mt-10">
       <Events />
       <ConsellingBanner />
       </div>
