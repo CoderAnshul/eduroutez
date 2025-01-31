@@ -17,7 +17,9 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
     }
   };
 
-  const displayedBlogs = blogData?.data?.slice(
+console.log('dftgyhuj',blogData);
+
+  const displayedBlogs = blogData?.data?.result.slice(
     0,
     currentPage * itemsPerPage
   );
