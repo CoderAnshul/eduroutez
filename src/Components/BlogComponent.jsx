@@ -51,7 +51,7 @@ const BlogComponent = () => {
     };
 
     // Fetch blog data for each blog in content
-    content.forEach(blog => fetchBlog(blog._id));
+    Array.isArray(content) && content.forEach(blog => fetchBlog(blog._id));
 
     return () => {
       Object.values(imageUrls).forEach(url => URL.revokeObjectURL(url));
