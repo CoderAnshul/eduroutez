@@ -22,7 +22,7 @@ const InstituteCourses = ({ instituteData }) => {
       setFilteredCourses(instituteData?.data?.courses);
     } else {
       const filtered = instituteData.data.courses.filter(
-        (course) => course.courseType === tab
+        (course) => course.courseType.replace("-", " ") === tab
       );
       setFilteredCourses(filtered);
     }

@@ -13,6 +13,9 @@ import categories from '../DataFiles/categories';
 import Cookies from 'js-cookie';
 import { ContactPageSharp } from '@mui/icons-material';
 import axiosInstance from '../ApiFunctions/axios'
+import { ArrowRight } from "lucide-react"; 
+import { useNavigate } from 'react-router-dom';;
+
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,6 +25,7 @@ const Navbar = () => {
 
   const accessToken = localStorage.getItem('accessToken');
   console.log('accessToken', accessToken);
+  const navigate = useNavigate();
 
 
   const toggleMenu = () => {
@@ -33,6 +37,10 @@ const Navbar = () => {
       e.preventDefault();
       setShowLoginPopup(true);
     }
+  };
+
+  const handleQuestion = () => {
+    navigate('/question-&-answers');
   };
 
   const handleLoginPopupClose = () => {
@@ -99,7 +107,9 @@ if(response)    {
             </Link>
         </div>
 
-          <div className="search ml-5 bg-white border-[1.5px] border-gray-500 px-4 py-2 rounded-lg items-center gap-2 w-[40%] overflow-hidden hidden sm:flex">
+     
+
+       {/* <div className="search ml-5 bg-white border-[1.5px] border-gray-500 px-4 py-2 rounded-lg items-center gap-2 w-[40%] overflow-hidden hidden sm:flex">
             <button>
               <img
                 className="hover:scale-105 transition-all"
@@ -114,9 +124,19 @@ if(response)    {
               id="search"
               placeholder="Search for Colleges, Institutes, and more..."
             />
-          </div>
+          </div>//} */}
 
           <div className="CustomFlex gap-3 opacity-80">
+          <div className=''>
+        <button
+          onClick={handleQuestion}
+          className="md:flex hidden items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition-colors"
+        >
+          Ask Question
+          {/* <span className="hidden md:flex">Ask Question</span> */}
+          <ArrowRight className="h-4 w-4 hidden md:flex" />
+        </button>
+        </div>
             <Link
               to="/writereview"
               className="CustomFlex gap-1 group hover:text-red-500 hover:scale-95 transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
