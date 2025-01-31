@@ -16,7 +16,7 @@ const Events = ({ className = "" }) => {
   ];
 
   return (
-    <div className={`relative h-[420px] w-1/2 bg-gray-300 ${className}`}>
+    <div className={`relative h-[420px] w-full sm:w-1/2 bg-gray-300 ${className}`}>
       <Swiper
         navigation={true}
         modules={[Navigation]}

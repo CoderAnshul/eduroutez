@@ -8,6 +8,7 @@ import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
 import { getCoursesById } from '../ApiFunctions/api';
 import { useQuery } from 'react-query';
+import ConsellingBanner from '../Components/ConsellingBanner';
 
 const tabs = [
   "Overview",
@@ -150,7 +151,10 @@ const Coursesinfopage = () => {
 
       {/* Additional Sections */}
       <BestRated />
-      <Events />
+      <div className="w-full flex items-start gap-8 mt-10">
+          <Events />
+          <ConsellingBanner />
+          </div>
     </div>
   );
 };

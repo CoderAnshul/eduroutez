@@ -60,8 +60,15 @@ const PopularCourses = () => {
               />
             </div>
             <div className="textContainer p-4">
-              <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A] line-clamp-2">
+              {/* <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A] line-clamp-2">
                 {box?.courseTitle || 'Untitled Course'}
+              </h3> */}
+               <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A] line-clamp-2">
+                {box?.courseTitle
+                  ? box.courseTitle.length > 20
+                    ? box.courseTitle.slice(0, 22) + "..."
+                    : box.courseTitle
+                  : "Untitled Course"}
               </h3>
               <div
                 className="text-sm mt-2 line-clamp-3 text-gray-600"

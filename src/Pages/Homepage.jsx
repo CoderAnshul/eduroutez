@@ -13,6 +13,7 @@ import Events from '../Components/Events'
 import { useQuery } from 'react-query'
 import { homeBanner } from '../ApiFunctions/api'
 import { useParams } from 'react-router-dom'
+import ConsellingBanner from '../Components/ConsellingBanner'
 
 const Homepage = () => {
 
@@ -51,7 +52,11 @@ const Homepage = () => {
          <BlogComponent/>
       </div>
          <Reviews/>
-         <Events className = "!w-full"/>
+         {/* <Events className = "!w-full"/> */}
+         <div className="flex gap-2 flex-col sm:flex-row items-center">
+          <Events />
+          <ConsellingBanner />
+          </div>
     </>
   )
 }

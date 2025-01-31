@@ -108,7 +108,7 @@ Eduroutez.com simplifies higher education navigation with accurate, up-to-date i
     </section>
 
     <Instructor/>
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-2 flex-col sm:flex-row items-center">
       <Events/>
       <ConsellingBanner/>
       </div>
