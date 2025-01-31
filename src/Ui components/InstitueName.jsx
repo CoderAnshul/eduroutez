@@ -7,7 +7,8 @@ import { toast } from "react-toastify";
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 const baseURL = import.meta.env.VITE_BASE_URL;
 
-const InstitueName = ({ instituteData }) => {
+const 
+InstitueName = ({ instituteData }) => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -30,18 +31,42 @@ const InstitueName = ({ instituteData }) => {
           responseType: "blob",
         }
       );
-
-      const blob = new Blob([response.data], { type: "image/jpeg" });
+  
+      // Get content type from response
+      const contentType = response.headers['content-type'];
+      
+      // Set file extension and type based on content type
+      let fileExtension;
+      let mimeType;
+      
+      if (contentType.includes('pdf')) {
+        fileExtension = 'pdf';
+        mimeType = 'application/pdf';
+      } else if (contentType.includes('jpeg') || contentType.includes('jpg')) {
+        fileExtension = 'jpg';
+        mimeType = 'image/jpeg';
+      } else if (contentType.includes('png')) {
+        fileExtension = 'png';
+        mimeType = 'image/png';
+      } else {
+        // Default to PDF if content type is not recognized
+        fileExtension = 'pdf';
+        mimeType = 'application/pdf';
+      }
+  
+      const blob = new Blob([response.data], { type: mimeType });
       const url = window.URL.createObjectURL(blob);
-
+  
       const a = document.createElement("a");
       a.href = url;
-      a.download = "brochure.jpg";
+      a.download = `brochure.${fileExtension}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-
+  
       window.URL.revokeObjectURL(url);
+      
+      toast.success("Brochure downloaded successfully");
     } catch (error) {
       console.error("Download error:", error);
       toast.error("Failed to download brochure");
@@ -95,8 +120,8 @@ const InstitueName = ({ instituteData }) => {
         <img
           className="h-full w-4/5 object-contain"
           src={
-            instituteData.thumbnailImage
-              ? `${Images}/${instituteData.thumbnailImage}`
+            instituteData?.data?.instituteLogo
+              ? `${Images}/${instituteData?.data?.instituteLogo}`
               : serachBoximg
           }
           alt="instituteLogo"

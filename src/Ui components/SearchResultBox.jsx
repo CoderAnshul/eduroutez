@@ -7,6 +7,7 @@ import cashhand from "../assets/Images/cashhand.png";
 import checklist from "../assets/Images/checklist.png";
 import { addToWishlist } from '../ApiFunctions/api';
 import axiosInstance from "../ApiFunctions/axios";
+import { toast } from "react-toastify";
 
 const SearchResultBox = ({ institute }) => {
 
@@ -39,30 +40,55 @@ const SearchResultBox = ({ institute }) => {
 
   const handleDownloadBrochure = async () => {
     try {
-      const response = await axiosInstance.get(`${baseURL}/download-bruchure/${institute._id}`, {
-        headers: {
-          'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken'),
-        },
-        responseType: 'blob', // Ensures the response is treated as binary data
-      });
+      const response = await axiosInstance.get(
+        `${baseURL}/download-bruchure/${institute._id}`,
+        {
+          headers: {
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
+          responseType: "blob",
+        }
+      );
   
-      // Create a Blob from the image data
-      const blob = new Blob([response.data], { type: 'image/jpeg' }); // Adjust MIME type based on the actual format (e.g., image/png)
+      // Get content type from response
+      const contentType = response.headers['content-type'];
+      
+      // Set file extension and type based on content type
+      let fileExtension;
+      let mimeType;
+      
+      if (contentType.includes('pdf')) {
+        fileExtension = 'pdf';
+        mimeType = 'application/pdf';
+      } else if (contentType.includes('jpeg') || contentType.includes('jpg')) {
+        fileExtension = 'jpg';
+        mimeType = 'image/jpeg';
+      } else if (contentType.includes('png')) {
+        fileExtension = 'png';
+        mimeType = 'image/png';
+      } else {
+        // Default to PDF if content type is not recognized
+        fileExtension = 'pdf';
+        mimeType = 'application/pdf';
+      }
+  
+      const blob = new Blob([response.data], { type: mimeType });
       const url = window.URL.createObjectURL(blob);
   
-      // Trigger a download
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = 'brochure.jpg'; // Change extension as needed (e.g., brochure.png)
+      a.download = `brochure.${fileExtension}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
   
-      // Cleanup
       window.URL.revokeObjectURL(url);
+      
+      toast.success("Brochure downloaded successfully");
     } catch (error) {
-      console.error('Download error:', error);
+      console.error("Download error:", error);
+      toast.error("Failed to download brochure");
     }
   };
   
