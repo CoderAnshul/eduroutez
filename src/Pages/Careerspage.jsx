@@ -44,12 +44,18 @@ const Careerspage = () => {
     const fetchCategories = async () => {
       try {
         const response = await careerCategories();
-        setCategories(response.data.data.result || []);
+        console.log('Full Categories Response:', response.data);
+        
+        const extractedCategories = response.data.result.map(category => 
+          typeof category === 'object' ? category.name || category.category : category
+        );
+        
+        setCategories(extractedCategories);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
     };
-
+  
     fetchCategories();
   }, []);
 
