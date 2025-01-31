@@ -74,7 +74,7 @@ const CourseCard = ({ course }) => {
           <span
             className="text-black flex font-semibold"
             dangerouslySetInnerHTML={{
-              __html: "₹" + (course.courseFee || "Free"),
+              __html: "₹" + (course.coursePrice || "Free"),
             }}
           />
         </p>

@@ -2,7 +2,6 @@ import React from "react";
 import { createQuery } from "../ApiFunctions/api";
 
 const QueryForm = ({instituteData}) => {
-  console.log('data',instituteData.data)
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent form default submission behavior
     console.log("Form submission initiated");
