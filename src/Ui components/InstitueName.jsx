@@ -17,6 +17,7 @@ InstitueName = ({ instituteData }) => {
     message: "",
     city: "",
     queryRelatedTo: "",
+    instituteId:""
   });
 
   const handleDownloadBrochure = async () => {
@@ -88,7 +89,8 @@ InstitueName = ({ instituteData }) => {
         phoneNo: formData.phone,
         city: formData.city,
         query: formData.message,
-        queryRelatedTo: formData.queryRelatedTo
+        queryRelatedTo: formData.queryRelatedTo,
+        instituteId:instituteData?.data?._id
       };
 
       await axiosInstance.post(`${baseURL}/query`, queryPayload, {
