@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PageBanner from "../Ui components/PageBanner";
 import CustomButton from "../Ui components/CustomButton";
 import { useQuery } from "react-query";
-import { careers } from "../ApiFunctions/api";
+import { careers, careerCategories } from "../ApiFunctions/api";
 import PopularCourses from "../Components/PopularCourses";
 import BlogComponent from "../Components/BlogComponent";
 import Events from "../Components/Events";
@@ -29,12 +29,29 @@ const fetchImage = async (imagePath) => {
 
 const Careerspage = () => {
   const [imageUrls, setImageUrls] = useState({});
+  const [categories, setCategories] = useState([]); // State to store categories
+
+  console.log('categories', categories);
 
   const { data: careerData, isLoading, isError, error } = useQuery(
     ["careers"],
     () => careers(),
     { enabled: true }
   );
+
+  // Fetch categories from the API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await careerCategories();
+        setCategories(response.data.data.result || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -113,16 +130,7 @@ const Careerspage = () => {
           </button>
           <h3 className="text-lg font-semibold mb-6">Filter by Category</h3>
           <div className="space-y-4">
-            {[
-              "Agriculture",
-              "Technology",
-              "Business",
-              "Healthcare",
-              "Engineering",
-              "Design",
-              "Education",
-              "Marketing",
-            ].map((category) => (
+            {categories.map((category) => (
               <label
                 key={category}
                 className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg shadow hover:bg-gray-200 cursor-pointer transition-all duration-200"
@@ -168,16 +176,7 @@ const Careerspage = () => {
             />
           </div>
           <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
-            {[
-              "Agriculture",
-              "Technology",
-              "Business",
-              "Healthcare",
-              "Engineering",
-              "Design",
-              "Education",
-              "Marketing",
-            ].map((category) => (
+            {categories.map((category) => (
               <label
                 key={category}
                 className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
