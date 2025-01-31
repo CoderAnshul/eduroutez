@@ -19,7 +19,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
 
 console.log('dftgyhuj',blogData);
 
-  const displayedBlogs = blogData?.data?.result.slice(
+  const displayedBlogs = blogData?.slice(
     0,
     currentPage * itemsPerPage
   );
@@ -58,6 +58,11 @@ console.log('dftgyhuj',blogData);
                   blog.description.split(" ").length > 30 && (
                     <span>........</span>
                   )}
+                <p className="text-sm text-gray-600 mt-2 bg-blue-100 p-1 rounded-lg inline-block">
+                  <badge>
+                    {blog.category}
+                    </badge> 
+                </p>
               </div>
               <div className="mt-4">
                 <CustomButton

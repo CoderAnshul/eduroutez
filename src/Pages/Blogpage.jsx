@@ -159,14 +159,22 @@ const Blogpage = () => {
 
                 {/* Content */}
                 <div className="w-full md:w-3/4 pl-6">
-                 <BlogandCareerBox 
-                            blogData={blogData || []} 
-                        />
+                    {/* Display selected categories as blue badges */}
+                    <div className="mb-4">
+                        {selectedCategories.map((category) => (
+                            <span key={category} className="inline-block bg-blue-500 text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
+                                {category}
+                            </span>
+                        ))}
+                    </div>
+                    <BlogandCareerBox 
+                        blogData={filteredBlogData || []} 
+                    />
                 </div>
             </div>
 
             <PopularCourses />
-            <div className="flex gap-2 flex-col sm:flex-row items-center">
+            <div className="flex gap-2 items-center">
                 <Events />
                 <ConsellingBanner />
             </div>
