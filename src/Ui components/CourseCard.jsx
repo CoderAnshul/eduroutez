@@ -61,23 +61,21 @@ const CourseCard = ({ course }) => {
           <h4 className="text-sm font-bold mb-2 text-gray-700">Cut Off</h4>
           <p className="text-xs font-medium opacity-70">{course.cutOff + "%" || "N/A"}</p>
         </div>
-        <div className="border-b-2 p-1 mb-2">
-          <h4 className="text-sm font-bold mb-2 text-gray-700">Ranking</h4>
-          <p className="text-xs font-medium opacity-70">{course.ranking || "N/A"}</p>
-        </div>
       </div>
 
       {/* Footer */}
       <div className="flex justify-between items-center bg-red-100 rounded-lg p-3 group-hover:bg-red-200">
         <span className="text-red-600 font-medium">{course.courseTitle || "PGPM"}</span>
-        <p>
-          <span
-            className="text-black flex font-semibold"
-            dangerouslySetInnerHTML={{
-              __html: "₹" + (course.coursePrice || "Free"),
-            }}
-          />
-        </p>
+        {course.coursePrice && (
+          <p>
+            <span
+              className="text-black flex font-semibold"
+              dangerouslySetInnerHTML={{
+                __html: "₹" + course.coursePrice,
+              }}
+            />
+          </p>
+        )}
       </div>
     </div>
   );
