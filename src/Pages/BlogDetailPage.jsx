@@ -74,7 +74,7 @@ const BlogDetailPage = () => {
 
   // Safely render blog details
   return (
-    <div className="mx-auto mt-10 p-4">
+    <div className="container max-w-[1300px] mx-auto mt-10 p-4">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         {imageUrl && (
           <div className="relative">
@@ -133,9 +133,9 @@ const BlogDetailPage = () => {
 
           {data?.description && (
             <div ref={overviewRef} className="space-y-4">
-             <div className="md:flex lg:space-x-6 mt-6">
+             <div className="flex flex-col lg:flex-row lg:space-x-6 mt-6 ">
                 {/* Main Content Section */}
-                <div className="lg:w-4/5">
+                <div className="lg:w-4/5 ">
                   <h3 className="text-lg font-semibold border-b pb-2">Overview</h3>
                   <div
                     className="text-gray-700"
@@ -144,7 +144,7 @@ const BlogDetailPage = () => {
                 </div>
 
                 {/* Recently Uploaded Blogs Section */}
-                <div className="lg:w-1/5 md:w-[30%] h-full mt-8 lg:mt-0">
+                <div className="lg:w-1/5 md:w-[30%] h-full min-w-[200px] mt-8  lg:mt-0">
                   <div className='sticky top-20'>
                   <h3 className="text-lg font-semibold mb-4">Recently Uploaded Blogs</h3>
                   <div className="space-y-4">

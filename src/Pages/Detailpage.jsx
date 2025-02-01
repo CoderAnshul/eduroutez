@@ -65,7 +65,7 @@ const DetailPage = () => {
 
   return (
     <>
-    <div className="px-[4vw] py-[2vw] flex flex-col items-start">
+    <div className="container max-w-[1300px] mx-auto px-[4vw] py-[2vw] flex flex-col items-start">
       {/* Banner Image */}
       {/* Banner Image */}
       <div className="h-80 w-full rounded-md">
@@ -101,7 +101,7 @@ const DetailPage = () => {
       </div>
 
       {/* Content Sections */}
-      <div className="mt-10 space-y-10">
+      <div className="mt-10 space-y-10 w-full">
         {tabConfig.map((tab) => {
           const content = getContent(tab.id);
           const isArray = Array.isArray(content);

@@ -62,7 +62,7 @@ const Coursesinfopage = () => {
   };
 
   return (
-    <div className="px-8 py-6 flex flex-col items-start bg-gray-50">
+    <div className="container max-w-[1300px] mx-auto px-8 py-6 flex flex-col items-start bg-gray-50">
       {/* Course Title */}
       <CoursesName content={content.courseTitle || 'Untitled Course'} />
       
@@ -70,7 +70,7 @@ const Coursesinfopage = () => {
       <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
 
       {/* Main Content */}
-      <div className="w-full flex flex-wrap gap-8">
+      <div className="w-full mt-5 flex flex-wrap gap-8">
         <div className="w-full lg:w-3/4">
           {/* Overview Section */}
           <div ref={sectionRefs[0]} className="bg-white shadow-md rounded-lg p-6 mb-6">
