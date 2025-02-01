@@ -26,6 +26,7 @@ import CutTOffInfo from '../Components/CutTOffInfo'
 import Ranking from '../Components/Ranking'
 import News from '../Components/News'
 import { Feed } from '@mui/icons-material'
+import Webinar from '../Components/Webinar'
 
 const tabs = [
   "College Info",
@@ -41,7 +42,8 @@ const tabs = [
   "Review",
   "Facilities",
   "Q & A",
-  "News"
+  "News",
+  "Webinar"
   
 
 ];
@@ -161,7 +163,7 @@ const Instituepage = () => {
   const sectionRefs = tabs.map(() => useRef(null));
 
 
-  const { data: instituteData, isLoading, isError, error } = useQuery(
+  const { data: instituteData, isError, error } = useQuery(
     ['institute', id], 
     () => getInstituteById(id),
     {
@@ -265,6 +267,9 @@ const Instituepage = () => {
                       </div>
                       <div ref={sectionRefs[13]} className="min-h-24 py-4">
                           <News instituteData={instituteData}/>
+                      </div>
+                      <div ref={sectionRefs[14]} className="min-h-24 py-4">
+                          <Webinar instituteData={instituteData}/>
                       </div>
                       {/* <div ref={sectionRefs[3]} className="min-h-screen p-4 bg-gray-50">
                           <Placements />
