@@ -211,7 +211,7 @@ const Instituepage = () => {
 // console.log('hi',instituteData?.data?._id);
   return (
     <>
-        <div className='px-[4vw] py-[2vw] flex flex-col items-start'>
+      <div className='container max-w-[1300px] mx-auto px-[4vw] py-[2vw] flex flex-col items-start'>
              <ImageSlider instituteData = {instituteData}/>
              <InstitueName instituteData = {instituteData}/>
               <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
