@@ -38,11 +38,7 @@ const Webinars = ({ instituteData }) => {
                 }
 
                 const response = await axios.get(`${baseURL}/webinars-by-institute/${instituteId}`);
-                
-                if (!response?.data?.data) {
-                    throw new Error("Invalid response format");
-                }
-
+               
                 setWebinarData(response.data.data);
             } catch (error) {
                 console.error("Error fetching webinar data:", error);
