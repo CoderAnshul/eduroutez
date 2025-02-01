@@ -58,7 +58,7 @@ const Coursesinfopage = () => {
 
   const renderHTML = (htmlContent) => {
     if (!htmlContent) return <p className="text-gray-500">No content available</p>;
-    return <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: htmlContent }} />;
+    return <div className="text-base prose prose-gray max-w-full" dangerouslySetInnerHTML={{ __html: htmlContent }} />;
   };
 
   return (
