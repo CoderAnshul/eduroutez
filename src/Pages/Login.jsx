@@ -16,7 +16,6 @@ const Login = () => {
 
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_BASE_URL;
-  console.log(apiUrl);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -31,17 +30,13 @@ const Login = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              
-            'x-access-token': localStorage.getItem('accessToken'),
-            'x-refresh-token': localStorage.getItem('refreshToken')
+              'x-access-token': localStorage.getItem('accessToken'),
+              'x-refresh-token': localStorage.getItem('refreshToken')
             },
           }
         );
-        console.log('respomse',response.data.data)
         return response.data;
-        
       } catch (error) {
-        console.error('dfghjbn',error.message);
         const errorMessage =
           error.response?.data?.message || "Login failed. Please try again.";
         throw new Error(errorMessage);
@@ -49,39 +44,35 @@ const Login = () => {
     },
     onSuccess: (data) => {
       console.log("Data", data);
-      if(data?.data?.user?.role === 'institute') {
-       
-        window.location.href = "https://admin.eduroutez.com/dashboard/";
-      } else if (data?.data?.user?.role === 'counsellor') {
-        window.location.href = "https://admin.eduroutez.com/dashboard/";
+      
+      // Store auth data
+      localStorage.setItem('accessToken', JSON.stringify(data.data.accessToken));
+      localStorage.setItem('userId', data?.data?.user?._id);
+      localStorage.setItem('role', data?.data?.user?.role);
+      localStorage.setItem('email', data?.data?.user?.email);
+      localStorage.setItem('refreshToken', JSON.stringify(data.data.refreshToken));
+      
+      toast.success("Logged in successfully!");
 
+      // Handle different role redirects
+      if(data?.data?.user?.role === 'institute' || data?.data?.user?.role === 'counsellor') {
+        window.location.href = "https://admin.eduroutez.com/dashboard/";
+        return;
       }
 
-      toast.success("Logged in successfully!");
- localStorage.setItem(
-        'accessToken',
-        JSON.stringify(data.data.accessToken)
-      );
-      localStorage.setItem(
-        'userId',
-        data?.data?.user?._id
-      );
-      localStorage.setItem(
-        'role',
-        data?.data?.user?.role
-      );
-      localStorage.setItem(
-        'email',
-        data?.data?.user?.email
-      );      
-      localStorage.setItem(
-        'refreshToken',
-        JSON.stringify(data.data.refreshToken)
-      );
-      console.log("LocalStorage set with tokens and user info");
-
-      if(data?.data?.user?.role === 'student'){
-      navigate("/");
+      // Check for pending webinar link
+      const pendingWebinarLink = sessionStorage.getItem('pendingWebinarLink');
+      
+      if (pendingWebinarLink) {
+        // Clear the stored link
+        sessionStorage.removeItem('pendingWebinarLink');
+        // Open the webinar in a new tab
+        window.open(pendingWebinarLink, '_blank');
+        // Navigate to home page
+        navigate("/");
+      } else {
+        // Default navigation for students
+        navigate("/");
       }
     },
     onError: (error) => {
@@ -94,6 +85,7 @@ const Login = () => {
     mutation.mutate(formData);
   };
 
+  // Rest of the component remains the same...
   return (
     <div className="flex h-auto">
       <ToastContainer />
@@ -198,7 +190,7 @@ const Login = () => {
           </button>
         </div>
         <p className="text-sm text-gray-500 mt-6">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link
             to="/signup"
             className="text-red-500 font-medium hover:underline"

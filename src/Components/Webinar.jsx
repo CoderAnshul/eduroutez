@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../ApiFunctions/axios";
 import { format } from "date-fns";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Webinars = ({ instituteData }) => {
     const [webinarData, setWebinarData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [showLoginDialog, setShowLoginDialog] = useState(false);
+    const [selectedWebinarLink, setSelectedWebinarLink] = useState(null);
     const itemsPerPage = 4;
+    const navigate = useNavigate();
     
-    // Safely access environment variables with fallbacks
     const Images = import.meta.env.VITE_IMAGE_BASE_URL || '';
     const baseURL = import.meta.env.VITE_BASE_URL || '';
-    
     const PLACEHOLDER_IMAGE = '/placeholder-image.jpg';
+    
+    const isLoggedIn = () => {
+        return !!localStorage.getItem('accessToken');
+    };
 
     useEffect(() => {
         const fetchWebinars = async () => {
@@ -30,9 +37,7 @@ const Webinars = ({ instituteData }) => {
                     throw new Error("Base URL is not configured");
                 }
 
-                const response = await axiosInstance.get(`${baseURL}/webinars-by-institute/${instituteId}`,
-                    { headers: { 'Content-Type': 'application/json' } }
-                );
+                const response = await axios.get(`${baseURL}/webinars-by-institute/${instituteId}`);
                 
                 if (!response?.data?.data) {
                     throw new Error("Invalid response format");
@@ -60,10 +65,61 @@ const Webinars = ({ instituteData }) => {
     };
 
     const handleJoinWebinar = (webinarLink) => {
-        if (webinarLink) {
+        if (!webinarLink) return;
+        
+        if (isLoggedIn()) {
             window.open(webinarLink, '_blank');
+        } else {
+            setSelectedWebinarLink(webinarLink);
+            setShowLoginDialog(true);
         }
     };
+
+    const handleLogin = () => {
+        if (selectedWebinarLink) {
+            sessionStorage.setItem('pendingWebinarLink', selectedWebinarLink);
+        }
+        setShowLoginDialog(false);
+        navigate('/login');
+    };
+
+    const LoginDialog = () => (
+        showLoginDialog && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative">
+                    <button
+                        onClick={() => setShowLoginDialog(false)}
+                        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                    >
+                        ✕
+                    </button>
+                    
+                    <h2 className="text-xl font-semibold mb-4">Login Required</h2>
+                    
+                    <div className="mb-6">
+                        <p className="text-gray-600">
+                            Please log in to join this webinar.
+                        </p>
+                    </div>
+                    
+                    <div className="flex justify-end gap-4">
+                        <button
+                            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                            onClick={() => setShowLoginDialog(false)}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                            onClick={handleLogin}
+                        >
+                            Login
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    );
 
     const displayedWebinars = webinarData?.slice(0, currentPage * itemsPerPage) || [];
 
@@ -158,6 +214,7 @@ const Webinars = ({ instituteData }) => {
 
     return (
         <div className="w-full p-6 border border-gray-200 rounded-lg">
+            <LoginDialog />
             <h3 className="text-xl font-bold mb-8">Upcoming Webinars</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {displayedWebinars.map((webinar) => (

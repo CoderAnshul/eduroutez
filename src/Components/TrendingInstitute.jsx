@@ -56,7 +56,7 @@ const TrendingInstitute = () => {
       </div>
 
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
-        {content.map((institute, index) => {
+        {(content?.length > 0) ? content.map((institute, index) => {
           if (index < 3) {
             return (
               <Link
@@ -88,14 +88,15 @@ const TrendingInstitute = () => {
 
               <h3 className="flex items-center mt-2 text-2xl font-bold text-[#000000c4]">
               <img className="h-5 mt-1 opacity-70" src={rupee} alt="rupee" />
-              {institute.price || ''}
+              {institute.maxFees || 'N/A'}
               </h3>
               </div>
               </Link>
             );
           }
           return null;
-        })}
+        }):
+        <p>No trending institutes available</p>}
       </div>
     </div>
   );

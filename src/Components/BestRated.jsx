@@ -7,6 +7,7 @@ import rupee from "../assets/Images/rupee.png";
 import CustomButton from "../Ui components/CustomButton";
 import { useQuery } from "react-query";
 import { bestRatedInstitute } from "../ApiFunctions/api";
+const Images=import.meta.env.VITE_IMAGE_BASE_URL;
 
 const BestRated = () => {
   const [content, setContent] = useState([]);
@@ -62,9 +63,11 @@ const BestRated = () => {
                   <div className="imageContainer">
                     <img
                       className="h-full w-full object-cover"
-                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${
-                        box.brochure || ""
-                      }`}
+                     src={
+                box.thumbnailImage
+                ? `${Images}/${box.thumbnailImage}`
+                : cardPhoto
+              }
                       alt="boxphoto"
                     />
                   </div>
@@ -73,8 +76,9 @@ const BestRated = () => {
                       {box.instituteName || "Institute Name Not Available"}
                     </h3>
                     <p className="text-sm mt-2">
-                      {box.collegeInfo
-                        ? `${box.collegeInfo.slice(0, 80)}...`
+                      {box.about
+                        ? 
+                        <span dangerouslySetInnerHTML={{ __html: box.about.slice(0, 100) + '...' }} />
                         : "No information available"}
                     </p>
                     <h3 className="flex items-center mt-2 text-2xl font-bold text-[#000000c4]">

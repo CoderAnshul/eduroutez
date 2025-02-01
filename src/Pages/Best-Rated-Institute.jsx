@@ -81,7 +81,7 @@ const BestRated = () => {
                             <div className="imageContainer">
                                 <img
                                     className="h-full w-full object-cover"
-                                    src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${box.brochure || ""}`}
+                                    src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${box.thumbnailImage || ""}`}
                                     alt="boxphoto"
                                 />
                             </div>
@@ -90,8 +90,8 @@ const BestRated = () => {
                                     {box.instituteName || "Institute Name Not Available"}
                                 </h3>
                                 <p className="text-sm mt-2">
-                                    {box.collegeInfo
-                                        ? `${box.collegeInfo.slice(0, 80)}...`
+                                    {box.about
+                                        ? <span dangerouslySetInnerHTML={{ __html: box.about.slice(0, 100) + '...' }} />
                                         : "No information available"}
                                 </p>
                                 <h3 className="flex items-center mt-2 text-2xl font-bold text-[#000000c4]">

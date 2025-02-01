@@ -56,11 +56,11 @@ const TrendingInstitute = () => {
                                     <h3 className='text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]'>
                                         {institute.instituteName}
                                     </h3>
-                                    <p className='text-sm mt-2'>{institute.about}</p>
+                                    <span dangerouslySetInnerHTML={{ __html: institute.about.slice(0, 100) + '...' }} />
                                     <h3 className='flex items-center mt-2 text-2xl font-bold text-[#000000c4]'>
                                         <img className='h-5 mt-1 opacity-70' src={rupee} alt="rupee" />
-                                        24,50,000
-                                    </h3>
+                                        {institute.maxFees}
+                                 </h3>
                                 </div>
                             </Link>
                         );
