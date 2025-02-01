@@ -39,40 +39,39 @@ const Faqs = ({instituteData}) => {
 
     return (
       <>
-        <div
-          className="border-2 rounded-xl p-3 overflow-hidden transition-all"
-          style={{ maxHeight: showMore ? '1000px' : 'calc(8 * 60px)' }}
-        >
-          {faqs.slice(0, showMore ? faqs.length : 8).map((faq, index) => (
-            <div key={index} className="border-b last:border-b-0 py-2">
-              <div
-                className="flex justify-between items-center cursor-pointer"
-                onClick={() => {
-                  const details = document.getElementById(`faq-details-${index}`);
-                  details?.classList.toggle('hidden');
-                }}
-              >
-                <h4 className="text-md font-semibold">{faq?.question || 'Untitled Question'}</h4>
-                <ChevronDown className="text-gray-500" />
-              </div>
-              <div
-                id={`faq-details-${index}`}
-                className="hidden mt-2 text-gray-600"
-              >
-                {faq?.answer || 'No answer available'}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {faqs.length > 8 && (
-          <button
-            onClick={() => setShowMore(!showMore)}
-            className="text-blue-600 mt-2"
+      <div
+        className="border-2 rounded-xl p-3 overflow-hidden transition-all"
+        style={{ maxHeight: showMore ? '1000px' : 'calc(8 * 60px)' }}
+      >
+        {faqs.slice(0, showMore ? faqs.length : 8).map((faq, index) => (
+        <div key={index} className="border-b last:border-b-0 py-2">
+          <div
+          className="flex justify-between items-center cursor-pointer"
+          onClick={() => {
+            const details = document.getElementById(`faq-details-${index}`);
+            details?.classList.toggle('hidden');
+          }}
           >
-            {showMore ? 'Show Less' : 'Show More'}
-          </button>
-        )}
+          <h4 className="text-md font-semibold">{faq?.question || 'Untitled Question'}</h4>
+          <ChevronDown className="text-gray-500" />
+          </div>
+          <div
+          id={`faq-details-${index}`}
+          className="hidden mt-2 text-gray-600"
+          dangerouslySetInnerHTML={{ __html: faq?.answer || 'No answer available' }}
+          />
+        </div>
+        ))}
+      </div>
+
+      {faqs.length > 8 && (
+        <button
+        onClick={() => setShowMore(!showMore)}
+        className="text-blue-600 mt-2"
+        >
+        {showMore ? 'Show Less' : 'Show More'}
+        </button>
+      )}
       </>
     );
   };

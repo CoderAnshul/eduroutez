@@ -60,10 +60,7 @@ const PopularCourses = () => {
               />
             </div>
             <div className="textContainer p-4">
-              {/* <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A] line-clamp-2">
-                {box?.courseTitle || 'Untitled Course'}
-              </h3> */}
-               <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A] line-clamp-2">
+              <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A] line-clamp-2">
                 {box?.courseTitle
                   ? box.courseTitle.length > 20
                     ? box.courseTitle.slice(0, 22) + "..."
@@ -76,10 +73,12 @@ const PopularCourses = () => {
                   __html: box?.longDescription?.slice(0, 80) + "..." || "No description available"
                 }}
               />
-              <h3 className="flex items-center mt-4 text-2xl font-bold text-[#000000c4]">
-                <img className="h-5 mt-1 opacity-70" src={rupee} alt="rupee" />
-                {box?.isCourseFree === "free" ? "0" : box?.price || "N/A"}
-              </h3>
+              {box?.price && (
+                <h3 className="flex items-center mt-4 text-2xl font-bold text-[#000000c4]">
+                  <img className="h-5 mt-1 opacity-70" src={rupee} alt="rupee" />
+                  {box?.isCourseFree === "free" ? "0" : box?.price || "N/A"}
+                </h3>
+              )}
             </div>
           </Link>
         )) : (

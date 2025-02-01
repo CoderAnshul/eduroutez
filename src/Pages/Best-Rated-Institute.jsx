@@ -94,14 +94,16 @@ const BestRated = () => {
                                         ? <span dangerouslySetInnerHTML={{ __html: box.about.slice(0, 100) + '...' }} />
                                         : "No information available"}
                                 </p>
-                                <h3 className="flex items-center mt-2 text-2xl font-bold text-[#000000c4]">
-                                    <img
-                                        className="h-5 mt-1 opacity-70"
-                                        src={rupee}
-                                        alt="rupee"
-                                    />
-                                    {box.maxFees || "N/A"}
-                                </h3>
+                                {box.maxFees && (
+                                    <h3 className="flex items-center mt-2 text-2xl font-bold text-[#000000c4]">
+                                        <img
+                                            className="h-5 mt-1 opacity-70"
+                                            src={rupee}
+                                            alt="rupee"
+                                        />
+                                        {box.maxFees}
+                                    </h3>
+                                )}
                             </div>
                         </Link>
                     ))

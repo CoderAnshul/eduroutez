@@ -65,31 +65,33 @@ const TrendingInstitute = () => {
               className="box lg:max-w-[500px] shadow-lg"
               >
               <div className="imageContainer">
-              <img
-              className="h-full w-full object-cover"
-              src={
-                institute.thumbnailImage
-                ? `${Images}/${institute.thumbnailImage}`
-                : cardPhoto
-              }
-              alt="Institute"
-              />
+                <img
+                className="h-full w-full object-cover"
+                src={
+                  institute.thumbnailImage
+                  ? `${Images}/${institute.thumbnailImage}`
+                  : cardPhoto
+                }
+                alt="Institute"
+                />
               </div>
               <div className="textContainer p-4">
-              <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]">
-              {institute.instituteName || 'Institute Name Not Available'}
-              </h3>
+                <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]">
+                {institute.instituteName || 'Institute Name Not Available'}
+                </h3>
 
-              <p className="text-sm mt-2">
-              {institute.about
-                ? <span dangerouslySetInnerHTML={{ __html: institute.about.slice(0, 100) + '...' }} />
-                : 'No description available'}
-              </p>
+                <p className="text-sm mt-2">
+                {institute.about
+                  ? <span dangerouslySetInnerHTML={{ __html: institute.about.slice(0, 100) + '...' }} />
+                  : 'No description available'}
+                </p>
 
-              <h3 className="flex items-center mt-2 text-2xl font-bold text-[#000000c4]">
-              <img className="h-5 mt-1 opacity-70" src={rupee} alt="rupee" />
-              {institute.maxFees || 'N/A'}
-              </h3>
+                {institute.maxFees && (
+                <h3 className="flex items-center mt-2 text-2xl font-bold text-[#000000c4]">
+                  <img className="h-5 mt-1 opacity-70" src={rupee} alt="rupee" />
+                  {institute.maxFees}
+                </h3>
+                )}
               </div>
               </Link>
             );

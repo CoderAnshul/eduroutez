@@ -130,10 +130,12 @@ const PopularCourses = () => {
                   dangerouslySetInnerHTML={{ __html: box.longDescription }}
                 />
                 <div className="flex items-center justify-between mt-4">
-                  <h3 className="flex items-center text-lg font-bold text-gray-900">
-                    <img className="h-5 mr-2" src={rupee} alt="rupee" />
-                    {box.isCourseFree === "free" ? "Free" : box.price}
-                  </h3>
+                  {box.price && (
+                    <h3 className="flex items-center text-lg font-bold text-gray-900">
+                      <img className="h-5 mr-2" src={rupee} alt="rupee" />
+                      {box.isCourseFree === "free" ? "Free" : box.price}
+                    </h3>
+                  )}
                   <Stack spacing={1}>
                     <Rating 
                       name="read-only" 

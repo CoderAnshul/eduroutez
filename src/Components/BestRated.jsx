@@ -54,44 +54,51 @@ const BestRated = () => {
         {content.length > 0 ? (
           content.map((box, index) => {
             if (index < 3 && box) {
-              return (
+                return (
                 <Link
                   to={`/institute/${box._id}`}
                   key={index}
                   className="box w-full max-w-sm lg:max-w-[500px] shadow-lg"
                 >
                   <div className="imageContainer">
-                    <img
-                      className="h-full w-full object-cover"
-                     src={
-                box.thumbnailImage
-                ? `${Images}/${box.thumbnailImage}`
-                : cardPhoto
-              }
-                      alt="boxphoto"
-                    />
+                  <img
+                    className="h-full w-full object-cover"
+                    src={
+                    box.thumbnailImage
+                      ? `${Images}/${box.thumbnailImage}`
+                      : cardPhoto
+                    }
+                    alt="boxphoto"
+                  />
                   </div>
                   <div className="textContainer p-4">
-                    <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]">
-                      {box.instituteName || "Institute Name Not Available"}
-                    </h3>
-                    <p className="text-sm mt-2">
-                      {box.about
-                        ? 
-                        <span dangerouslySetInnerHTML={{ __html: box.about.slice(0, 100) + '...' }} />
-                        : "No information available"}
-                    </p>
+                  <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]">
+                    {box.instituteName || "Institute Name Not Available"}
+                  </h3>
+                  <p className="text-sm mt-2">
+                    {box.about ? (
+                    <span
+                      dangerouslySetInnerHTML={{
+                      __html: box.about.slice(0, 100) + "...",
+                      }}
+                    />
+                    ) : (
+                    "No information available"
+                    )}
+                  </p>
+                  {box.maxFees && (
                     <h3 className="flex items-center mt-2 text-2xl font-bold text-[#000000c4]">
-                      <img
-                        className="h-5 mt-1 opacity-70"
-                        src={rupee}
-                        alt="rupee"
-                      />
-                      {box.maxFees || "N/A"}
+                    <img
+                      className="h-5 mt-1 opacity-70"
+                      src={rupee}
+                      alt="rupee"
+                    />
+                    {box.maxFees}
                     </h3>
+                  )}
                   </div>
                 </Link>
-              );
+                );
             }
             return null;
           })
