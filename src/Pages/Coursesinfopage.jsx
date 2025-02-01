@@ -89,7 +89,7 @@ const Coursesinfopage = () => {
              {/* <p><strong>Status:</strong> {content.status || 'Not specified'}</p>*/}
             </div>
             <div className="mt-4">
-              <h5 className="font-semibold mb-2">Short Description</h5>
+              <h5 className="font-semibold mb-2 ">Short Description</h5>
               {renderHTML(content.shortDescription)}
               <h5 className="font-semibold mb-2 mt-4">Long Description</h5>
               {renderHTML(content.longDescription)}
@@ -97,7 +97,7 @@ const Coursesinfopage = () => {
           </div>
 
           {/* Eligibility Section */}
-          <div ref={sectionRefs[1]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+          <div ref={sectionRefs[1]} className="bg-white shadow-md rounded-lg p-6 mb-6 ">
             <h4 className="text-2xl font-semibold text-red-500 mb-4">Eligibility</h4>
             {renderHTML(content.courseEligibility)}
             <div className="mt-4">

@@ -38,6 +38,10 @@ const CourseCard = ({ course }) => {
           <h4 className="text-sm font-bold mb-2 text-gray-700">Duration</h4>
           <p className="text-xs font-medium opacity-70">{(course.courseDurationYears + " Year") + " & " + (course.courseDurationMonths + " month") || "N/A"}</p>
         </div>
+          <div className="border-b-2 p-1 mb-2">
+          <h4 className="text-sm font-bold mb-2 text-gray-700">Exam Accepted</h4>
+          <p className="text-xs font-medium opacity-70">{(course.examAccepted) || "N/A"}</p>
+        </div>
         <div className="border-b-2 p-1 mb-2">
           <h4 className="text-sm font-bold mb-2 text-gray-700">Type</h4>
           <p className="text-xs font-medium opacity-70">{(course.courseType) || "N/A"}</p>

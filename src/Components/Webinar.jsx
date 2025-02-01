@@ -211,8 +211,8 @@ const Webinars = ({ instituteData }) => {
     return (
         <div className="w-full p-6 border border-gray-200 rounded-lg">
             <LoginDialog />
-            <h3 className="text-xl font-bold mb-8">Upcoming Webinars</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <h3 className="text-xl font-bold mb-8">changes in webinarinars</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                 {displayedWebinars.map((webinar) => (
                     <WebinarCard key={webinar?._id || Math.random()} webinar={webinar} />
                 ))}
