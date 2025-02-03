@@ -1,35 +1,68 @@
 import React, { useState } from 'react';
+import axiosInstance from '../../ApiFunctions/axios';
 
-const ReviewFeedbackPopup = ({ isOpen, onClose }) => {
+const ReviewFeedbackPopup = ({ isOpen, onClose, counselorId }) => {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+const apiUrl =  import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
   if (!isOpen) return null;
 
   const handleRating = (index) => {
-    setRating(index + 1); // Set rating based on the selected star
+    setRating(index + 1);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Handle form submission logic (e.g., send to API)
-    console.log('Submitted Rating:', rating);
-    console.log('Submitted Review:', review);
-    onClose();
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      // Get student email from localStorage
+      const studentEmail = localStorage.getItem('email');
+      
+      if (!studentEmail) {
+        throw new Error('Student email not found in localStorage');
+      }
+
+      const response = await axiosInstance.post(`${apiUrl}/submit-counsellor-review`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+  
+          studentEmail,
+          counselorId,
+          rating,
+          review
+        
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit review');
+      }
+
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="fixed p-4 inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Review Counselor</h2>
           <button
             onClick={onClose}
-            className="text-red-500 hover:text-red-700"
+            className="text-gray-500 hover:text-gray-700"
           >
-            <i className="fa fa-times"></i>
+            ✕
           </button>
         </div>
+
         <form onSubmit={handleSubmit}>
           {/* Rating Section */}
           <div className="mb-6 text-center">
@@ -53,7 +86,7 @@ const ReviewFeedbackPopup = ({ isOpen, onClose }) => {
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Note</label>
             <textarea
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 resize-none"
               rows="5"
               placeholder="Enter your review"
               value={review}
@@ -61,20 +94,29 @@ const ReviewFeedbackPopup = ({ isOpen, onClose }) => {
             />
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 text-red-500 text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded"
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              disabled={isSubmitting}
             >
               Discard
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-red-600 text-white rounded"
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+              disabled={isSubmitting}
             >
-              Submit
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
           </div>
         </form>

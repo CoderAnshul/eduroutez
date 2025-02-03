@@ -64,6 +64,13 @@ console.log('responsrftgyhuje',response.data)
       
       <div className="flex items-center gap-4">
         <button
+          onClick={() => window.location.href = 'https://eduroutez.com/'}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-colors"
+        >
+          <img src="/public/back.png" alt="Back" className="h-4 w-4" />
+          Visit Home Page
+        </button>
+        <button
           onClick={handleBecomeCounselor}
           className="lg:flex hidden items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition-colors"
         >
