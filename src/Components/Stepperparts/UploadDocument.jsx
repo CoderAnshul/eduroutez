@@ -3,25 +3,31 @@ import React, { useState } from "react";
 const UploadDocument = ({ setFormData, setIsSubmit }) => {
   const [studentIdImage, setStudentIdImage] = useState(null); // State for Student ID/Marksheets
   const [selfieImage, setSelfieImage] = useState(null); // State for Selfie
+  const [studentIdPreview, setStudentIdPreview] = useState(null); // State for Student ID Preview
+  const [selfiePreview, setSelfiePreview] = useState(null); // State for Selfie Preview
 
   const handleImageUpload = (e, type) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
-      if (type === "studentId") {
-        // setStudentIdImage(imageUrl);
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          studentIdImage: file,
-        }));
-      } else if (type === "selfie") {
-        // setSelfieImage(imageUrl);
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          selfieImage: file,
-        }));
-      }
+      reader.readAsDataURL(file); // Read the file as data URL
+      reader.onloadend = () => {
+        if (type === "studentId") {
+          setStudentIdImage(file);
+          setStudentIdPreview(reader.result); // Set the preview for studentIdImage
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            studentIdImage: file,
+          }));
+        } else if (type === "selfie") {
+          setSelfieImage(file);
+          setSelfiePreview(reader.result); // Set the preview for selfieImage
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            selfieImage: file,
+          }));
+        }
+      };
     }
   };
 
@@ -29,12 +35,14 @@ const UploadDocument = ({ setFormData, setIsSubmit }) => {
   const handleRemoveImage = (type) => {
     if (type === "studentId") {
       setStudentIdImage(null);
+      setStudentIdPreview(null); // Clear the preview
       setFormData((prevFormData) => ({
         ...prevFormData,
         studentIdImage: null,
       }));
     } else if (type === "selfie") {
       setSelfieImage(null);
+      setSelfiePreview(null); // Clear the preview
       setFormData((prevFormData) => ({
         ...prevFormData,
         selfieImage: null,
@@ -57,9 +65,9 @@ const UploadDocument = ({ setFormData, setIsSubmit }) => {
         <div className="grid grid-cols-2 gap-6 mt-6">
           {/* Left Box - Student ID */}
           <div className="w-64 h-40 border border-gray-300 rounded-lg bg-gray-100 flex flex-col items-center justify-center relative">
-            {studentIdImage ? (
+            {studentIdPreview ? (
               <img
-                src={studentIdImage}
+                src={studentIdPreview}
                 alt="Student ID"
                 className="w-full h-full object-cover rounded-lg"
               />
@@ -92,9 +100,9 @@ const UploadDocument = ({ setFormData, setIsSubmit }) => {
 
           {/* Right Box - Selfie */}
           <div className="w-64 h-40 border border-gray-300 rounded-sm bg-gray-100 flex flex-col items-center justify-center relative">
-            {selfieImage ? (
+            {selfiePreview ? (
               <img
-                src={selfieImage}
+                src={selfiePreview}
                 alt="Selfie"
                 className="w-full h-full object-cover rounded-lg"
               />
