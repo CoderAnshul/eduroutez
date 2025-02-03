@@ -219,61 +219,80 @@ const Instituepage = () => {
               <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
              <div className='w-full flex gap-4'>
 
-              {/* -------------main content of college and ads section ------------------- */}
-                <div className='w-full lg:w-4/5'>
-                  <div className='w-full min-h-24 '>
-                      <div ref={sectionRefs[0]} className="min-h-24 pt-4 ">
-                          <CollegeInfo instituteData = {instituteData} />
-                      </div>
-                      <div ref={sectionRefs[1]} className="min-h-24 py-4">
-                          <InstituteCourses instituteData = {instituteData} />
-                      </div>
-                      <div ref={sectionRefs[2]} className="min-h-24 py-4">
-                          <Addmissioninfo instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[3]} className="min-h-24 pt-4">
-                          <Placementinfo instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[4]} className="min-h-24 pt-4">
-                          <CampusInfo instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[5]} className="min-h-24 pt-4">
-                        <FeeInfo ref={sectionRefs[5]} instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[6]} className="min-h-24 pt-4">
-                          <ScholarshipInfo instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[7]} className="min-h-24 pt-4">
-                          <CutTOffInfo instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[8]} className="min-h-24 pt-4">
-                          <Ranking instituteData={instituteData}/>
-                      </div>
-                      
-                      <div ref={sectionRefs[9]} className="min-h-24 pt-4">
-                          <GalleryInfo instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[10]} className="min-h-24 pt-4">
-                          <ReviewandRating ratings={ratings} reviews={reviews} instituteId={instituteData._id} instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[11]} className="min-h-24 py-4">
-                          <InstituteFacilites instituteData={instituteData}/>
-                      </div>
-                      <div  className="min-h-24 py-4">
-                          <RecruitersSlider instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[12]} className="min-h-24 py-4">
-                          <Faqs instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[13]} className="min-h-24 py-4">
-                          <News instituteData={instituteData}/>
-                      </div>
-                      <div ref={sectionRefs[14]} className="min-h-24 py-4">
-                          <Webinar instituteData={instituteData}/>
-                      </div>
-                      {/* <div ref={sectionRefs[3]} className="min-h-screen p-4 bg-gray-50">
-                          <Placements />
-                      </div> */}
+                      <div className='w-full lg:w-4/5'>
+                        <div className='w-full min-h-24 '>
+                          <div ref={sectionRefs[0]} className="min-h-24 pt-4 ">
+                            <CollegeInfo instituteData = {instituteData} />
+                          </div>
+                          <div ref={sectionRefs[1]} className="min-h-24 py-4">
+                            <InstituteCourses instituteData = {instituteData} />
+                          </div>
+                          {instituteData?.data?.examAccepted && (
+  <div className="px-4 py-5 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+    <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+      </svg>
+      Accepted Exams
+    </h3>
+    <div className="flex flex-wrap gap-2">
+      {instituteData?.data?.examAccepted.split(',').map((exam, index) => (
+        <span 
+          key={index}
+          className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-sm font-medium hover:bg-red-100 transition-colors duration-200"
+        >
+          {exam.trim()}
+        </span>
+      ))}
+    </div>
+  </div>
+)}
+                          <div ref={sectionRefs[2]} className="min-h-24 py-4">
+                            <Addmissioninfo instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[3]} className="min-h-24 pt-4">
+                            <Placementinfo instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[4]} className="min-h-24 pt-4">
+                            <CampusInfo instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[5]} className="min-h-24 pt-4">
+                          <FeeInfo ref={sectionRefs[5]} instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[6]} className="min-h-24 pt-4">
+                            <ScholarshipInfo instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[7]} className="min-h-24 pt-4">
+                            <CutTOffInfo instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[8]} className="min-h-24 pt-4">
+                            <Ranking instituteData={instituteData}/>
+                          </div>
+                          
+                          <div ref={sectionRefs[9]} className="min-h-24 pt-4">
+                            <GalleryInfo instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[10]} className="min-h-24 pt-4">
+                            <ReviewandRating ratings={ratings} reviews={reviews} instituteId={instituteData._id} instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[11]} className="min-h-24 py-4">
+                            <InstituteFacilites instituteData={instituteData}/>
+                          </div>
+                          <div  className="min-h-24 py-4">
+                            <RecruitersSlider instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[12]} className="min-h-24 py-4">
+                            <Faqs instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[13]} className="min-h-24 py-4">
+                            <News instituteData={instituteData}/>
+                          </div>
+                          <div ref={sectionRefs[14]} className="min-h-24 py-4">
+                            <Webinar instituteData={instituteData}/>
+                          </div>
+                          {/* <div ref={sectionRefs[3]} className="min-h-screen p-4 bg-gray-50">
+                            <Placements />
+                          </div> */}
                       
                   </div>
                 </div>

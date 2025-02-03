@@ -7,8 +7,8 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
   const [formData, setFormData] = useState({
     date: "",
     timeSlot: "",
-    email: counselor?.email ?? "",
-    studentEmail: localStorage.getItem("email"),
+    counselorId: counselor?._id ?? "",
+    studentId: localStorage.getItem("userId"),
   });
   const [availableSlots, setAvailableSlots] = useState([]);
   const [counselorSchedule, setCounselorSchedule] = useState(null);
@@ -114,8 +114,8 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
             {
               date: formData.date,
               slot: formData.timeSlot,
-              email: counselor.email,
-              studentEmail: formData.studentEmail,
+              counselorId: counselor._id,
+              studentId: formData.studentEmail,
               paymentId: response.razorpay_payment_id,
             },
             {
