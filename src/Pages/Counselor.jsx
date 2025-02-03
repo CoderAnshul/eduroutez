@@ -8,18 +8,17 @@ const CounselorListPage = () => {
     const [searchParams] = useSearchParams();
     const category = searchParams.get('category');
 
-    const [counselors, setCounselors] = useState([]);
+    const [counselors, setCounselors] = useState([]); // All counselors
+    const [displayedCounselors, setDisplayedCounselors] = useState([]); // Filtered counselors
     const [loading, setLoading] = useState(true);
     const [isCallPopupOpen, setIsCallPopupOpen] = useState(false);
     const [isReviewPopupOpen, setIsReviewPopupOpen] = useState(false);
     const [selectedCounselor, setSelectedCounselor] = useState(null);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [limit] = useState(6);
     const [selectedStreams, setSelectedStreams] = useState([]);
     const [streams, setStreams] = useState([]);
-
-    console.log('category', streams);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [page, setPage] = useState(1);
+    const [itemsPerPage] = useState(6);
 
     const inspirationalQuotes = [
         {
@@ -50,53 +49,24 @@ const CounselorListPage = () => {
 
     const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    // Reset counselors and page when category changes
+    // Fetch all counselors initially
     useEffect(() => {
-        setCounselors([]);
-        setPage(1);
-        setHasMore(true);
-        fetchCounselors(1);
+        fetchAllCounselors();
     }, [category]);
 
-    const fetchCounselors = async (currentPage) => {
+    const fetchAllCounselors = async () => {
         try {
             setLoading(true);
             let endpoint = `${VITE_BASE_URL}/counselors`;
-            let params = {
-                page: currentPage,
-                limit
-            };
-
-            // If category is present, use the category-specific endpoint
+            
             if (category) {
                 endpoint = `${VITE_BASE_URL}/counselors-by-category`;
-                params = {};
-                const body = {
-                    category
-                };
-                const response = await axios.post(endpoint, body, { params });
-                const newCounselors = response.data.data || [];
-                
-                if (newCounselors.length < limit) {
-                    setHasMore(false);
-                }
-
-                setCounselors(prevCounselors => 
-                    currentPage === 1 ? newCounselors : [...prevCounselors, ...newCounselors]
-                );
-                return;
+                const response = await axios.post(endpoint, { category });
+                setCounselors(response.data.data || []);
+            } else {
+                const response = await axios.get(endpoint);
+                setCounselors(response.data.data.result || []);
             }
-
-            const response = await axios.get(endpoint, { params });
-            const newCounselors = response.data.data.result || [];
-            
-            if (newCounselors.length < limit) {
-                setHasMore(false);
-            }
-
-            setCounselors(prevCounselors => 
-                currentPage === 1 ? newCounselors : [...prevCounselors, ...newCounselors]
-            );
         } catch (error) {
             console.error('Error fetching counselors:', error.message);
         } finally {
@@ -117,10 +87,55 @@ const CounselorListPage = () => {
         fetchStreams();
     }, []);
 
-    const loadMoreCounselors = () => {
-        const nextPage = page + 1;
-        setPage(nextPage);
-        fetchCounselors(nextPage);
+    // Filter and search logic
+    useEffect(() => {
+        let filtered = [...counselors];
+
+        // Apply stream filter
+        if (selectedStreams.length > 0) {
+            filtered = filtered.filter(counselor => 
+                counselor && counselor.category && 
+                selectedStreams.includes(counselor.category)
+            );
+        }
+
+        // Apply search filter
+        if (searchTerm) {
+            try {
+                const regex = new RegExp(searchTerm, 'i');
+                filtered = filtered.filter(counselor => 
+                    regex.test(counselor.firstname) || 
+                    regex.test(counselor.lastname) || 
+                    regex.test(counselor.category) ||
+                    regex.test(counselor.language) ||
+                    regex.test(counselor.level)
+                );
+            } catch (e) {
+                // Handle invalid regex
+                filtered = filtered.filter(counselor => 
+                    counselor.firstname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    counselor.lastname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    counselor.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    counselor.language?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    counselor.level?.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+        }
+
+        // Paginate results
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        setDisplayedCounselors(filtered.slice(startIndex, endIndex));
+    }, [counselors, selectedStreams, searchTerm, page]);
+
+    const handleStreamChange = (stream) => {
+        if (!stream) return;
+        setSelectedStreams(prev =>
+            prev.includes(stream)
+                ? prev.filter(str => str !== stream)
+                : [...prev, stream]
+        );
+        setPage(1); // Reset to first page when filtering
     };
 
     const handleScheduleCall = (counselor) => {
@@ -133,21 +148,6 @@ const CounselorListPage = () => {
         setIsReviewPopupOpen(true);
     };
 
-    const handleStreamChange = (stream) => {
-        if (!stream) return;
-        setSelectedStreams((prev) =>
-            prev.includes(stream)
-                ? prev.filter((str) => str !== stream)
-                : [...prev, stream]
-        );
-    };
-
-    const filteredCounselors = selectedStreams.length > 0
-        ? counselors.filter((counselor) =>
-            counselor && counselor.category && selectedStreams.includes(counselor.category)
-        )
-        : counselors;
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-8xl mx-auto">
@@ -157,6 +157,23 @@ const CounselorListPage = () => {
                             "{currentQuote.quote}"
                         </blockquote>
                         <p className="text-lg text-gray-500">— {currentQuote.author}</p>
+                    </div>
+                </div>
+
+                {/* Search Bar */}
+                <div className="mb-8 max-w-2xl mx-auto">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors"
+                            placeholder="Search counselors by name, category, language, or level..."
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setPage(1); // Reset to first page when searching
+                            }}
+                        />
+                        <i className="fa fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                     </div>
                 </div>
 
@@ -184,95 +201,106 @@ const CounselorListPage = () => {
 
                     {/* Main Content */}
                     <div className="w-full md:w-3/4 pl-6">
-                        {loading && counselors.length === 0 ? (
+                        {loading ? (
                             <div className="flex justify-center items-center h-64">
                                 <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {filteredCounselors.map((counselor, index) => (
-                                    <div 
-                                        key={index} 
-                                        className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-xl"
-                                    >
-                                        <div className="p-6">
-                                            <div className="flex items-center mb-4">
-                                                {counselor.profilePhoto ? (
-                                                    <img
-                                                        src={counselor.profilePhoto}
-                                                        alt={`${counselor.firstname} ${counselor.lastname}`}
-                                                        className="h-20 w-20 rounded-full object-cover mr-4 border-2 border-red-100"
-                                                    />
-                                                ) : (
-                                                    <div className="h-20 w-20 rounded-full bg-red-100 flex items-center justify-center mr-4">
-                                                        <i className="fa fa-user text-red-600 text-3xl"></i>
-                                                    </div>
-                                                )}
-                                                <div>
-                                                    <h2 className="text-xl font-bold text-gray-900">
-                                                        {counselor.firstname} {counselor.lastname}
-                                                    </h2>
-                                                    <div className="flex items-center mt-1">
-                                                        <i className="fa fa-star text-yellow-500 mr-1"></i>
-                                                        <span className="text-gray-600">
-                                                            {counselor.rating || 0} Rating
-                                                        </span>
+                            <>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {displayedCounselors.map((counselor, index) => (
+                                        <div 
+                                            key={index} 
+                                            className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-xl"
+                                        >
+                                            {/* Counselor card content remains the same */}
+                                            <div className="p-6">
+                                                <div className="flex items-center mb-4">
+                                                    {counselor.profilePhoto ? (
+                                                        <img
+                                                            src={counselor.profilePhoto}
+                                                            alt={`${counselor.firstname} ${counselor.lastname}`}
+                                                            className="h-20 w-20 rounded-full object-cover mr-4 border-2 border-red-100"
+                                                        />
+                                                    ) : (
+                                                        <div className="h-20 w-20 rounded-full bg-red-100 flex items-center justify-center mr-4">
+                                                            <i className="fa fa-user text-red-600 text-3xl"></i>
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <h2 className="text-xl font-bold text-gray-900">
+                                                            {counselor.firstname} {counselor.lastname}
+                                                        </h2>
+                                                        <div className="flex items-center mt-1">
+                                                            <i className="fa fa-star text-yellow-500 mr-1"></i>
+                                                            <span className="text-gray-600">
+                                                                {counselor.rating || 0} Rating
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <div className="space-y-3 mt-4">
-                                                {counselor.level && (
-                                                    <div className="flex items-center text-gray-600">
-                                                        <i className="fa fa-briefcase mr-2 text-red-500"></i>
-                                                        <span>Level: {counselor.level}</span>
-                                                    </div>
-                                                )}
-                                                {counselor.language && (
-                                                    <div className="flex items-center text-gray-600">
-                                                        <i className="fa fa-language mr-2 text-green-500"></i>
-                                                        <span>Languages: {counselor.language}</span>
-                                                    </div>
-                                                )}
-                                                {counselor.ExperienceYear && (
-                                                    <div className="flex items-center text-gray-600">
-                                                        <i className="fa fa-clock mr-2 text-purple-500"></i>
-                                                        <span>Experience: {counselor.ExperienceYear} years</span>
-                                                    </div>
-                                                )}
-                                            </div>
+                                                <div className="space-y-3 mt-4">
+                                                    {counselor.level && (
+                                                        <div className="flex items-center text-gray-600">
+                                                            <i className="fa fa-briefcase mr-2 text-red-500"></i>
+                                                            <span>Level: {counselor.level}</span>
+                                                        </div>
+                                                    )}
+                                                    {counselor.language && (
+                                                        <div className="flex items-center text-gray-600">
+                                                            <i className="fa fa-language mr-2 text-green-500"></i>
+                                                            <span>Languages: {counselor.language}</span>
+                                                        </div>
+                                                    )}
+                                                    {counselor.ExperienceYear && (
+                                                        <div className="flex items-center text-gray-600">
+                                                            <i className="fa fa-clock mr-2 text-purple-500"></i>
+                                                            <span>Experience: {counselor.ExperienceYear} years</span>
+                                                        </div>
+                                                    )}
+                                                </div>
 
-                                            <div className="mt-6 flex space-x-4">
-                                                <button 
-                                                    onClick={() => handleScheduleCall(counselor)}
-                                                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                                >
-                                                    <i className="fa fa-phone mr-2"></i>
-                                                    Schedule Call
-                                                </button>
-                                                <button
-                                                    onClick={() => handleReviewFeedback(counselor)}
-                                                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                                >
-                                                    <i className="fa fa-comment mr-2"></i>
-                                                    Review Feedback
-                                                </button>
+                                                <div className="mt-6 flex space-x-4">
+                                                    <button 
+                                                        onClick={() => handleScheduleCall(counselor)}
+                                                        className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                                    >
+                                                        <i className="fa fa-phone mr-2"></i>
+                                                        Schedule Call
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReviewFeedback(counselor)}
+                                                        className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                                    >
+                                                        <i className="fa fa-comment mr-2"></i>
+                                                        Review Feedback
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                    ))}
+                                </div>
 
-                        {hasMore && !loading && (
-                            <div className="mt-12 text-center">
-                                <button 
-                                    className="px-8 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-semibold shadow-md"
-                                    onClick={loadMoreCounselors}
-                                >
-                                    Load More Counselors
-                                </button>
-                            </div>
+                                {/* Pagination */}
+                                <div className="mt-8 flex justify-center">
+                                    <button
+                                        onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+                                        disabled={page === 1}
+                                        className="mx-2 px-4 py-2 rounded-md bg-red-600 text-white disabled:opacity-50"
+                                    >
+                                        Previous
+                                    </button>
+                                    <span className="mx-4 py-2">Page {page}</span>
+                                    <button
+                                        onClick={() => setPage(prev => prev + 1)}
+                                        disabled={displayedCounselors.length < itemsPerPage}
+                                        className="mx-2 px-4 py-2 rounded-md bg-red-600 text-white disabled:opacity-50"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>
@@ -292,7 +320,6 @@ const CounselorListPage = () => {
                     setIsReviewPopupOpen(false);
                     setSelectedCounselor(null);
                 }}
-                
                 counselor={selectedCounselor}
             />
         </div>
