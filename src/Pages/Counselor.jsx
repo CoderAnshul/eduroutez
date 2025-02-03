@@ -292,6 +292,7 @@ const CounselorListPage = () => {
                     setIsReviewPopupOpen(false);
                     setSelectedCounselor(null);
                 }}
+                
                 counselor={selectedCounselor}
             />
         </div>

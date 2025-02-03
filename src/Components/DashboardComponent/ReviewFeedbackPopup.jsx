@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../ApiFunctions/axios';
 
-const ReviewFeedbackPopup = ({ isOpen, onClose, counselorId }) => {
+const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
+  console.log('counselor', counselor); // Log the entire counselor object
   const [rating, setRating] = useState(0);
-  const [review, setReview] = useState('');
+  const [comment, setComment] = useState(''); // Fixed variable name
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-const apiUrl =  import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
+  const apiUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
+
   if (!isOpen) return null;
 
   const handleRating = (index) => {
@@ -19,7 +21,6 @@ const apiUrl =  import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
     setError('');
 
     try {
-      // Get student email from localStorage
       const studentEmail = localStorage.getItem('email');
       
       if (!studentEmail) {
@@ -27,18 +28,13 @@ const apiUrl =  import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
       }
 
       const response = await axiosInstance.post(`${apiUrl}/submit-counsellor-review`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-  
-          studentEmail,
-          counselorId,
-          rating,
-          review
-        
+        studentEmail,
+        counselorId: counselor?._id, // Use counselor._id directly from props
+        rating,
+        comment
       });
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error('Failed to submit review');
       }
 
@@ -89,8 +85,8 @@ const apiUrl =  import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
               className="w-full border border-gray-300 rounded px-3 py-2 resize-none"
               rows="5"
               placeholder="Enter your review"
-              value={review}
-              onChange={(e) => setReview(e.target.value)}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)} // Fixed function name
             />
           </div>
 
