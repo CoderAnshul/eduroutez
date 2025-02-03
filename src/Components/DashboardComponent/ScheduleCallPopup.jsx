@@ -115,7 +115,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
               date: formData.date,
               slot: formData.timeSlot,
               counselorId: counselor._id,
-              studentId: formData.studentEmail,
+              studentId: formData.studentId,
               paymentId: response.razorpay_payment_id,
             },
             {
