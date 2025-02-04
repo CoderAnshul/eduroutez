@@ -23,6 +23,7 @@ import BestRatedInstitute from './Pages/Best-Rated-Institute';
 import TrendingInstitute from './Pages/TrendingInstitute';
 import Counselor from './Pages/Counselor';
 import NewsDetail from './Pages/NewsDetail';
+import ScheduledSlots from './Pages/ScheduledSlots';
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -95,6 +96,7 @@ const App = () => {
             <Route path="documents" element={<StudentDocument />} />
             <Route path="counselor" element={<CounselorListPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="slots" element={<ScheduledSlots />} />
             <Route path="wishlist" element={<Wishlist/>} />
             <Route path='reviews' element={<ReviewActivity/>}></Route>
             <Route path="redeem" element={<Redeem/>} />
