@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import DOMPurify from 'dompurify';
 import { CarrerDetail } from "../ApiFunctions/api";
 import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
@@ -11,7 +12,6 @@ const DetailPage = () => {
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
   const { id } = useParams();
 
-  // Combined configuration for tabs and sections with separate refs for title and content
   const tabConfig = [
     { id: "overview", name: "Overview", titleRef: useRef(null) },
     { id: "eligibility", name: "Eligibility", titleRef: useRef(null) },
@@ -35,7 +35,7 @@ const DetailPage = () => {
 
   const scrollToSection = (tabItem) => {
     setActiveTab(tabItem.name);
-    const yOffset = -120; // Adjusted for better title visibility
+    const yOffset = -120;
     const element = tabItem.titleRef.current;
     if (element) {
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
@@ -44,51 +44,75 @@ const DetailPage = () => {
   };
 
   if (!data) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+      </div>
+    );
   }
 
   const getContent = (tabId) => {
-    switch (tabId) {
-      case 'overview':
-        return data.description;
-      case 'eligibility':
-        return data.eligibility || [];
-      case 'jobRoles':
-        return data.jobRoles || [];
-      case 'opportunity':
-        return data.opportunity || [];
-      case 'topColleges':
-        return data.topColleges || [];
-      default:
-        return null;
-    }
+    const content = {
+      overview: data.description,
+      eligibility: data.eligibility || [],
+      jobRoles: data.jobRoles || [],
+      opportunity: data.opportunity || [],
+      topColleges: data.topColleges || []
+    };
+    return DOMPurify.sanitize(content[tabId]);
   };
 
+  const contentStyles = `
+    html-content
+    [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:my-4
+    [&>h2]:text-xl [&>h2]:font-bold [&>h2]:my-3
+    [&>h3]:text-lg [&>h3]:font-bold [&>h3]:my-2
+    [&>p]:text-gray-700 [&>p]:my-3 [&>p]:leading-relaxed
+    
+    [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:my-4
+    [&>ul>li]:text-gray-700 [&>ul>li]:my-2
+    
+    [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:my-4
+    [&>ol>li]:text-gray-700 [&>ol>li]:my-2
+    
+    [&>table]:w-full [&>table]:border-collapse [&>table]:my-4
+    [&>table>thead>tr>th]:bg-gray-50 [&>table>thead>tr>th]:text-left 
+    [&>table>thead>tr>th]:p-3 [&>table>thead>tr>th]:border [&>table>thead>tr>th]:border-gray-200
+    [&>table>tbody>tr>td]:p-3 [&>table>tbody>tr>td]:border [&>table>tbody>tr>td]:border-gray-200
+    
+    [&>a]:text-blue-600 [&>a]:underline [&>a:hover]:text-blue-800
+    
+    [&>img]:max-w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:my-4
+    
+    [&>blockquote]:pl-4 [&>blockquote]:border-l-4 [&>blockquote]:border-gray-300 
+    [&>blockquote]:italic [&>blockquote]:my-4 [&>blockquote]:text-gray-600
+  `;
+
   return (
-    <>
-      <div className="container max-w-[1300px] mx-auto px-[4vw] py-[2vw] flex flex-col items-start">
-        {/* Banner Image */}
-        <div className="h-80 w-full rounded-md">
+    <div className="min-h-screen bg-gray-50">
+      {/* Banner Section */}
+      <div className="container max-w-[1300px] mx-auto px-6 py-8">
+        <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg mb-8">
           <img
             className="h-full w-full object-cover"
             src={`${Images}/${data.image}`}
-            alt="bannerdetailimg"
+            alt={data.title || "Career banner"}
           />
         </div>
 
-        {/* Tabs */}
-        <div className="w-full md:px-4 py-6 sticky top-0 bg-white z-50">
-          <h1 className="text-2xl font-bold mb-4">{data.title || "Career Details"}</h1>
+        {/* Navigation Tabs */}
+        <div className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-4 sticky top-0 z-50">
+          <h1 className="text-2xl font-bold mb-6 px-4">{data.title || "Career Details"}</h1>
           <div className="w-full overflow-x-auto">
-            <div className="border-2 rounded-lg border-gray-300">
+            <div className="border rounded-xl border-gray-200">
               <ul className="flex justify-evenly items-center whitespace-nowrap">
                 {tabConfig.map((tab) => (
                   <li
                     key={tab.id}
-                    className={`cursor-pointer px-8 py-2 text-sm font-medium 
+                    className={`cursor-pointer px-8 py-3 text-sm font-medium transition-all duration-200 
                       ${activeTab === tab.name
-                        ? "bg-red-600 py-2 rounded-full m-1 px-4 text-white border-red-600"
-                        : "text-gray-700 hover:text-black"
+                        ? "bg-red-600 rounded-full mx-2 text-white"
+                        : "text-gray-700 hover:text-black hover:bg-gray-50 rounded-full mx-2"
                       }`}
                     onClick={() => scrollToSection(tab)}
                   >
@@ -101,28 +125,35 @@ const DetailPage = () => {
         </div>
 
         {/* Content Sections */}
-        <div className="mt-10 space-y-10 w-full">
+        <div className="mt-10 space-y-8">
           {tabConfig.map((tab) => {
             const content = getContent(tab.id);
             const isArray = Array.isArray(content);
             
             return (
-              <div key={tab.id} className="scroll-mt-24">
+              <div 
+                key={tab.id} 
+                className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-8 scroll-mt-24"
+              >
                 <h3 
                   ref={tab.titleRef}
-                  className="text-lg font-semibold mb-2 pt-4"
+                  className="text-lg font-bold mb-6"
                 >
                   {tab.name}
                 </h3>
                 {isArray ? (
-                  <ul className="list-disc list-inside space-y-2 text-gray-800">
+                  <ul className="space-y-4">
                     {content.map((item, idx) => (
-                      <li key={idx} dangerouslySetInnerHTML={{ __html: item }} />
+                      <li 
+                        key={idx} 
+                        className={contentStyles}
+                        dangerouslySetInnerHTML={{ __html: item }}
+                      />
                     ))}
                   </ul>
                 ) : (
                   <div
-                    className="text-gray-700"
+                    className={`${contentStyles} text-base prose prose-gray max-w-full`}
                     dangerouslySetInnerHTML={{ __html: content }}
                   />
                 )}
@@ -132,12 +163,14 @@ const DetailPage = () => {
         </div>
       </div>
 
-      {/* Additional Sections */}
-      <div className="flex gap-2 flex-col sm:flex-row items-center">
-        <Events />
-        <ConsellingBanner />
+      {/* Additional Components */}
+      <div className="container max-w-[1300px] mx-auto px-6 py-8">
+        <div className="flex gap-4 flex-col sm:flex-row">
+          <Events />
+          <ConsellingBanner />
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
