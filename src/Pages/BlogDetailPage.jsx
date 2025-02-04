@@ -37,13 +37,16 @@ const BlogDetailPage = () => {
 
     const fetchRecentBlogs = async () => {
       try {
-        const response = await getRecentBlogs();
-        if (response && response.data) {
-          const filteredBlogs = response.data.filter(blog => blog.id !== parseInt(id)).slice(0, 5);
-          setRecentBlogs(filteredBlogs);
-        }
+      const response = await getRecentBlogs();
+      if (response && response.data?.result) {
+        const filteredBlogs = response.data?.result
+        .filter(blog => blog.id !== parseInt(id))
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+        .slice(0, 5);
+        setRecentBlogs(filteredBlogs);
+      }
       } catch (error) {
-        console.error('Error fetching recent blogs:', error);
+      console.error('Error fetching recent blogs:', error);
       }
     };
 
