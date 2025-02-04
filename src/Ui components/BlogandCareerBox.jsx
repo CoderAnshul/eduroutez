@@ -4,7 +4,7 @@ import CustomButton from "./CustomButton";
 
 const BlogandCareerBox = ({ boxData, blogData }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 8;
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
   const handleSeeMore = () => {

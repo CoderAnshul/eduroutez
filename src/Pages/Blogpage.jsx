@@ -11,13 +11,19 @@ import axios from 'axios'
 const Blogpage = () => {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const itemsPerPage = 8; // Set number of items per page
 
     const baseURL = import.meta.env.VITE_BASE_URL;
-    // Fetch blogs
+    
+    // Fetch blogs with pagination
     const { data: blogData, isLoading: blogLoading, isError: blogError, error: blogFetchError } = useQuery(
-      ['blogs'], 
-      blogs,
-      { enabled: true }
+      ['blogs', page], 
+      () => blogs(page),
+      { 
+        enabled: true,
+        keepPreviousData: true // Keep previous data while fetching new page
+      }
     );
 
     // Fetch categories
@@ -25,7 +31,6 @@ const Blogpage = () => {
       ['blog-categories'],
       async () => {
         const response = await axios.get(`${baseURL}/blog-category`);
-        console.log('cat',response.data);
         return response.data;
       },
       { enabled: true }
@@ -38,6 +43,12 @@ const Blogpage = () => {
                 ? prev.filter((cat) => cat !== category)
                 : [...prev, category]
         );
+        setPage(1); // Reset to first page when changing categories
+    };
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+        window.scrollTo(0, 0); // Scroll to top when changing pages
     };
   
     if (blogLoading || categoryLoading) {
@@ -57,6 +68,8 @@ const Blogpage = () => {
     }
 
     const categories = categoryData?.data?.result || [];
+    const totalItems = blogData?.data?.totalDocuments;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     const filteredBlogData = selectedCategories.length > 0
         ? blogData?.data?.result?.filter((blog) =>
@@ -76,6 +89,90 @@ const Blogpage = () => {
                 .map((blog) => blog?.category)
                 .filter(Boolean)
         );
+        setPage(1); // Reset to first page when searching
+    };
+
+    // Pagination component
+    const Pagination = () => {
+        const pageNumbers = [];
+        const maxVisiblePages = 5;
+        
+        let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.push(i);
+        }
+
+        return (
+            <div className="flex items-center justify-center space-x-2 mt-8">
+                <button
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 1}
+                    className={`px-3 py-1 rounded-md ${
+                        page === 1 
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                        : 'bg-red-600 text-white hover:bg-red-700'
+                    }`}
+                >
+                    Previous
+                </button>
+                
+                {startPage > 1 && (
+                    <>
+                        <button
+                            onClick={() => handlePageChange(1)}
+                            className="px-3 py-1 rounded-md hover:bg-gray-200"
+                        >
+                            1
+                        </button>
+                        {startPage > 2 && <span>...</span>}
+                    </>
+                )}
+
+                {pageNumbers.map(number => (
+                    <button
+                        key={number}
+                        onClick={() => handlePageChange(number)}
+                        className={`px-3 py-1 rounded-md ${
+                            page === number 
+                            ? 'bg-red-600 text-white' 
+                            : 'hover:bg-gray-200'
+                        }`}
+                    >
+                        {number}
+                    </button>
+                ))}
+
+                {endPage < totalPages && (
+                    <>
+                        {endPage < totalPages - 1 && <span>...</span>}
+                        <button
+                            onClick={() => handlePageChange(totalPages)}
+                            className="px-3 py-1 rounded-md hover:bg-gray-200"
+                        >
+                            {totalPages}
+                        </button>
+                    </>
+                )}
+
+                <button
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={page === totalPages}
+                    className={`px-3 py-1 rounded-md ${
+                        page === totalPages 
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                        : 'bg-red-600 text-white hover:bg-red-700'
+                    }`}
+                >
+                    Next
+                </button>
+            </div>
+        );
     };
 
     return (
@@ -84,7 +181,7 @@ const Blogpage = () => {
             
             {/* Filter button for mobile */}
             <button
-                className="mx-[20px] mt-[30px] z-[500] bg-blue-600 text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
+                className="mx-[20px] mt-[30px] z-[500] bg-red-600 text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
                 onClick={() => setIsFilterOpen(true)}
             >
                 Filters
@@ -113,7 +210,7 @@ const Blogpage = () => {
                                     value={category.name}
                                     checked={selectedCategories.includes(category.name)}
                                     onChange={() => handleCategoryChange(category.name)}
-                                    className="form-checkbox h-5 w-5 text-blue-500"
+                                    className="form-checkbox h-5 w-5 text-red-500"
                                 />
                                 <span className="text-base font-medium">{category.name}</span>
                             </label>
@@ -159,10 +256,10 @@ const Blogpage = () => {
 
                 {/* Content */}
                 <div className="w-full md:w-3/4 pl-6">
-                    {/* Display selected categories as blue badges */}
+                    {/* Display selected categories as red badges */}
                     <div className="mb-4">
                         {selectedCategories.map((category) => (
-                            <span key={category} className="inline-block bg-blue-500 text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
+                            <span key={category} className="inline-block bg-red-500 text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
                                 {category}
                             </span>
                         ))}
@@ -170,6 +267,7 @@ const Blogpage = () => {
                     <BlogandCareerBox 
                         blogData={filteredBlogData || []} 
                     />
+                    <Pagination />
                 </div>
             </div>
 

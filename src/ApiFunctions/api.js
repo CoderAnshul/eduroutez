@@ -139,10 +139,15 @@ export const homeBanner = async () => {
     throw error;
   }
 };
-export const blogs = async () => {
+export const blogs = async (page) => {
   try {
     console.log("blogs");
-    const response = await axios.get(`${baseURL}/blogs`);
+    const response = await axios.get(`${baseURL}/blogs`, {
+      params: {
+        page,
+        limit:8
+            },
+    });
     return response.data;
 
     // return response.data;
@@ -186,14 +191,17 @@ export const postQuestion = async (formData) => {
   }
 };
 
-export const careers = async () => {
+export const careers = async (page) => {
   try {
-    const response = await axios.get(`${baseURL}/careers`);
+    const response = await axios.get(`${baseURL}/careers`, {
+      params: {
+        page,
+        limit:8
+            },
+    });
     return response.data;
-
-    // return response.data;
   } catch (error) {
-    console.error(`Error fetching banner `, error);
+    console.error(`Error fetching careers:`, error);
     throw error;
   }
 };

@@ -6,8 +6,10 @@ const StudentDocument = () => {
   const [formData, setFormData] = useState({
     aadhaar: null,
     pan: null,
+    profilePicture: null,
     aadhaarPreview: null,
-    panPreview: null
+    panPreview: null,
+    profilePicturePreview: null,
   });
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -36,8 +38,12 @@ const StudentDocument = () => {
         panPreview: data.data.panCardImage 
           ? `${imageBaseUrl}/${data.data.panCardImage}` 
           : null,
+        profilePicturePreview: data.data.profilePicture 
+          ? `${imageBaseUrl}/${data.data.profilePicture}` 
+          : null,
         aadhaar: null,
-        pan: null
+        pan: null,
+        profilePicture: null
       };
       setFormData(initialFormData);
     }
@@ -84,6 +90,7 @@ const StudentDocument = () => {
     
     if (formData.aadhaar) finalFormData.append('adharCardImage', formData.aadhaar);
     if (formData.pan) finalFormData.append('panCardImage', formData.pan);
+    if (formData.profilePicture) finalFormData.append('profilePicture', formData.profilePicture);
     
     mutate(finalFormData);
   };
@@ -112,7 +119,6 @@ const StudentDocument = () => {
                 alt="Aadhaar Card Preview" 
                 className="max-h-48 w-auto object-contain rounded-md"
               />
-              
             </div>
           )}
         </div>
@@ -132,7 +138,25 @@ const StudentDocument = () => {
                 alt="PAN Card Preview" 
                 className="max-h-48 w-auto object-contain rounded-md"
               />
-            
+            </div>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
+          <input
+            type="file"
+            name="profilePicture"
+            onChange={handleFileChange}
+            accept=".jpg,.jpeg,.png"
+            className="block w-full text-gray-700 border border-gray-300 rounded-md shadow-sm"
+          />
+          {formData.profilePicturePreview && (
+            <div className="mt-2">
+              <img 
+                src={formData.profilePicturePreview} 
+                alt="Profile Picture Preview" 
+                className="max-h-48 w-auto object-contain rounded-md"
+              />
             </div>
           )}
         </div>
@@ -140,7 +164,7 @@ const StudentDocument = () => {
 
       <button
         onClick={handleSubmit}
-        disabled={isSubmitting || (!formData.aadhaar && !formData.pan)}
+        disabled={isSubmitting || (!formData.aadhaar && !formData.pan && !formData.profilePicture)}
         className="mt-6 px-4 py-2 bg-red-600 text-white font-medium text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
       >
         {isSubmitting ? 'Uploading...' : 'Upload Documents'}

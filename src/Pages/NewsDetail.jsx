@@ -139,14 +139,15 @@ const NewsDetail = () => {
             )}
           </div>
 
-          <div className="prose max-w-none">
+          <div className="prose max-w-none news-content">
             {newsDetail.description ? (
-              <div 
-                className="text-gray-700 leading-relaxed"
-                dangerouslySetInnerHTML={{ 
-                  __html: newsDetail.description || 'No description available'
-                }}
-              />
+             <div 
+             className="text-gray-700 leading-relaxed whitespace-pre-line"
+             dangerouslySetInnerHTML={{ 
+               __html: newsDetail.description || 'No description available'
+             }}
+           />
+           
             ) : (
               <p className="text-gray-500 italic">No content available</p>
             )}

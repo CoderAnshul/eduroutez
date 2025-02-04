@@ -7,18 +7,16 @@ import PopularCourses from "../Components/PopularCourses";
 import BlogComponent from "../Components/BlogComponent";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
-
 import axios from "axios";
+import { Link } from "react-router-dom";
 
-const Images=import.meta.env.VITE_IMAGE_BASE_URL;
-
+const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
 const fetchImage = async (imagePath) => {
   try {
     const response = await axios.get(`${Images}/${imagePath}`, {
       responseType: 'blob'
     });
-    // Create URL immediately and store it
     const imageUrl = URL.createObjectURL(response.data);
     return imageUrl;
   } catch (error) {
@@ -29,52 +27,59 @@ const fetchImage = async (imagePath) => {
 
 const Careerspage = () => {
   const [imageUrls, setImageUrls] = useState({});
-  const [categories, setCategories] = useState([]); // State to store categories
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [allCareerData, setAllCareerData] = useState([]);
 
-  console.log('categories', categories);
-
-  const { data: careerData, isLoading, isError, error } = useQuery(
-    ["careers"],
-    () => careers(),
+  const { data: careerData, isLoading, isError, error, refetch } = useQuery(
+    ["careers", page],
+    () => careers(page),
     { enabled: true }
   );
 
-  // Fetch categories from the API
+  useEffect(() => {
+    if (careerData) {
+      setTotalPages(careerData.data.totalPages);
+      setAllCareerData(prevData => [...prevData, ...careerData.data.result]);
+    }
+  }, [careerData]);
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await careerCategories();
-        console.log('Full Categories Response:', response.data);
-        
-        const extractedCategories = response.data.result.map(category => 
+        const extractedCategories = response.data.result.map(category =>
           typeof category === 'object' ? category.name || category.category : category
         );
-        
         setCategories(extractedCategories);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
     };
-  
+
     fetchCategories();
   }, []);
 
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  // Combined filtering function
+  const getFilteredData = () => {
+    return allCareerData.filter(career => {
+      const matchesSearch = career.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          career.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(career.category);
+      return matchesSearch && matchesCategory;
+    });
+  };
 
-  const filteredData =
-    selectedCategories.length > 0
-      ? careerData?.data.result.filter((career) =>
-          selectedCategories.includes(career.category)
-        )
-      : careerData?.data.result;
-
-  // Use effect to handle image loading
   useEffect(() => {
     const loadImages = async () => {
+      const filteredData = getFilteredData();
       if (filteredData) {
         const imagePromises = filteredData.map(async (career) => {
-          if (!imageUrls[career.image]) {  // Only fetch if we don't have the URL already
+          if (!imageUrls[career.image]) {
             const url = await fetchImage(career.image);
             return { [career.image]: url };
           }
@@ -92,30 +97,41 @@ const Careerspage = () => {
 
     loadImages();
 
-    // Cleanup function to revoke object URLs
     return () => {
       Object.values(imageUrls).forEach(url => {
         if (url) URL.revokeObjectURL(url);
       });
     };
-  }, [filteredData]); // Add filteredData as dependency
+  }, [allCareerData, searchTerm, selectedCategories]);
 
   const handleCategoryChange = (category) => {
-    setSelectedCategories((prev) =>
+    setSelectedCategories(prev =>
       prev.includes(category)
-        ? prev.filter((cat) => cat !== category)
+        ? prev.filter(cat => cat !== category)
         : [...prev, category]
     );
   };
 
-  if (isLoading) return <p>Loading...</p>;
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const loadMore = () => {
+    if (page < totalPages) {
+      setPage(prevPage => prevPage + 1);
+      refetch();
+    }
+  };
+
+  if (isLoading && page === 1) return <p>Loading...</p>;
   if (isError) return <p>Error: {error.message}</p>;
+
+  const filteredData = getFilteredData();
 
   return (
     <>
       <PageBanner pageName="Career Opportunity" currectPage="career opportunity" />
       
-      {/* Filter button for mobile */}
       <button
         className="mx-[20px] mt-[30px] z-[500] bg-blue-600 text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
         onClick={() => setIsFilterOpen(true)}
@@ -123,7 +139,6 @@ const Careerspage = () => {
         Filters
       </button>
 
-      {/* Sidebar Overlay */}
       <div className={`fixed inset-0 bg-black bg-opacity-50 z-[10001] flex transition-opacity duration-300 ${isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
         <div
           className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${isFilterOpen ? "translate-x-0" : "-translate-x-full"}`}
@@ -159,9 +174,7 @@ const Careerspage = () => {
         ></div>
       </div>
 
-      {/* Main Content */}
       <div className={`flex px-[4vw] pt-5 mb-14 ${isFilterOpen ? "pointer-events-none" : ""}`}>
-        {/* Desktop Sidebar */}
         <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">Filter by Category</h3>
           <div className="mb-4">
@@ -169,16 +182,8 @@ const Careerspage = () => {
               type="text"
               placeholder="Search..."
               className="w-full p-2 border-2 border-gray-300 rounded-lg"
-              onChange={(e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                setSelectedCategories(
-                  careerData?.data.result
-                    .filter((career) =>
-                      career.title.toLowerCase().includes(searchTerm)
-                    )
-                    .map((career) => career.category)
-                );
-              }}
+              value={searchTerm}
+              onChange={handleSearch}
             />
           </div>
           <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
@@ -199,13 +204,15 @@ const Careerspage = () => {
           </div>
         </div>
 
-        {/* Content */}
         <div className="w-full md:w-3/4 px-6">
+        
           <div className="flex flex-wrap justify-start gap-6">
-            {filteredData?.map((career) => (
-              <div
+            {filteredData.map((career) => (
+              <Link
                 key={career._id}
-                className="max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
+                to={`/detailpage/${career._id}`}
+                className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer
+                                max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
               >
                 <div className="relative h-48">
                   {!imageUrls[career.image] ? (
@@ -235,8 +242,17 @@ const Careerspage = () => {
                     <CustomButton text="View More" to={`/detailpage/${career._id}`} />
                   </div>
                 </div>
-              </div>
-            ))}
+</Link>            ))}
+          </div>
+          <div className="flex justify-center mt-6">
+            {page < totalPages && filteredData.length > 0 && (
+              <button
+                className="bg-red-600 text-white rounded-lg px-4 py-2 shadow-lg"
+                onClick={loadMore}
+              >
+                Load More
+              </button>
+            )}
           </div>
         </div>
       </div>
