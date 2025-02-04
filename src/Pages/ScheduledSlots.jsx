@@ -96,7 +96,7 @@ const ScheduledSlots = () => {
                                     Session with {slot.counselorId?.firstname || 'Unknown Counselor'}
                                 </h2>
                                 <span className={`${getStatusBadgeColor(slot.status)} px-3 py-1 rounded-full text-sm font-medium`}>
-                                    {slot.status || 'Unknown'}
+                                    {slot.status || 'Scheduled'}
                                 </span>
                             </div>
                         </div>
@@ -129,7 +129,7 @@ const ScheduledSlots = () => {
                                         </span>
                                     </div>
                                 </div>
-                                {slot.status === 'scheduled' && slot.link && (
+                                {slot.link && (
                                     <div className="flex items-center justify-end">
                                         <a
                                             href={slot.link}
