@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { blogById, getRecentBlogs } from '../ApiFunctions/api'; // Import getRecentBlogs
-import { useParams } from 'react-router-dom';
-
+import { blogById, getRecentBlogs } from '../ApiFunctions/api';
+import { useParams, Link } from 'react-router-dom';
 
 const BlogDetailPage = () => {
   const [data, setData] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [error, setError] = useState(null);
-  const [recentBlogs, setRecentBlogs] = useState([]); // State for recent blogs
+  const [recentBlogs, setRecentBlogs] = useState([]);
   const { id } = useParams();
   const overviewRef = useRef(null);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
@@ -22,7 +21,6 @@ const BlogDetailPage = () => {
         }
         setData(response.data);
 
-        // Safely handle image fetching
         if (response.data.image) {
           const imageResponse = await fetch(`${Images}/${response.data.image}`);
           const imageBlob = await imageResponse.blob();
@@ -37,23 +35,22 @@ const BlogDetailPage = () => {
 
     const fetchRecentBlogs = async () => {
       try {
-      const response = await getRecentBlogs();
-      if (response && response.data?.result) {
-        const filteredBlogs = response.data?.result
-        .filter(blog => blog.id !== parseInt(id))
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-        .slice(0, 5);
-        setRecentBlogs(filteredBlogs);
-      }
+        const response = await getRecentBlogs();
+        if (response && response.data?.result) {
+          const filteredBlogs = response.data?.result
+            .filter(blog => blog.id !== parseInt(id))
+            .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+            .slice(0, 5);
+          setRecentBlogs(filteredBlogs);
+        }
       } catch (error) {
-      console.error('Error fetching recent blogs:', error);
+        console.error('Error fetching recent blogs:', error);
       }
     };
 
     fetchBlog();
     fetchRecentBlogs();
 
-    // Cleanup function to revoke object URL
     return () => {
       if (imageUrl) {
         URL.revokeObjectURL(imageUrl);
@@ -61,7 +58,6 @@ const BlogDetailPage = () => {
     };
   }, [id]);
 
-  // Error handling
   if (error) {
     return (
       <div className="container mx-auto mt-10 p-4 text-center text-red-600">
@@ -70,12 +66,10 @@ const BlogDetailPage = () => {
     );
   }
 
-  // Loading state
   if (!data) {
     return <div>Loading...</div>;
   }
 
-  // Safely render blog details
   return (
     <div className="container max-w-[1300px] mx-auto mt-10 p-4">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
@@ -136,8 +130,7 @@ const BlogDetailPage = () => {
 
           {data?.description && (
             <div ref={overviewRef} className="space-y-4">
-             <div className="flex flex-col lg:flex-row lg:space-x-6 mt-6 ">
-                {/* Main Content Section */}
+              <div className="flex flex-col lg:flex-row lg:space-x-6 mt-6 ">
                 <div className="lg:w-4/5 ">
                   <h3 className="text-lg font-semibold border-b pb-2">Overview</h3>
                   <div
@@ -146,35 +139,32 @@ const BlogDetailPage = () => {
                   />
                 </div>
 
-                {/* Recently Uploaded Blogs Section */}
                 <div className="lg:w-1/5 md:w-[30%] h-full min-w-[200px] mt-8  lg:mt-0">
                   <div className='sticky top-20'>
-                  <h3 className="text-lg font-semibold mb-4">Recently Uploaded Blogs</h3>
-                  <div className="space-y-4">
-                    {/* Blog Box */}
-                    {recentBlogs?.map((blog) => (
-                      <div key={blog.id} className="flex items-center p-3 bg-white rounded-lg shadow-md">
-                        {/* Blog Image */}
-                        <div className="w-1/3">
-                          <img
-                            src={`${Images}/${blog.image}`}
-                            alt={blog.title}
-                            className="w-full h-20 object-cover rounded-md"
-                          />
-                        </div>
-                        {/* Blog Details */}
-                        <div className="w-2/3 ml-3">
-                          <h4 className="text-md font-medium text-gray-800 truncate">{blog.title}</h4>
-                          <p className="text-sm text-gray-600 truncate" dangerouslySetInnerHTML={{ __html: blog.description.split(' ').slice(0, 30).join(' ') + '...' }}></p>
-                          <span className="text-xs text-gray-500">{new Date(blog.createdAt).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                    <h3 className="text-lg font-semibold mb-4">Recently Uploaded Blogs</h3>
+                    <div className="space-y-4">
+                      {recentBlogs?.map((blog) => (
+                        <Link key={blog.id} to={`/blogdetailpage/${blog?._id}`}>
+                          <div className="flex items-center p-3 bg-white rounded-lg shadow-md">
+                            <div className="w-1/3">
+                              <img
+                                src={`${Images}/${blog.image}`}
+                                alt={blog.title}
+                                className="w-full h-20 object-cover rounded-md"
+                              />
+                            </div>
+                            <div className="w-2/3 ml-3">
+                              <h4 className="text-md font-medium text-gray-800 truncate">{blog.title}</h4>
+                              <p className="text-sm text-gray-600 truncate" dangerouslySetInnerHTML={{ __html: blog.description.split(' ').slice(0, 30).join(' ') + '...' }}></p>
+                              <span className="text-xs text-gray-500">{new Date(blog.createdAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-
             </div>
           )}
         </div>
