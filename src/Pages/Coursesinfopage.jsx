@@ -62,10 +62,10 @@ const Coursesinfopage = () => {
   };
 
   return (
-    <div className="container max-w-[1300px] mx-auto px-8 py-6 flex flex-col items-start bg-gray-50">
+    <><div className="container max-w-[1300px] mx-auto px-8 py-6 flex flex-col items-start bg-gray-50">
       {/* Course Title */}
       <CoursesName content={content.courseTitle || 'Untitled Course'} />
-      
+
       {/* Tab Navigation */}
       <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
 
@@ -77,7 +77,7 @@ const Coursesinfopage = () => {
             <h4 className="text-2xl font-semibold text-red-500 mb-4">Overview</h4>
             {renderHTML(content.courseOverview)}
             <div className="grid grid-cols-2 gap-4 mt-4">
-             {/* <p><strong>Type:</strong> {content.courseType || 'Not specified'}</p>*/}
+              {/* <p><strong>Type:</strong> {content.courseType || 'Not specified'}</p>*/}
               <p><strong>Duration:</strong> {
                 [
                   content.courseDurationYears && `${content.courseDurationYears} years`,
@@ -86,7 +86,7 @@ const Coursesinfopage = () => {
               }</p>
               <p><strong>Cost:</strong> {content.isCourseFree === 'free' ? 'Free' : 'Paid'}</p>
               <p><strong>Category:</strong> {content.category?.title || 'Not specified'}</p>
-             {/* <p><strong>Status:</strong> {content.status || 'Not specified'}</p>*/}
+              {/* <p><strong>Status:</strong> {content.status || 'Not specified'}</p>*/}
             </div>
             <div className="mt-4">
               <h5 className="font-semibold mb-2 ">Short Description</h5>
@@ -151,11 +151,13 @@ const Coursesinfopage = () => {
 
       {/* Additional Sections */}
       <BestRated />
-      <div className="w-full flex items-start gap-8 mt-10">
-          <Events />
-          <ConsellingBanner />
-          </div>
+
     </div>
+      <div className="w-full flex items-start  mt-10">
+        <Events />
+        <ConsellingBanner />
+      </div></>
+
   );
 };
 
