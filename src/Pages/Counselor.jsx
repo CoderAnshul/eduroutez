@@ -20,6 +20,8 @@ const CounselorListPage = () => {
     const [page, setPage] = useState(1);
     const [itemsPerPage] = useState(6);
 
+    const Images=import.meta.env.VITE_IMAGE_BASE_URL;
+
     const inspirationalQuotes = [
         {
             quote: "Guidance is the compass that helps you navigate life's challenges.",
@@ -218,8 +220,8 @@ const CounselorListPage = () => {
                                                 <div className="flex items-center mb-4">
                                                     {counselor.profilePhoto ? (
                                                         <img
-                                                            src={counselor.profilePhoto}
-                                                            alt={`${counselor.firstname} ${counselor.lastname}`}
+                                                        src={`${Images}/${counselor.profilePhoto.replace('uploads/', '')}`}
+                                                        alt={`${counselor.firstname} ${counselor.lastname}`}
                                                             className="h-20 w-20 rounded-full object-cover mr-4 border-2 border-red-100"
                                                         />
                                                     ) : (
