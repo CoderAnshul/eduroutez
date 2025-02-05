@@ -97,7 +97,7 @@ const DetailPage = () => {
           <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg mb-8">
             <img
               className="h-full w-full object-cover"
-              src={${Images} /${data.image}}
+              src={`${Images}/${data.image}`}
             alt={data.title || "Career banner"}
           />
           </div>
