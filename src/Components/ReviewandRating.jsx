@@ -166,6 +166,9 @@ const ReviewandRating = ( {instituteData} ) => {
               year={review.year}
               placementStars={review?.placementStars}
               campusLifeStars={review?.campusLifeStars}
+              campusLifeDescription={review?.campusLifeDescription}
+              facultyDescription={review?.facultyDescription}
+              placementDescription={review?.placementDescription}
               facultyStars={review?.facultyStars}
               suggestionsStars={review?.suggestionsStars}
               rating={review.placementStars + review.facultyStars + review.campusLifeStars + review.suggestionsStars}

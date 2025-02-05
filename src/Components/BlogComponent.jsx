@@ -88,7 +88,7 @@ const BlogComponent = () => {
               <div className="h-56 min-h-56 max-h-56 w-full overflow-hidden">
                 <img
                   className="w-full h-full object-cover object-top rounded-t-xl"
-                  src={`${Images}/${blog.image}`} // Use the correct image URL for each blog
+                  src={`${Images}/${blog?.thumbnail}`} // Use the correct image URL for each blog
                   alt={blog.title}
                 />
               </div>

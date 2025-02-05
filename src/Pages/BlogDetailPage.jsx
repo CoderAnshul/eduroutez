@@ -148,7 +148,7 @@ const BlogDetailPage = () => {
                           <div className="flex items-center p-3 bg-white rounded-lg shadow-md">
                             <div className="w-1/3">
                               <img
-                                src={`${Images}/${blog.image}`}
+                                src={`${Images}/${blog?.thumbnail  }`}
                                 alt={blog.title}
                                 className="w-full h-20 object-cover rounded-md"
                               />

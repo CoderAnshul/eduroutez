@@ -36,7 +36,7 @@ console.log('dftgyhuj',blogData);
           >
             <div className="relative">
               <img
-                src={`${Images}/${blog.image}`}
+                src={`${Images}/${blog?.thumbnail}`}
                 alt={blog.title}
                 className="w-full h-48 object-cover"
               />

@@ -24,6 +24,7 @@ import TrendingInstitute from './Pages/TrendingInstitute';
 import Counselor from './Pages/Counselor';
 import NewsDetail from './Pages/NewsDetail';
 import ScheduledSlots from './Pages/ScheduledSlots';
+import Payout from './Pages/Payout';
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -42,11 +43,12 @@ const Writereview = React.lazy(() => import('./Pages/Writereview'));
 const Login = React.lazy(() => import('./Pages/Login'));
 const Signup = React.lazy(() => import('./Pages/Signup'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
-const counselling = React.lazy(() => import('./Pages/counselling'));
+// const counselling = React.lazy(() => import('./Pages/counselling'));
 const Wishlist = React.lazy(() => import('./Pages/Wishlist'));
 const Question=React.lazy(()=>import('./Pages/Question-Answer'))
 const Redeem = React.lazy(()=> import('./Pages/Redeem'))
 const Logout = React.lazy(()=> import('./Pages/Logout'))
+
 const App = () => {
   return (
     <BrowserRouter>
@@ -100,6 +102,8 @@ const App = () => {
             <Route path="wishlist" element={<Wishlist/>} />
             <Route path='reviews' element={<ReviewActivity/>}></Route>
             <Route path="redeem" element={<Redeem/>} />
+          <Route path='payout' element={<Payout/>}/>
+
             < Route path='refer&earn' element={<ReferAndEarn></ReferAndEarn>}></Route>
             <Route path="logout" element={<Logout/>} />
 

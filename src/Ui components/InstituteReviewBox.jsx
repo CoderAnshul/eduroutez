@@ -2,9 +2,13 @@ import React, { useState, useCallback, useMemo } from 'react';
 import Rating from '@mui/material/Rating';
 
 const InstituteReviewBox = ({ 
+
   reviewerName, 
   designation , 
   year ,
+  campusLifeDescription,
+  facultyDescription,
+  placementDescription,
   rating , 
   review ,
   courseRatings,
@@ -115,6 +119,21 @@ const InstituteReviewBox = ({
               {designation} {year && `| ${year}`}
             </p> */}
             <p className="text-sm text-gray-700 mb-4 break-words">{review}</p>
+          
+
+            {/* Suggestions */}
+            
+            <h5 className="font-bold text-gray-800 mb-2">placement
+            </h5>
+            <p className='text-sm text-gray-700 mb-4 break-words'>{placementDescription
+            }</p>
+            
+            <h5 className="font-bold text-gray-800 mb-2">Faculty</h5>
+            <p className='text-sm text-gray-700 mb-4 break-words'>{facultyDescription
+            }</p>
+            
+            <h5 className="font-bold text-gray-800 mb-2">Campus</h5>
+            <p className='text-sm text-gray-700 mb-4 break-words'>{campusLifeDescription}</p>
 
             {/* Course Ratings */}
             {/* {ratingCategories.some(category => courseRatings[category]) ? ( */}
