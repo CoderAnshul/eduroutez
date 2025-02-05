@@ -1,99 +1,113 @@
-import React, { useState } from 'react'
-import PageBanner from '../Ui components/PageBanner'
-import BlogandCareerBox from '../Ui components/BlogandCareerBox'
-import Events from '../Components/Events'
-import ConsellingBanner from '../Components/ConsellingBanner'
-import PopularCourses from '../Components/PopularCourses'
-import { useQuery } from 'react-query'
-import { blogs } from '../ApiFunctions/api'
-import HighRatedCareers from '../Components/HighRatedCareers'
-import axios from 'axios'
+import React, { useState, useEffect } from 'react';
+import { useQuery } from 'react-query';
+import axios from 'axios';
+import PageBanner from '../Ui components/PageBanner';
+import BlogandCareerBox from '../Ui components/BlogandCareerBox';
+import Events from '../Components/Events';
+import ConsellingBanner from '../Components/ConsellingBanner';
+import PopularCourses from '../Components/PopularCourses';
+import HighRatedCareers from '../Components/HighRatedCareers';
 
 const Blogpage = () => {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [page, setPage] = useState(1);
-    const itemsPerPage = 8; // Set number of items per page
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredData, setFilteredData] = useState([]);
+    const itemsPerPage = 8;
 
     const baseURL = import.meta.env.VITE_BASE_URL;
-    
-    // Fetch blogs with pagination
+
+    // Fetch all blogs at once
     const { data: blogData, isLoading: blogLoading, isError: blogError, error: blogFetchError } = useQuery(
-      ['blogs', page], 
-      () => blogs(page),
-      { 
-        enabled: true,
-        keepPreviousData: true // Keep previous data while fetching new page
-      }
+        ['all-blogs'],
+        async () => {
+            const response = await axios.get(`${baseURL}/blogs`, {
+                params: {
+                    limit: 1000 // Fetch a large number of blogs
+                }
+            });
+            return response.data;
+        },
+        { enabled: true }
     );
 
     // Fetch categories
     const { data: categoryData, isLoading: categoryLoading, isError: categoryError } = useQuery(
-      ['blog-categories'],
-      async () => {
-        const response = await axios.get(`${baseURL}/blog-category`);
-        return response.data;
-      },
-      { enabled: true }
+        ['blog-categories'],
+        async () => {
+            const response = await axios.get(`${baseURL}/blog-category`);
+            return response.data;
+        },
+        { enabled: true }
     );
+
+    // Filter and paginate data
+    useEffect(() => {
+        if (!blogData?.data?.result) return;
+
+        let filtered = blogData.data.result;
+
+        // Apply category filter
+        if (selectedCategories.length > 0) {
+            filtered = filtered.filter(blog => 
+                blog && blog.category && selectedCategories.includes(blog.category)
+            );
+        }
+
+        // Apply search filter
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            filtered = filtered.filter(blog =>
+                blog?.title?.toLowerCase()?.includes(term) ||
+                blog?.category?.toLowerCase()?.includes(term)
+            );
+        }
+
+        setFilteredData(filtered);
+        setPage(1); // Reset to first page when filters change
+    }, [blogData, selectedCategories, searchTerm]);
 
     const handleCategoryChange = (category) => {
         if (!category) return;
-        setSelectedCategories((prev) =>
+        setSelectedCategories(prev =>
             prev.includes(category)
-                ? prev.filter((cat) => cat !== category)
+                ? prev.filter(cat => cat !== category)
                 : [...prev, category]
         );
-        setPage(1); // Reset to first page when changing categories
+    };
+
+    const handleSearch = (value) => {
+        setSearchTerm(value);
     };
 
     const handlePageChange = (newPage) => {
         setPage(newPage);
-        window.scrollTo(0, 0); // Scroll to top when changing pages
+        window.scrollTo(0, 0);
     };
-  
+
     if (blogLoading || categoryLoading) {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     }
 
     if (blogError || categoryError) {
-        return <div className="min-h-screen flex items-center justify-center">
-            Error: {blogFetchError?.message || 'Something went wrong'}
-        </div>;
-    }
-
-    if (!blogData?.data) {
-        return <div className="min-h-screen flex items-center justify-center">
-            No blog data available
-        </div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                Error: {blogFetchError?.message || 'Something went wrong'}
+            </div>
+        );
     }
 
     const categories = categoryData?.data?.result || [];
-    const totalItems = blogData?.data?.totalDocuments;
+    const totalItems = filteredData.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-    const filteredBlogData = selectedCategories.length > 0
-        ? blogData?.data?.result?.filter((blog) =>
-            blog && blog.category && selectedCategories.includes(blog.category)
-        )
-        : blogData?.data?.result;
+    // Get current page items
+    const currentItems = filteredData.slice(
+        (page - 1) * itemsPerPage,
+        page * itemsPerPage
+    );
 
-    const handleSearch = (searchTerm) => {
-        if (!searchTerm || !blogData?.data?.result) return;
-        
-        const term = searchTerm.toLowerCase().trim();
-        setSelectedCategories(
-            blogData.data.result
-                .filter((blog) =>
-                    blog?.title?.toLowerCase()?.includes(term)
-                )
-                .map((blog) => blog?.category)
-                .filter(Boolean)
-        );
-        setPage(1); // Reset to first page when searching
-    };
-
-    // Pagination component
     const Pagination = () => {
         const pageNumbers = [];
         const maxVisiblePages = 5;
@@ -235,6 +249,7 @@ const Blogpage = () => {
                             placeholder="Search..."
                             className="w-full p-2 border-2 border-gray-300 rounded-lg"
                             onChange={(e) => handleSearch(e.target.value)}
+                            value={searchTerm}
                         />
                     </div>
                     <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
@@ -265,9 +280,7 @@ const Blogpage = () => {
                             </span>
                         ))}
                     </div>
-                    <BlogandCareerBox 
-                        blogData={filteredBlogData || []} 
-                    />
+                    <BlogandCareerBox blogData={currentItems || []} />
                     <Pagination />
                 </div>
             </div>
@@ -279,7 +292,7 @@ const Blogpage = () => {
                 <ConsellingBanner />
             </div>
         </>
-    )
-}
+    );
+};
 
-export default Blogpage
+export default Blogpage;
