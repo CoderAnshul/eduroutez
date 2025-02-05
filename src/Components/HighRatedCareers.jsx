@@ -27,8 +27,8 @@ const HighRatedCareers = () => {
 
           // Fetch images for each career
           const imagePromises = result.map(async (career) => {
-            if (career.image) {
-              const imageResponse = await fetch(`${Images}/${career.image}`);
+            if (career.thumbnail) {
+              const imageResponse = await fetch(`${Images}/${career.thumbnail}`);
               const imageBlob = await imageResponse.blob();
               const imageObjectURL = URL.createObjectURL(imageBlob);
               return { id: career._id, url: imageObjectURL };

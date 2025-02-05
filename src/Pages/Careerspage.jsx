@@ -79,9 +79,9 @@ const Careerspage = () => {
       const filteredData = getFilteredData();
       if (filteredData) {
         const imagePromises = filteredData.map(async (career) => {
-          if (!imageUrls[career.image]) {
-            const url = await fetchImage(career.image);
-            return { [career.image]: url };
+          if (!imageUrls[career.thumbnail]) {
+            const url = await fetchImage(career.thumbnail);
+            return { [career.thumbnail]: url };
           }
           return null;
         });
@@ -215,13 +215,13 @@ const Careerspage = () => {
                                 max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
               >
                 <div className="relative h-48">
-                  {!imageUrls[career.image] ? (
+                  {!imageUrls[career.thumbnail] ? (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100">
                       <p>Loading image...</p>
                     </div>
                   ) : (
                     <img
-                      src={imageUrls[career.image]}
+                        src={imageUrls[career.thumbnail]}
                       alt={career.title}
                       className="w-full h-full rounded-xl object-cover"
                     />
