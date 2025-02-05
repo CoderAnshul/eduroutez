@@ -11,7 +11,7 @@ const SearchableDropdown = ({ options, onChange }) => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredOptions = options.filter((option) =>
+  const filteredOptions = (options || [])?.filter((option) =>
     option.instituteName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
