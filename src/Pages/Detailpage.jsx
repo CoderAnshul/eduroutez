@@ -89,7 +89,7 @@ const DetailPage = () => {
   `;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <><div className="min-h-screen bg-gray-50">
       {/* Banner Section */}
       <div className="container max-w-[1300px] mx-auto px-6 py-8">
         <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg mb-8">
@@ -129,13 +129,13 @@ const DetailPage = () => {
           {tabConfig.map((tab) => {
             const content = getContent(tab.id);
             const isArray = Array.isArray(content);
-            
+
             return (
-              <div 
-                key={tab.id} 
+              <div
+                key={tab.id}
                 className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-8 scroll-mt-24"
               >
-                <h3 
+                <h3
                   ref={tab.titleRef}
                   className="text-lg font-bold mb-6"
                 >
@@ -144,8 +144,8 @@ const DetailPage = () => {
                 {isArray ? (
                   <ul className="space-y-4">
                     {content.map((item, idx) => (
-                      <li 
-                        key={idx} 
+                      <li
+                        key={idx}
                         className={contentStyles}
                         dangerouslySetInnerHTML={{ __html: item }}
                       />
@@ -165,12 +165,14 @@ const DetailPage = () => {
 
       {/* Additional Components */}
       <div className="container max-w-[1300px] mx-auto px-6 py-8">
-        <div className="flex gap-4 flex-col sm:flex-row">
-          <Events />
-          <ConsellingBanner />
-        </div>
+       
       </div>
     </div>
+      <div className="flex flex-col sm:flex-row">
+        <Events />
+        <ConsellingBanner />
+      </div>
+    </>
   );
 };
 
