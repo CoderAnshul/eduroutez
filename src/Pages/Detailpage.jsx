@@ -97,7 +97,7 @@ const DetailPage = () => {
           <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg mb-8">
             <img
               className="h-full w-full object-cover"
-              src={${Images} /${data.image}}
+              src={`${Images}/${data.image}`}
             alt={data.title || "Career banner"}
           />
           </div>
@@ -155,10 +155,10 @@ const DetailPage = () => {
                     </ul>
                   ) : (
                     <div
-                      className={${contentStyles} text-base prose prose-gray max-w-full}
-                  dangerouslySetInnerHTML={{ __html: content }}
-                  />
-                )}
+                      className={`${contentStyles} text-base prose prose-gray max-w-full`}
+                      dangerouslySetInnerHTML={{ __html: content }}
+                    />
+                  )}
                 </div>
               );
             })}
