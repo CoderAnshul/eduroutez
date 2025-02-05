@@ -45,7 +45,7 @@ const ReferAndEarn = () => {
                         'x-refresh-token': localStorage.getItem('refreshToken')                    }
                 });
                 console.log("Referral History:", response.data.data);
-                setReferrals(response.data.data.result || []);
+                setReferrals(response.data.data || []);
             } catch (error) {
                 console.error("Error fetching referral history:", error);
             }
@@ -129,16 +129,16 @@ const ReferAndEarn = () => {
                                     <div className="flex justify-between items-center">
                                         <div>
                                             <h3 className="text-lg font-bold text-gray-800">{referral.name}</h3>
-                                            <p className="text-gray-600">{referral.date}</p>
+                                            <p className="text-gray-600">{new Date(referral.createdAt).toLocaleDateString('en-GB')}</p>
                                         </div>
                                         <span
                                             className={`px-4 py-2 rounded-lg text-white font-semibold ${
                                                 referral.status === 'Completed'
                                                     ? 'bg-green-500'
-                                                    : 'bg-yellow-500'
+                                                    : 'bg-green-500'
                                             }`}
                                         >
-                                            {referral.status}
+                                            50 Points
                                         </span>
                                     </div>
                                 </CardContent>

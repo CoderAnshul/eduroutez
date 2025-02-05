@@ -21,7 +21,7 @@ const PayoutForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         setLoading(true);
-        setError(null);
+        setError(null);   
         setSuccess(null);
 
         try {
@@ -55,6 +55,7 @@ const PayoutForm = () => {
                         <h2 className="text-2xl font-bold text-gray-900">
                             Request Payout
                         </h2>
+                        
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
