@@ -155,10 +155,10 @@ const DetailPage = () => {
                     </ul>
                   ) : (
                     <div
-                      className={${contentStyles} text-base prose prose-gray max-w-full}
-                  dangerouslySetInnerHTML={{ __html: content }}
-                  />
-                )}
+                      className={`${contentStyles} text-base prose prose-gray max-w-full`}
+                      dangerouslySetInnerHTML={{ __html: content }}
+                    />
+                  )}
                 </div>
               );
             })}
