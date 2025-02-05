@@ -10,6 +10,8 @@ import { useQuery } from 'react-query';
 import { getInstitutes } from '../ApiFunctions/api';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
+import BlogComponent from '../Components/BlogComponent';
+import HighRatedCareers from '../Components/HighRatedCareers';
 
 const SearchPage = () => {
   const tabs = [
@@ -264,6 +266,9 @@ const SearchPage = () => {
           </div>
         </div>
       </div>
+      <BlogComponent></BlogComponent>
+      <HighRatedCareers></HighRatedCareers>
+
       <BestRated />
       <Events />
     </>

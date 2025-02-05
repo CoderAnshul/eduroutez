@@ -7,6 +7,12 @@ import rupee from '../assets/Images/rupee.png';
 import CustomButton from '../Ui components/CustomButton';
 import { useQuery } from 'react-query';
 import { AllpopularCourses } from '../ApiFunctions/api';
+import HighRatedCareers from '../Components/HighRatedCareers';
+import BlogComponent from '../Components/BlogComponent';
+import BestRated from '../Components/BestRated';
+import Events from '../Components/Events';
+import ConsellingBanner from '../Components/ConsellingBanner';
+
 
 const PopularCourses = () => {
   const [content, setContent] = useState([]);
@@ -76,6 +82,7 @@ const PopularCourses = () => {
   }
 
   return (
+    <>
     <div>
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center">
@@ -150,7 +157,16 @@ const PopularCourses = () => {
           ))}
         </div>
       </div>
+      
     </div>
+      <HighRatedCareers></HighRatedCareers>
+      <BlogComponent/>      <BestRated />
+      
+            <div className="w-full flex items-start  mt-10">
+              <Events />
+              <ConsellingBanner />
+            </div>
+            </>
   );
 };
 

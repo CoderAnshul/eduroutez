@@ -6,6 +6,7 @@ import ConsellingBanner from '../Components/ConsellingBanner'
 import PopularCourses from '../Components/PopularCourses'
 import { useQuery } from 'react-query'
 import { blogs } from '../ApiFunctions/api'
+import HighRatedCareers from '../Components/HighRatedCareers'
 import axios from 'axios'
 
 const Blogpage = () => {
@@ -272,6 +273,7 @@ const Blogpage = () => {
             </div>
 
             <PopularCourses />
+            <HighRatedCareers />
             <div className="flex gap-2 items-center">
                 <Events />
                 <ConsellingBanner />

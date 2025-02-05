@@ -8,6 +8,10 @@ import CustomButton from '../Ui components/CustomButton';
 import {alltrendingInstitute,allbestRatedInstitute, getInstituteById, trendingInstitute } from '../ApiFunctions/api';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
+import BlogComponent from '../Components/BlogComponent';
+import HighRatedCareers from '../Components/HighRatedCareers';
+import Events from '../Components/Events';
+import ConsellingBanner from '../Components/ConsellingBanner';
 const Images=import.meta.env.VITE_IMAGE_BASE_URL;
 
 
@@ -37,6 +41,7 @@ const TrendingInstitute = () => {
     }
 
     return (
+        <>
         <div className='w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto'>
             <div className='flex items-center justify-between mb-10'>
                 <h3 className='text-xl font-bold'>Trending institute</h3>
@@ -69,7 +74,14 @@ const TrendingInstitute = () => {
                     }
                 })}
             </div>
+            <BlogComponent></BlogComponent>
+            <HighRatedCareers></HighRatedCareers>
         </div>
+        <div className="flex gap-4 flex-col sm:flex-row">
+          <Events />
+          <ConsellingBanner />
+        </div>
+        </>
     );
 };
 

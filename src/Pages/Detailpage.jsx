@@ -5,6 +5,7 @@ import { CarrerDetail } from "../ApiFunctions/api";
 import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
+import BlogComponent from "../Components/BlogComponent";
 
 const DetailPage = () => {
   const [data, setData] = useState(null);
@@ -89,6 +90,7 @@ const DetailPage = () => {
   `;
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50">
       {/* Banner Section */}
       <div className="container max-w-[1300px] mx-auto px-6 py-8">
@@ -164,13 +166,13 @@ const DetailPage = () => {
       </div>
 
       {/* Additional Components */}
-      <div className="container max-w-[1300px] mx-auto px-6 py-8">
-        <div className="flex gap-4 flex-col sm:flex-row">
+     <BlogComponent />
+    </div>
+    <div className="flex gap-4 flex-col sm:flex-row">
           <Events />
           <ConsellingBanner />
         </div>
-      </div>
-    </div>
+    </>
   );
 };
 

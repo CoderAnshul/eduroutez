@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { blogById, getRecentBlogs } from '../ApiFunctions/api';
 import { useParams, Link } from 'react-router-dom';
+import HighRatedCareers from '../Components/HighRatedCareers';
+import Events from '../Components/Events';
+import ConsellingBanner from '../Components/ConsellingBanner';
 
 const BlogDetailPage = () => {
   const [data, setData] = useState(null);
@@ -71,6 +74,7 @@ const BlogDetailPage = () => {
   }
 
   return (
+    <>
     <div className="container max-w-[1300px] mx-auto mt-10 p-4">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         {imageUrl && (
@@ -169,7 +173,15 @@ const BlogDetailPage = () => {
           )}
         </div>
       </div>
+
+      <HighRatedCareers></HighRatedCareers>
+ 
     </div>
+    <div className="flex gap-2 items-center">
+                <Events />
+                <ConsellingBanner />
+            </div>
+</>
   );
 };
 
