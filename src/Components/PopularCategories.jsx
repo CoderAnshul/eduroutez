@@ -69,6 +69,7 @@ const PopularCategories = () => {
       .map((category, index) => (
         <Link
           key={index}
+          to={`/counselor?category=${category.name}`}
           className='h-12 py-2 px-2 md:px-3 md:max-w-auto flex flex-1 max-w-fit gap-1 whitespace-nowrap items-center rounded-full bg-white'
         >
           <h4 className='text-xs md:text-md'>
@@ -85,4 +86,3 @@ const PopularCategories = () => {
 };
 
 export default PopularCategories;
-

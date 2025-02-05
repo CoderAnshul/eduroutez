@@ -9,6 +9,13 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
     suggestionsStars: 0,
   });
 
+  const [errors, setErrors] = useState({
+    placementDescription: "",
+    facultyDescription: "",
+    campusLifeDescription: "",
+    suggestionDescription: "",
+  });
+
   const handleRatingChange = (category, newValue) => {
     setRatings((prev) => {
       const updatedRatings = { ...prev, [category]: newValue };
@@ -26,6 +33,18 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
       ...prevFormData,
       [id]: value,
     }));
+
+    if (value.length < 100) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [id]: "Description must be at least 100 characters long.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [id]: "",
+      }));
+    }
   };
 
   const handleRadioChange = (e) => {
@@ -88,6 +107,11 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your review on placements..."
             ></textarea>
+            {errors.placementDescription && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.placementDescription}
+              </p>
+            )}
           </div>
 
           {/* Faculty / Course Content */}
@@ -111,6 +135,11 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your review on faculty or course content..."
             ></textarea>
+            {errors.facultyDescription && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.facultyDescription}
+              </p>
+            )}
           </div>
 
           {/* Campus / Hostel */}
@@ -134,6 +163,11 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your review on campus or hostel..."
             ></textarea>
+            {errors.campusLifeDescription && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.campusLifeDescription}
+              </p>
+            )}
           </div>
 
           {/* Suggestions */}
@@ -157,6 +191,11 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your suggestions..."
             ></textarea>
+            {errors.suggestionDescription && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.suggestionDescription}
+              </p>
+            )}
           </div>
 
           {/* Recommendation */}

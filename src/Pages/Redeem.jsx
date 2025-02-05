@@ -79,6 +79,30 @@ const Redeem = () => {
         setRedeemPoints(''); // Reset input
     };
 
+    useEffect(() => {
+        const fetchRedemptionHistory = async () => {
+            try {
+                const userId = localStorage.getItem('userId'); // Get user ID from localStorage
+                if (!userId) throw new Error("User ID not found in localStorage");
+
+                const response = await axios.get(`${VITE_BASE_URL}/redeem-history`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-access-token': localStorage.getItem('accessToken'),
+                        'x-refresh-token': localStorage.getItem('refreshToken')
+                    }
+                });
+
+                setHistory(response.data?.data?.result || []); // Set history from the response
+            } catch (error) {
+                console.error("Error fetching redemption history:", error);
+                setMessage("Failed to fetch redemption history.");
+            }
+        };
+
+        fetchRedemptionHistory();
+    }, []);
+
     return (
         <div className="max-w-4xl mx-auto p-6 space-y-8">
             {/* Points Summary */}
@@ -136,10 +160,13 @@ const Redeem = () => {
                                 key={index}
                                 className="flex justify-between items-center bg-white rounded-lg shadow-sm p-4 border"
                             >
-                                <span className="font-semibold text-gray-700">
-                                    Redeemed: <span className="text-red-600">{entry.points} pts</span>
-                                </span>
-                                <span className="text-sm text-gray-500">{entry.timestamp}</span>
+                                <div>
+                                    <span className="font-semibold text-gray-700">
+                                        Redeemed: <span className="text-red-600">{entry.points} pts</span>
+                                    </span>
+                                    <p className="text-sm text-gray-500">{entry.remarks}</p>
+                                </div>
+                                <span className="text-sm text-gray-500">{new Date(entry.createdAt).toLocaleString()}</span>
                             </li>
                         ))}
                     </ul>
