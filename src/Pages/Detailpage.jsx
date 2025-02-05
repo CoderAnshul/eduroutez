@@ -5,6 +5,7 @@ import { CarrerDetail } from "../ApiFunctions/api";
 import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
+import BlogComponent from "../Components/BlogComponent";
 
 const DetailPage = () => {
   const [data, setData] = useState(null);
@@ -89,86 +90,85 @@ const DetailPage = () => {
   `;
 
   return (
-    <><div className="min-h-screen bg-gray-50">
-      {/* Banner Section */}
-      <div className="container max-w-[1300px] mx-auto px-6 py-8">
-        <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg mb-8">
-          <img
-            className="h-full w-full object-cover"
-            src={`${Images}/${data.image}`}
+    <>
+      <div className="min-h-screen bg-gray-50">
+        {/* Banner Section */}
+        <div className="container max-w-[1300px] mx-auto px-6 py-8">
+          <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg mb-8">
+            <img
+              className="h-full w-full object-cover"
+              src={${Images} /${data.image}}
             alt={data.title || "Career banner"}
           />
-        </div>
+          </div>
 
-        {/* Navigation Tabs */}
-        <div className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-4 sticky top-0 z-50">
-          <h1 className="text-2xl font-bold mb-6 px-4">{data.title || "Career Details"}</h1>
-          <div className="w-full overflow-x-auto">
-            <div className="border rounded-xl border-gray-200">
-              <ul className="flex justify-evenly items-center whitespace-nowrap">
-                {tabConfig.map((tab) => (
-                  <li
-                    key={tab.id}
-                    className={`cursor-pointer px-8 py-3 text-sm font-medium transition-all duration-200 
+          {/* Navigation Tabs */}
+          <div className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-4 sticky top-0 z-50">
+            <h1 className="text-2xl font-bold mb-6 px-4">{data.title || "Career Details"}</h1>
+            <div className="w-full overflow-x-auto">
+              <div className="border rounded-xl border-gray-200">
+                <ul className="flex justify-evenly items-center whitespace-nowrap">
+                  {tabConfig.map((tab) => (
+                    <li
+                      key={tab.id}
+                      className={`cursor-pointer px-8 py-3 text-sm font-medium transition-all duration-200 
                       ${activeTab === tab.name
-                        ? "bg-red-600 rounded-full mx-2 text-white"
-                        : "text-gray-700 hover:text-black hover:bg-gray-50 rounded-full mx-2"
-                      }`}
-                    onClick={() => scrollToSection(tab)}
+                          ? "bg-red-600 rounded-full mx-2 text-white"
+                          : "text-gray-700 hover:text-black hover:bg-gray-50 rounded-full mx-2"
+                        }`}
+                      onClick={() => scrollToSection(tab)}
+                    >
+                      {tab.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Content Sections */}
+          <div className="mt-10 space-y-8">
+            {tabConfig.map((tab) => {
+              const content = getContent(tab.id);
+              const isArray = Array.isArray(content);
+
+              return (
+                <div
+                  key={tab.id}
+                  className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-8 scroll-mt-24"
+                >
+                  <h3
+                    ref={tab.titleRef}
+                    className="text-lg font-bold mb-6"
                   >
                     {tab.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
+                  </h3>
+                  {isArray ? (
+                    <ul className="space-y-4">
+                      {content.map((item, idx) => (
+                        <li
+                          key={idx}
+                          className={contentStyles}
+                          dangerouslySetInnerHTML={{ __html: item }}
+                        />
+                      ))}
+                    </ul>
+                  ) : (
+                    <div
+                      className={${contentStyles} text-base prose prose-gray max-w-full}
+                  dangerouslySetInnerHTML={{ __html: content }}
+                  />
+                )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Content Sections */}
-        <div className="mt-10 space-y-8">
-          {tabConfig.map((tab) => {
-            const content = getContent(tab.id);
-            const isArray = Array.isArray(content);
-
-            return (
-              <div
-                key={tab.id}
-                className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-8 scroll-mt-24"
-              >
-                <h3
-                  ref={tab.titleRef}
-                  className="text-lg font-bold mb-6"
-                >
-                  {tab.name}
-                </h3>
-                {isArray ? (
-                  <ul className="space-y-4">
-                    {content.map((item, idx) => (
-                      <li
-                        key={idx}
-                        className={contentStyles}
-                        dangerouslySetInnerHTML={{ __html: item }}
-                      />
-                    ))}
-                  </ul>
-                ) : (
-                  <div
-                    className={`${contentStyles} text-base prose prose-gray max-w-full`}
-                    dangerouslySetInnerHTML={{ __html: content }}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
+        {/* Additional Components */}
+        <BlogComponent />
       </div>
-
-      {/* Additional Components */}
-      <div className="container max-w-[1300px] mx-auto px-6 py-8">
-       
-      </div>
-    </div>
-      <div className="flex flex-col sm:flex-row">
+      <div className="flex gap-4 flex-col sm:flex-row">
         <Events />
         <ConsellingBanner />
       </div>

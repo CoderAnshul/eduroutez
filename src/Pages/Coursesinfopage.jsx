@@ -9,6 +9,8 @@ import Events from '../Components/Events';
 import { getCoursesById } from '../ApiFunctions/api';
 import { useQuery } from 'react-query';
 import ConsellingBanner from '../Components/ConsellingBanner';
+import HighRatedCareers from '../Components/HighRatedCareers';
+import BlogComponent from '../Components/BlogComponent';
 
 const tabs = [
   "Overview",
@@ -150,7 +152,8 @@ const Coursesinfopage = () => {
       </div>
 
       {/* Additional Sections */}
-      <BestRated />
+      <HighRatedCareers></HighRatedCareers>
+<BlogComponent/>      <BestRated />
 
     </div>
       <div className="w-full flex items-start  mt-10">

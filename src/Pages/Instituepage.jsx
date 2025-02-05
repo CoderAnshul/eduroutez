@@ -27,6 +27,8 @@ import Ranking from '../Components/Ranking'
 import News from '../Components/News'
 import { Feed } from '@mui/icons-material'
 import Webinar from '../Components/Webinar'
+import HighRatedCareers from '../Components/HighRatedCareers'
+import BlogComponent from '../Components/BlogComponent'
 
 const tabs = [
   "College Info",
@@ -299,6 +301,8 @@ const Instituepage = () => {
                 <QueryForm instituteData={instituteData}/>
 
              </div>
+             <HighRatedCareers></HighRatedCareers>
+             <BlogComponent></BlogComponent>
              <BestRated/>
              <Events className="!w-full"/>
         </div>

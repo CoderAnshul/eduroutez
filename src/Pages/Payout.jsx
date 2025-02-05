@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Wallet, AlertCircle, CheckCircle2, DollarSign } from 'lucide-react';
 import axiosInstance from '../ApiFunctions/axios';
 import { toast } from 'sonner';
@@ -11,12 +11,36 @@ const PayoutForm = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
-    const apiUrl= import.meta.env.VITE_BASE_URL;
-
+    const [userPoints, setUserPoints] = useState(0);
+    const apiUrl = import.meta.env.VITE_BASE_URL;
 
     const paymentMethods = [
         { id: 'bank', name: 'Bank Transfer', icon: Wallet }
     ];
+
+    useEffect(() => {
+        const fetchUserPoints = async () => {
+            try {
+                const userId = localStorage.getItem('userId'); // Get user ID from localStorage
+                if (!userId) throw new Error("User ID not found in localStorage");
+
+                const response = await axiosInstance.get(`${apiUrl}/user/`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-access-token': localStorage.getItem('accessToken'),
+                        'x-refresh-token': localStorage.getItem('refreshToken')
+                    }
+                });
+
+                setUserPoints(response.data.data?.balance || 0); // Set points from the response
+            } catch (error) {
+                console.error("Error fetching user points:", error);
+                setError("Failed to fetch points.");
+            }
+        };
+
+        fetchUserPoints();
+    }, [apiUrl]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -53,27 +77,27 @@ const PayoutForm = () => {
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="text-center pb-8">
                         <h2 className="text-2xl font-bold text-gray-900">
-                            Request Payout
+                            Payout Request Form
                         </h2>
-                        
                     </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-8">
-                        {/* Payment Method Selection */}
+                    <div className="text-center pb-4">
+                        <h3 className="text-xl font-medium text-gray-700">
+                            Current Balance: {userPoints} points
+                        </h3>
+                    </div>
+                    <form onSubmit={handleSubmit}>
                         <div className="space-y-4">
                             <label className="block text-sm font-medium text-gray-700">
-                                Select Payment Method
+                                Payment Method
                             </label>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="flex space-x-4 mb-8">
                                 {paymentMethods.map((method) => (
                                     <button
                                         key={method.id}
                                         type="button"
                                         onClick={() => setPaymentMethod(method.name)}
-                                        className={`p-4 border rounded-lg flex flex-col items-center justify-center gap-2 transition-all ${
-                                            paymentMethod === method.name
-                                                ? 'border-red-500 bg-red-50 text-red-600'
-                                                : 'border-gray-200 hover:border-gray-300'
+                                        className={`flex items-center space-x-2 p-2 border mb-8 rounded-lg ${
+                                            paymentMethod === method.name ? 'border-red-500' : 'border-gray-200'
                                         }`}
                                     >
                                         <method.icon className="w-6 h-6" />
@@ -96,7 +120,7 @@ const PayoutForm = () => {
                                     type="number"
                                     value={requestedAmount}
                                     onChange={(e) => setRequestedAmount(Number(e.target.value))}
-                                    className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                    className="block w-full pl-10 mb-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                     placeholder="Enter amount"
                                     min="0"
                                     step="0.01"

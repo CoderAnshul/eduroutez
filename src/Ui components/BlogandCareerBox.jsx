@@ -56,7 +56,7 @@ console.log('dftgyhuj',blogData);
                 ></p>
                 {blog.description &&
                   blog.description.split(" ").length > 30 && (
-                    <span>........</span>
+                    <span>....</span>
                   )}
                 <p className="text-sm text-gray-600 mt-2 bg-blue-100 p-1 rounded-lg inline-block">
                   <badge>

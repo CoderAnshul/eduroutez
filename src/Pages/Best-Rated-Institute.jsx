@@ -7,6 +7,11 @@ import rupee from "../assets/Images/rupee.png";
 import CustomButton from "../Ui components/CustomButton";
 import { useQuery } from "react-query";
 import { allbestRatedInstitute } from "../ApiFunctions/api";
+import HighRatedCareers from "../Components/HighRatedCareers";
+import BlogComponent from "../Components/BlogComponent";
+import Events from "../Components/Events";
+import ConsellingBanner from "../Components/ConsellingBanner";
+
 
 const BestRated = () => {
     const [content, setContent] = useState([]);
@@ -55,6 +60,7 @@ const BestRated = () => {
     }
 
     return (
+        <>
         <div className="w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
             {/* Hero Section */}
             <div className="relative bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-8">
@@ -122,6 +128,15 @@ const BestRated = () => {
                 </div>
             )}
         </div>
+        <HighRatedCareers></HighRatedCareers>
+      <BlogComponent/> 
+           <BestRated />
+      
+            <div className="w-full flex items-start  mt-10">
+              <Events />
+              <ConsellingBanner />
+            </div>
+        </>
     );
 };
 

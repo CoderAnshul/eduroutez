@@ -65,7 +65,7 @@ const HighRatedCareers = () => {
   }
 
   return (
-    <div className='w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10'>
+    <div className='w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto'>
       <div className='flex items-center justify-between mb-10'>
         <h3 className='text-xl font-bold'>High Rated careers</h3>
         <Link to="/careerspage">
