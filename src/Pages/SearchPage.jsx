@@ -1,38 +1,245 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PageBanner from '../Ui components/PageBanner';
 import SearchResultInfo from '../Ui components/SearchResultInfo';
 import ExpandedBox from '../Ui components/ExpandedBox';
-import Filter from '../Ui components/Filter';
 import SearchResultBox from '../Ui components/SearchResultBox';
+import Filter from '../Ui components/Filter';
 import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
-import { useQuery } from 'react-query';
-import { getInstitutes } from '../ApiFunctions/api';
-import { useSelector } from 'react-redux';
 import axios from 'axios';
 import BlogComponent from '../Components/BlogComponent';
 import HighRatedCareers from '../Components/HighRatedCareers';
-
+import { useQuery } from 'react-query';
+import { getInstitutes } from '../ApiFunctions/api';
+import { useSelector } from 'react-redux';
 const SearchPage = () => {
-  const tabs = [
-    { id: "best-rated", label: "Best Rated" },
-    { id: "most-popular", label: "Most Popular" },
-    { id: "latest", label: "Latest" },
-  ];
-
-  const [activeFilter, setActiveFilter] = useState(tabs[0].id);
   const [selectedFilters, setSelectedFilters] = useState({});
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [title, setTitle] = useState(null);
-  const [value, setValue] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [content, setContent] = useState([]);
   const [filteredContent, setFilteredContent] = useState([]);
-  const [visibleItems, setVisibleItems] = useState(10); // Initially show 10 items
   const [totalDocuments, setTotalDocuments] = useState(0);
-  const inputField = useSelector(store => store.input.inputField)
-  // console.log("input field " + inputField)
-  // console.log(content)
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
+  const inputField = useSelector(store => store.input.inputField);
 
+  const baseURL = import.meta.env.VITE_BASE_URL;
+
+
+
+  const staticStateLocations = [
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "Andaman and Nicobar Islands",
+    "Chandigarh",
+    "Dadra and Nagar Haveli",
+    "Daman and Diu",
+    "Delhi",
+    "Jammu and Kashmir",
+    "Ladakh",
+    "Lakshadweep",
+    "Puducherry"
+  ];
+
+  const staticCities = [
+    "Mumbai",
+    "Delhi",
+    "Bangalore",
+    "Hyderabad",
+    "Ahmedabad",
+    "Chennai",
+    "Kolkata",
+    "Pune",
+    "Jaipur",
+    "Surat",
+    "Lucknow",
+    "Kanpur",
+    "Nagpur",
+    "Indore",
+    "Thane",
+    "Bhopal",
+    "Visakhapatnam",
+    "Pimpri-Chinchwad",
+    "Patna",
+    "Vadodara",
+    "Ghaziabad",
+    "Ludhiana",
+    "Agra",
+    "Nashik",
+    "Faridabad",
+    "Meerut",
+    "Rajkot",
+    "Kalyan-Dombivli",
+    "Vasai-Virar",
+    "Varanasi",
+    "Srinagar",
+    "Aurangabad",
+    "Dhanbad",
+    "Amritsar",
+    "Navi Mumbai",
+    "Allahabad",
+    "Ranchi",
+    "Howrah",
+    "Coimbatore",
+    "Jabalpur",
+    "Gwalior",
+    "Vijayawada",
+    "Jodhpur",
+    "Madurai",
+    "Raipur",
+    "Kota",
+    "Guwahati",
+    "Chandigarh",
+    "Solapur",
+    "Hubli-Dharwad",
+    "Mysore",
+    "Tiruchirappalli",
+    "Bareilly",
+    "Aligarh",
+    "Tiruppur",
+    "Moradabad",
+    "Jalandhar",
+    "Bhubaneswar",
+    "Salem",
+    "Warangal",
+    "Guntur",
+    "Bhiwandi",
+    "Saharanpur",
+    "Gorakhpur",
+    "Bikaner",
+    "Amravati",
+    "Noida",
+    "Jamshedpur",
+    "Bhilai",
+    "Cuttack",
+    "Firozabad",
+    "Kochi",
+    "Bhavnagar",
+    "Dehradun",
+    "Durgapur",
+    "Asansol",
+    "Nanded",
+    "Kolhapur",
+    "Ajmer",
+    "Gulbarga",
+    "Jamnagar",
+    "Ujjain",
+    "Loni",
+    "Siliguri",
+    "Jhansi",
+    "Ulhasnagar",
+    "Nellore",
+    "Jammu",
+    "Sangli-Miraj & Kupwad",
+    "Belgaum",
+    "Mangalore",
+    "Ambattur",
+    "Tirunelveli",
+    "Malegaon",
+    "Gaya",
+    "Jalgaon",
+    "Udaipur",
+    "Maheshtala",
+    "Davanagere",
+    "Kozhikode",
+    "Kurnool",
+    "Rajpur Sonarpur",
+    "Bokaro"
+  ]
+
+
+  const filterSections = [
+    {
+      "title": "streams",
+      "items": [
+        "Computer Science Engineering",
+        "Mechanical Engineering",
+        "Civil Engineering",
+        "Electrical Engineering",
+        "Information Technology",
+        "Chemical Engineering",
+        "Aerospace Engineering",
+        "Electronics and Communication Engineering",
+        "Biotechnology Engineering",
+        "Automobile Engineering",
+        "Robotics Engineering",
+        "Petroleum Engineering",
+        "Artificial Intelligence and Data Science",
+        "Biomedical Engineering",
+        "Environmental Engineering"
+      ]
+    },
+
+    {
+      title: "state",
+      items: staticStateLocations, // Using static locations instead of API data
+    },
+
+    {
+      title: "city",
+      items: staticCities, // Using static locations instead of API data
+    },
+
+    {
+      title: "specialization",
+      items: [
+        "Computer Science & Engineering",
+        "Mechanical Engineering",
+        "Electrical & Electronics Engineering",
+        "Civil Engineering",
+        "Artificial Intelligence & Machine Learning",
+        "Data Science & Analytics",
+        "Cybersecurity",
+        "Robotics & Automation",
+        "Aerospace Engineering",
+        "Biotechnology Engineering"
+      ],
+    },
+    {
+      title: "Total Fees",
+      items: ["> 5 Lakh", "3 - 5 Lakh", "1 - 3 Lakh", "< 1 Lakh"],
+    },
+    {
+      title: "Exam",
+      items: [
+        "JEE Mains", "JEE Advanced", "BITSAT", "VITEEE", "SRMJEEE", 
+        "WBJEE", "COMEDK UGET", "NEET UG", "AIIMS", "JIPMER"
+      ]
+    },
+    {
+      title: "organisationType",
+      items: ["Private", "Public"],
+    },
+    {
+      title: "Ratings",
+      items: ["5 stars", "4 stars", "3 stars", "2 stars", "1 star"],
+    },
+  ];
 
   const { data, isLoading, isError } = useQuery(
     ["institute"],
@@ -49,226 +256,98 @@ const SearchPage = () => {
     }
   );
 
-  
 
+  // Handle filter selection
+  const handleFilterChange = (filterCategory, filterValue) => {
+    setSelectedFilters(prevFilters => {
+      const newFilters = { ...prevFilters };
+      if (!newFilters[filterCategory]) newFilters[filterCategory] = [];
+      if (newFilters[filterCategory].includes(filterValue)) {
+        newFilters[filterCategory] = newFilters[filterCategory].filter(value => value !== filterValue);
+        if (newFilters[filterCategory].length === 0) delete newFilters[filterCategory];
+      } else {
+        newFilters[filterCategory].push(filterValue);
+      }
+      return newFilters;
+    });
+  };
+
+  // Fetch data when filters change
   useEffect(() => {
-    if (title && value && content.length > 0) {
-      const filteredArray = content.filter(item => {
-        const hasKey = item.hasOwnProperty(title);
-        if (hasKey) {
-          const fieldValue = item[title];
-          if (Array.isArray(fieldValue)) {
-            return fieldValue.includes(value);
-          } else {
-            return fieldValue === value;
-          }
-        }
-        return false;
-      });
-      setFilteredContent(filteredArray);
+    if (Object.keys(selectedFilters).length > 0) {
+      fetchFilteredInstitutes(selectedFilters);
+    }
+  }, [selectedFilters]);
+
+  const fetchFilteredInstitutes = async (filters) => {
+    setLoading(true);
+    try {
+      const queryString = `filters=${encodeURIComponent(JSON.stringify(filters))}`;
+      const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+      if (response.data) {
+        setContent(response.data.data.result);
+        setFilteredContent(response.data.data.result);
+        setTotalDocuments(response.data.data.totalDocuments);
+      }
+    } catch (error) {
+      console.error('Error fetching filtered institutes:', error);
+      setFetchError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle search functionality
+  useEffect(() => {
+    if (searchQuery.length > 0) {
+      const filtered = content.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredContent(filtered);
     } else {
       setFilteredContent(content);
     }
-  }, [title, value, content]);
-
-  const toggleFilter = () => {
-    setIsFilterOpen(!isFilterOpen);
-  };
-
-  const handleFilterChange = (filterCategory, filterValue) => {
-    setSelectedFilters(prevFilters => ({
-      ...prevFilters,
-      [filterCategory]: filterValue,
-    }));
-  };
-
-  const loadMore = () => {
-    setVisibleItems(prevVisibleItems => prevVisibleItems + 10); // Show 10 more items
-  };
-
-  const loadLess = () => {
-    setVisibleItems(10); // Reset to initial 10 items
-  };
-
-  const contentData = [
-    {
-      title: "Introduction",
-      content: `The Indian Institute of Technology Bombay (IIT Bombay), established in 1958, is one of India's premier engineering and research institutions.`,
-    },
-    {
-      title: "Undergraduate Programs",
-      content: `IIT Bombay offers a range of undergraduate programs, primarily in engineering, science, and design.`,
-    },
-    {
-      title: "Admission Cutoffs",
-      content: `The admission cutoffs for IIT Bombay are highly competitive.`,
-    },
-    {
-      title: "Postgraduate Programs",
-      content: `IIT Bombay offers diverse postgraduate programs, including M.Tech, MBA, MSc, and Ph.D.`,
-    },
-  ];
-
-  const filterSections = [
-    {
-      title: "streams",
-      items: [
-        "Computer Science Engineering",
-        "Mechanical Engineering",
-        "Civil Engineering",
-        "Electrical Engineering",
-        "Information Technology",
-        "Chemical Engineering",
-        "Aerospace Engineering",
-      ],
-    },
-    {
-      title: "state",
-      items: [
-        "Rajasthan",
-        "Karnataka",
-        "Maharashtra",
-        "Madhya Pradesh",
-        "Uttar Pradesh",
-        "Delhi",
-        "Tamil Nadu"
-      ],
-    },
-    {
-      title: "city",
-      items: [
-        "Bangalore",
-        "Indore",
-        "Jaipur",
-        "Mumbai",
-        "Delhi",
-      ],
-    },
-    {
-      title: "specialization",
-      items: [
-        "Health Information Administration",
-        "Finance",
-        "Sales & Marketing",
-        "Human Resources",
-        "International Business",
-        "IT & Systems",
-      ],
-    },
-    {
-      title: "Total Fees",
-      items: ["> 5 Lakh"],
-    },
-    {
-      title: "Exam",
-      items: ["Jee Mains", "CAT", "GATE", "BITSAT"],
-    },
-    {
-      title: "organisationType",
-      items: ["Private", "Public"],
-    },
-    {
-      title: "Ratings",
-      items: ["5 stars", "4 stars", "3 stars", "2 stars", "1 star"],
-    },
-  ];
-
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">{console.log("calling api")}</div>;
-  }
-
-  if (isError) {
-    return <div className="flex justify-center items-center h-screen">Error loading institutes</div>;
-  }
+  }, [searchQuery, content]);
 
   return (
     <>
       <PageBanner pageName="Search" currectPage="Search" />
       <div className="px-[4vw] pb-[2vw] flex flex-col items-start">
         <SearchResultInfo />
-        <div className="border-2 mt-3 border-opacity-65 px-4 shadow-lg rounded-lg pt-3 border-gray-300 pb-1 w-full">
-          <ExpandedBox contentData={contentData} />
-        </div>
 
-        <div className="flex gap-4 w-full mt-14 relative">
-          <div className="filters w-[25%] mt-14 hidden lg:block">
-            <Filter 
-              filterSections={filterSections} 
-              settitle={setTitle} 
-              setvalue={setValue} 
-            />
+  
+
+        {/* Filter & Results Section */}
+        <div className="flex gap-4 w-full mt-6">
+          {/* Filters Sidebar */}
+          <div className="filters w-[25%] hidden lg:block">
+            <Filter filterSections={filterSections} handleFilterChange={handleFilterChange} />
           </div>
 
-          <div className={`filterResult w-full ${isFilterOpen ? 'lg:w-[75%]' : 'lg:w-[75%]'}`}>
-            <div className="flex flex-col py-4 px-2 border-b">
-              <button
-                onClick={toggleFilter}
-                className="lg:hidden max-w-28 bg-red-500 text-white py-2 px-4 rounded-lg"
-              >
-                Filter
-              </button>
-              <div className="flex items-center justify-between mt-3 flex-wrap whitespace-nowrap w-full">
-                <div className="text-sm text-gray-700">
-                  <span className="font-semibold text-red-500">
-                    {totalDocuments || "0"}
-                  </span>{" "}
-                  Institutes
+          {/* Search & Filter Results */}
+          <div className="filterResult w-full">
+            {loading ? (
+              <div className="text-center py-8">Loading results...</div>
+            ) : fetchError ? (
+              <div className="text-center py-8 text-red-500">Error fetching results</div>
+            ) : filteredContent.length > 0 ? (
+              <>
+                <div className="text-sm text-gray-700 mb-2">
+                  <span className="font-semibold text-red-500">{totalDocuments || "0"}</span> Institutes Found
                 </div>
-                <div className="flex border-2 border-opacity-15">
-                  {tabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveFilter(tab.id)}
-                      className={`text-xs md:text-sm py-2 px-3 ${
-                        tab.id !== tabs[tabs.length - 1].id ? 'border-r-2' : ''
-                      } border-opacity-15 font-medium transition-colors ${
-                        activeFilter === tab.id 
-                          ? 'text-red-500 border-red-500 font-semibold' 
-                          : 'text-gray-700'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Display institutes */}
-            {filteredContent?.slice(0, visibleItems).map((institute, index) => (
-              <SearchResultBox key={institute._id || index} institute={institute} />
-            ))}
-
-            {/* "See More" button - show if there are more items to display */}
-            {/* {visibleItems < filteredContent && (
-              
-              <div className="flex justify-center mt-8">
-                <button
-                  onClick={loadMore}
-                  className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
-                >
-                  See More
-                </button>
-              </div>
-            )} */}
-
-            {/* "See Less" button - show if expanded and there are more than 10 items */}
-            {visibleItems > 10 && (
-              <div className="flex justify-center mt-8">
-                <button
-                  onClick={loadLess}
-                  className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
-                >
-                  See Less
-                </button>
-              </div>
+                {filteredContent.map((institute, index) => (
+                  <SearchResultBox key={index} institute={institute} />
+                ))}
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-500">No institutes found.</div>
             )}
           </div>
         </div>
       </div>
-      <BlogComponent></BlogComponent>
-      <HighRatedCareers></HighRatedCareers>
 
+      <BlogComponent />
+      <HighRatedCareers />
       <BestRated />
       <Events />
     </>

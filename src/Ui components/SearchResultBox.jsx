@@ -7,6 +7,8 @@ import cashhand from "../assets/Images/cashhand.png";
 import checklist from "../assets/Images/checklist.png";
 import { addToWishlist } from '../ApiFunctions/api';
 import axiosInstance from "../ApiFunctions/axios";
+import { MapPin, Building } from 'lucide-react';
+
 import { toast } from "react-toastify";
 
 const SearchResultBox = ({ institute }) => {
@@ -37,6 +39,16 @@ const SearchResultBox = ({ institute }) => {
   };
 
   const hasWishlistFeature = institute.plan?.features?.some(feature => feature.key === 'WishList' && feature.value === 'Yes');
+
+
+  const overallRating = institute.reviews.length > 0 
+    ? institute?.reviews.reduce((sum, review) => sum + ( review.placementStars || 0) + 
+      ( review.campusLifeStars || 0) + 
+      ( review.facultyStars || 0) + 
+      (review.suggestionsStars || 0), 0) / (institute?.reviews.length * 4 || 1)
+    : 0;
+console.log('h',isNaN(overallRating) ? 3 : overallRating)
+
 
   const handleDownloadBrochure = async () => {
     try {
@@ -133,21 +145,27 @@ const SearchResultBox = ({ institute }) => {
         <div className="w-full md:w-3/4 flex flex-col ">
                 <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">{institute.instituteName}</h3>
-                <span className="text-gray-500 font-medium">#2</span>
                 </div>
 
                 <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <span className="flex items-center">
-                  <span className="text-yellow-500">★</span> 4.1
-                </span>
-                <span>(8 Reviews)</span>
-                <span>• {institute.city} {institute.state} • {institute.organisationType}</span>
-                </div>
+                {overallRating !==0 && (
+              <span className="flex items-center">
+                <span className="text-yellow-500">★</span>{overallRating}
+              </span>
+            )}
+                <span>{institute.reviews.length} Reviews</span>
+                <span className="flex items-center gap-2 text-gray-600">
+      <MapPin size={16} className="text-gray-500" />
+      <span>{institute.state}</span>
+      <span className="mx-1">•</span>
+      <Building size={16} className="text-gray-500" />
+      <span>{institute.organisationType}</span>
+    </span>                </div>
 
                 <div className="flex items-center space-x-4 mt-5 mb-2">
-                <span className="text-gray-700 font-medium md:text-xl text-xs sm:text-sm flex items-center gap-1">
+               {/* <span className="text-gray-700 font-medium md:text-xl text-xs sm:text-sm flex items-center gap-1">
                   <img src={rupee} className="h-4 opacity-75 mt-1" alt="rupee" />{institute.minFees || '300000'}-{institute.maxFees || 'onwards'}
-                </span>
+                </span>*/}
                 <span className="flex items-center font-medium md:text-xl text-xs sm:text-sm space-x-1">
                   <img src={badge} alt="AICTE" className="h-4 opacity-75 mt-1" />
                   <span>{institute.affiliation || 'AICTE'}</span>

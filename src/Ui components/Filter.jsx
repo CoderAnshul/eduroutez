@@ -1,26 +1,16 @@
 import React, { useState } from "react";
 
-const Filter = ({ filterSections, settitle, setvalue }) => {
+const Filter = ({ filterSections, handleFilterChange }) => {
   const [searchTerms, setSearchTerms] = useState({});
   const [openSections, setOpenSections] = useState(
-    filterSections.map(() => true) // Initialize all sections as open
+    filterSections.map(() => true)
   );
-
-  const handleSearchChange = (sectionTitle, value) => {
-    setSearchTerms((prev) => ({
-      ...prev,
-      [sectionTitle]: value,
-    }));
-  };
 
   const toggleSection = (index) => {
     setOpenSections((prev) =>
       prev.map((isOpen, i) => (i === index ? !isOpen : isOpen))
     );
   };
-  // item.toLowerCase().includes(
-  //   (searchTerms[section.title] || "").toLowerCase()
-  // )
 
   return (
     <div className="space-y-2">
@@ -29,7 +19,6 @@ const Filter = ({ filterSections, settitle, setvalue }) => {
 
         return (
           <div key={index} className="w-full border rounded-lg">
-            {/* Accordion Header */}
             <button
               onClick={() => toggleSection(index)}
               className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 text-sm font-medium text-gray-700 border-none outline-none focus:outline-none"
@@ -53,39 +42,12 @@ const Filter = ({ filterSections, settitle, setvalue }) => {
               </svg>
             </button>
 
-            {/* Accordion Content */}
             <div
-              className={`overflow-y-scroll scrollbar-thumb-red transition-all duration-300 ${
+              className={`overflow-y-scroll transition-all duration-300 ${
                 openSections[index] ? "max-h-80" : "max-h-0"
               }`}
             >
               <div className="p-4 space-y-3">
-                {/* Search Input */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder={`Search ${section.title}`}
-                    value={searchTerms[section.title] || ""}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-
-                      // Set title and value conditionally
-                      if (newValue) {
-                        setTitle(section.title);
-                        setValue(newValue); // Assuming you're using `newValue` here
-                      } else {
-                        setTitle(null);
-                        setValue(null);
-                      }
-
-                      // You can log the value here for debugging purposes
-                      console.log(newValue);
-                    }}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-
-                {/* Checkboxes */}
                 {filteredItems.length > 0 ? (
                   filteredItems.map((item, idx) => (
                     <label
@@ -95,11 +57,7 @@ const Filter = ({ filterSections, settitle, setvalue }) => {
                       <input
                         type="checkbox"
                         onChange={(e) => {
-                          e.target.checked
-                            ? settitle(section.title)
-                            : settitle(null);
-                          e.target.checked ? setvalue(item) : setvalue(null);
-                          console.log(e.target.checked);
+                          handleFilterChange(section.title, item);
                         }}
                         className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
                       />
