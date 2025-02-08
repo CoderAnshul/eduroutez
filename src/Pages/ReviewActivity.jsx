@@ -333,6 +333,7 @@ const ReviewActivity = () => {
                         {/* Header Section */}
                         <div className="border-b pb-4 mb-4">
                             <h2 className="text-2xl font-semibold mb-2">{review.reviewTitle}</h2>
+                            <h4 className="text-lg font-medium text-gray-600"> Collage Name : <strong> {review.institute.instituteName}</strong></h4>
                             <p className="text-gray-600">{review.content}</p>
                         </div>
 
