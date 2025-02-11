@@ -3,9 +3,11 @@ import { useQuery } from "react-query";
 import { useDispatch } from "react-redux";
 import { getInstitutes } from "../../ApiFunctions/api";
 import { setAllFieldsTrue, setAllFieldsFalse } from "../../config/inputSlice";
+import axiosInstance from "../../ApiFunctions/axios";
 
 const SearchableDropdown = ({ options, onChange }) => {
   const [searchTerm, setSearchTerm] = useState("");
+
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -46,16 +48,35 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const dispatch = useDispatch();
-
-  // Dispatch actions based on input state
-  useEffect(() => {
-    if (email !== "" && name !== "" && mobile !== "") {
-      dispatch(setAllFieldsTrue());
-    } else {
-      dispatch(setAllFieldsFalse());
+  const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
+  // Fetch student data
+  const { data: studentData } = useQuery(
+    ["student"],
+    async () => {
+      const id=localStorage.getItem('userId')
+      const response = await axiosInstance.get(`${VITE_BASE_URL}/student/${id}`);
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        if (data?.data) {
+          setEmail(data.data.email || "");
+          setName(data.data.name || "");
+          setMobile(data.data.phone || "");
+          
+          // Update form data with fetched values
+          setFormData(prev => ({
+            ...prev,
+            email: data.data.email,
+            fullName: data.data.name,
+            mobileNumber: data.data.phoneNo
+          }));
+        }
+      }
     }
-  }, [email, name, mobile, dispatch]);
+  );
 
+  // Fetch institutes
   const { data, isLoading, isError, error } = useQuery(
     ["institutes"],
     () => getInstitutes(),
@@ -69,6 +90,15 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
       setColleges(data?.data?.result);
     }
   }, [data]);
+
+  // Check if all required fields are filled
+  useEffect(() => {
+    if (email !== "" && name !== "" && mobile !== "") {
+      dispatch(setAllFieldsTrue());
+    } else {
+      dispatch(setAllFieldsFalse());
+    }
+  }, [email, name, mobile, dispatch]);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -113,9 +143,10 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
             <input
               type="email"
               id="email"
-              placeholder="Enter your email" 
-              className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
-              onChange={handleInputChange}
+              placeholder="Enter your email"
+              value={email}
+              disabled
+              className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none bg-gray-100"
             />
           </div>
           <div>
@@ -129,10 +160,29 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               type="text"
               id="fullName"
               placeholder="Enter your name"
-              className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
-              onChange={handleInputChange}
+              value={name}
+              disabled
+              className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none bg-gray-100"
             />
           </div>
+          {/* Other fields remain the same */}
+          <div>
+            <label
+              htmlFor="contactNumber"
+              className="block text-sm font-medium text-gray-500"
+            >
+              Mobile Number
+            </label>
+            <input
+              type="tel"
+              id="mobileNumber"
+              placeholder="Enter your number"
+              value={mobile}
+              disabled
+              className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none bg-gray-100"
+            />
+          </div>
+          {/* Rest of the form fields remain unchanged */}
           <div>
             <label
               htmlFor="gender"
@@ -150,21 +200,6 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               <option>Female</option>
               <option>Other</option>
             </select>
-          </div>
-          <div>
-            <label
-              htmlFor="contactNumber"
-              className="block text-sm font-medium text-gray-500"
-            >
-              Mobile Number
-            </label>
-            <input
-              type="tel"
-              id="mobileNumber"
-              placeholder="Enter your number"
-              className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
-              onChange={handleInputChange}
-            />
           </div>
           <div>
             <label
