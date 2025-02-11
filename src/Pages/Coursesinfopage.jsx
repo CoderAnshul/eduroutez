@@ -143,7 +143,8 @@ const Coursesinfopage = () => {
 
           {/* Pros and Cons */}
           <div className="mb-6">
-            <ProsandCons />
+            <ProsandCons course={content}
+             />
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,17 +11,23 @@ const BecomeCounselor = () => {
     email: "",
     contactno: "",
     password: "",
-    category: "", // Added category field
+    category: "",
+    otp: ""
   });
 
-  const [streams, setStreams] = useState([]); // State to store streams
+  const [streams, setStreams] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
+  const otpInputs = useRef(new Array(6).fill(null));
+  
   const navigate = useNavigate();
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
-    // Fetch streams from API
     const fetchStreams = async () => {
       try {
         const response = await axios.get(`${VITE_BASE_URL}/streams`);
@@ -42,30 +48,192 @@ const BecomeCounselor = () => {
     }));
   };
 
+  const handleSendOTP = async () => {
+    if (!formData.email || !formData.contactno) {
+      toast.error("Please enter both email and phone number");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${VITE_BASE_URL}/send-otp`, {
+        email: formData.email,
+        contact_number: formData.contactno
+      });
+      
+      if (response.data) {
+        setIsOtpSent(true);
+        setShowOtpModal(true);
+        toast.success("OTP sent successfully!");
+        // Focus first OTP input
+        setTimeout(() => {
+          otpInputs.current[0]?.focus();
+        }, 100);
+      }
+    } catch (err) {
+      toast.error("Failed to send OTP. Please try again.");
+    }
+  };
+
+  const handleOtpChange = (index, value) => {
+    // Only allow single digit
+    if (value.length > 1) {
+      value = value.slice(-1);
+    }
+  
+    // Only allow numbers
+    if (value && !/^\d+$/.test(value)) return;
+  
+    const newOtpValues = [...otpValues];
+    newOtpValues[index] = value;
+    setOtpValues(newOtpValues);
+  
+    // Set combined OTP in form data
+    setFormData(prev => ({
+      ...prev,
+      otp: newOtpValues.join('')
+    }));
+  
+    // Move to next input if typing a number
+    if (value && index < 5) {
+      otpInputs.current[index + 1]?.focus();
+    }
+  };
+  
+  const handleKeyDown = (index, event) => {
+    if (event.key === "Backspace" && !otpValues[index] && index > 0) {
+      otpInputs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text');
+    const pastedNumbers = pastedData.match(/\d/g);
+    
+    if (pastedNumbers) {
+      const newOtpValues = [...otpValues];
+      pastedNumbers.slice(0, 6).forEach((num, index) => {
+        newOtpValues[index] = num;
+      });
+      setOtpValues(newOtpValues);
+      setFormData(prev => ({
+        ...prev,
+        otp: newOtpValues.join('')
+      }));
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    const combinedOtp = otpValues.join('');
+    if (combinedOtp.length !== 6) {
+      toast.error("Please enter complete OTP");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${VITE_BASE_URL}/verify-otp`, {
+        email: formData.email,
+        contact_number: formData.contactno,
+        otp: combinedOtp
+      });
+      
+      if (response.data) {
+        setIsOtpVerified(true);
+        setShowOtpModal(false);
+        toast.success("OTP verified successfully!");
+      }
+    } catch (err) {
+      toast.error("Invalid OTP. Please try again.");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!isOtpVerified) {
+      toast.error("Please verify your email/phone first");
+      return;
+    }
+
     try {
-      // Make POST request to /counselor API
       const response = await axios.post(`${VITE_BASE_URL}/counselor`, formData);
-      console.log("Response", response);
-
-        toast.success("Your application has been submitted successfully!");
-        setSuccess("Your application has been submitted successfully!");
-        setError("");
-
-        // Redirect to admin page
-        window.location.href = "https://admin.eduroutez.com/";
-      
+      toast.success("Your application has been submitted successfully!");
+      setSuccess("Your application has been submitted successfully!");
+      setError("");
+      window.location.href = "https://admin.eduroutez.com/";
     } catch (err) {
       setError("There was an error with your submission. Please try again.");
       setSuccess("");
     }
   };
 
+  // OTP Modal Component
+  const OtpModal = () => {
+    if (!showOtpModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
+          {/* Close button */}
+          <button 
+            onClick={() => setShowOtpModal(false)}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          >
+            ✕
+          </button>
+
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Enter Verification Code</h2>
+            <p className="text-gray-600">
+              We have sent OTP to {formData.email}
+            </p>
+          </div>
+
+          {/* OTP Input Boxes */}
+          <div className="flex justify-center gap-2 mb-6">
+            {otpValues.map((value, index) => (
+              <input
+                key={index}
+                ref={el => otpInputs.current[index] = el}
+                type="text"
+                maxLength={1}
+                value={value}
+                onChange={(e) => handleOtpChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                onPaste={handlePaste}
+                className="w-12 h-12 text-center text-xl font-semibold border-2 rounded-lg focus:border-red-500 focus:outline-none"
+              />
+            ))}
+          </div>
+
+          <div className="text-center mb-6">
+            <p className="text-gray-600 mb-2">
+              Didn't receive the code?
+            </p>
+            <button
+              onClick={handleSendOTP}
+              className="text-red-600 font-semibold hover:text-red-800"
+            >
+              Resend OTP
+            </button>
+          </div>
+
+          <button
+            onClick={handleVerifyOTP}
+            className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800"
+          >
+            Verify OTP
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col md:flex-row h-auto">
       <ToastContainer />
+      <OtpModal />
+      
       {/* Left Section */}
       <div className="w-full md:w-1/2 bg-red-700 text-white flex flex-col justify-center items-center px-10 py-8 md:py-0">
         <h1 className="text-4xl lg:text-[45px] font-semibold mb-4 w-11/12 text-center md:text-start">
@@ -106,7 +274,6 @@ const BecomeCounselor = () => {
             />
           </div>
 
-          {/* Last Name */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="lastname">
               Last Name
@@ -122,7 +289,6 @@ const BecomeCounselor = () => {
             />
           </div>
 
-          {/* Email */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="email">
               Email
@@ -138,7 +304,6 @@ const BecomeCounselor = () => {
             />
           </div>
 
-          {/* Phone */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="contactno">
               Phone Number
@@ -154,7 +319,6 @@ const BecomeCounselor = () => {
             />
           </div>
 
-          {/* Password */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="password">
               Password
@@ -170,7 +334,6 @@ const BecomeCounselor = () => {
             />
           </div>
 
-          {/* Category */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="category">
               Category
@@ -191,13 +354,26 @@ const BecomeCounselor = () => {
             </select>
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-red-700 text-white py-2 rounded-lg font-semibold hover:bg-red-800"
-          >
-            Submit Application
-          </button>
+          {!isOtpVerified && (
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={handleSendOTP}
+                className="w-full bg-red-700 text-white py-2 rounded-lg font-semibold hover:bg-red-800 mb-4"
+              >
+                Send OTP
+              </button>
+            </div>
+          )}
+
+          {isOtpVerified && (
+            <button
+              type="submit"
+              className="w-full bg-red-700 text-white py-2 rounded-lg font-semibold hover:bg-red-800"
+            >
+              Submit Application
+            </button>
+          )}
         </form>
 
         {error && <p className="text-red-500 mt-4">{error}</p>}
