@@ -170,9 +170,11 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
                   <img src={badge} alt="AICTE" className="h-4 opacity-75 mt-1" />
                   <span>{institute.affiliation || 'AICTE'}</span>
                 </span>
+                {institute.highestPackage && (
                 <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl">
                   <img src={cashhand} alt="cash" className="h-4 opacity-75 mt-1" />{institute.highestPackage || '10LPA'}
                 </span>
+              )}
                 {institute.examAccepted && (
   <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl relative group">
     <img src={checklist} alt="checklist" className="h-4 opacity-75 mt-1" />

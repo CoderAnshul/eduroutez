@@ -60,7 +60,57 @@ const Coursesinfopage = () => {
 
   const renderHTML = (htmlContent) => {
     if (!htmlContent) return <p className="text-gray-500">No content available</p>;
-    return <div className="text-base prose prose-gray max-w-full" dangerouslySetInnerHTML={{ __html: htmlContent }} />;
+    return (
+      <div className="text-base prose prose-gray max-w-full">
+        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+        <style jsx>{`
+          ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+          }
+          li {
+            margin-bottom: 0.5rem;
+          }
+          h1, h2, h3, h4, h5, h6 {
+            margin-top: 1rem;
+            color: #1a202c; /* Customize the color as needed */
+          }
+          h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.3;
+          }
+          h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            line-height: 1.3;
+          }
+          h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.3;
+          }
+          h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.3;
+          }
+          h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.3;
+          }
+          h6 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.3;
+          }
+          a {
+            color: blue; /* Link color */
+          }
+        `}</style>
+      </div>
+    );
   };
 
   return (
@@ -79,7 +129,6 @@ const Coursesinfopage = () => {
             <h4 className="text-2xl font-semibold text-red-500 mb-4">Overview</h4>
             {renderHTML(content.courseOverview)}
             <div className="grid grid-cols-2 gap-4 mt-4">
-              {/* <p><strong>Type:</strong> {content.courseType || 'Not specified'}</p>*/}
               <p><strong>Duration:</strong> {
                 [
                   content.courseDurationYears && `${content.courseDurationYears} years`,
@@ -88,7 +137,6 @@ const Coursesinfopage = () => {
               }</p>
               <p><strong>Cost:</strong> {content.isCourseFree === 'free' ? 'Free' : 'Paid'}</p>
               <p><strong>Category:</strong> {content.category?.title || 'Not specified'}</p>
-              {/* <p><strong>Status:</strong> {content.status || 'Not specified'}</p>*/}
             </div>
             <div className="mt-4">
               <h5 className="font-semibold mb-2 ">Short Description</h5>
@@ -143,8 +191,7 @@ const Coursesinfopage = () => {
 
           {/* Pros and Cons */}
           <div className="mb-6">
-            <ProsandCons course={content}
-             />
+            <ProsandCons course={content} />
           </div>
         </div>
 
@@ -153,15 +200,15 @@ const Coursesinfopage = () => {
       </div>
 
       {/* Additional Sections */}
-      <HighRatedCareers></HighRatedCareers>
-<BlogComponent/>      <BestRated />
+      <HighRatedCareers />
+      <BlogComponent />
+      <BestRated />
 
     </div>
       <div className="w-full flex items-start  mt-10">
         <Events />
         <ConsellingBanner />
       </div></>
-
   );
 };
 

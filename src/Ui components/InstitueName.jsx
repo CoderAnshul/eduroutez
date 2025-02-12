@@ -4,6 +4,8 @@ import location from "../assets/Images/location.png";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import axiosInstance from "../ApiFunctions/axios";
 import { toast } from "react-toastify";
+import { Building } from 'lucide-react';
+
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -143,9 +145,11 @@ InstitueName = ({ instituteData }) => {
               <img className="h-3" src={location} alt="location" />
               {instituteData?.data?.city}
             </p>
-            <p className="text-sm font-semibold opacity-75">
-              ● {instituteData?.data?.organisationType}
-            </p>
+            <p className="text-sm font-semibold opacity-75 flex items-center">
+  <Building size={16} className="text-gray-500 mr-2" />
+  {instituteData?.data?.organisationType}
+</p>
+
             <p className="text-sm font-semibold opacity-75">
               ● {instituteData?.data?.establishedYear}
             </p>
