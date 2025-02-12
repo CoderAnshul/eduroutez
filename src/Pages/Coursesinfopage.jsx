@@ -129,12 +129,17 @@ const Coursesinfopage = () => {
             <h4 className="text-2xl font-semibold text-red-500 mb-4">Overview</h4>
             {renderHTML(content.courseOverview)}
             <div className="grid grid-cols-2 gap-4 mt-4">
-              <p><strong>Duration:</strong> {
-                [
-                  content.courseDurationYears && `${content.courseDurationYears} years`,
-                  content.courseDurationMonths && `${content.courseDurationMonths} months`
-                ].filter(Boolean).join(' ') || 'Not specified'
-              }</p>
+            <p>
+  {(content.courseDurationYears || content.courseDurationMonths) && (
+    <>
+      <strong>Duration: </strong>
+      {[
+        content.courseDurationYears > 0 && `${content.courseDurationYears} years`,
+        content.courseDurationMonths > 0 && `${content.courseDurationMonths} months`
+      ].filter(Boolean).join(' ')}
+    </>
+  )}
+</p>
               <p><strong>Cost:</strong> {content.isCourseFree === 'free' ? 'Free' : 'Paid'}</p>
               <p><strong>Category:</strong> {content.category?.title || 'Not specified'}</p>
             </div>
