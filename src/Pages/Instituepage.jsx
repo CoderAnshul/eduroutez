@@ -29,6 +29,7 @@ import { Feed } from '@mui/icons-material'
 import Webinar from '../Components/Webinar'
 import HighRatedCareers from '../Components/HighRatedCareers'
 import BlogComponent from '../Components/BlogComponent'
+import Promotions from '../Pages/CoursePromotions'
 
 const tabs = [
   "College Info",
@@ -298,8 +299,10 @@ const Instituepage = () => {
                       
                   </div>
                 </div>
-                <QueryForm instituteData={instituteData}/>
-
+                <div className='w-[300px] h-[250px]'>
+                  <QueryForm instituteData={instituteData}/>
+                  <Promotions location="INSTITUTE_PAGE" />
+                </div>
              </div>
              <HighRatedCareers></HighRatedCareers>
              <BlogComponent></BlogComponent>

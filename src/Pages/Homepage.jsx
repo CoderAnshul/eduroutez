@@ -14,6 +14,7 @@ import { useQuery } from 'react-query'
 import { homeBanner } from '../ApiFunctions/api'
 import { useParams } from 'react-router-dom'
 import ConsellingBanner from '../Components/ConsellingBanner'
+import Promotions from './CoursePromotions'
 
 const Homepage = () => {
 
@@ -45,6 +46,7 @@ const Homepage = () => {
       <div className='p-[4vw] flex flex-col items-center' >
          <BestRated/>
          <TrendingInstitute/>
+         <Promotions location='HOME_PAGE'/>
          <HighRatedCareers/>
       </div>
       <Instructor/>
