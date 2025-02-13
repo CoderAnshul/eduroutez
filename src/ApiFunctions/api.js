@@ -1,3 +1,4 @@
+import { Sort } from "@mui/icons-material";
 import axios from "axios";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
@@ -56,7 +57,7 @@ export const blogById = async (id) => {
 //getRecentBlogs
 export const getRecentBlogs = async () => {
   try {
-    const response = await axios.get(`${baseURL}/blogs?limit=5`);
+    const response = await axios.get(`${baseURL}/blogs?limit=5&sort={"createdAt":"desc"}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching recent blogs:`, error);
@@ -142,7 +143,7 @@ export const homeBanner = async () => {
 export const blogs = async (page) => {
   try {
     console.log("blogs");
-    const response = await axios.get(`${baseURL}/blogs`, {
+    const response = await axios.get(`${baseURL}/blogs?sortCon={"createdAt":"desc"}`, {
       params: {
         page,
         limit:8
@@ -161,13 +162,10 @@ export const blogs = async (page) => {
 export const getBlogs = async () => {
   try {
     console.log("blogs");
-    const response = await axios.get(`${baseURL}/blogs`);
+    const response = await axios.get(`${baseURL}/blogs?sort={"createdAt":"desc"}`);
     return response.data;
-
-    // return response.data;
   } catch (error) {
-    console.error(`Error fetching banner `, error);
-
+    console.error(`Error fetching blogs `, error);
     throw error;
   }
 };
@@ -193,7 +191,7 @@ export const postQuestion = async (formData) => {
 
 export const careers = async (page) => {
   try {
-    const response = await axios.get(`${baseURL}/careers`, {
+    const response = await axios.get(`${baseURL}/careers?sort={"createdAt":"desc"}`, {
       params: {
         page,
         limit:8
@@ -251,7 +249,7 @@ export const AllpopularCourses = async () => {
 export const bestRatedInstitute = async () => {
   try {
     const response = await axios.get(
-      `${baseURL}/best-rated-institute?filters=limit=3`
+      `${baseURL}/best-rated-institute?filters={"limit":3}&sort={"createdAt":"desc"}`
     );
     return response.data;
 
@@ -320,10 +318,10 @@ export const careerCategories = async () => {
 
 export const career = async () => {
   try {
-    const response = await axios.get(`${baseURL}/careers?limit=3`);
+    const response = await axios.get(`${baseURL}/careers?limit=3&sort={"createdAt":"desc"}`);
     return response.data;
 
-    // return response.data;
+    // return response.data;s
   } catch (error) {
     console.error(`Error fetching career `, error);
 

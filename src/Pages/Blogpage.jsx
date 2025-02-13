@@ -22,7 +22,7 @@ const Blogpage = () => {
     const { data: blogData, isLoading: blogLoading, isError: blogError, error: blogFetchError } = useQuery(
         ['all-blogs'],
         async () => {
-            const response = await axios.get(`${baseURL}/blogs`, {
+            const response = await axios.get(`${baseURL}/blogs?sort={"createdAt":"desc"}`, {
                 params: {
                     limit: 1000 // Fetch a large number of blogs
                 }

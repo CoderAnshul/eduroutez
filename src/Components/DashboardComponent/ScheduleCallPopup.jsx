@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import {Link} from "react-router-dom";
 
-const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
+const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
   const [formData, setFormData] = useState({
     date: "",
     timeSlot: "",
@@ -17,6 +17,17 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
   const isLoggedIn = !!localStorage.getItem("accessToken");
 
   useEffect(() => {
+    const loadRazorpayScript = () => {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        script.onload = () => console.log("Razorpay script loaded");
+        script.onerror = () => console.error("Failed to load Razorpay script");
+        document.body.appendChild(script);
+    };
+
+    loadRazorpayScript();
+
     const fetchCounselorSchedule = async () => {
       try {
         const response = await fetch(`${apiUrl}/counselorslots/${counselor?.email ?? ""}`);
@@ -138,6 +149,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
+      console.log('erroe',error.message)
       toast.error("Payment initialization failed. Please try again.");
     }
   };
