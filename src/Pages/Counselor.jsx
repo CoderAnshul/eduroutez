@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import ScheduleCallPopup from '../Components/DashboardComponent/ScheduleCallPopup';
 import ReviewFeedbackPopup from '../Components/DashboardComponent/ReviewFeedbackPopup';
+import {Link} from "react-router-dom";
 
 const CounselorListPage = () => {
     const [searchParams] = useSearchParams();
@@ -15,6 +16,8 @@ const CounselorListPage = () => {
     const [isReviewPopupOpen, setIsReviewPopupOpen] = useState(false);
     const [selectedCounselor, setSelectedCounselor] = useState(null);
     const [selectedStreams, setSelectedStreams] = useState([]);
+    const [showLoginPopup, setShowLoginPopup] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [streams, setStreams] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(1);
@@ -50,6 +53,25 @@ const CounselorListPage = () => {
     }, [currentQuote]);
 
     const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
+
+
+    useEffect(() => {
+        const token = localStorage.getItem('token'); // Or however you store your auth token
+        setIsLoggedIn(!!token);
+    }, []);
+
+    const handleReviewFeedback = (counselor) => {
+        if (!isLoggedIn) {
+            setShowLoginPopup(true);
+            return;
+        }
+        setSelectedCounselor(counselor);
+        setIsReviewPopupOpen(true);
+    };
+
+    const handleLoginPopupClose = () => {
+        setShowLoginPopup(false);
+    };
 
     // Fetch all counselors initially
     useEffect(() => {
@@ -145,11 +167,7 @@ const CounselorListPage = () => {
         setIsCallPopupOpen(true);
     };
 
-    const handleReviewFeedback = (counselor) => {
-        setSelectedCounselor(counselor);
-        setIsReviewPopupOpen(true);
-    };
-
+  
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-8xl mx-auto">
@@ -307,6 +325,31 @@ const CounselorListPage = () => {
                     </div>
                 </div>
             </div>
+
+            {showLoginPopup && (
+                <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
+                    <div className="popup bg-white p-12 m-20s rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
+                        <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
+                            Hey there! We'd love to hear your thoughts. Please log in to share your review with us and help others make informed decisions.
+                        </h3>
+                        <div className="flex justify-center space-x-6">
+                            <button
+                                onClick={handleLoginPopupClose}
+                                className="bg-gray-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-gray-700 focus:outline-none"
+                            >
+                                Close
+                            </button>
+                            <Link
+                                to="/login"
+                                onClick={handleLoginPopupClose}
+                                className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+                            >
+                                Log In
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <ScheduleCallPopup
                 isOpen={isCallPopupOpen}
