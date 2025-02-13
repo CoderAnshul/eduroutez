@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { toast,ToastContainer } from "react-toastify";
-import axiosInstance from "../../ApiFunctions/axios";
-import loadRazorpayScript from "../../loadRazorpayScript";
+import { toast, ToastContainer } from "react-toastify";
+import {Link} from "react-router-dom";
 
 const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
   const [formData, setFormData] = useState({
@@ -12,19 +11,18 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
   });
   const [availableSlots, setAvailableSlots] = useState([]);
   const [counselorSchedule, setCounselorSchedule] = useState(null);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
-
-  // Check if user is logged in
   const isLoggedIn = !!localStorage.getItem("accessToken");
 
-  // Fetch counselor's schedule
   useEffect(() => {
     const fetchCounselorSchedule = async () => {
       try {
-        const response = await axiosInstance.get(`${apiUrl}/counselorslots/${counselor?.email ?? ""}`);
-        if (response.data?.data) {
-          setCounselorSchedule(response.data.data);
+        const response = await fetch(`${apiUrl}/counselorslots/${counselor?.email ?? ""}`);
+        const data = await response.json();
+        if (data?.data) {
+          setCounselorSchedule(data.data);
         }
       } catch (error) {
         console.error("Error fetching counselor schedule:", error);
@@ -37,7 +35,6 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
     }
   }, [isOpen, counselor?.email, apiUrl]);
 
-  // Generate time slots based on selected date
   useEffect(() => {
     if (!formData.date || !counselorSchedule) return;
 
@@ -77,7 +74,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -88,67 +85,61 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
       return;
     }
 
-    // Check if the user is logged in
     if (!isLoggedIn) {
-      toast.error("You must be logged in to book a slot.");
-      onLoginOpen(); 
+      setShowLoginDialog(true);
       return;
     }
 
-    const scriptLoaded = await loadRazorpayScript();
-    if (!scriptLoaded) {
-      toast.error("Failed to load payment gateway. Please try again.");
-      return;
-    }
-
-    const options = {
-      key: "rzp_test_1DP5mmOlF5G5ag", // Replace with your Razorpay Key
-      amount: 50000, // 500 Rs in paise
-      currency: "INR",
-      name: "Your App Name",
-      description: "Slot Booking Fee",
-      handler: async function (response) {
-        try {
-          const bookingResponse = await axiosInstance.post(
-            `${apiUrl}/bookslot`,
-            {
-              date: formData.date,
-              slot: formData.timeSlot,
-              counselorId: counselor._id,
-              studentId: formData.studentId,
-              paymentId: response.razorpay_payment_id,
-            },
-            {
+    try {
+      const options = {
+        key: "rzp_test_1DP5mmOlF5G5ag",
+        amount: 50000,
+        currency: "INR",
+        name: "Your App Name",
+        description: "Slot Booking Fee",
+        handler: async (response) => {
+          try {
+            const bookingResponse = await fetch(`${apiUrl}/bookslot`, {
+              method: 'POST',
               headers: {
-                "Content-Type": "application/json",
-                "x-access-token": localStorage.getItem("accessToken"),
-                "x-refresh-token": localStorage.getItem("refreshToken"),
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem("accessToken"),
+                'x-refresh-token': localStorage.getItem("refreshToken"),
               },
+              body: JSON.stringify({
+                date: formData.date,
+                slot: formData.timeSlot,
+                counselorId: counselor._id,
+                studentId: formData.studentId,
+                paymentId: response.razorpay_payment_id,
+              }),
+            });
+
+            if (bookingResponse.ok) {
+              onClose();
+              toast.success("Slot booked successfully!");
+            } else {
+              toast.error("Failed to book slot after payment.");
             }
-          );
-
-          if (bookingResponse) {
-            onClose();
-            toast.success("Slot booked successfully!");
-          } else {
-            toast.error("Failed to book slot after payment.");
+          } catch (error) {
+            console.error("Error booking slot:", error);
+            toast.error("Booking failed. Please contact support.");
           }
-        } catch (error) {
-          console.error("Error booking slot:", error);
-          toast.error("Booking failed. Please contact support.");
-        }
-      },
-      prefill: {
-        email: formData.studentEmail,
-        contact: formData.phone,
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
+        },
+        prefill: {
+          email: formData.studentEmail,
+          contact: formData.phone,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
 
-    const razorpay = new window.Razorpay(options);
-    razorpay.open();
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      toast.error("Payment initialization failed. Please try again.");
+    }
   };
 
   if (!isOpen) return null;
@@ -156,76 +147,117 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor, onLoginOpen }) => {
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <div className="fixed p-4 inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-96 p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Schedule Call</h2>
-          <button onClick={onClose} className="text-red-500 hover:text-red-700">
-            <i className="fa fa-times"></i>
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">
-              Schedule Call Date <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              min={today}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">
-              Time Slots <span className="text-red-500">*</span>
-            </label>
-            {availableSlots.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-                {availableSlots.map((time) => (
-                  <label key={time} className="flex items-center">
-                    <input
-                      type="radio"
-                      name="timeSlot"
-                      value={time}
-                      checked={formData.timeSlot === time}
-                      onChange={handleChange}
-                      className="mr-2"
-                      required
-                    />
-                    {time}
-                  </label>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500">
-                {formData.date ? "No slots available for selected date" : "Please select a date to view available slots"}
-              </p>
-            )}
-          </div>
-          <div className="flex justify-end gap-2">
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900">Schedule Call</h2>
             <button
-              type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              className="text-gray-400 hover:text-gray-500 focus:outline-none"
             >
-              Discard
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              disabled={!formData.date || !formData.timeSlot}
-            >
-              Submit
+              <span className="sr-only">Close</span>
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
-        </form>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Schedule Call Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                min={today}
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Time Slots <span className="text-red-500">*</span>
+              </label>
+              {availableSlots.length > 0 ? (
+                <div className="mt-2 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                  {availableSlots.map((time) => (
+                    <label key={time} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="timeSlot"
+                        value={time}
+                        checked={formData.timeSlot === time}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                        required
+                      />
+                      <span className="text-sm text-gray-900">{time}</span>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2 text-sm text-gray-500">
+                  {formData.date 
+                    ? "No slots available for selected date" 
+                    : "Please select a date to view available slots"}
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!formData.date || !formData.timeSlot}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Book Slot
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
+
+      {showLoginDialog && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-12 rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
+            <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
+              Hey there! You'll need to log in first to book a session with our counselor. This helps us provide you with the best possible experience.
+            </h3>
+            
+            <div className="flex justify-center space-x-6">
+              <button
+                type="button"
+                onClick={() => setShowLoginDialog(false)}
+                className="bg-gray-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-gray-700 focus:outline-none"
+              >
+                Close
+              </button>
+              <Link
+          to="/login"
+          onClick={() => setShowLoginDialog(false)}
+          className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+        >
+          Log In
+        </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ToastContainer />
-    </div>
+    </>
   );
 };
 
