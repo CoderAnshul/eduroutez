@@ -3,46 +3,43 @@ import React, { useRef, useState, useEffect } from "react";
 const TabSlider = ({ tabs, sectionRefs, className }) => {
     const sliderRef = useRef();
     const [isOverflowing, setIsOverflowing] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(0); // Track the active tab
+    const [activeIndex, setActiveIndex] = useState(0);
 
-    // Function to check if the content is overflowing
     const checkOverflow = () => {
         const slider = sliderRef.current;
         if (slider) {
-            setIsOverflowing(slider.scrollWidth > slider.clientWidth); // Set overflow state based on scrollWidth
+            setIsOverflowing(slider.scrollWidth > slider.clientWidth);
         }
     };
 
     useEffect(() => {
-        checkOverflow(); // Check if content overflows on institutesmount
-        window.addEventListener("resize", checkOverflow); // Recheck on window resize
+        checkOverflow();
+        window.addEventListener("resize", checkOverflow);
 
         return () => {
-            window.removeEventListener("resize", checkOverflow); // Cleanup event listener
+            window.removeEventListener("resize", checkOverflow);
         };
     }, []);
 
     const handleTabClick = (index) => {
-        setActiveIndex(index); 
+        setActiveIndex(index);
     
-        const section = sectionRefs[index].current; 
+        const section = sectionRefs[index].current;
         if (section) {
-            const topOffset = 100; 
-            const sectionTop = section.getBoundingClientRect().top + window.scrollY; 
-            const scrollToPosition = sectionTop - topOffset; 
+            const topOffset = 100;
+            const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+            const scrollToPosition = sectionTop - topOffset;
     
             window.scrollTo({
                 top: scrollToPosition,
-                behavior: "smooth", 
+                behavior: "smooth",
             });
         }
     };
-    
 
-    // Function to handle scrolling (left or right)
     const scroll = (direction) => {
         const slider = sliderRef.current;
-        const scrollAmount = direction === "left" ? -200 : 200; // Adjust scroll amount as needed
+        const scrollAmount = direction === "left" ? -200 : 200;
         slider.scrollBy({
             left: scrollAmount,
             behavior: "smooth",
@@ -55,7 +52,7 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
                 className="sticky tabsScroll top-0 bg-white z-10 border-[1.5px] solid border-black border-opacity-35 rounded-md overflow-x-auto scrollbar-hide"
                 ref={sliderRef}
             >
-                <ul className="flex border-b justify-between py-1">
+                <ul className="flex border-b justify-between py-1 list-none m-0 p-0">
                     {tabs.map((tab, index) => (
                         <li
                             key={index}
@@ -69,25 +66,23 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
                 </ul>
             </div>
 
-            {/* Left Arrow - Visible only when content is overflowing */}
             {isOverflowing && (
                 <button
                     className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[#F0FDF4] transition-transform active:scale-95 p-1 pb-2 px-3 shadow-md rounded-full z-20"
                     onClick={() => scroll("left")}
                     style={{ marginLeft: "-10px" }}
                 >
-                    &#8592; {/* Left arrow symbol */}
+                    &#8592;
                 </button>
             )}
 
-            {/* Right Arrow - Visible only when content is overflowing */}
             {isOverflowing && (
                 <button
                     className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[#ffaf80] transition-transform active:scale-95 p-1 pb-2 px-3 shadow-md rounded-full z-20"
                     onClick={() => scroll("right")}
                     style={{ marginRight: "-10px" }}
                 >
-                    &#8594; {/* Right arrow symbol */}
+                    &#8594;
                 </button>
             )}
         </div>

@@ -86,12 +86,12 @@ const TrendingInstitute = () => {
                   : 'No description available'}
                 </p>
 
-                {institute.maxFees && (
+               {/* {institute.maxFees && (
                 <h3 className="flex items-center mt-2 text-2xl font-bold text-[#000000c4]">
                   <img className="h-5 mt-1 opacity-70" src={rupee} alt="rupee" />
                   {institute.maxFees}
                 </h3>
-                )}
+                )}*/}
               </div>
               </Link>
             );
