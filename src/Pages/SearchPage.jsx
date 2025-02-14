@@ -12,7 +12,10 @@ import HighRatedCareers from '../Components/HighRatedCareers';
 import { useQuery } from 'react-query';
 import { getInstitutes } from '../ApiFunctions/api';
 import { useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
+
 const SearchPage = () => {
+  const [searchParams] = useSearchParams();
   const [selectedFilters, setSelectedFilters] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [content, setContent] = useState([]);
@@ -20,11 +23,33 @@ const SearchPage = () => {
   const [totalDocuments, setTotalDocuments] = useState(0);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(false);
+  const [streams, setStreams] = useState([]);
   const inputField = useSelector(store => store.input.inputField);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
+  const streamFromUrl = searchParams.get('stream');
 
+  const { data: streamsData } = useQuery(
+    ["streams"],
+    async () => {
+      const response = await axios.get(`${baseURL}/streams`);
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        const streamNames = data.data?.result
+          ?.filter(stream => stream.status)
+          ?.map(stream => stream.name) || [];
+        setStreams(streamNames);
+      },
+    }
+  );
 
+  useEffect(() => {
+    if (streamFromUrl && streams.includes(streamFromUrl)) {
+      handleFilterChange('streams', streamFromUrl);
+    }
+  }, [streams, streamFromUrl]);
 
   const staticStateLocations = [
     "Andhra Pradesh",
@@ -172,39 +197,19 @@ const SearchPage = () => {
     "Bokaro"
   ]
 
-
   const filterSections = [
     {
       "title": "streams",
-      "items": [
-        "Computer Science Engineering",
-        "Mechanical Engineering",
-        "Civil Engineering",
-        "Electrical Engineering",
-        "Information Technology",
-        "Chemical Engineering",
-        "Aerospace Engineering",
-        "Electronics and Communication Engineering",
-        "Biotechnology Engineering",
-        "Automobile Engineering",
-        "Robotics Engineering",
-        "Petroleum Engineering",
-        "Artificial Intelligence and Data Science",
-        "Biomedical Engineering",
-        "Environmental Engineering"
-      ]
+      "items": streams, 
     },
-
     {
       title: "state",
-      items: staticStateLocations, // Using static locations instead of API data
+      items: staticStateLocations,
     },
-
     {
       title: "city",
-      items: staticCities, // Using static locations instead of API data
+      items: staticCities,
     },
-
     {
       title: "specialization",
       items: [
@@ -250,14 +255,11 @@ const SearchPage = () => {
         const { result, totalDocuments } = data.data;
         setContent(result);
         setFilteredContent(result);
-        // console.log('result',result);
         setTotalDocuments(totalDocuments);
       }
     }
   );
 
-
-  // Handle filter selection
   const handleFilterChange = (filterCategory, filterValue) => {
     setSelectedFilters(prevFilters => {
       const newFilters = { ...prevFilters };
@@ -272,7 +274,6 @@ const SearchPage = () => {
     });
   };
 
-  // Fetch data when filters change
   useEffect(() => {
     if (Object.keys(selectedFilters).length > 0) {
       fetchFilteredInstitutes(selectedFilters);
@@ -297,7 +298,6 @@ const SearchPage = () => {
     }
   };
 
-  // Handle search functionality
   useEffect(() => {
     if (searchQuery.length > 0) {
       const filtered = content.filter(item =>
@@ -315,16 +315,11 @@ const SearchPage = () => {
       <div className="px-[4vw] pb-[2vw] flex flex-col items-start">
         <SearchResultInfo />
 
-  
-
-        {/* Filter & Results Section */}
         <div className="flex gap-4 w-full mt-6">
-          {/* Filters Sidebar */}
           <div className="filters w-[25%] hidden lg:block">
             <Filter filterSections={filterSections} handleFilterChange={handleFilterChange} />
           </div>
 
-          {/* Search & Filter Results */}
           <div className="filterResult w-full">
             {loading ? (
               <div className="text-center py-8">Loading results...</div>
