@@ -156,7 +156,7 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
                 <span>{institute.reviews.length} Reviews</span>
                 <span className="flex items-center gap-2 text-gray-600">
       <MapPin size={16} className="text-gray-500" />
-      <span>{institute.state}</span>
+      <span>{institute.stateName}</span>
       <span className="mx-1">•</span>
       <Building size={16} className="text-gray-500" />
       <span>{institute.organisationType}</span>

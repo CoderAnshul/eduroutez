@@ -143,7 +143,7 @@ InstitueName = ({ instituteData }) => {
           <div className="flex mt-2 gap-3 whitespace-nowrap">
             <p className="flex items-center text-sm font-semibold opacity-75">
               <img className="h-3" src={location} alt="location" />
-              {instituteData?.data?.city}
+              {instituteData?.data?.cityName}
             </p>
             <p className="text-sm font-semibold opacity-75 flex items-center">
   <Building size={16} className="text-gray-500 mr-2" />
