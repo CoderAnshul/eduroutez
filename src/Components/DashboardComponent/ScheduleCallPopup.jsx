@@ -127,7 +127,6 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
             });
 
             if (bookingResponse.ok) {
-              onClose();
               toast.success("Slot booked successfully!");
             } else {
               toast.error("Failed to book slot after payment.");

@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import ScheduleCallPopup from '../Components/DashboardComponent/ScheduleCallPopup';
 import ReviewFeedbackPopup from '../Components/DashboardComponent/ReviewFeedbackPopup';
 import {Link} from "react-router-dom";
+import Promotions from './CoursePromotions';
 
 const CounselorListPage = () => {
     const [searchParams] = useSearchParams();
@@ -217,6 +218,7 @@ const CounselorListPage = () => {
                                 </label>
                             ))}
                         </div>
+                        <Promotions location="COUNSELING_PAGE_SIDEBAR" className="h-[250px]"/>
                     </div>
 
                     {/* Main Content */}
@@ -324,6 +326,8 @@ const CounselorListPage = () => {
                         )}
                     </div>
                 </div>
+                <Promotions location="COUNSELING_PAGE_MAIN" className="h-[90px]"/>
+
             </div>
 
             {showLoginPopup && (

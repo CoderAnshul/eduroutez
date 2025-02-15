@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import {createReview} from '../ApiFunctions/api';
 import { useQuery } from "react-query";
 import { useSelector } from 'react-redux';
+import Promotions from "./CoursePromotions";
 // import { useMutation, useQuery } from '@tanstack/react-query';
 
 const Writereview = () => {
@@ -118,8 +119,13 @@ if (data) {
   
 
   return (
+    <>
+         <div className="w-full items-center max-w-4xl h-24 mx-auto">
+        <Promotions location="REVIEW_PAGE" className="h-[90px]" />
+      </div>
     <div className="p-3 h-[600px] pb-14 bg-white relative flex flex-col">
       {/* Step Content */}
+    
       <div className=" p-2 md:p-6 rounded h-[300px] relative overflow-hidden shadow flex-1">
         {renderStepContent()}
       </div>
@@ -181,6 +187,7 @@ if (data) {
         </div>
       )}
     </div>
+    </>
   );
 };
 

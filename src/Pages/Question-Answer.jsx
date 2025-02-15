@@ -3,6 +3,7 @@ import { useQuery, useMutation } from 'react-query';
 import { Send, Loader2, MessageCircle, Clock, Tag, School, User } from 'lucide-react';
 import axiosInstance from '../ApiFunctions/axios';
 import { toast, ToastContainer } from "react-toastify";
+import Promotions from './CoursePromotions';
 
 const Card = ({ children, className = '' }) => (
   <div className={`bg-white rounded-xl shadow-lg border border-gray-200 ${className}`}>
@@ -197,7 +198,9 @@ const CombinedQuestionsPage = () => {
               </form>
             </CardContent>
           </Card>
-        </div>
+          <div className="w-full max-w-4xl h-24">
+        <Promotions location="QA_PAGE" />
+      </div>        </div>
 
         {/* Questions List Section */}
         <div className="lg:w-1/2">

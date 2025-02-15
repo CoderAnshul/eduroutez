@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { getInstitutes } from "../../ApiFunctions/api";
 import { setAllFieldsTrue, setAllFieldsFalse } from "../../config/inputSlice";
 import axiosInstance from "../../ApiFunctions/axios";
+import Promotions from "../../Pages/CoursePromotions";
 
 const SearchableDropdown = ({ options, onChange }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -125,6 +126,7 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
 
   return (
     <div className="flex flex-col items-center h-full">
+      
       <div className="w-full max-w-4xl p-6 bg-white rounded-lg h-[480px] overflow-y-scroll">
         <h1 className="text-2xl font-semibold text-center">
           Personal Information

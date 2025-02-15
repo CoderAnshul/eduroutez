@@ -43,6 +43,11 @@ const Login = () => {
       }
     },
     onSuccess: (data) => {
+      if (data?.data?.user?.role !== 'student') {
+        toast.error("Invalid credentials");
+        return;
+      }
+
       console.log("Data", data);
       
       // Store auth data
@@ -53,12 +58,6 @@ const Login = () => {
       localStorage.setItem('refreshToken', JSON.stringify(data.data.refreshToken));
       
       toast.success("Logged in successfully!");
-
-      // Handle different role redirects
-      if(data?.data?.user?.role === 'institute' || data?.data?.user?.role === 'counsellor') {
-        window.location.href = "https://admin.eduroutez.com/dashboard/";
-        return;
-      }
 
       // Check for pending webinar link
       const pendingWebinarLink = sessionStorage.getItem('pendingWebinarLink');
