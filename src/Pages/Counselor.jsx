@@ -56,7 +56,7 @@ const CounselorListPage = () => {
 
 
     useEffect(() => {
-        const token = localStorage.getItem('token'); // Or however you store your auth token
+        const token = localStorage.getItem('accessToken'); // Or however you store your auth token
         setIsLoggedIn(!!token);
     }, []);
 
