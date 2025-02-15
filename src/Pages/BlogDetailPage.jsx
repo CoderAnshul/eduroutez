@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import HighRatedCareers from '../Components/HighRatedCareers';
 import Events from '../Components/Events';
 import ConsellingBanner from '../Components/ConsellingBanner';
+import Promotions from '../Pages/CoursePromotions';
 
 const BlogDetailPage = () => {
   const [data, setData] = useState(null);
@@ -75,113 +76,116 @@ const BlogDetailPage = () => {
 
   return (
     <>
-    <div className="container max-w-[1300px] mx-auto mt-10 p-4">
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-        {imageUrl && (
-          <div className="relative">
-            <img
-              className="w-full h-80 object-cover"
-              src={imageUrl}
-              alt={data.title || 'Blog Image'}
-            />
-            {data.title && (
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <h1 className="text-4xl font-bold text-white text-center">{data.title}</h1>
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="p-6 space-y-6">
-          {data.metaImage && data.metaTitle && (
-            <div className="flex space-x-4">
+      <div className="container max-w-[1300px] mx-auto mt-10 p-4">
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+          {imageUrl && (
+            <div className="relative">
               <img
-                className="h-10 w-10 rounded-full"
-                src={`${Images}/${data.metaImage}`}
-                alt="Meta"
+                className="w-full h-80 object-cover"
+                src={imageUrl}
+                alt={data.title || 'Blog Image'}
               />
-              <div>
-                <h2 className="text-2xl font-semibold">{data.metaTitle}</h2>
-                {data.createdAt && (
-                  <p className="text-gray-600">
-                    {new Date(data.createdAt).toLocaleDateString()}
-                  </p>
-                )}
-              </div>
+              {data.title && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                  <h1 className="text-4xl font-bold text-white text-center">{data.title}</h1>
+                </div>
+              )}
             </div>
           )}
 
-          <div className="space-y-4">
-            {data.metaDescription && (
-              <p className="text-gray-700">{data.metaDescription}</p>
-            )}
-
-            {data.metaKeywords && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {data.metaKeywords.split(",").map((keyword, index) => (
-                  keyword.trim() && (
-                    <span
-                      key={index}
-                      className="inline-block bg-red-500 text-white text-sm px-3 py-1 rounded-full"
-                    >
-                      {keyword.trim()}
-                    </span>
-                  )
-                ))}
+          <div className="p-6 space-y-6">
+            {data.metaImage && data.metaTitle && (
+              <div className="flex space-x-4">
+                <img
+                  className="h-10 w-10 rounded-full"
+                  src={`${Images}/${data.metaImage}`}
+                  alt="Meta"
+                />
+                <div>
+                  <h2 className="text-2xl font-semibold">{data.metaTitle}</h2>
+                  {data.createdAt && (
+                    <p className="text-gray-600">
+                      {new Date(data.createdAt).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
               </div>
             )}
-          </div>
 
-          {data?.description && (
-            <div ref={overviewRef} className="space-y-4">
-              <div className="flex flex-col lg:flex-row lg:space-x-6 mt-6 ">
-                <div className="lg:w-4/5 ">
-                  <h3 className="text-lg font-semibold border-b pb-2">Overview</h3>
-                  <div
-                    className="text-gray-700"
-                    dangerouslySetInnerHTML={{ __html: data.description }}
-                  />
+            <div className="space-y-4">
+              {data.metaDescription && (
+                <p className="text-gray-700">{data.metaDescription}</p>
+              )}
+
+              {data.metaKeywords && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {data.metaKeywords.split(",").map((keyword, index) => (
+                    keyword.trim() && (
+                      <span
+                        key={index}
+                        className="inline-block bg-red-500 text-white text-sm px-3 py-1 rounded-full"
+                      >
+                        {keyword.trim()}
+                      </span>
+                    )
+                  ))}
                 </div>
+              )}
+            </div>
 
-                <div className="lg:w-1/5 md:w-[30%] h-full min-w-[200px] mt-8  lg:mt-0">
-                  <div className='sticky top-20'>
-                    <h3 className="text-lg font-semibold mb-4">Recently Uploaded Blogs</h3>
-                    <div className="space-y-4">
-                      {recentBlogs?.map((blog) => (
-                        <Link key={blog.id} to={`/blogdetailpage/${blog?._id}`}>
-                          <div className="flex items-center p-3 bg-white rounded-lg shadow-md">
-                            <div className="w-1/3">
-                              <img
-                                src={`${Images}/${blog?.thumbnail  }`}
-                                alt={blog.title}
-                                className="w-full h-20 object-cover rounded-md"
-                              />
+            {data?.description && (
+              <div ref={overviewRef} className="space-y-4">
+                <div className="flex flex-col lg:flex-row lg:space-x-6 mt-6 ">
+                  <div className="lg:w-4/5 ">
+                    <h3 className="text-lg font-semibold border-b pb-2">Overview</h3>
+                    <div
+                      className="text-gray-700"
+                      dangerouslySetInnerHTML={{ __html: data.description }}
+                    />
+                  </div>
+
+                  <div className="lg:w-1/5 md:w-[30%] h-full min-w-[200px] mt-8  lg:mt-0">
+                    <div className='sticky top-20'>
+                      <h3 className="text-lg font-semibold mb-4">Recently Uploaded Blogs</h3>
+                      <div className="space-y-4">
+                        {recentBlogs?.map((blog) => (
+                          <Link key={blog.id} to={`/blogdetailpage/${blog?._id}`}>
+                            <div className="flex items-center p-3 bg-white rounded-lg shadow-md">
+                              <div className="w-1/3">
+                                <img
+                                  src={`${Images}/${blog?.thumbnail}`}
+                                  alt={blog.title}
+                                  className="w-full h-20 object-cover rounded-md"
+                                />
+                              </div>
+                              <div className="w-2/3 ml-3">
+                                <h4 className="text-md font-medium text-gray-800 truncate">{blog.title}</h4>
+                                <p className="text-sm text-gray-600 truncate" dangerouslySetInnerHTML={{ __html: blog.description.split(' ').slice(0, 30).join(' ') + '...' }}></p>
+                                <span className="text-xs text-gray-500">{new Date(blog.createdAt).toLocaleDateString()}</span>
+                              </div>
                             </div>
-                            <div className="w-2/3 ml-3">
-                              <h4 className="text-md font-medium text-gray-800 truncate">{blog.title}</h4>
-                              <p className="text-sm text-gray-600 truncate" dangerouslySetInnerHTML={{ __html: blog.description.split(' ').slice(0, 30).join(' ') + '...' }}></p>
-                              <span className="text-xs text-gray-500">{new Date(blog.createdAt).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
+                    <div className="w-[300px] h-[250px]">
+            <Promotions location="BLOG_PAGE" />
+          </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+         
         </div>
-      </div>
 
-      <HighRatedCareers></HighRatedCareers>
- 
-    </div>
-    <div className="flex gap-2 items-center">
-                <Events />
-                <ConsellingBanner />
-            </div>
-</>
+        <HighRatedCareers></HighRatedCareers>
+      </div>
+      <div className="flex gap-2 items-center">
+        <Events />
+        <ConsellingBanner />
+      </div>
+    </>
   );
 };
 

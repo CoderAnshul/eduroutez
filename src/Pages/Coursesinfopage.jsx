@@ -11,6 +11,7 @@ import { useQuery } from 'react-query';
 import ConsellingBanner from '../Components/ConsellingBanner';
 import HighRatedCareers from '../Components/HighRatedCareers';
 import BlogComponent from '../Components/BlogComponent';
+import Promotions from '../Pages/CoursePromotions';
 
 const tabs = [
   "Overview",
@@ -31,7 +32,7 @@ const Coursesinfopage = () => {
     { 
       enabled: Boolean(id),
       retry: 2,
-      staleTime: 5 * 60 * 1000 // 5 minutes
+      staleTime: 5 * 60 * 1000
     }
   );
 
@@ -73,7 +74,7 @@ const Coursesinfopage = () => {
           }
           h1, h2, h3, h4, h5, h6 {
             margin-top: 1rem;
-            color: #1a202c; /* Customize the color as needed */
+            color: #1a202c;
           }
           h1 {
             font-size: 2.25rem;
@@ -106,7 +107,7 @@ const Coursesinfopage = () => {
             line-height: 1.3;
           }
           a {
-            color: blue; /* Link color */
+            color: blue;
           }
         `}</style>
       </div>
@@ -114,48 +115,51 @@ const Coursesinfopage = () => {
   };
 
   return (
-    <><div className="container max-w-[1300px] mx-auto px-8 py-6 flex flex-col items-start bg-gray-50">
-      {/* Course Title */}
-      <CoursesName content={content.courseTitle || 'Untitled Course'} />
-
-      {/* Tab Navigation */}
-      <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
-
-      {/* Main Content */}
-      <div className="w-full mt-5 flex flex-wrap gap-8">
-        <div className="w-full lg:w-3/4">
-          {/* Overview Section */}
-          <div ref={sectionRefs[0]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h4 className="text-2xl font-semibold text-red-500 mb-4">Overview</h4>
-            {renderHTML(content.courseOverview)}
-            <div className="grid grid-cols-2 gap-4 mt-4">
-            <p>
-  {(content.courseDurationYears || content.courseDurationMonths) && (
     <>
-      <strong>Duration: </strong>
-      {[
-        content.courseDurationYears > 0 && `${content.courseDurationYears} years`,
-        content.courseDurationMonths > 0 && `${content.courseDurationMonths} months`
-      ].filter(Boolean).join(' ')}
-    </>
-  )}
-</p>
-              <p><strong>Cost:</strong> {content.isCourseFree === 'free' ? 'Free' : 'Paid'}</p>
-              <p><strong>Category:</strong> {content.category?.title || 'Not specified'}</p>
-            </div>
-            <div className="mt-4">
-              <h5 className="font-semibold mb-2 ">Short Description</h5>
-              {renderHTML(content.shortDescription)}
-              <h5 className="font-semibold mb-2 mt-4">Long Description</h5>
-              {renderHTML(content.longDescription)}
-            </div>
-          </div>
+      <div className="container max-w-[1300px] mx-auto px-8 py-6 flex flex-col items-start bg-gray-50">
+        {/* Course Title */}
+        <CoursesName content={content.courseTitle || 'Untitled Course'} />
 
-          {/* Eligibility Section */}
-          <div ref={sectionRefs[1]} className="bg-white shadow-md rounded-lg p-6 mb-6 ">
-            <h4 className="text-2xl font-semibold text-red-500 mb-4">Eligibility</h4>
-            {renderHTML(content.courseEligibility)}
-            <div className="mt-4">
+        {/* Tab Navigation */}
+        <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
+
+        {/* Main Content Area with Sidebar */}
+        <div className="w-full mt-5 flex gap-8">
+          {/* Main Content */}
+          <div className="w-full lg:w-2/3">
+            {/* Overview Section */}
+            <div ref={sectionRefs[0]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+              <h4 className="text-2xl font-semibold text-red-500 mb-4">Overview</h4>
+              {renderHTML(content.courseOverview)}
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <p>
+                  {(content.courseDurationYears || content.courseDurationMonths) && (
+                    <>
+                      <strong>Duration: </strong>
+                      {[
+                        content.courseDurationYears > 0 && `${content.courseDurationYears} years`,
+                        content.courseDurationMonths > 0 && `${content.courseDurationMonths} months`
+                      ].filter(Boolean).join(' ')}
+                    </>
+                  )}
+                </p>
+                <p><strong>Cost:</strong> {content.isCourseFree === 'free' ? 'Free' : 'Paid'}</p>
+                <p><strong>Category:</strong> {content.category?.title || 'Not specified'}</p>
+              </div>
+              <div className="mt-4">
+                <h5 className="font-semibold mb-2">Short Description</h5>
+                {renderHTML(content.shortDescription)}
+                <h5 className="font-semibold mb-2 mt-4">Long Description</h5>
+                {renderHTML(content.longDescription)}
+              </div>
+            </div>
+
+            {/* Other sections... */}
+            {/* Eligibility Section */}
+            <div ref={sectionRefs[1]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+              <h4 className="text-2xl font-semibold text-red-500 mb-4">Eligibility</h4>
+              {renderHTML(content.courseEligibility)}
+              <div className="mt-4">
               <h5 className="font-semibold mb-2">General Eligibility</h5>
               <p className="text-gray-700">{content.eligibility || 'Not specified'}</p>
               <h5 className="font-semibold mb-2 mt-4">Cut Off</h5>
@@ -163,57 +167,60 @@ const Coursesinfopage = () => {
               <h5 className="font-semibold mb-2 mt-4">Exams Accepted</h5>
               <p className="text-gray-700">{content.examAccepted || 'Not specified'}</p>
             </div>
-          </div>
+            </div>
 
-          {/* Curriculum Section */}
-          <div ref={sectionRefs[2]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h4 className="text-2xl font-semibold text-red-500 mb-4">Curriculum</h4>
-            {renderHTML(content.courseCurriculum)}
-          </div>
+            {/* Curriculum Section */}
+            <div ref={sectionRefs[2]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+              <h4 className="text-2xl font-semibold text-red-500 mb-4">Curriculum</h4>
+              {renderHTML(content.courseCurriculum)}
+            </div>
 
-          {/* Fees Section */}
-          <div ref={sectionRefs[3]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h4 className="text-2xl font-semibold text-red-500 mb-4">Course Fees</h4>
-            {renderHTML(content.courseFee)}
-          </div>
+            {/* Fees Section */}
+            <div ref={sectionRefs[3]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+              <h4 className="text-2xl font-semibold text-red-500 mb-4">Course Fees</h4>
+              {renderHTML(content.courseFee)}
+            </div>
+<Promotions location="COURSES_PAGE" />
+            {/* Opportunities Section */}
+            <div ref={sectionRefs[4]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+              <h4 className="text-2xl font-semibold text-red-500 mb-4">Career Opportunities</h4>
+              {renderHTML(content.courseOpportunities)}
+            </div>
 
-          {/* Opportunities Section */}
-          <div ref={sectionRefs[4]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h4 className="text-2xl font-semibold text-red-500 mb-4">Career Opportunities</h4>
-            {renderHTML(content.courseOpportunities)}
-          </div>
+            {/* Application Section */}
+            <div ref={sectionRefs[5]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+              <h4 className="text-2xl font-semibold text-red-500 mb-4">Application Details</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <p><strong>Application Start Date:</strong></p>
+                <p>{formatDate(content.applicationStartDate)}</p>
+                <p><strong>Application End Date:</strong></p>
+                <p>{formatDate(content.applicationEndDate)}</p>
+              </div>
+            </div>
 
-          {/* Application Section */}
-          <div ref={sectionRefs[5]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h4 className="text-2xl font-semibold text-red-500 mb-4">Application Details</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <p><strong>Application Start Date:</strong></p>
-              <p>{formatDate(content.applicationStartDate)}</p>
-              <p><strong>Application End Date:</strong></p>
-              <p>{formatDate(content.applicationEndDate)}</p>
+            {/* Pros and Cons */}
+            <div className="mb-6">
+              <ProsandCons course={content} />
             </div>
           </div>
 
-          {/* Pros and Cons */}
-          <div className="mb-6">
-            <ProsandCons course={content} />
+          {/* Right Sidebar */}
+          <div className="hidden lg:block lg:w-1/3 space-y-6">
+                   <QueryForm />
           </div>
         </div>
 
-        {/* Query Form */}
-        <QueryForm />
+        {/* Additional Sections */}
+        <HighRatedCareers />
+        <BlogComponent />
+        <BestRated />
       </div>
-
-      {/* Additional Sections */}
-      <HighRatedCareers />
-      <BlogComponent />
-      <BestRated />
-
-    </div>
-      <div className="w-full flex items-start  mt-10">
+      
+      <div className="w-full flex items-start mt-10">
         <Events />
         <ConsellingBanner />
-      </div></>
+      </div>
+    </>
   );
 };
 

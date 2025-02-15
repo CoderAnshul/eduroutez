@@ -14,6 +14,7 @@ import { useQuery } from 'react-query'
 import { homeBanner } from '../ApiFunctions/api'
 import { useParams } from 'react-router-dom'
 import ConsellingBanner from '../Components/ConsellingBanner'
+import Promotions from './CoursePromotions'
 
 const Homepage = () => {
 
@@ -36,15 +37,24 @@ const Homepage = () => {
   return (
     <>
       <Banner/>
-      <div className='p-[4vw] flex flex-col items-center' >
-          <Counselling/>
-          <PopularCourses/>
-         
+   
+      <div className="p-4 flex flex-col items-center">
+  
+      <Counselling />
       </div>
+      {/* Using standard Tailwind classes for width and height instead of arbitrary values */}
+      <div className="w-full max-w-4xl h-fit mx-auto">
+        <Promotions location="HOME_PAGE" className="h-[90px]" />
+      </div>
+      <div className="p-4 flex flex-col items-center">
+      <PopularCourses />
+      </div>
+  
       <PopularCategories/>
       <div className='p-[4vw] flex flex-col items-center' >
          <BestRated/>
          <TrendingInstitute/>
+        
          <HighRatedCareers/>
       </div>
       <Instructor/>

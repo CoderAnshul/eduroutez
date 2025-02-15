@@ -1,0 +1,111 @@
+import React, { useState, useEffect } from 'react';
+import { useQuery } from 'react-query';
+import axiosInstance from '../ApiFunctions/axios';
+
+const baseURL = import.meta.env.VITE_BASE_URL;
+const imageUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+
+const fetchPromotions = async () => {
+  const response = await axiosInstance.get(`${baseURL}/promotions?limit=10000`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-access-token': localStorage.getItem('accessToken'),
+      'x-refresh-token': localStorage.getItem('refreshToken')
+    }
+  });
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch promotions');
+  }
+  return response.data;
+};
+
+const Promotions = ({ location , className }) => {
+  const [randomPromo, setRandomPromo] = useState(null);
+
+  const { data: promotionsData, isLoading, isError } = useQuery(
+    'promotions',
+    fetchPromotions,
+    {
+      staleTime: 5 * 60 * 1000,
+      retry: 2
+    }
+  );
+
+  useEffect(() => {
+    if (promotionsData?.data?.result) {
+      const filteredPromotions = promotionsData.data.result.filter(
+        promo => promo.location === location
+      );
+      
+      if (filteredPromotions.length > 0) {
+        const randomIndex = Math.floor(Math.random() * filteredPromotions.length);
+        setRandomPromo(filteredPromotions[randomIndex]);
+      }
+    }
+  }, [promotionsData, location]);
+
+  if (isLoading) {
+    return (
+      <div className="w-full">
+        <div className="bg-white rounded-lg shadow-lg">
+          <div className="animate-pulse">
+            <div className="aspect-video bg-gray-200 rounded-lg" />
+            <div className="p-6 space-y-3">
+              <div className="h-4 bg-gray-200 rounded w-1/4" />
+              <div className="h-6 bg-gray-200 rounded w-3/4" />
+              <div className="h-4 bg-gray-200 rounded w-1/2" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !randomPromo) {
+    return null;
+  }
+
+  return (
+    <div className={`w-full overflow-hidden ${className}`}>
+      <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+        <div 
+          className={`relative overflow-hidden rounded-lg cursor-pointer group ${className}`}
+          onClick={() => {
+            if (randomPromo.link) {
+              window.location.href = randomPromo.link;
+            }
+          }}
+        >
+          <div className={`relative aspect-video overflow-hidden w-full ${className}`}>
+            {randomPromo.image && (
+              <img
+                src={`${imageUrl}/${randomPromo.image}`}
+                alt={randomPromo.title}
+                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+              />
+            )}
+            <div className=" inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+            <h3 className="text-2xl font-bold mb-2">
+              {randomPromo.title}
+            </h3>
+            {randomPromo.description && (
+              <p className="text-sm text-white/90 mb-2">
+                {randomPromo.description}
+              </p>
+            )}
+            {randomPromo.link && (
+              <p className="text-sm text-white/90 underline hover:text-white">
+                Learn more
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Promotions;
