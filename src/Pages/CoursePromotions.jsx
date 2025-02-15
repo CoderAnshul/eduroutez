@@ -19,7 +19,7 @@ const fetchPromotions = async () => {
   return response.data;
 };
 
-const Promotions = ({ location }) => {
+const Promotions = ({ location , className }) => {
   const [randomPromo, setRandomPromo] = useState(null);
 
   const { data: promotionsData, isLoading, isError } = useQuery(
@@ -66,17 +66,17 @@ const Promotions = ({ location }) => {
   }
 
   return (
-    <div className="w-full">
-      <div className="bg-white rounded-lg shadow-lg">
+    <div className={`w-full overflow-hidden ${className}`}>
+      <div className={`bg-white rounded-lg shadow-lg ${className}`}>
         <div 
-          className="relative overflow-hidden rounded-lg cursor-pointer group"
+          className={`relative overflow-hidden rounded-lg cursor-pointer group ${className}`}
           onClick={() => {
             if (randomPromo.link) {
               window.location.href = randomPromo.link;
             }
           }}
         >
-          <div className="relative aspect-video overflow-hidden">
+          <div className={`relative aspect-video overflow-hidden w-full ${className}`}>
             {randomPromo.image && (
               <img
                 src={`${imageUrl}/${randomPromo.image}`}
@@ -84,7 +84,7 @@ const Promotions = ({ location }) => {
                 className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <div className=" inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
 
           <div className="absolute bottom-0 left-0 right-0 p-6 text-white">

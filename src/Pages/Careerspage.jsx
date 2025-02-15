@@ -259,7 +259,10 @@ const Careerspage = () => {
       </div>
 
       <PopularCourses />
-      <Promotions location="CAREER_PAGE" />
+      <div className="w-full items-center max-w-4xl h-fit mx-auto">
+        
+      <Promotions location="CAREER_PAGE" className="h-[90px]" />
+      </div>
       <BlogComponent />
       <div className="flex gap-2 flex-col sm:flex-row items-center">
         <Events />

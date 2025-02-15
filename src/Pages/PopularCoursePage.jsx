@@ -101,7 +101,14 @@ const PopularCourses = () => {
 
       {/* Popular Courses Section */}
       <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className='w-full items-center max-w-4xl h-24 mx-auto'>
+
+          <div className='w-full items-center max-w-4xl h-24 mx-auto'>
+
       <Promotions location="COURSES_PAGE" />
+          </div>
+
+        </div>
 
         <div className="flex items-center justify-between mb-10">
           <h3 className="text-3xl font-bold">Popular Courses</h3>
@@ -163,7 +170,10 @@ const PopularCourses = () => {
       
       
     </div>
-    <Promotions location="COURSES_PAGE" />
+    <div className='w-full items-center max-w-4xl h-fit mx-auto'>
+
+    <Promotions location="COURSES_PAGE" className="h-[90px]" />
+    </div>
 
       <HighRatedCareers></HighRatedCareers>
       <BlogComponent/>      <BestRated />

@@ -121,7 +121,7 @@ if (data) {
   return (
     <>
          <div className="w-full items-center max-w-4xl h-24 mx-auto">
-        <Promotions location="REVIEW_PAGE" />
+        <Promotions location="REVIEW_PAGE" className="h-[90px]" />
       </div>
     <div className="p-3 h-[600px] pb-14 bg-white relative flex flex-col">
       {/* Step Content */}
