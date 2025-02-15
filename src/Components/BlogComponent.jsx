@@ -95,9 +95,9 @@ const BlogComponent = () => {
 
               {/* Card Content */}
               <div className="p-6">
-                <h4 className="text-xl font-semibold text-gray-800">
+                <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-gray-800">
                   {blog.title.length > 30 ? `${blog.title.slice(0,35)}...` : blog.title}
-                </h4>
+                </h3>
                 <p className="text-sm h-16 text-gray-600 mt-3 line-clamp-3" dangerouslySetInnerHTML={{ __html: blog.description }}></p>
                 <div className="mt-4">
                   <button className="bg-red-600 text-white mt-4 py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
