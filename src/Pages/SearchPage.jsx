@@ -13,6 +13,7 @@ import { useQuery } from 'react-query';
 import { getInstitutes } from '../ApiFunctions/api';
 import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
+import Promotions from './CoursePromotions';
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -330,7 +331,10 @@ const SearchPage = () => {
                 <div className="text-sm text-gray-700 mb-2">
                   <span className="font-semibold text-red-500">{totalDocuments || "0"}</span> Institutes Found
                 </div>
-                {filteredContent.map((institute, index) => (
+                <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}>
+  <Promotions location="INSTITUTE_PAGE_RECTANGLE"></Promotions>
+</div>                {filteredContent.map((institute, index) => (
+                  
                   <SearchResultBox key={index} institute={institute} />
                 ))}
               </>

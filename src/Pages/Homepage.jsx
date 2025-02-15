@@ -37,16 +37,24 @@ const Homepage = () => {
   return (
     <>
       <Banner/>
-      <div className='p-[4vw] flex flex-col items-center' >
-          <Counselling/>
-          <PopularCourses/>
-         
+   
+      <div className="p-4 flex flex-col items-center">
+  
+      <Counselling />
       </div>
+      {/* Using standard Tailwind classes for width and height instead of arbitrary values */}
+      <div className="w-full max-w-4xl h-24">
+        <Promotions location="HOME_PAGE" />
+      </div>
+      <div className="p-4 flex flex-col items-center">
+      <PopularCourses />
+      </div>
+  
       <PopularCategories/>
       <div className='p-[4vw] flex flex-col items-center' >
          <BestRated/>
          <TrendingInstitute/>
-         <Promotions location='HOME_PAGE'/>
+        
          <HighRatedCareers/>
       </div>
       <Instructor/>

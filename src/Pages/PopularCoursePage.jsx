@@ -12,6 +12,7 @@ import BlogComponent from '../Components/BlogComponent';
 import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
 import ConsellingBanner from '../Components/ConsellingBanner';
+import Promotions from './CoursePromotions';
 
 
 const PopularCourses = () => {
@@ -100,6 +101,8 @@ const PopularCourses = () => {
 
       {/* Popular Courses Section */}
       <div className="max-w-7xl mx-auto px-6 py-10">
+      <Promotions location="COURSES_PAGE" />
+
         <div className="flex items-center justify-between mb-10">
           <h3 className="text-3xl font-bold">Popular Courses</h3>
         </div>
@@ -158,7 +161,10 @@ const PopularCourses = () => {
         </div>
       </div>
       
+      
     </div>
+    <Promotions location="COURSES_PAGE" />
+
       <HighRatedCareers></HighRatedCareers>
       <BlogComponent/>      <BestRated />
       

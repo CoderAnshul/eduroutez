@@ -180,7 +180,7 @@ const Coursesinfopage = () => {
               <h4 className="text-2xl font-semibold text-red-500 mb-4">Course Fees</h4>
               {renderHTML(content.courseFee)}
             </div>
-
+<Promotions location="COURSES_PAGE" />
             {/* Opportunities Section */}
             <div ref={sectionRefs[4]} className="bg-white shadow-md rounded-lg p-6 mb-6">
               <h4 className="text-2xl font-semibold text-red-500 mb-4">Career Opportunities</h4>
@@ -207,7 +207,6 @@ const Coursesinfopage = () => {
           {/* Right Sidebar */}
           <div className="hidden lg:block lg:w-1/3 space-y-6">
                    <QueryForm />
-                   <Promotions location="COURSES_PAGE" />
           </div>
         </div>
 

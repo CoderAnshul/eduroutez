@@ -265,6 +265,7 @@ const Instituepage = () => {
                           <div ref={sectionRefs[6]} className="min-h-24 pt-4">
                             <ScholarshipInfo instituteData={instituteData}/>
                           </div>
+                          <Promotions location="INSTITUTE_PAGE_RECTANGLE"></Promotions>
                           <div ref={sectionRefs[7]} className="min-h-24 pt-4">
                             <CutTOffInfo instituteData={instituteData}/>
                           </div>

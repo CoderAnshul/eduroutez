@@ -9,6 +9,7 @@ import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import Promotions from "./CoursePromotions";
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -258,6 +259,7 @@ const Careerspage = () => {
       </div>
 
       <PopularCourses />
+      <Promotions location="CAREER_PAGE" />
       <BlogComponent />
       <div className="flex gap-2 flex-col sm:flex-row items-center">
         <Events />
