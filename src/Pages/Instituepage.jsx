@@ -265,7 +265,7 @@ const Instituepage = () => {
                           <div ref={sectionRefs[6]} className="min-h-24 pt-4">
                             <ScholarshipInfo instituteData={instituteData}/>
                           </div>
-                          <Promotions location="INSTITUTE_PAGE_RECTANGLE"></Promotions>
+                          <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px]"></Promotions>
                           <div ref={sectionRefs[7]} className="min-h-24 pt-4">
                             <CutTOffInfo instituteData={instituteData}/>
                           </div>
@@ -302,7 +302,7 @@ const Instituepage = () => {
                 </div>
                 <div className='w-[300px] h-[250px]'>
                   <QueryForm instituteData={instituteData}/>
-                  <Promotions location="INSTITUTE_PAGE" />
+                  <Promotions location="INSTITUTE_PAGE " className="h-[250px]"/>
                 </div>
              </div>
              <HighRatedCareers></HighRatedCareers>

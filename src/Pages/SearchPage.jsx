@@ -332,7 +332,7 @@ const SearchPage = () => {
                   <span className="font-semibold text-red-500">{totalDocuments || "0"}</span> Institutes Found
                 </div>
                 <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}>
-  <Promotions location="INSTITUTE_PAGE_RECTANGLE"></Promotions>
+                <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px]"></Promotions>
 </div>                {filteredContent.map((institute, index) => (
                   
                   <SearchResultBox key={index} institute={institute} />

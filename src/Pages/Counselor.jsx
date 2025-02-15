@@ -218,7 +218,7 @@ const CounselorListPage = () => {
                                 </label>
                             ))}
                         </div>
-                        <Promotions location="COUNSELING_PAGE_SIDEBAR"/>
+                        <Promotions location="COUNSELING_PAGE_SIDEBAR" className="h-[250px]"/>
                     </div>
 
                     {/* Main Content */}
@@ -326,7 +326,7 @@ const CounselorListPage = () => {
                         )}
                     </div>
                 </div>
-                <Promotions location="COUNSELING_PAGE_MAIN"/>
+                <Promotions location="COUNSELING_PAGE_MAIN" className="h-[90px]"/>
 
             </div>
 
