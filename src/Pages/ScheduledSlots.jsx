@@ -19,7 +19,7 @@ const ScheduledSlots = () => {
                         "Content-Type": "application/json",
                     }
                 });
-                setSlots(response.data?.data || []);
+                setSlots(response.data?.data?.result || []);
                 setError(null);
             } catch (error) {
                 console.log('Error fetching scheduled slots:', error.message);
@@ -89,7 +89,7 @@ const ScheduledSlots = () => {
             <h1 className="text-2xl font-bold mb-6">Your Scheduled Sessions</h1>
             <div className="space-y-4">
                 {slots.map((slot) => (
-                    <div key={slot._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div key={slot._id || Math.random()} className="bg-white rounded-lg shadow-md overflow-hidden">
                         <div className="bg-gray-50 p-4">
                             <div className="flex justify-between items-center">
                                 <h2 className="text-lg font-semibold">
