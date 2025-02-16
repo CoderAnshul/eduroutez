@@ -163,20 +163,20 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
     </span>                </div>
 
                 <div className="flex items-center space-x-4 mt-5 mb-2">
-               <span className="text-gray-700 font-medium md:text-xl text-xs sm:text-sm flex items-center gap-1">
+               <span className="text-gray-700 font-medium md:text-lg text-xs sm:text-sm flex items-center gap-1">
                   <img src={rupee} className="h-4 opacity-75 mt-1" alt="rupee" />{institute.minFees || '200000'}-{institute.maxFees || 'onwards'}
                 </span>
-                <span className="flex items-center font-medium md:text-xl text-xs sm:text-sm space-x-1">
+                <span className="flex items-center font-medium md:text-lg text-xs sm:text-sm space-x-1">
                   <img src={badge} alt="AICTE" className="h-4 opacity-75 mt-1" />
                   <span>{institute.affiliation || 'AICTE'}</span>
                 </span>
                 {institute.highestPackage && (
-                <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl">
+                <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-lg">
                   <img src={cashhand} alt="cash" className="h-4 opacity-75 mt-1" />{institute.highestPackage || '10LPA'}
                 </span>
               )}
                 {institute.examAccepted && (
-  <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl relative group">
+  <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-lg relative group">
     <img src={checklist} alt="checklist" className="h-4 opacity-75 mt-1" />
     <span>
       {institute.examAccepted.split(',')[0]}
