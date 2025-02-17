@@ -25,7 +25,7 @@ const ReviewActivity = () => {
                         'x-refresh-token': localStorage.getItem('refreshToken')
                     },
                 });
-                setReviews(response.data.data || []);
+                setReviews(response.data.data ?? []);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -42,7 +42,7 @@ const ReviewActivity = () => {
 
     const handleUpdateReview = async () => {
         try {
-            const response = await axios.patch(`${apiUrl}/review/${editingReview._id}`, editingReview, {
+            const response = await axios.patch(`${apiUrl}/review/${editingReview?._id}`, editingReview, {
                 headers: {
                     'Content-Type': 'application/json',
                     'x-access-token': localStorage.getItem('accessToken'),
@@ -51,7 +51,7 @@ const ReviewActivity = () => {
             });
 
             const updatedReviews = reviews.map(review => 
-                review._id === editingReview._id ? response.data.data : review
+                review._id === editingReview?._id ? response.data.data : review
             );
             toast.success('Review updated successfully');
             setReviews(updatedReviews);
@@ -122,7 +122,7 @@ const ReviewActivity = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                                 <input 
                                     type="text"
-                                    value={editingReview.fullName || ''}
+                                    value={editingReview?.fullName ?? ''}
                                     onChange={(e) => setEditingReview({
                                         ...editingReview, 
                                         fullName: e.target.value
@@ -133,7 +133,7 @@ const ReviewActivity = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
                                 <select 
-                                    value={editingReview.gender || ''} 
+                                    value={editingReview?.gender ?? ''} 
                                     onChange={(e) => setEditingReview({
                                         ...editingReview, 
                                         gender: e.target.value
@@ -154,14 +154,14 @@ const ReviewActivity = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Placement Rating</label>
                                 <StarRatingEdit 
-                                    rating={editingReview.placementStars}
+                                    rating={editingReview?.placementStars ?? 0}
                                     onChange={(stars) => setEditingReview({
                                         ...editingReview, 
                                         placementStars: stars
                                     })}
                                 />
                                 <textarea 
-                                    value={editingReview.placementDescription || ''}
+                                    value={editingReview?.placementDescription ?? ''}
                                     onChange={(e) => setEditingReview({
                                         ...editingReview, 
                                         placementDescription: e.target.value
@@ -176,14 +176,14 @@ const ReviewActivity = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Faculty Rating</label>
                                 <StarRatingEdit 
-                                    rating={editingReview.facultyStars}
+                                    rating={editingReview?.facultyStars ?? 0}
                                     onChange={(stars) => setEditingReview({
                                         ...editingReview, 
                                         facultyStars: stars
                                     })}
                                 />
                                 <textarea 
-                                    value={editingReview.facultyDescription || ''}
+                                    value={editingReview?.facultyDescription ?? ''}
                                     onChange={(e) => setEditingReview({
                                         ...editingReview, 
                                         facultyDescription: e.target.value
@@ -198,14 +198,14 @@ const ReviewActivity = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Campus Life Rating</label>
                                 <StarRatingEdit 
-                                    rating={editingReview.campusLifeStars}
+                                    rating={editingReview?.campusLifeStars ?? 0}
                                     onChange={(stars) => setEditingReview({
                                         ...editingReview, 
                                         campusLifeStars: stars
                                     })}
                                 />
                                 <textarea 
-                                    value={editingReview.campusLifeDescription || ''}
+                                    value={editingReview?.campusLifeDescription ?? ''}
                                     onChange={(e) => setEditingReview({
                                         ...editingReview, 
                                         campusLifeDescription: e.target.value
@@ -220,14 +220,14 @@ const ReviewActivity = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Suggestions Rating</label>
                                 <StarRatingEdit 
-                                    rating={editingReview.suggestionsStars}
+                                    rating={editingReview?.suggestionsStars ?? 0}
                                     onChange={(stars) => setEditingReview({
                                         ...editingReview, 
                                         suggestionsStars: stars
                                     })}
                                 />
                                 <textarea 
-                                    value={editingReview.suggestionDescription || ''}
+                                    value={editingReview?.suggestionDescription ?? ''}
                                     onChange={(e) => setEditingReview({
                                         ...editingReview, 
                                         suggestionDescription: e.target.value
@@ -244,7 +244,7 @@ const ReviewActivity = () => {
                             <label className="block text-sm font-medium text-gray-700 mb-2">Review Title</label>
                             <input 
                                 type="text"
-                                value={editingReview.reviewTitle || ''}
+                                value={editingReview?.reviewTitle ?? ''}
                                 onChange={(e) => setEditingReview({
                                     ...editingReview, 
                                     reviewTitle: e.target.value
@@ -255,7 +255,7 @@ const ReviewActivity = () => {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Review Content</label>
                             <textarea 
-                                value={editingReview.content || ''}
+                                value={editingReview?.content ?? ''}
                                 onChange={(e) => setEditingReview({
                                     ...editingReview, 
                                     content: e.target.value
@@ -333,7 +333,9 @@ const ReviewActivity = () => {
                         {/* Header Section */}
                         <div className="border-b pb-4 mb-4">
                             <h2 className="text-2xl font-semibold mb-2">{review.reviewTitle}</h2>
-                            <h4 className="text-lg font-medium text-gray-600"> Collage Name : <strong> {review.institute.instituteName}</strong></h4>
+                            
+                          
+                           <h4 className="text-lg font-medium text-gray-600"> Collage Name : <strong> {review?.institute?.instituteName ?? 'N/A'}</strong></h4>
                             <p className="text-gray-600">{review.content}</p>
                         </div>
 
@@ -343,36 +345,36 @@ const ReviewActivity = () => {
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
                                     <h3 className="font-semibold">Placement</h3>
-                                    <StarRating rating={review.placementStars} />
+                                    <StarRating rating={review.placementStars ?? 0} />
                                 </div>
-                                <p className="text-sm text-gray-600">{review.placementDescription}</p>
+                                <p className="text-sm text-gray-600">{review.placementDescription ?? 'No description provided'}</p>
                             </div>
 
                             {/* Faculty Rating */}
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
                                     <h3 className="font-semibold">Faculty</h3>
-                                    <StarRating rating={review.facultyStars} />
+                                    <StarRating rating={review.facultyStars ?? 0} />
                                 </div>
-                                <p className="text-sm text-gray-600">{review.facultyDescription}</p>
+                                <p className="text-sm text-gray-600">{review.facultyDescription ?? 'No description provided'}</p>
                             </div>
 
                             {/* Campus Life Rating */}
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
                                     <h3 className="font-semibold">Campus Life</h3>
-                                    <StarRating rating={review.campusLifeStars} />
+                                    <StarRating rating={review.campusLifeStars ?? 0} />
                                 </div>
-                                <p className="text-sm text-gray-600">{review.campusLifeDescription}</p>
+                                <p className="text-sm text-gray-600">{review.campusLifeDescription ?? 'No description provided'}</p>
                             </div>
 
                             {/* Suggestions Rating */}
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
                                     <h3 className="font-semibold">Suggestions</h3>
-                                    <StarRating rating={review.suggestionsStars} />
+                                    <StarRating rating={review.suggestionsStars ?? 0} />
                                 </div>
-                                <p className="text-sm text-gray-600">{review.suggestionDescription}</p>
+                                <p className="text-sm text-gray-600">{review.suggestionDescription ?? 'No description provided'}</p>
                             </div>
                         </div>
 
