@@ -139,6 +139,13 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
               </svg>
             </button>
           )}
+          <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
+            <div className="space-x-4">
+              <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Admission</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a>
+            </div>
+          </div>
         </div>
 
         {/* Right Section - Details */}
@@ -156,7 +163,7 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
                 <span>{institute.reviews.length} Reviews</span>
                 <span className="flex items-center gap-2 text-gray-600">
       <MapPin size={16} className="text-gray-500" />
-      <span>{institute.state}</span>
+      <span>{institute.stateName}</span>
       <span className="mx-1">•</span>
       <Building size={16} className="text-gray-500" />
       <span>{institute.organisationType}</span>
@@ -208,9 +215,9 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
                 <p className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{ __html: institute.about }} />
           <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">
             <div className="space-x-4">
-              <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
+             {/* <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
               <a href={`/institute/${institute._id}`} className="hover:underline">Admission</a>
-              <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a>*/}
             </div>
             <div className="flex space-x-4 justify-end">
               <button className="bg-red-600 text-white px-4 py-2 rounded-lg" onClick={handleDownloadBrochure}>
