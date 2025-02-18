@@ -311,7 +311,8 @@ const SearchPage = () => {
 
   return (
     <>
-      <PageBanner pageName="Search" currectPage="Search" />
+                    <Promotions location="SEARCH_PAGE" className="h-[320px]"></Promotions>
+
       <div className="px-[4vw] pb-[2vw] flex flex-col items-start">
 
         <div className="flex gap-4 w-full mt-6">
