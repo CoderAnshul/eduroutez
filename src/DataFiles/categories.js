@@ -1,19 +1,38 @@
-const categories = [
-    {
-      label: 'MAP',
-      sidebarItems: [
-        { id: 1, name: 'Top Ranked Colleges' },
-        { id: 2, name: 'Popular Courses' },
-        { id: 3, name: 'Exams' },
-        { id: 4, name: 'Colleges By Location' },
-        { id: 5, name: 'Compare Colleges' },
-        { id: 6, name: 'College Reviews' },
-        { id: 7, name: 'CAT Percentile Predictor' },
-        { id: 8, name: 'College Predictors' },
-        { id: 9, name: 'Ask Current MBA Students' },
-        { id: 10, name: 'Resources' },
-        { id: 11, name: 'Popular Specialization' },
-      ],
+import { useState, useEffect } from 'react';
+import axiosInstance from '../ApiFunctions/axios';
+
+const useCategories = () => {
+  const [categoriesData, setCategoriesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('fetching data',import.meta.env.VITE_BASE_URL);
+        const [collegeResponse, examResponse] = await Promise.all([
+          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams`),
+          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams`)
+        ]);
+console.log('collegeResponse', examResponse.data);
+console.log('collegeResponse.data', examResponse.data);
+        // Transform API data to match required format
+        const collegeItems = collegeResponse.data?.data?.result?.map((item, index) => ({
+          id: index + 1,
+          name: item.name,
+          // Add other transformations as needed
+        }));
+        const examItems = examResponse.data?.data?.result.map((item, index) => ({
+          id:  index + 1,
+          name: item.name,
+          // Add other transformations as needed
+        }));
+
+
+        const updatedCategories = [
+          {
+            label: 'Colleges',
+            sidebarItems: collegeItems,
       contents: {
         1: [
           [
@@ -22,6 +41,24 @@ const categories = [
             { name: 'Top MBA Colleges in Pune', link: '#' },
             { name: 'Top MBA Colleges in Ranchi', link: '#' },
             { name: 'Top MBA Colleges in Delhi', link: '#' },
+          ],
+          [
+            { name: 'Top MBA Colleges in Chennai', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+          ],
+          [
+            { name: 'Top MBA Colleges in Chennai', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
+            { name: 'Top MBA Colleges in Hyderabad', link: '#' },
           ],
           [
             { name: 'Top MBA Colleges in Chennai', link: '#' },
@@ -124,14 +161,9 @@ const categories = [
     },
     
     {
-      label: 'ENGINEERING',
-      sidebarItems: [
-        { id: 1, name: 'Top Ranked Colleges' },
-        { id: 2, name: 'Popular Courses' },
-        { id: 3, name: 'Exams' },
-        { id: 4, name: 'Colleges By Location' },
-        { id: 5, name: 'Compare Colleges' },
-      ],
+      label: 'Exams',
+      sidebarItems:examItems,
+
       contents: {
         1: [
           [
@@ -186,7 +218,7 @@ const categories = [
       },
     },
     {
-      label: 'MEDICAL',
+      label: 'Courses',
       sidebarItems: [
         { id: 1, name: 'Top Ranked Colleges' },
         { id: 2, name: 'Popular Courses' },
@@ -248,7 +280,7 @@ const categories = [
       },
     },
     {
-      label: 'DESIGN',
+      label: 'Careers',
       sidebarItems: [
         { id: 1, name: 'Top Ranked Colleges' },
         { id: 2, name: 'Popular Courses' },
@@ -310,7 +342,7 @@ const categories = [
       },
     },
     {
-      label: 'MEDIA',
+      label: 'Latest Updates',
       sidebarItems: [
         { id: 1, name: 'Top Ranked Colleges' },
         { id: 2, name: 'Popular Courses' },
@@ -374,7 +406,7 @@ const categories = [
       },
     },
     {
-      label: 'TOURISM',
+      label: 'More',
       sidebarItems: [
         { id: 1, name: 'Top Ranked Colleges' },
         { id: 2, name: 'Popular Courses' },
@@ -434,131 +466,22 @@ const categories = [
           ],
         ],
       },
-    },
-    {
-      label: 'HOSPITALITY',
-      sidebarItems: [
-        { id: 1, name: 'Top Ranked Colleges' },
-        { id: 2, name: 'Popular Courses' },
-        { id: 3, name: 'Exams' },
-        { id: 4, name: 'Colleges By Location' },
-        { id: 5, name: 'Compare Colleges' },
-      ],
-      contents: {
-        1: [
-          [
-            { name: 'Top Hospitality Colleges in India', link: '#' },
-            { name: 'Top Hospitality Colleges in Delhi', link: '#' },
-          ],
-          [
-            { name: 'Top Hospitality Colleges in Mumbai', link: '#' },
-            { name: 'Top Hospitality Colleges in Bangalore', link: '#' },
-          ],
-        ],
-        2: [
-          [
-            { name: 'BHM', link: '#' },
-            { name: 'B.Sc in Hospitality and Hotel Administration', link: '#' },
-          ],
-          [
-            { name: 'MBA in Hospitality', link: '#' },
-            { name: 'Diploma in Hotel Management', link: '#' },
-          ],
-        ],
-        3: [
-          [
-            { name: 'NCHMCT JEE', link: '#' },
-            { name: 'IHM Entrance Exam', link: '#' },
-          ],
-          [
-            { name: 'Hotel Management Entrance Exam', link: '#' },
-            { name: 'BHMCT Entrance Exam', link: '#' },
-          ],
-        ],
-        4: [
-          [
-            { name: 'Colleges in Delhi', link: '#' },
-            { name: 'Colleges in Mumbai', link: '#' },
-          ],
-          [
-            { name: 'Colleges in Bangalore', link: '#' },
-            { name: 'Colleges in Pune', link: '#' },
-          ],
-        ],
-        5: [
-          [
-            { name: 'College A vs College B', link: '#' },
-            { name: 'College C vs College D', link: '#' },
-          ],
-          [
-            { name: 'College E vs College F', link: '#' },
-            { name: 'College G vs College H', link: '#' },
-          ],
-        ],
-      },
-    },
-    {
-      label: 'COUNSELING',
-      sidebarItems: [
-        { id: 1, name: 'Top Ranked Colleges' },
-        { id: 2, name: 'Popular Courses' },
-        { id: 3, name: 'Exams' },
-        { id: 4, name: 'Colleges By Location' },
-        { id: 5, name: 'Compare Colleges' },
-      ],
-      contents: {
-        1: [
-          [
-            { name: 'Top Counseling Colleges in India', link: '#' },
-            { name: 'Top Counseling Colleges in Delhi', link: '#' },
-          ],
-          [
-            { name: 'Top Counseling Colleges in Mumbai', link: '#' },
-            { name: 'Top Counseling Colleges in Bangalore', link: '#' },
-          ],
-        ],
-        2: [
-          [
-            { name: 'B.A. in Psychology', link: '#' },
-            { name: 'M.A. in Counseling Psychology', link: '#' },
-          ],
-          [
-            { name: 'Diploma in Counseling', link: '#' },
-            { name: 'Certificate in Counseling Skills', link: '#' },
-          ],
-        ],
-        3: [
-          [
-            { name: 'Entrance Exam for Psychology', link: '#' },
-            { name: 'NET Exam for Psychology', link: '#' },
-          ],
-          [
-            { name: 'State Level Counseling Exams', link: '#' },
-            { name: 'University Level Counseling Exams', link: '#' },
-          ],
-        ],
-        4: [
-          [
-            { name: 'Colleges in Delhi', link: '#' },
-            { name: 'Colleges in Mumbai', link: '#' },
-          ],
-          [
-            { name: 'Colleges in Bangalore', link: '#' },
-            { name: 'Colleges in Chennai', link: '#' },
-          ],
-        ],
-        5: [
-          [
-            { name: 'College A vs College B', link: '#' },
-            { name: 'College C vs College D', link: '#' },
-          ],
-          [
-            { name: 'College E vs College F', link: '#' },
-            { name: 'College G vs College H', link: '#' },
-          ],
-        ],
-      },
-    },
+    }
   ];
 
-  export default categories;
+  console.log('updatedCategories', updatedCategories);
+  setCategoriesData(updatedCategories);
+  setLoading(false);
+} catch (err) {
+  setError(err.message);
+  setLoading(false);
+}
+};
+
+fetchData();
+}, []);
+
+return { categoriesData, loading, error };
+};
+
+export default useCategories;

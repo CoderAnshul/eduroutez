@@ -15,13 +15,20 @@ import { ContactPageSharp } from '@mui/icons-material';
 import axiosInstance from '../ApiFunctions/axios'
 import { ArrowRight } from "lucide-react"; 
 import { useNavigate } from 'react-router-dom';;
-
+import useCategories from '../DataFiles/categories';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // For hover menu
   const location = useLocation();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const { categoriesData, loading, error } = useCategories();
+  console.log('categoriesData', categoriesData);
+  useEffect(() => {
+    if (error) {
+      console.error('Navbar Error:', error);
+    }
+  }, [error]);
 
   const accessToken = localStorage.getItem('accessToken');
   console.log('accessToken', accessToken);
@@ -271,7 +278,7 @@ if(response)    {
               </Link>
             </li>
             <div className="md:hidden overflow-y-scroll scrollbar-thumb-transparent">
-              <MobileNavbar categories={categories} />
+              <MobileNavbar categories={categoriesData} />
             </div>
           </ul>
         </div>
@@ -304,7 +311,7 @@ if(response)    {
 
 
       <div className="hidden md:flex">
-        <SecondMenu categories={categories} />
+        <SecondMenu categories={categoriesData} />
       </div>
     </>
   );

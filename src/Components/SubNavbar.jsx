@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import downArrow from '../assets/Images/downArrow.png'
+
+
 
 const SubNavbar = ({categories}) => {
   const [activeContent, setActiveContent] = useState({});
   const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [dropdownAlignment, setDropdownAlignment] = useState('left-0');
+  const [dropdownAlignment, setDropdownAlignment] = useState('left-0'); // Alignment state
 
   const handleMouseEnter = (category, event) => {
     const boundingBox = event.target.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const categoryWidth = boundingBox.width;
 
+    // Calculate alignment based on the element's position
     if (category.label === 'MEDIA') {
       setDropdownAlignment('transform translate-x-[-50%]');
     } else if (boundingBox.left <= categoryWidth) {
@@ -22,6 +25,8 @@ const SubNavbar = ({categories}) => {
     }
 
     setHoveredCategory(category.label);
+
+    // Set the first sidebar item as active by default
     const firstItemId = category.sidebarItems[0]?.id || null;
     setActiveContent((prev) => ({
       ...prev,
@@ -36,7 +41,7 @@ const SubNavbar = ({categories}) => {
 
   return (
     <div>
-      <div className="w-full h-auto bg-white shadow-sm">
+      <div className=" w-full h-auto bg-white">
         <div className="w-full px-5 py-2 h-full mx-auto flex justify-between">
           <div className="w-3/5 h-full flex flex-col justify-between">
             <div className="h-1/2 w-fit px-1 flex relative items-center justify-start gap-7">
@@ -47,62 +52,72 @@ const SubNavbar = ({categories}) => {
                   onMouseEnter={(e) => handleMouseEnter(category, e)}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <h5 className="text-xs gap-2 font-medium text-gray-600 group-hover:text-red-500 group-hover:scale-95 transform transition-all duration-200 flex items-center cursor-pointer">
+                  <h5 className="text-xs gap-2 font-[500] group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer">
                     {category.label}
-                    <ChevronDown className="w-3 h-3 group-hover:rotate-180 transition-transform duration-200" />
+                    <img
+                      className="h-3 group-hover:rotate-180 transition-all"
+                      src={downArrow}
+                      alt="downArrow"
+                    />
                   </h5>
-                  
                   {hoveredCategory === category.label && (
-                    <div className={`absolute top-4 z-50 w-full rounded-lg shadow-lg ${dropdownAlignment}`}>
-                      <div className="py-4 bg-white rounded-lg shadow-lg w-full flex">
-                        <div className="w-64 bg-gray-50 rounded-l-lg border-r border-gray-100">
-                          <ul>
-                            {category.sidebarItems.map((item) => (
-                              <li
-                                key={item.id}
-                                className={`px-2 py-2 text-sm flex justify-between items-center cursor-pointer transition-all
-                                  ${
+                    <div
+                      className={`absolute top-full z-50 w-full bg-red-100 flex ${dropdownAlignment}`}
+                    >
+                      <div className="w-64 bg-white overflow-y-auto">
+                        <ul>
+                          {console.log('categories',category)}
+                          {category?.sidebarItems?.map((item) => (
+                            <li
+                              key={item.id}
+                              className={`px-2 py-2 group text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
+                                activeContent[category.label] === item.id
+                                  ? 'bg-red-400 border-l-2 border-red-500 text-white'
+                                  : 'bg-red-500 text-white'
+                              }`}
+                              onMouseEnter={() =>
+                                setActiveContent((prev) => ({
+                                  ...prev,
+                                  [category.label]: item.id,
+                                }))
+                              }
+                            >
+                              {item.name}
+                              <span className="text-xs">
+                                <img
+                                  className={`h-3 transform transition-transform duration-300 ${
                                     activeContent[category.label] === item.id
-                                      ? 'bg-red-500 text-white'
-                                      : 'text-gray-700 hover:bg-red-50 hover:text-red-600'
+                                      ? '-rotate-0'
+                                      : '-rotate-90'
                                   }`}
-                                onMouseEnter={() =>
-                                  setActiveContent((prev) => ({
-                                    ...prev,
-                                    [category.label]: item.id,
-                                  }))
-                                }
-                              >
-                                {item.name}
-                                <ChevronDown 
-                                  className={`w-3 h-3 transition-transform duration-200
-                                    ${activeContent[category.label] === item.id ? 'rotate-0' : '-rotate-90'}`}
+                                  src={downArrow}
+                                  alt=""
                                 />
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        
-                        {activeContent[category.label] && (
-                          <div className="w-fit p-3 flex flex-wrap gap-4">
-                            {category.contents[activeContent[category.label]]?.map(
-                              (subArray, columnIndex) => (
-                                <div key={columnIndex} className="flex flex-col gap-1">
-                                  {subArray.map((item, itemIndex) => (
-                                    <a
-                                      key={itemIndex}
-                                      href={item.link}
-                                      className="block text-xs text-gray-600 hover:text-red-600 hover:underline transition-colors duration-200"
-                                    >
-                                      {item.name}
-                                    </a>
-                                  ))}
-                                </div>
-                              )
-                            )}
-                          </div>
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      {activeContent[category.label] && (
+                        <div className="w-fit p-3 flex flex-wrap gap-4" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(200px, 1fr))` }}>
+                        {category.contents[activeContent[category.label]]?.map(
+                          (subArray, columnIndex) => (
+                            <div key={columnIndex} className="flex flex-col gap-1">
+                              {subArray.map((item, itemIndex) => (
+                                <a
+                                  key={itemIndex}
+                                  href={item.link}
+                                  className="block text-xs text-black hover:underline"
+                                >
+                                  {item.name}
+                                </a>
+                              ))}
+                            </div>
+                          )
                         )}
                       </div>
+                      
+                      )}
                     </div>
                   )}
                 </div>
@@ -115,4 +130,6 @@ const SubNavbar = ({categories}) => {
   );
 };
 
-export default SubNavbar;
+      
+      export default SubNavbar;
+      

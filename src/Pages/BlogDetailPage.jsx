@@ -77,7 +77,7 @@ const BlogDetailPage = () => {
   return (
     <>
       <div className="container max-w-[1300px] mx-auto mt-10 p-4">
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
           {imageUrl && (
             <div className="relative">
               <img

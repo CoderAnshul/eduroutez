@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import downArrow from '../assets/Images/downArrow.png';
 
 const MobileNavbar = ({ categories }) => {
+  console.log('dfghjk',categories);
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeItem, setActiveItem] = useState(null);
 
@@ -17,7 +18,7 @@ const MobileNavbar = ({ categories }) => {
   return (
     <div className="w-full bg-gray-100 h-[450px] overflow-y-auto scrollbar-thumb-transparent">
       <ul className="space-y-2">
-        {categories.map((category, index) => (
+        {categories?.map((category, index) => (
           <li key={index}>
             <div
               className={`flex justify-between items-center p-3 transition-all rounded cursor-pointer ${

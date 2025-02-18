@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import PageBanner from '../Ui components/PageBanner';
-import SearchResultInfo from '../Ui components/SearchResultInfo';
 import ExpandedBox from '../Ui components/ExpandedBox';
 import SearchResultBox from '../Ui components/SearchResultBox';
 import Filter from '../Ui components/Filter';
@@ -249,7 +248,7 @@ const SearchPage = () => {
 
   const { data, isLoading, isError } = useQuery(
     ["institute"],
-    () => getInstitutes(inputField,inputField,inputField),
+    () => getInstitutes(inputField,inputField,inputField,inputField),
     {
       enabled: true,
       onSuccess: (data) => {
@@ -312,9 +311,9 @@ const SearchPage = () => {
 
   return (
     <>
-      <PageBanner pageName="Search" currectPage="Search" />
+                    <Promotions location="SEARCH_PAGE" className="h-[320px]"></Promotions>
+
       <div className="px-[4vw] pb-[2vw] flex flex-col items-start">
-        <SearchResultInfo />
 
         <div className="flex gap-4 w-full mt-6">
           <div className="filters w-[25%] hidden lg:block">

@@ -139,78 +139,90 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
               </svg>
             </button>
           )}
-        </div>
-
-        {/* Right Section - Details */}
-        <div className="w-full md:w-3/4 flex flex-col ">
-                <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">{institute.instituteName}</h3>
-                </div>
-
-                <div className="flex items-center space-x-3 text-sm text-gray-600">
-                {overallRating !==0 && (
-              <span className="flex items-center">
-                <span className="text-yellow-500">★</span>{overallRating}
-              </span>
-            )}
-                <span>{institute.reviews.length} Reviews</span>
-                <span className="flex items-center gap-2 text-gray-600">
-      <MapPin size={16} className="text-gray-500" />
-      <span>{institute.stateName}</span>
-      <span className="mx-1">•</span>
-      <Building size={16} className="text-gray-500" />
-      <span>{institute.organisationType}</span>
-    </span>                </div>
-
-                <div className="flex items-center space-x-4 mt-5 mb-2">
-               <span className="text-gray-700 font-medium md:text-lg text-xs sm:text-sm flex items-center gap-1">
-                  <img src={rupee} className="h-4 opacity-75 mt-1" alt="rupee" />{institute.minFees || '200000'}-{institute.maxFees || 'onwards'}
-                </span>
-                <span className="flex items-center font-medium md:text-lg text-xs sm:text-sm space-x-1">
-                  <img src={badge} alt="AICTE" className="h-4 opacity-75 mt-1" />
-                  <span>{institute.affiliation || 'AICTE'}</span>
-                </span>
-                {institute.highestPackage && (
-                <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-lg">
-                  <img src={cashhand} alt="cash" className="h-4 opacity-75 mt-1" />{institute.highestPackage || '10LPA'}
-                </span>
-              )}
-                {institute.examAccepted && (
-  <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-lg relative group">
-    <img src={checklist} alt="checklist" className="h-4 opacity-75 mt-1" />
-    <span>
-      {institute.examAccepted.split(',')[0]}
-      {institute.examAccepted.split(',').length > 1 && (
-        <span className="text-blue-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer ml-1">
-          + {institute.examAccepted.split(',').length-1} more
-        </span>
-      )}
-    </span>
-    {institute.examAccepted.split(',').length > 1 && (
-      <span className="absolute left-0 top-full mt-2 hidden group-hover:block bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50 min-w-[200px]">
- 
-        <div className="max-h-[200px] overflow-y-auto">
-          {institute.examAccepted.split(',').slice(1).map((exam, index) => (
-            <div 
-              key={index} 
-              className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-            >
-              {exam.trim()}
-            </div>
-          ))}
-        </div>
-      </span>
-    )}
-  </span>
-)}
-                </div>
-
-                <p className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{ __html: institute.about }} />
-          <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">
+          <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
             <div className="space-x-4">
               <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
               <a href={`/institute/${institute._id}`} className="hover:underline">Admission</a>
               <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section - Details */}
+        <div className="w-full md:w-3/4 flex flex-col ">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">{institute.instituteName}</h3>
+          </div>
+
+          <div className="flex items-center space-x-3 text-sm text-gray-600">
+            {overallRating !== 0 && (
+              <span className="flex items-center">
+                <span className="text-yellow-500">★</span>{overallRating}
+              </span>
+            )}
+            <span>{institute.reviews.length} Reviews</span>
+            <span className="flex items-center gap-2 text-gray-600">
+              <MapPin size={16} className="text-gray-500" />
+              <span>{institute.stateName}</span>
+              <span className="mx-1">•</span>
+              <Building size={16} className="text-gray-500" />
+              <span>{institute.organisationType}</span>
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-4 mt-5 mb-2">
+            {institute.minFees && institute.maxFees && (
+              <span className="text-gray-700 font-medium md:text-xl text-xs sm:text-sm flex items-center gap-1">
+                <img src={rupee} className="h-4 opacity-75 mt-1" alt="rupee" />{institute.minFees}-{institute.maxFees}
+              </span>
+            )}
+            <span className="flex items-center font-medium md:text-xl text-xs sm:text-sm space-x-1">
+              <img src={badge} alt="AICTE" className="h-4 opacity-75 mt-1" />
+              <span>{institute.affiliation || 'AICTE'}</span>
+            </span>
+            {institute.highestPackage && (
+              <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl">
+                <img src={cashhand} alt="cash" className="h-4 opacity-75 mt-1" />{institute.highestPackage}
+              </span>
+            )}
+            {institute.examAccepted && (
+              <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl relative group">
+                <img src={checklist} alt="checklist" className="h-4 opacity-75 mt-1" />
+                <span>
+                  {institute.examAccepted.split(',')[0]}
+                  {institute.examAccepted.split(',').length > 1 && (
+                    <span className="text-blue-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer ml-1">
+                      + {institute.examAccepted.split(',').length - 1} more
+                    </span>
+                  )}
+                </span>
+                {institute.examAccepted.split(',').length > 1 && (
+                  <span className="absolute left-0 top-full mt-2 hidden group-hover:block bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50 min-w-[200px]">
+                    <div className="max-h-[200px] overflow-y-auto">
+                      {institute.examAccepted.split(',').slice(1).map((exam, index) => (
+                        <div
+                          key={index}
+                          className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                        >
+                          {exam.trim()}
+                        </div>
+                      ))}
+                    </div>
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
+
+          <p className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{ __html: institute.about }} />
+          <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">
+            <div className="space-x-4">
+              {/* <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Admission</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a> */}
+            </div>
+          </div>
+        </div>
             </div>
             <div className="flex space-x-4 justify-end">
               <button className="bg-red-600 text-white px-4 py-2 rounded-lg" onClick={handleDownloadBrochure}>
@@ -221,9 +233,6 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
               </CustomButton>
           </div>
         </div>
-    </div>
-  </div>
-</div>
   );
 };
 

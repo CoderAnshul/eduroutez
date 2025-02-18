@@ -23,6 +23,14 @@ const CounselorListPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(1);
     const [itemsPerPage] = useState(6);
+ 
+
+    useEffect(() => {
+        const nameParam = searchParams.get('name');
+        if (nameParam) {
+            setSearchTerm(nameParam);
+        }
+    }, [searchParams]);
 
     const Images=import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -129,7 +137,8 @@ const CounselorListPage = () => {
             try {
                 const regex = new RegExp(searchTerm, 'i');
                 filtered = filtered.filter(counselor => 
-                    regex.test(counselor.firstname) || 
+                    regex.test(counselor.firstname + ' ' + counselor.lastname) || 
+                    regex.test(counselor.firstname) ||
                     regex.test(counselor.lastname) || 
                     regex.test(counselor.category) ||
                     regex.test(counselor.language) ||

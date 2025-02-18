@@ -36,6 +36,7 @@
 
 html{
     min-width: 380px;
+    overflow-x: hidden;
 }
 
 input[type="text"] {
