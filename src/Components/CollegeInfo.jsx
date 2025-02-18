@@ -33,7 +33,7 @@ const CollegeInfo = ({instituteData}) => {
 
 
   return (
-    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 pt-8'>
+    <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 '>
         <ExpandedBox contentData={contentData} instituteData={instituteData}/>
     </div>
   )

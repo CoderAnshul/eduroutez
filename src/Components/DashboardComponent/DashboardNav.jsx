@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react"; // Import ArrowRight icon from lucide-react
 import axiosInstance from "../../ApiFunctions/axios";
 import { useNavigate } from 'react-router-dom';;
+import visitwebiste from "../../../src/assets/Images/vistiHome.png"
 
 const DashboardNav = () => {
   const [userName, setUserName] = useState("");
@@ -65,10 +66,9 @@ console.log('responsrftgyhuje',response.data)
       <div className="flex items-center gap-4">
         <button
           onClick={() => window.location.href = 'https://eduroutez.com/'}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 text-white rounded-md active:scale-105 transition-colors"
         >
-          <img src="/public/back.png" alt="Back" className="h-4 w-4" />
-          Visit Home Page
+          <img src={visitwebiste} alt="Back" className="h-10 w-10" />
         </button>
         <button
           onClick={handleBecomeCounselor}
