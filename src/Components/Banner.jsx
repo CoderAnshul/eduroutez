@@ -249,7 +249,7 @@ const Banner = () => {
                     </div>
                     {searchType === 'course' && (
                       <div className="text-sm text-gray-600">
-                        {suggestion.instituteName} - {suggestion.city}
+                        {suggestion.instituteName} - {suggestion.cityName}
                       </div>
                     )}
                     {searchType === 'counsellor' && suggestion.specialization && (
