@@ -23,6 +23,14 @@ const CounselorListPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(1);
     const [itemsPerPage] = useState(6);
+ 
+
+    useEffect(() => {
+        const nameParam = searchParams.get('name');
+        if (nameParam) {
+            setSearchTerm(nameParam);
+        }
+    }, [searchParams]);
 
     const Images=import.meta.env.VITE_IMAGE_BASE_URL;
 

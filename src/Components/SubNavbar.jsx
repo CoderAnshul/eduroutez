@@ -66,7 +66,8 @@ const SubNavbar = ({categories}) => {
                     >
                       <div className="w-64 bg-white overflow-y-auto">
                         <ul>
-                          {category.sidebarItems.map((item) => (
+                          {console.log('categories',category)}
+                          {category?.sidebarItems?.map((item) => (
                             <li
                               key={item.id}
                               className={`px-2 py-2 group text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
