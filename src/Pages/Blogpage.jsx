@@ -241,7 +241,7 @@ const Blogpage = () => {
             {/* Main Content */}
             <div className={`flex px-[4vw] pb-[2vw] mt-10 ${isFilterOpen ? "pointer-events-none" : ""}`}>
                 {/* Desktop Sidebar */}
-                <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md">
+                <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
                     <h3 className="text-lg font-semibold mb-4">Filter by Category</h3>
                     <div className="mb-4">
                         <input

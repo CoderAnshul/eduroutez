@@ -176,7 +176,7 @@ const Careerspage = () => {
       </div>
 
       <div className={`flex px-[4vw] pt-5 mb-14 ${isFilterOpen ? "pointer-events-none" : ""}`}>
-        <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md">
+        <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
           <h3 className="text-lg font-semibold mb-4">Filter by Category</h3>
           <div className="mb-4">
             <input
@@ -206,7 +206,6 @@ const Careerspage = () => {
         </div>
 
         <div className="w-full md:w-3/4 px-6">
-        
           <div className="flex flex-wrap justify-start gap-6">
             {filteredData.map((career) => (
               <Link
@@ -243,7 +242,8 @@ const Careerspage = () => {
                     <CustomButton text="View More" to={`/detailpage/${career._id}`} />
                   </div>
                 </div>
-</Link>            ))}
+              </Link>
+            ))}
           </div>
           <div className="flex justify-center mt-6">
             {page < totalPages && filteredData.length > 0 && (
@@ -260,8 +260,7 @@ const Careerspage = () => {
 
       <PopularCourses />
       <div className="w-full items-center max-w-4xl h-fit mx-auto">
-        
-      <Promotions location="CAREER_PAGE" className="h-[90px]" />
+        <Promotions location="CAREER_PAGE" className="h-[90px]" />
       </div>
       <BlogComponent />
       <div className="flex gap-2 flex-col sm:flex-row items-center">

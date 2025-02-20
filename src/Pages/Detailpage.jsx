@@ -36,7 +36,7 @@ const DetailPage = () => {
 
   const scrollToSection = (tabItem) => {
     setActiveTab(tabItem.name);
-    const yOffset = -120;
+    const yOffset = -170;
     const element = tabItem.titleRef.current;
     if (element) {
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;

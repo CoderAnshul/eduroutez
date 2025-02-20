@@ -39,6 +39,10 @@ html{
     overflow-x: hidden;
 }
 
+ol{
+  padding-left:25px;
+}
+
 input[type="text"] {
     background-color: transparent;
     outline: none;
