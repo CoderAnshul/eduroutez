@@ -5,15 +5,22 @@ import HighRatedCareers from '../Components/HighRatedCareers';
 import Events from '../Components/Events';
 import ConsellingBanner from '../Components/ConsellingBanner';
 import Promotions from '../Pages/CoursePromotions';
+import BlogReviewForm from '../Components/BlogReviewForm'; // New import
+import axiosInstance from '../ApiFunctions/axios';
 
 const BlogDetailPage = () => {
   const [data, setData] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [error, setError] = useState(null);
   const [recentBlogs, setRecentBlogs] = useState([]);
+  const [isLiked, setIsLiked] = useState(false);
   const { id } = useParams();
   const overviewRef = useRef(null);
+  const reviewsRef = useRef(null);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+
+  // Get current user ID from localStorage
+  const currentUserId = localStorage.getItem('userId');
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -24,6 +31,12 @@ const BlogDetailPage = () => {
           return;
         }
         setData(response.data);
+
+        // Check if user has already liked this blog
+        if (response.data.likes && currentUserId) {
+          const userHasLiked = response.data.likes.includes(currentUserId);
+          setIsLiked(userHasLiked);
+        }
 
         if (response.data.image) {
           const imageResponse = await fetch(`${Images}/${response.data.image}`);
@@ -60,7 +73,42 @@ const BlogDetailPage = () => {
         URL.revokeObjectURL(imageUrl);
       }
     };
-  }, [id]);
+  }, [id, currentUserId]);
+
+  // Handle like/dislike functionality
+  const handleLike = async () => {
+    if (!currentUserId) {
+      alert("Please login to like this blog");
+      return;
+    }
+    
+    try {
+      const likeValue = isLiked ? "0" : "1"; // Toggle like value
+      
+      // Call the like-dislike API
+      await axiosInstance.post('http://localhost:4001/api/v1/like-dislike', {
+        id: id,
+        type: "blog", // Changed to "blog" from "course"
+        like: likeValue
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')
+        }
+      });
+    
+      // Update local state
+      setIsLiked(!isLiked);
+      console.log(`Blog ${id} like status updated to ${!isLiked}`);
+    } catch (error) {
+      console.error('Error updating like status:', error);
+    }
+  };
+
+
+  // Calculate number of likes
+  const likesCount = data?.likes?.length || 0;
 
   if (error) {
     return (
@@ -78,6 +126,38 @@ const BlogDetailPage = () => {
     <>
       <div className="container max-w-[1300px] mx-auto mt-10 p-4">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+          {/* Blog Header */}
+          <div className="flex justify-between items-center p-6">
+            <h1 className="text-3xl font-bold">{data.title || 'Blog Post'}</h1>
+            
+            {/* Like Button */}
+            <button 
+              onClick={handleLike}
+              disabled={!currentUserId || isLiked}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 ${
+                !currentUserId ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
+                isLiked ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="22" 
+                height="22" 
+                viewBox="0 0 24 24" 
+                fill={isLiked ? "currentColor" : "none"} 
+                stroke="currentColor" 
+                strokeWidth={isLiked ? "1" : "2"} 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                className={`transition-transform ${isLiked ? 'scale-110' : ''}`}
+              >
+                <path d="M14 9V5a3 3 0 0 0-3-3L7 6v12h11.28a2 2 0 0 0 1.94-1.52l1.16-5A2 2 0 0 0 19.44 9z"></path>
+              </svg>
+              <span className="font-medium">{likesCount > 0 && likesCount}</span>
+            </button>
+          </div>
+
+
           {imageUrl && (
             <div className="relative">
               <img
@@ -144,7 +224,7 @@ const BlogDetailPage = () => {
                     />
                   </div>
 
-                  <div className="lg:w-1/5 md:w-[30%] h-full min-w-[200px] mt-8  lg:mt-0">
+                  <div className="lg:w-1/5 md:w-[30%] h-full min-w-[200px] mt-8 lg:mt-0">
                     <div className='sticky top-20'>
                       <h3 className="text-lg font-semibold mb-4">Recently Uploaded Blogs</h3>
                       <div className="space-y-4">
@@ -168,18 +248,23 @@ const BlogDetailPage = () => {
                         ))}
                       </div>
                     </div>
-                    <div className="w-[300px] h-[250px]">
-            <Promotions location="BLOG_PAGE" />
-          </div>
+                    <div className="w-full mt-6">
+                      <Promotions location="BLOG_PAGE" />
+                    </div>
                   </div>
                 </div>
               </div>
             )}
+
+            {/* Reviews Section - New */}
+            <div ref={reviewsRef} id="reviews" className="mt-10 border-t pt-6">
+              <h3 className="text-2xl font-semibold text-red-500 mb-4">Reviews</h3>
+              <BlogReviewForm blog={data} />
+            </div>
           </div>
-         
         </div>
 
-        <HighRatedCareers></HighRatedCareers>
+        <HighRatedCareers />
       </div>
       <div className="flex gap-2 items-center">
         <Events />

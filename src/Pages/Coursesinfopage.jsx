@@ -12,6 +12,7 @@ import ConsellingBanner from '../Components/ConsellingBanner';
 import HighRatedCareers from '../Components/HighRatedCareers';
 import BlogComponent from '../Components/BlogComponent';
 import Promotions from '../Pages/CoursePromotions';
+import CourseReviewForm from '../Components/CourseReviewForm'; // Import the new component
 import axiosInstance from '../ApiFunctions/axios';
 
 const tabs = [
@@ -20,7 +21,8 @@ const tabs = [
   "Curriculum",
   "Fees",
   "Opportunities",
-  "Application"
+  "Application",
+  "Reviews"  // Added new tab for reviews
 ];
 
 const Coursesinfopage = () => {
@@ -38,6 +40,17 @@ const Coursesinfopage = () => {
     }
   );
 
+  // Get current user ID from localStorage
+  const currentUserId = localStorage.getItem('userId');
+
+  // Check if user has already liked this course
+  useEffect(() => {
+    if (courseData?.data?.likes && currentUserId) {
+      const userHasLiked = courseData.data.likes.includes(currentUserId);
+      setIsLiked(userHasLiked);
+    }
+  }, [courseData, currentUserId]);
+
   const content = courseData?.data ?? {};
 
   if (!id) {
@@ -53,6 +66,12 @@ const Coursesinfopage = () => {
   }
 
   const handleLike = async () => {
+    if (!currentUserId) {
+      // Redirect to login or show login modal
+      alert("Please login to like this course");
+      return;
+    }
+    
     try {
       const likeValue = isLiked ? "0" : "1"; // Toggle like value
       
@@ -141,20 +160,39 @@ const Coursesinfopage = () => {
     );
   };
 
+  // Calculate number of likes
+  const likesCount = content.likes?.length || 0;
+
   return (
     <>
       <div className="container max-w-[1300px] mx-auto px-8 py-6 flex flex-col items-start bg-gray-50">
         {/* Course Title */}
         <div className="flex justify-between items-center w-full">
           <CoursesName content={content.courseTitle || 'Untitled Course'} />
+       
           <button 
             onClick={handleLike}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${isLiked ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}
+            disabled={!currentUserId || isLiked}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 ${
+              !currentUserId ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
+              isLiked ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="22" 
+              height="22" 
+              viewBox="0 0 24 24" 
+              fill={isLiked ? "currentColor" : "none"} 
+              stroke="currentColor" 
+              strokeWidth={isLiked ? "1" : "2"} 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              className={`transition-transform ${isLiked ? 'scale-110' : ''}`}
+            >
+              <path d="M14 9V5a3 3 0 0 0-3-3L7 6v12h11.28a2 2 0 0 0 1.94-1.52l1.16-5A2 2 0 0 0 19.44 9z"></path>
             </svg>
-            {isLiked ? 'Liked' : 'Like'}
+            <span className="font-medium">{likesCount > 0 && likesCount}</span>
           </button>
         </div>
 
@@ -235,6 +273,11 @@ const Coursesinfopage = () => {
                 <p><strong>Application End Date:</strong></p>
                 <p>{formatDate(content.applicationEndDate)}</p>
               </div>
+            </div>
+
+            {/* Reviews Section - New */}
+            <div ref={sectionRefs[6]} id="reviews" className="mb-6">
+              <CourseReviewForm course={content}  />
             </div>
 
             {/* Pros and Cons */}
