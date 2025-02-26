@@ -103,10 +103,9 @@ const PopularCourses = () => {
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className='w-full items-center max-w-4xl h-24 mx-auto'>
 
-          <div className='w-full items-center max-w-4xl h-24 mx-auto'>
-
-      <Promotions location="COURSES_PAGE" />
-          </div>
+        <div className="w-full max-w-4xl h-fit mx-auto">
+        <Promotions location="COURSES_PAGE" className="h-[90px]" />
+      </div>
 
         </div>
 

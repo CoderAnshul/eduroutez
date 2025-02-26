@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import CoursesName from '../Ui components/CoursesName';
 import TabSlider from '../Ui components/TabSlider';
@@ -12,6 +12,7 @@ import ConsellingBanner from '../Components/ConsellingBanner';
 import HighRatedCareers from '../Components/HighRatedCareers';
 import BlogComponent from '../Components/BlogComponent';
 import Promotions from '../Pages/CoursePromotions';
+import axiosInstance from '../ApiFunctions/axios';
 
 const tabs = [
   "Overview",
@@ -25,6 +26,7 @@ const tabs = [
 const Coursesinfopage = () => {
   const { id } = useParams();
   const sectionRefs = tabs.map(() => useRef(null));
+  const [isLiked, setIsLiked] = useState(false);
 
   const { data: courseData, isLoading, isError } = useQuery(
     ['course', id],
@@ -49,6 +51,31 @@ const Coursesinfopage = () => {
   if (isError || !content) {
     return <div className="flex justify-center items-center h-screen">Error loading course data.</div>;
   }
+
+  const handleLike = async () => {
+    try {
+      const likeValue = isLiked ? "0" : "1"; // Toggle like value
+      
+      // Call the like-dislike API
+      await axiosInstance.post('http://localhost:4001/api/v1/like-dislike', {
+        id: id,
+        type: "course",
+        like: likeValue
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')
+        }
+      });
+    
+      // Update local state
+      setIsLiked(!isLiked);
+      console.log(`Course ${id} like status updated to ${!isLiked}`);
+    } catch (error) {
+      console.error('Error updating like status:', error);
+    }
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Not specified';
@@ -118,7 +145,18 @@ const Coursesinfopage = () => {
     <>
       <div className="container max-w-[1300px] mx-auto px-8 py-6 flex flex-col items-start bg-gray-50">
         {/* Course Title */}
-        <CoursesName content={content.courseTitle || 'Untitled Course'} />
+        <div className="flex justify-between items-center w-full">
+          <CoursesName content={content.courseTitle || 'Untitled Course'} />
+          <button 
+            onClick={handleLike}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${isLiked ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            {isLiked ? 'Liked' : 'Like'}
+          </button>
+        </div>
 
         {/* Tab Navigation */}
         <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
@@ -154,19 +192,18 @@ const Coursesinfopage = () => {
               </div>
             </div>
 
-            {/* Other sections... */}
             {/* Eligibility Section */}
             <div ref={sectionRefs[1]} className="bg-white shadow-md rounded-lg p-6 mb-6">
               <h4 className="text-2xl font-semibold text-red-500 mb-4">Eligibility</h4>
               {renderHTML(content.courseEligibility)}
               <div className="mt-4">
-              <h5 className="font-semibold mb-2">General Eligibility</h5>
-              <p className="text-gray-700">{content.eligibility || 'Not specified'}</p>
-              <h5 className="font-semibold mb-2 mt-4">Cut Off</h5>
-              <p className="text-gray-700">{content.cutOff || 'Not specified'}</p>
-              <h5 className="font-semibold mb-2 mt-4">Exams Accepted</h5>
-              <p className="text-gray-700">{content.examAccepted || 'Not specified'}</p>
-            </div>
+                <h5 className="font-semibold mb-2">General Eligibility</h5>
+                <p className="text-gray-700">{content.eligibility || 'Not specified'}</p>
+                <h5 className="font-semibold mb-2 mt-4">Cut Off</h5>
+                <p className="text-gray-700">{content.cutOff || 'Not specified'}</p>
+                <h5 className="font-semibold mb-2 mt-4">Exams Accepted</h5>
+                <p className="text-gray-700">{content.examAccepted || 'Not specified'}</p>
+              </div>
             </div>
 
             {/* Curriculum Section */}
@@ -180,7 +217,9 @@ const Coursesinfopage = () => {
               <h4 className="text-2xl font-semibold text-red-500 mb-4">Course Fees</h4>
               {renderHTML(content.courseFee)}
             </div>
-<Promotions location="COURSES_PAGE" />
+            
+            <Promotions location="COURSES_PAGE" />
+            
             {/* Opportunities Section */}
             <div ref={sectionRefs[4]} className="bg-white shadow-md rounded-lg p-6 mb-6">
               <h4 className="text-2xl font-semibold text-red-500 mb-4">Career Opportunities</h4>
@@ -206,7 +245,7 @@ const Coursesinfopage = () => {
 
           {/* Right Sidebar */}
           <div className="hidden lg:block lg:w-1/3 space-y-6">
-                   <QueryForm />
+            <QueryForm />
           </div>
         </div>
 

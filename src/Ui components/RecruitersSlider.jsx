@@ -27,7 +27,8 @@ const RecruitersSlider = ({instituteData}) => {
       try {
         const response = await fetch(`${import.meta.env.VITE_BASE_URL}/recruiters-by-institute/${instituteData?.data?._id}`);
         const json = await response.json();
-        setRecruiters(json?.data || []);
+        console.log('json',json?.data);
+        setRecruiters(json?.data?.result || []);
       } catch (error) {
         console.error('Error fetching recruiters:', error);
       }

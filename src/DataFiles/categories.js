@@ -9,24 +9,28 @@ const useCategories = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('fetching data',import.meta.env.VITE_BASE_URL);
-        const [collegeResponse, examResponse] = await Promise.all([
+        const [collegeResponse, examResponse, coursesResponse] = await Promise.all([
           axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams`),
-          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams`)
+          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams`),
+          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/courses?filters={"isCoursePopular":true}`)
         ]);
-console.log('collegeResponse', examResponse.data);
-console.log('collegeResponse.data', examResponse.data);
+        console.log('coursesResponse',coursesResponse)
+
         // Transform API data to match required format
         const collegeItems = collegeResponse.data?.data?.result?.map((item, index) => ({
           id: index + 1,
           name: item.name,
-          // Add other transformations as needed
         }));
+
         const examItems = examResponse.data?.data?.result.map((item, index) => ({
-          id:  index + 1,
+          id: index + 1,
           name: item.name,
-          // Add other transformations as needed
         }));
+
+        const courseItems = coursesResponse.data?.data?.result.map((item, index) => ({
+          id: index + 1,
+          name: item.courseTitle,
+        })) || [];
 
 
         const updatedCategories = [
@@ -219,65 +223,6 @@ console.log('collegeResponse.data', examResponse.data);
     },
     {
       label: 'Courses',
-      sidebarItems: [
-        { id: 1, name: 'Top Ranked Colleges' },
-        { id: 2, name: 'Popular Courses' },
-        { id: 3, name: 'Exams' },
-        { id: 4, name: 'Colleges By Location' },
-        { id: 5, name: 'Compare Colleges' },
-      ],
-      contents: {
-        1: [
-          [
-            { name: 'Top Medical Colleges in India', link: '#' },
-            { name: 'Top Medical Colleges in Delhi', link: '#' },
-          ],
-          [
-            { name: 'Top Medical Colleges in Mumbai', link: '#' },
-            { name: 'Top Medical Colleges in Bangalore', link: '#' },
-          ],
-        ],
-        2: [
-          [
-            { name: 'MBBS', link: '#' },
-            { name: 'BDS', link: '#' },
-          ],
-          [
-            { name: 'BAMS', link: '#' },
-            { name: 'BHMS', link: '#' },
-          ],
-        ],
-        3: [
-          [
-            { name: 'NEET Exam', link: '#' },
-            { name: 'AIIMS Exam', link: '#' },
-          ],
-          [
-            { name: 'JIPMER Exam', link: '#' },
-            { name: 'PGIMER Exam', link: '#' },
-          ],
-        ],
-        4: [
-          [
-            { name: 'Colleges in Delhi', link: '#' },
-            { name: 'Colleges in Mumbai', link: '#' },
-          ],
-          [
-            { name: 'Colleges in Bangalore', link: '#' },
-            { name: 'Colleges in Chennai', link: '#' },
-          ],
-        ],
-        5: [
-          [
-            { name: 'College A vs College B', link: '#' },
-            { name: 'College C vs College D', link: '#' },
-          ],
-          [
-            { name: 'College E vs College F', link: '#' },
-            { name: 'College G vs College H', link: '#' },
-          ],
-        ],
-      },
     },
     {
       label: 'Careers',

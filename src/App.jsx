@@ -25,6 +25,7 @@ import Counselor from './Pages/Counselor';
 import NewsDetail from './Pages/NewsDetail';
 import ScheduledSlots from './Pages/ScheduledSlots';
 import Payout from './Pages/Payout';
+import NewsPage from './Pages/NewsPage';
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -83,6 +84,7 @@ const App = () => {
           <Route path="/trending-institute" element={<TrendingInstitute/>} />
           <Route path='/counselor' element={<Counselor />}></Route>
             <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="/news" element={<NewsPage />} />
 
            {/* Protected Dashboard Routes */}
           <Route
