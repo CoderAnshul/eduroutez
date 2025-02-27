@@ -279,6 +279,8 @@ const Blogpage = () => {
                                 {category}
                             </span>
                         ))}
+
+                        
                     </div>
                     <BlogandCareerBox blogData={currentItems || []} />
                     <Pagination />

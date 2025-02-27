@@ -10,6 +10,7 @@ import ConsellingBanner from "../Components/ConsellingBanner";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Promotions from "./CoursePromotions";
+import SocialShare from "../Components/SocialShare";
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -41,6 +42,14 @@ const Careerspage = () => {
     () => careers(page),
     { enabled: true }
   );
+
+
+
+  const handleShareClick = (e, blog) => {
+    e.preventDefault(); // Prevent the Link navigation
+    e.stopPropagation(); // Stop event from bubbling up
+    // Any additional share handling logic can go here
+  };
 
   useEffect(() => {
     if (careerData) {
@@ -238,6 +247,55 @@ const Careerspage = () => {
                         .join(" ") + (career.description.split(" ").length > 25 ? "..." : "")
                     }}
                   />
+
+<div className='flex items-center gap-2 text-gray-600'>
+                      {career.views && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                          <span className='text-gray-500'>{career.views}</span>
+                        </div>
+                      )}
+                      {career.likes && career.likes.length>0 && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
+                            <path d="M9 22V12"></path>
+                          </svg>
+                          <span className=''>{career.likes.length>0 && career.likes.length}</span>
+                        </div>
+                      )}
+                       <div onClick={handleShareClick}>
+      <SocialShare 
+        title={career.title} 
+        url={`${window.location.origin}/detailpage/${career._id}`}
+        contentType="career"
+      />
+    </div>
+                    </div>
+
                   <div className="inline-block !mx-auto !mt-2">
                     <CustomButton text="View More" to={`/detailpage/${career._id}`} />
                   </div>

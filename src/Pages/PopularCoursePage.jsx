@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Rating from '@mui/material/Rating';
-import Stack from '@mui/material/Stack';
 import { Link } from 'react-router-dom';
 import cardPhoto from '../assets/Images/teacher.jpg';
 import rupee from '../assets/Images/rupee.png';
-import CustomButton from '../Ui components/CustomButton';
 import { useQuery } from 'react-query';
 import { AllpopularCourses } from '../ApiFunctions/api';
 import HighRatedCareers from '../Components/HighRatedCareers';
@@ -13,7 +10,7 @@ import BestRated from '../Components/BestRated';
 import Events from '../Components/Events';
 import ConsellingBanner from '../Components/ConsellingBanner';
 import Promotions from './CoursePromotions';
-
+import SocialShare from '../Components/SocialShare';
 
 const PopularCourses = () => {
   const [content, setContent] = useState([]);
@@ -29,6 +26,12 @@ const PopularCourses = () => {
       },
     }
   );
+
+  const handleShareClick = (e, box) => {
+    e.preventDefault(); // Prevent the Link navigation
+    e.stopPropagation(); // Stop event from bubbling up
+    // Any additional share handling logic can go here
+  };
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -84,104 +87,128 @@ const PopularCourses = () => {
 
   return (
     <>
-    <div>
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center">
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div className="relative z-10">
-          <h1 className="text-5xl font-bold leading-tight">
-            Unlock Your Potential with Top Courses
-          </h1>
-          <p className="mt-4 text-lg">
-            Learn new skills, elevate your career, and achieve your dreams. Explore our popular courses today!
-          </p>
-       
+      <div>
+        {/* Hero Section */}
+        <div className="relative bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center">
+          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+          <div className="relative z-10">
+            <h1 className="text-5xl font-bold leading-tight">
+              Unlock Your Potential with Top Courses
+            </h1>
+            <p className="mt-4 text-lg">
+              Learn new skills, elevate your career, and achieve your dreams. Explore our popular courses today!
+            </p>
+          </div>
         </div>
+
+        {/* Popular Courses Section */}
+        <div className="max-w-7xl mx-auto px-6 py-10">
+          <div className='w-full items-center max-w-4xl h-24 mx-auto'>
+            <div className="w-full max-w-4xl h-fit mx-auto">
+              <Promotions location="COURSES_PAGE" className="h-[90px]" />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mb-10">
+            <h3 className="text-3xl font-bold">Popular Courses</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {content.map((box) => (
+              <div key={box._id} className="flex flex-col">
+             <Link
+  to={`/coursesinfopage/${box._id}`}
+  className="bg-white rounded-lg shadow-lg  transform transition-all hover:scale-105 hover:shadow-xl flex-grow z-1"
+>
+  <div className="relative">
+    <img
+      className="h-48 w-full object-cover"
+      src={images[box._id] || cardPhoto}
+      alt={box.courseTitle}
+      onError={(e) => {
+        console.warn(`Image load failed for ${box.courseTitle}, using fallback`);
+        e.target.src = cardPhoto;
+        e.target.onerror = null;
+      }}
+    />
+    {box.isCourseFree === "free" && (
+      <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+        Free
+      </span>
+    )}
+  </div>
+
+  <div className="p-4">
+    <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
+      {box.courseTitle}
+    </h3>
+    <div
+      className="text-sm text-gray-600 mt-2 line-clamp-2"
+      dangerouslySetInnerHTML={{ __html: box.longDescription }}
+    />
+
+    {/* Views, Likes, and Share - Now Inside the Card */}
+    <div className="flex items-center justify-between mt-4">
+      <div className="flex items-center gap-4 text-gray-600">
+        {box.views && (
+          <div className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span>{box.views}</span>
+          </div>
+        )}
+        {box.likes && box.likes.length > 0 && (
+          <div className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
+              <path d="M9 22V12"></path>
+            </svg>
+            <span>{box.likes.length}</span>
+          </div>
+        )}
       </div>
 
-      {/* Popular Courses Section */}
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className='w-full items-center max-w-4xl h-24 mx-auto'>
+      {/* Share button inside card */}
+      <div className="relative"           onClick={(e) => handleShareClick(e, box)}
+      >
 
-        <div className="w-full max-w-4xl h-fit mx-auto">
+
+        {/* Social Share Component (hidden until clicked) */}
+        <div className="absolute right-0 z-10">
+          <SocialShare 
+            title={box.courseTitle} 
+            url={`${window.location.origin}/coursesinfopage/${box._id}`} 
+            contentType="course" 
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</Link>
+
+                
+              
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      <div className='w-full items-center max-w-4xl h-fit mx-auto'>
         <Promotions location="COURSES_PAGE" className="h-[90px]" />
       </div>
 
-        </div>
-
-        <div className="flex items-center justify-between mb-10">
-          <h3 className="text-3xl font-bold">Popular Courses</h3>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {content.map((box) => (
-            <Link
-              to={`/coursesinfopage/${box._id}`}
-              key={box._id}
-              className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-xl"
-            >
-              <div className="relative">
-                <img
-                  className="h-48 w-full object-cover"
-                  src={images[box._id] || cardPhoto}
-                  alt={box.courseTitle}
-                  onError={(e) => {
-                    console.warn(`Image load failed for ${box.courseTitle}, using fallback`);
-                    e.target.src = cardPhoto;
-                    e.target.onerror = null; // Prevent infinite loop
-                  }}
-                />
-                {box.isCourseFree === "free" && (
-                  <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                    Free
-                  </span>
-                )}
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
-                  {box.courseTitle}
-                </h3>
-                <div
-                  className="text-sm text-gray-600 mt-2 line-clamp-2"
-                  dangerouslySetInnerHTML={{ __html: box.longDescription }}
-                />
-                <div className="flex items-center justify-between mt-4">
-                  {box.price && (
-                    <h3 className="flex items-center text-lg font-bold text-gray-900">
-                      <img className="h-5 mr-2" src={rupee} alt="rupee" />
-                      {box.isCourseFree === "free" ? "Free" : box.price}
-                    </h3>
-                  )}
-                  <Stack spacing={1}>
-                    <Rating 
-                      name="read-only" 
-                      value={box.rating || 0} 
-                      readOnly 
-                      size="small"
-                    />
-                  </Stack>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+      <HighRatedCareers />
+      <BlogComponent />      
+      <BestRated />
+      
+      <div className="w-full flex items-start mt-10">
+        <Events />
+        <ConsellingBanner />
       </div>
-      
-      
-    </div>
-    <div className='w-full items-center max-w-4xl h-fit mx-auto'>
-
-    <Promotions location="COURSES_PAGE" className="h-[90px]" />
-    </div>
-
-      <HighRatedCareers></HighRatedCareers>
-      <BlogComponent/>      <BestRated />
-      
-            <div className="w-full flex items-start  mt-10">
-              <Events />
-              <ConsellingBanner />
-            </div>
-            </>
+    </>
   );
 };
 

@@ -7,6 +7,7 @@ import rupee from '../assets/Images/rupee.png';
 import CustomButton from '../Ui components/CustomButton';
 import { useQuery } from 'react-query';
 import { career } from '../ApiFunctions/api';
+import SocialShare from './SocialShare';
 
 const HighRatedCareers = () => {
   const [content, setContent] = useState([]);
@@ -14,6 +15,12 @@ const HighRatedCareers = () => {
 
   const Images=import.meta.env.VITE_IMAGE_BASE_URL;
 
+
+  const handleShareClick = (e, blog) => {
+    e.preventDefault(); // Prevent the Link navigation
+    e.stopPropagation(); // Stop event from bubbling up
+    // Any additional share handling logic can go here
+  };
 
   const { data, isLoading, isError } = useQuery(
     ["career"],
@@ -87,6 +94,39 @@ const HighRatedCareers = () => {
               </h3>
 
               <p className='text-sm mt-2' dangerouslySetInnerHTML={{ __html: box?.description?.slice(0, 80) + "..." || "No description available" }}></p>
+              <div className='flex items-center justify-between px-4 pb-4'>
+                      {box.views && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                          <span className='text-gray-500'>{box.views}</span>
+                      
+                        </div>
+                        
+
+                        
+                      )}
+                      <div className='flex items-center gap-2 text-gray-600' onClick={handleShareClick}>
+                          <SocialShare 
+        title={career.title} 
+        url={`${window.location.origin}/detailpage/${career._id}`}
+        contentType="career"
+      />
+      </div>
+                    
+                    </div>
             </div>
           </Link>
         )) : <div className="w-full text-center">No careers available at the moment.</div>}

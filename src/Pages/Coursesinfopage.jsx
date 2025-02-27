@@ -198,30 +198,40 @@ const Coursesinfopage = () => {
               
            </div>
        
-          <button 
-            onClick={handleLike}
-            disabled={!currentUserId }
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 ${
-              !currentUserId ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
-              isLiked ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="22" 
-              height="22" 
-              viewBox="0 0 24 24" 
-              fill={isLiked ? "currentColor" : "none"} 
-              stroke="currentColor" 
-              strokeWidth={isLiked ? "1" : "2"} 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-              className={`transition-transform ${isLiked ? 'scale-110' : ''}`}
-            >
-              <path d="M14 9V5a3 3 0 0 0-3-3L7 6v12h11.28a2 2 0 0 0 1.94-1.52l1.16-5A2 2 0 0 0 19.44 9z"></path>
-            </svg>
-            <span className="font-medium">{likesCount > 0 && likesCount}</span>
-          </button>
+           <button
+  onClick={handleLike}
+  disabled={!currentUserId}
+  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
+    ${
+      !currentUserId
+        ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300'
+        : isLiked
+        ? 'bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200'
+        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+    } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
+>
+  {/* Better Designed Thumb SVG */}
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24"
+    className={`transition-transform duration-300 ${isLiked ? 'scale-110' : ''}`}
+    fill={isLiked ? "#F59E0B" : "none"} 
+    stroke="#F59E0B" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <path d="M2 10h4v10H2z"></path>
+    <path d="M6 10v10h9.7c1.2 0 2.2-.9 2.4-2l1.3-7c.2-1.1-.6-2-1.7-2H12c-.5 0-1-.4-1-1V4.5c0-1.3-1-2.5-2.5-2.5S6 3.2 6 4.5V10z"></path>
+  </svg>
+
+  {/* Like Count */}
+  <span className="font-medium text-sm">{likesCount > 0 ? likesCount : "Like"}</span>
+</button>
+
+
         </div>
 
         {/* Tab Navigation */}

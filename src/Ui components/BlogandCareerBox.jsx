@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import CustomButton from "./CustomButton";
+import SocialShare from "../Components/SocialShare";
 
 const BlogandCareerBox = ({ boxData, blogData }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,8 +18,11 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
     }
   };
 
-console.log('dftgyhuj',blogData);
-
+  const handleShareClick = (e, blog) => {
+    e.preventDefault(); // Prevent the Link navigation
+    e.stopPropagation(); // Stop event from bubbling up
+    // Any additional share handling logic can go here
+  };
   const displayedBlogs = blogData?.slice(
     0,
     currentPage * itemsPerPage
@@ -64,6 +68,56 @@ console.log('dftgyhuj',blogData);
                     </badge> 
                 </p>
               </div>
+
+              <div className='flex items-center gap-2 text-gray-600'>
+                      {blog.views && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                          <span className='text-gray-500'>{blog.views}</span>
+                        </div>
+                      )}
+                      {blog.likes && blog.likes.length>0 && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
+                            <path d="M9 22V12"></path>
+                          </svg>
+                          <span className=''>{blog.likes.length>0 && blog.likes.length}</span>
+                        </div>
+                      )}
+                       <div onClick={handleShareClick}>
+      <SocialShare 
+        title={blog?.title} 
+        url={`${window.location.origin}/blogdetailpage/${blog._id}`}
+        contentType="career"
+      />
+    </div>
+                    </div>
+
+
               <div className="mt-4">
                 <CustomButton
                   text="Read More"
