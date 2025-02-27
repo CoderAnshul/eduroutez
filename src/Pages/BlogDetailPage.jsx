@@ -5,8 +5,9 @@ import HighRatedCareers from '../Components/HighRatedCareers';
 import Events from '../Components/Events';
 import ConsellingBanner from '../Components/ConsellingBanner';
 import Promotions from '../Pages/CoursePromotions';
-import BlogReviewForm from '../Components/BlogReviewForm'; // New import
+import BlogReviewForm from '../Components/BlogReviewForm';
 import axiosInstance from '../ApiFunctions/axios';
+import SocialShare from '../Components/SocialShare';
 
 const BlogDetailPage = () => {
   const [data, setData] = useState(null);
@@ -14,6 +15,7 @@ const BlogDetailPage = () => {
   const [error, setError] = useState(null);
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
+  const [view, setView] = useState('overview');
   const { id } = useParams();
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
@@ -21,10 +23,12 @@ const BlogDetailPage = () => {
 
   // Get current user ID from localStorage
   const currentUserId = localStorage.getItem('userId');
-
+  
+  // Combined fetch function that gets blog data and recent blogs
   useEffect(() => {
-    const fetchBlog = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch blog details
         const response = await blogById(id);
         if (!response || !response.data) {
           setError(new Error('No blog data found'));
@@ -38,42 +42,38 @@ const BlogDetailPage = () => {
           setIsLiked(userHasLiked);
         }
 
+        // Get blog image
         if (response.data.image) {
           const imageResponse = await fetch(`${Images}/${response.data.image}`);
           const imageBlob = await imageResponse.blob();
           const imageObjectURL = URL.createObjectURL(imageBlob);
           setImageUrl(imageObjectURL);
         }
-      } catch (error) {
-        console.error('Error fetching blog:', error);
-        setError(error);
-      }
-    };
-
-    const fetchRecentBlogs = async () => {
-      try {
-        const response = await getRecentBlogs();
-        if (response && response.data?.result) {
-          const filteredBlogs = response.data?.result
+        
+        // Fetch recent blogs
+        const recentBlogsResponse = await getRecentBlogs();
+        if (recentBlogsResponse && recentBlogsResponse.data?.result) {
+          const filteredBlogs = recentBlogsResponse.data?.result
             .filter(blog => blog.id !== parseInt(id))
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
             .slice(0, 5);
           setRecentBlogs(filteredBlogs);
         }
       } catch (error) {
-        console.error('Error fetching recent blogs:', error);
+        console.error('Error fetching data:', error);
+        setError(error);
       }
     };
 
-    fetchBlog();
-    fetchRecentBlogs();
+    fetchData();
 
+    // Cleanup function
     return () => {
       if (imageUrl) {
         URL.revokeObjectURL(imageUrl);
       }
     };
-  }, [id, currentUserId]);
+  }, [id, currentUserId, Images]);
 
   // Handle like/dislike functionality
   const handleLike = async () => {
@@ -88,7 +88,7 @@ const BlogDetailPage = () => {
       // Call the like-dislike API
       await axiosInstance.post('http://localhost:4001/api/v1/like-dislike', {
         id: id,
-        type: "blog", // Changed to "blog" from "course"
+        type: "blog",
         like: likeValue
       }, {
         headers: {
@@ -105,7 +105,6 @@ const BlogDetailPage = () => {
       console.error('Error updating like status:', error);
     }
   };
-
 
   // Calculate number of likes
   const likesCount = data?.likes?.length || 0;
@@ -126,38 +125,66 @@ const BlogDetailPage = () => {
     <>
       <div className="container max-w-[1300px] mx-auto mt-10 p-4">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
-          {/* Blog Header */}
+          {/* Blog Header - Only one instance */}
           <div className="flex justify-between items-center p-6">
             <h1 className="text-3xl font-bold">{data.title || 'Blog Post'}</h1>
             
-            {/* Like Button */}
-            <button 
-              onClick={handleLike}
-              disabled={!currentUserId || isLiked}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 ${
-                !currentUserId ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
-                isLiked ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                width="22" 
-                height="22" 
-                viewBox="0 0 24 24" 
-                fill={isLiked ? "currentColor" : "none"} 
-                stroke="currentColor" 
-                strokeWidth={isLiked ? "1" : "2"} 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-                className={`transition-transform ${isLiked ? 'scale-110' : ''}`}
+            <div className="flex items-center gap-4">
+              {/* Views Counter */}
+              <div className="flex items-center gap-2 text-gray-600">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span className="font-medium">{data.views || 0}</span>
+              </div>
+
+              
+              <SocialShare 
+      title={data.title} 
+      url={`${window.location.origin}/blogdetailpage/${id}`}
+      contentType="blog"
+    />
+              
+              {/* Like Button */}
+              <button 
+                onClick={handleLike}
+                disabled={!currentUserId || isLiked}
+                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 ${
+                  !currentUserId ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
+                  isLiked ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
               >
-                <path d="M14 9V5a3 3 0 0 0-3-3L7 6v12h11.28a2 2 0 0 0 1.94-1.52l1.16-5A2 2 0 0 0 19.44 9z"></path>
-              </svg>
-              <span className="font-medium">{likesCount > 0 && likesCount}</span>
-            </button>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="22" 
+                  height="22" 
+                  viewBox="0 0 24 24" 
+                  fill={isLiked ? "currentColor" : "none"} 
+                  stroke="currentColor" 
+                  strokeWidth={isLiked ? "1" : "2"} 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  className={`transition-transform ${isLiked ? 'scale-110' : ''}`}
+                >
+                  <path d="M14 9V5a3 3 0 0 0-3-3L7 6v12h11.28a2 2 0 0 0 1.94-1.52l1.16-5A2 2 0 0 0 19.44 9z"></path>
+                </svg>
+                <span className="font-medium">{likesCount > 0 && likesCount}</span>
+              </button>
+            </div>
           </div>
 
-
+          {/* Rest of the component remains the same */}
           {imageUrl && (
             <div className="relative">
               <img

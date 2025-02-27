@@ -14,7 +14,7 @@ import BlogComponent from '../Components/BlogComponent';
 import Promotions from '../Pages/CoursePromotions';
 import CourseReviewForm from '../Components/CourseReviewForm'; // Import the new component
 import axiosInstance from '../ApiFunctions/axios';
-
+import SocialShare from '../Components/SocialShare';
 const tabs = [
   "Overview",
   "Eligibility",
@@ -169,10 +169,38 @@ const Coursesinfopage = () => {
         {/* Course Title */}
         <div className="flex justify-between items-center w-full">
           <CoursesName content={content.courseTitle || 'Untitled Course'} />
+          <div className="flex items-center gap-4">
+              {/* Views Counter */}
+              <div className="flex items-center gap-2 text-gray-600">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span className="font-medium">{content.views || 0}</span>
+              </div>
+
+
+              <SocialShare 
+      title={content.courseTitle} 
+      url={`${window.location.origin}/coursesinfopage/${id}`}
+      contentType="course"
+    />
+              
+           </div>
        
           <button 
             onClick={handleLike}
-            disabled={!currentUserId || isLiked}
+            disabled={!currentUserId }
             className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 ${
               !currentUserId ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
               isLiked ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'

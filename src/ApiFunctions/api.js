@@ -47,6 +47,8 @@ export const addToWishlist = async (userId, instituteId) => {
 
 export const blogById = async (id) => {
   try {
+    var count=0;
+    console.log("id", count++);
     const response = await axios.get(`${baseURL}/blog/${id}`);
     return response.data;
   } catch (error) {
