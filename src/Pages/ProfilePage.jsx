@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 
@@ -32,6 +32,10 @@ const ProfilePage = () => {
     country: "",
     state: "",
     city: "",
+    // Store the name values separately for display purposes
+    countryName: "",
+    stateName: "",
+    cityName: ""
   });
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -39,27 +43,41 @@ const ProfilePage = () => {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   
-  // Add these flags to track if location data has been fetched
-  const [statesFetched, setStatesFetched] = useState(false);
-  const [citiesFetched, setCitiesFetched] = useState(false);
+  // Track when location data needs to be loaded
+  const [countryLoaded, setCountryLoaded] = useState(false);
+  const [statesLoaded, setStatesLoaded] = useState(false);
+  const [citiesLoaded, setCitiesLoaded] = useState(false);
 
   // Fetch user data
   const { isLoading } = useQuery("userData", fetchUserData, {
     onSuccess: (data) => {
+      // Format date properly
+      const formattedDate = data.dateOfBirth && !isNaN(new Date(data.dateOfBirth))
+        ? new Date(data.dateOfBirth).toISOString().split('T')[0]
+        : null;
+
+      // Set form data with user data
       setFormData({
-        name: data.name,
-        phone: data.phone,
-        dateOfBirth: data.dateOfBirth && !isNaN(new Date(data.dateOfBirth))
-          ? new Date(data.dateOfBirth).toISOString().split('T')[0]
-          : null,
-        gender: data.gender,
-        designation: data.designation,
-        about: data.about,
-        address: data.address,
-        country: data.country,
-        state: data.state,
-        city: data.city,
+        name: data.name || "",
+        phone: data.phone || "",
+        dateOfBirth: formattedDate,
+        gender: data.gender || "Male",
+        designation: data.designation || "",
+        about: data.about || "",
+        address: data.address || "",
+        country: data.country?._id || "", // Use _id initially
+        state: data.state?._id || "",
+        city: data.city?._id || "",
+        // Store the name values for display
+        countryName: data.country?.name || "",
+        stateName: data.state?.name || "",
+        cityName: data.city?.name || ""
       });
+      
+      // Set flags to load location data if needed
+      if (data.country?._id) {
+        setCountryLoaded(true);
+      }
     },
     onError: (error) => {
       alert("Error fetching user data: " + error.message);
@@ -69,23 +87,44 @@ const ProfilePage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Handle special cases for location fields
     if (name === "country") {
+      // Find the selected country to get its name
+      const selectedCountry = countries.find(country => country.id.toString() === value);
+      
       setFormData({ 
         ...formData, 
         [name]: value, 
+        countryName: selectedCountry?.name || "",
         state: "", // Reset dependent fields
-        city: "" 
+        stateName: "",
+        city: "",
+        cityName: "" 
       });
-      setStatesFetched(false); // Reset the fetched flag
-      setCitiesFetched(false);
+      // Reset states and cities when country changes
+      setStatesLoaded(false);
+      setCitiesLoaded(false);
     } else if (name === "state") {
+      // Find the selected state to get its name
+      const selectedState = states.find(state => state.id.toString() === value);
+      
       setFormData({ 
         ...formData, 
-        [name]: value, 
-        city: "" // Reset city when state changes
+        [name]: value,
+        stateName: selectedState?.name || "",
+        city: "", // Reset city when state changes
+        cityName: ""
       });
-      setCitiesFetched(false); // Reset the fetched flag
+      // Reset cities when state changes
+      setCitiesLoaded(false);
+    } else if (name === "city") {
+      // Find the selected city to get its name
+      const selectedCity = cities.find(city => city.id.toString() === value);
+      
+      setFormData({
+        ...formData,
+        [name]: value,
+        cityName: selectedCity?.name || ""
+      });
     } else {
       // Normal field update
       setFormData({ ...formData, [name]: value });
@@ -98,60 +137,125 @@ const ProfilePage = () => {
       try {
         const res = await axiosInstance.get(`${apiUrl}/countries`);
         setCountries(res.data?.data || []);
+        
+        // If we have country data from the API, try to match it with the fetched countries
+        if (formData.countryName && !formData.country && res.data?.data) {
+          const matchedCountry = res.data.data.find(
+            country => country.name === formData.countryName
+          );
+          if (matchedCountry) {
+            setFormData(prev => ({
+              ...prev,
+              country: matchedCountry.id
+            }));
+            setCountryLoaded(true);
+          }
+        }
       } catch (err) {
         console.error("Failed to fetch countries:", err);
       }
     };
     fetchCountries();
-  }, [apiUrl]);
+  }, [apiUrl, formData.countryName]);
 
-  // Fetch states when a country is selected and not already fetched
+  // Fetch states when a country is selected
   useEffect(() => {
     const fetchStates = async () => {
-      if (formData.country && !statesFetched) {
-        try {
-          // Use the selected country's iso2 as countryCode
-          const selectedCountry = countries.find(country => country.id.toString() === formData.country);
-          if (selectedCountry) {
-            // Send countryCode in the request body
-            const res = await axiosInstance.post(`${apiUrl}/states-by-country`, {
-              countryCode: selectedCountry.iso2
-            });
-            setStates(res.data?.data || []);
-            setStatesFetched(true); // Mark as fetched
+      // Only fetch states if we have a country and haven't already loaded states for this country
+      if (!formData.country || statesLoaded) return;
+      
+      try {
+        // Find the selected country to get its ISO code
+        const selectedCountry = countries.find(country => country.id.toString() === formData.country.toString());
+        if (selectedCountry) {
+          const res = await axiosInstance.post(`${apiUrl}/states-by-country`, {
+            countryCode: selectedCountry.iso2
+          });
+          setStates(res.data?.data || []);
+          
+          // If we have state data from the API, try to match it with the fetched states
+          if (formData.stateName && !formData.state && res.data?.data) {
+            const matchedState = res.data.data.find(
+              state => state.name === formData.stateName
+            );
+            if (matchedState) {
+              setFormData(prev => ({
+                ...prev,
+                state: matchedState.id
+              }));
+            }
           }
-        } catch (err) {
-          console.error("Failed to fetch states:", err);
+          
+          setStatesLoaded(true);
         }
+      } catch (err) {
+        console.error("Failed to fetch states:", err);
       }
     };
-    fetchStates();
-  }, [formData.country, countries, apiUrl, statesFetched]);
+    
+    if (countries.length > 0 && formData.country) {
+      fetchStates();
+    }
+  }, [formData.country, countries, apiUrl, statesLoaded, formData.stateName]);
 
-  // Fetch cities when a state is selected and not already fetched
+  // Fetch cities when a state is selected
   useEffect(() => {
     const fetchCities = async () => {
-      if (formData.state && formData.country && !citiesFetched) {
-        try {
-          // Get the country iso2 code for API request
-          const selectedCountry = countries.find(country => country.id.toString() === formData.country);
-          const selectedState = states.find(state => state.id.toString() === formData.state);
-          if (selectedCountry && selectedState) {
-            // Send countryCode and stateCode in the request body
-            const res = await axiosInstance.post(`${apiUrl}/cities-by-state`, {
-              countryCode: selectedCountry.iso2,
-              stateCode: selectedState.iso2
-            });
-            setCities(res.data?.data || []);
-            setCitiesFetched(true); // Mark as fetched
+      // Only fetch cities if we have a country and state and haven't already loaded cities for this state
+      if (!formData.state || !formData.country || citiesLoaded) return;
+      
+      try {
+        // Get the country and state ISO codes for the API request
+        const selectedCountry = countries.find(country => country.id.toString() === formData.country.toString());
+        const selectedState = states.find(state => state.id.toString() === formData.state.toString());
+        
+        if (selectedCountry && selectedState) {
+          const res = await axiosInstance.post(`${apiUrl}/cities-by-state`, {
+            countryCode: selectedCountry.iso2,
+            stateCode: selectedState.iso2
+          });
+          setCities(res.data?.data || []);
+          
+          // If we have city data from the API, try to match it with the fetched cities
+          if (formData.cityName && !formData.city && res.data?.data) {
+            const matchedCity = res.data.data.find(
+              city => city.name === formData.cityName
+            );
+            if (matchedCity) {
+              setFormData(prev => ({
+                ...prev,
+                city: matchedCity.id
+              }));
+            }
           }
-        } catch (err) {
-          console.error("Failed to fetch cities:", err);
+          
+          setCitiesLoaded(true);
         }
+      } catch (err) {
+        console.error("Failed to fetch cities:", err);
       }
     };
-    fetchCities();
-  }, [formData.state, formData.country, countries, states, apiUrl, citiesFetched]);
+    
+    if (states.length > 0 && formData.state) {
+      fetchCities();
+    }
+  }, [formData.state, formData.country, countries, states, apiUrl, citiesLoaded, formData.cityName]);
+
+  // This effect is triggered when user data is loaded and country is set
+  useEffect(() => {
+    if (countryLoaded && formData.country && countries.length > 0) {
+      // Reset the flag so this only runs once per country selection
+      setCountryLoaded(false);
+      setStatesLoaded(false); // Force states to load for this country
+    }
+  }, [countryLoaded, formData.country, countries]);
+
+  // This effect is triggered when states are loaded and state is set from user data
+  useEffect(() => {
+    if (statesLoaded && formData.state && states.length > 0) {
+      setCitiesLoaded(false); // Force cities to load for this state
+    }
+  }, [statesLoaded, formData.state, states]);
 
   // Update profile mutation
   const updateProfileMutation = useMutation({
@@ -161,8 +265,8 @@ const ProfilePage = () => {
         throw new Error("User ID not found in localStorage");
       }
       
-      const endpoint = `${apiUrl}/student/${userId}`; // Correct endpoint for updating user
-      const response = await axiosInstance.patch(endpoint, updatedForm, { // Using PATCH instead of POST
+      const endpoint = `${apiUrl}/student/${userId}`;
+      const response = await axiosInstance.patch(endpoint, updatedForm, {
         headers: {
           'Content-Type': 'application/json',
           'x-access-token': localStorage.getItem('accessToken'),
@@ -185,9 +289,49 @@ const ProfilePage = () => {
     try {
       // Add email to form data from localStorage
       const email = localStorage.getItem('email')?.replace(/^"|"$/g, '');
-      const updatedForm = { ...formData, email };
       
-      console.log("Submitting form data:", updatedForm);
+      // Create the payload with nested objects for location data
+      const updatedForm = {
+        name: formData.name,
+        phone: formData.phone,
+        dateOfBirth: formData.dateOfBirth,
+        gender: formData.gender,
+        designation: formData.designation,
+        about: formData.about,
+        address: formData.address,
+        email: email
+      };
+      
+      // Only add location data if they exist
+      if (formData.country) {
+        const selectedCountry = countries.find(country => country.id.toString() === formData.country.toString());
+        if (selectedCountry) {
+          updatedForm.country = {
+            name: selectedCountry.name,
+            iso2: selectedCountry.iso2
+          };
+        }
+      }
+      
+      if (formData.state) {
+        const selectedState = states.find(state => state.id.toString() === formData.state.toString());
+        if (selectedState) {
+          updatedForm.state = {
+            name: selectedState.name,
+            iso2: selectedState.iso2
+          };
+        }
+      }
+      
+      if (formData.city) {
+        const selectedCity = cities.find(city => city.id.toString() === formData.city.toString());
+        if (selectedCity) {
+          updatedForm.city = {
+            name: selectedCity.name
+          };
+        }
+      }
+      
       updateProfileMutation.mutate(updatedForm);
     } catch (error) {
       console.error("Submit error:", error);
@@ -317,7 +461,9 @@ const ProfilePage = () => {
                   onChange={handleChange}
                   className="w-full border rounded px-4 py-2"
                 >
-                  <option value="">Select Country...</option>
+                  <option value="">
+                    {formData.countryName ? `${formData.countryName} (Selected)` : "Select Country..."}
+                  </option>
                   {countries.map((country) => (
                     <option key={country.id} value={country.id}>
                       {country.name}
@@ -335,7 +481,9 @@ const ProfilePage = () => {
                   className="w-full border rounded px-4 py-2"
                   disabled={!formData.country}
                 >
-                  <option value="">Select State...</option>
+                  <option value="">
+                    {formData.stateName ? `${formData.stateName} (Selected)` : "Select State..."}
+                  </option>
                   {states.map((state) => (
                     <option key={state.id} value={state.id}>
                       {state.name}
@@ -353,7 +501,9 @@ const ProfilePage = () => {
                   className="w-full border rounded px-4 py-2"
                   disabled={!formData.state}
                 >
-                  <option value="">Select City...</option>
+                  <option value="">
+                    {formData.cityName ? `${formData.cityName}` : "Select City..."}
+                  </option>
                   {cities.map((city) => (
                     <option key={city.id} value={city.id}>
                       {city.name}
