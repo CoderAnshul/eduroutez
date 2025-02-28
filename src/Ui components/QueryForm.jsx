@@ -36,7 +36,7 @@ const QueryForm = ({instituteData}) => {
   };
 
   return (
-    <div className="hidden lg:block items-center pt-4 min-w-[240px] justify-center min-h-44 w-1/5">
+    <div className="hidden lg:block items-center pt-4 min-w-[400px] justify-center min-h-44 w-1/5">
       <form
         className="w-full max-w-sm p-2 bg-[#F0FDF4] rounded-lg shadow-md"
         onSubmit={handleSubmit}

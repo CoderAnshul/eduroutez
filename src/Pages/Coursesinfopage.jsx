@@ -15,6 +15,7 @@ import Promotions from '../Pages/CoursePromotions';
 import CourseReviewForm from '../Components/CourseReviewForm'; // Import the new component
 import axiosInstance from '../ApiFunctions/axios';
 import SocialShare from '../Components/SocialShare';
+
 const tabs = [
   "Overview",
   "Eligibility",
@@ -189,49 +190,45 @@ const Coursesinfopage = () => {
                 <span className="font-medium">{content.views || 0}</span>
               </div>
 
-
               <SocialShare 
-      title={content.courseTitle} 
-      url={`${window.location.origin}/coursesinfopage/${id}`}
-      contentType="course"
-    />
-              
+                title={content.courseTitle} 
+                url={`${window.location.origin}/coursesinfopage/${id}`}
+                contentType="course"
+              />
            </div>
        
            <button
-  onClick={handleLike}
-  disabled={!currentUserId}
-  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
-    ${
-      !currentUserId
-        ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300'
-        : isLiked
-        ? 'bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200'
-        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-    } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
->
-  {/* Better Designed Thumb SVG */}
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24"
-    className={`transition-transform duration-300 ${isLiked ? 'scale-110' : ''}`}
-    fill={isLiked ? "#F59E0B" : "none"} 
-    stroke="#F59E0B" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-  >
-    <path d="M2 10h4v10H2z"></path>
-    <path d="M6 10v10h9.7c1.2 0 2.2-.9 2.4-2l1.3-7c.2-1.1-.6-2-1.7-2H12c-.5 0-1-.4-1-1V4.5c0-1.3-1-2.5-2.5-2.5S6 3.2 6 4.5V10z"></path>
-  </svg>
+              onClick={handleLike}
+              disabled={!currentUserId}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
+                ${
+                  !currentUserId
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300'
+                    : isLiked
+                    ? 'bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200'
+                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
+            >
+              {/* Better Designed Thumb SVG */}
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24"
+                className={`transition-transform duration-300 ${isLiked ? 'scale-110' : ''}`}
+                fill={isLiked ? "#F59E0B" : "none"} 
+                stroke="#F59E0B" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <path d="M2 10h4v10H2z"></path>
+                <path d="M6 10v10h9.7c1.2 0 2.2-.9 2.4-2l1.3-7c.2-1.1-.6-2-1.7-2H12c-.5 0-1-.4-1-1V4.5c0-1.3-1-2.5-2.5-2.5S6 3.2 6 4.5V10z"></path>
+              </svg>
 
-  {/* Like Count */}
-  <span className="font-medium text-sm">{likesCount > 0 ? likesCount : "Like"}</span>
-</button>
-
-
+              {/* Like Count */}
+              <span className="font-medium text-sm">{likesCount > 0 ? likesCount : "Like"}</span>
+            </button>
         </div>
 
         {/* Tab Navigation */}
@@ -242,76 +239,88 @@ const Coursesinfopage = () => {
           {/* Main Content */}
           <div className="w-full lg:w-2/3">
             {/* Overview Section */}
-            <div ref={sectionRefs[0]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-              <h4 className="text-2xl font-semibold text-red-500 mb-4">Overview</h4>
-              {renderHTML(content.courseOverview)}
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <p>
-                  {(content.courseDurationYears || content.courseDurationMonths) && (
-                    <>
-                      <strong>Duration: </strong>
-                      {[
-                        content.courseDurationYears > 0 && `${content.courseDurationYears} years`,
-                        content.courseDurationMonths > 0 && `${content.courseDurationMonths} months`
-                      ].filter(Boolean).join(' ')}
-                    </>
-                  )}
-                </p>
-                <p><strong>Cost:</strong> {content.isCourseFree === 'free' ? 'Free' : 'Paid'}</p>
-                <p><strong>Category:</strong> {content.category?.title || 'Not specified'}</p>
+            {content.courseOverview && (
+              <div ref={sectionRefs[0]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+                <h4 className="text-2xl font-semibold text-red-500 mb-4">Overview</h4>
+                {renderHTML(content.courseOverview)}
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <p>
+                    {(content.courseDurationYears || content.courseDurationMonths) && (
+                      <>
+                        <strong>Duration: </strong>
+                        {[
+                          content.courseDurationYears > 0 && `${content.courseDurationYears} years`,
+                          content.courseDurationMonths > 0 && `${content.courseDurationMonths} months`
+                        ].filter(Boolean).join(' ')}
+                      </>
+                    )}
+                  </p>
+                  <p><strong>Cost:</strong> {content.isCourseFree === 'free' ? 'Free' : 'Paid'}</p>
+                  <p><strong>Category:</strong> {content.category?.title || 'Not specified'}</p>
+                </div>
+                <div className="mt-4">
+                  <h5 className="font-semibold mb-2">Short Description</h5>
+                  {renderHTML(content.shortDescription)}
+                  <h5 className="font-semibold mb-2 mt-4">Long Description</h5>
+                  {renderHTML(content.longDescription)}
+                </div>
               </div>
-              <div className="mt-4">
-                <h5 className="font-semibold mb-2">Short Description</h5>
-                {renderHTML(content.shortDescription)}
-                <h5 className="font-semibold mb-2 mt-4">Long Description</h5>
-                {renderHTML(content.longDescription)}
-              </div>
-            </div>
+            )}
 
             {/* Eligibility Section */}
-            <div ref={sectionRefs[1]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-              <h4 className="text-2xl font-semibold text-red-500 mb-4">Eligibility</h4>
-              {renderHTML(content.courseEligibility)}
-              <div className="mt-4">
-                <h5 className="font-semibold mb-2">General Eligibility</h5>
-                <p className="text-gray-700">{content.eligibility || 'Not specified'}</p>
-                <h5 className="font-semibold mb-2 mt-4">Cut Off</h5>
-                <p className="text-gray-700">{content.cutOff || 'Not specified'}</p>
-                <h5 className="font-semibold mb-2 mt-4">Exams Accepted</h5>
-                <p className="text-gray-700">{content.examAccepted || 'Not specified'}</p>
+            {content.courseEligibility && (
+              <div ref={sectionRefs[1]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+                <h4 className="text-2xl font-semibold text-red-500 mb-4">Eligibility</h4>
+                {renderHTML(content.courseEligibility)}
+                <div className="mt-4">
+                  <h5 className="font-semibold mb-2">General Eligibility</h5>
+                  <p className="text-gray-700">{content.eligibility || 'Not specified'}</p>
+                  <h5 className="font-semibold mb-2 mt-4">Cut Off</h5>
+                  <p className="text-gray-700">{content.cutOff || 'Not specified'}</p>
+                  <h5 className="font-semibold mb-2 mt-4">Exams Accepted</h5>
+                  <p className="text-gray-700">{content.examAccepted || 'Not specified'}</p>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Curriculum Section */}
-            <div ref={sectionRefs[2]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-              <h4 className="text-2xl font-semibold text-red-500 mb-4">Curriculum</h4>
-              {renderHTML(content.courseCurriculum)}
-            </div>
+            {content.courseCurriculum && (
+              <div ref={sectionRefs[2]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+                <h4 className="text-2xl font-semibold text-red-500 mb-4">Curriculum</h4>
+                {renderHTML(content.courseCurriculum)}
+              </div>
+            )}
 
             {/* Fees Section */}
-            <div ref={sectionRefs[3]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-              <h4 className="text-2xl font-semibold text-red-500 mb-4">Course Fees</h4>
-              {renderHTML(content.courseFee)}
-            </div>
+            {content.courseFee && (
+              <div ref={sectionRefs[3]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+                <h4 className="text-2xl font-semibold text-red-500 mb-4">Course Fees</h4>
+                {renderHTML(content.courseFee)}
+              </div>
+            )}
             
             <Promotions location="COURSES_PAGE" />
             
             {/* Opportunities Section */}
-            <div ref={sectionRefs[4]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-              <h4 className="text-2xl font-semibold text-red-500 mb-4">Career Opportunities</h4>
-              {renderHTML(content.courseOpportunities)}
-            </div>
+            {content.courseOpportunities && (
+              <div ref={sectionRefs[4]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+                <h4 className="text-2xl font-semibold text-red-500 mb-4">Career Opportunities</h4>
+                {renderHTML(content.courseOpportunities)}
+              </div>
+            )}
 
             {/* Application Section */}
-            <div ref={sectionRefs[5]} className="bg-white shadow-md rounded-lg p-6 mb-6">
-              <h4 className="text-2xl font-semibold text-red-500 mb-4">Application Details</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <p><strong>Application Start Date:</strong></p>
-                <p>{formatDate(content.applicationStartDate)}</p>
-                <p><strong>Application End Date:</strong></p>
-                <p>{formatDate(content.applicationEndDate)}</p>
+            {(content.applicationStartDate || content.applicationEndDate) && (
+              <div ref={sectionRefs[5]} className="bg-white shadow-md rounded-lg p-6 mb-6">
+                <h4 className="text-2xl font-semibold text-red-500 mb-4">Application Details</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <p><strong>Application Start Date:</strong></p>
+                  <p>{formatDate(content.applicationStartDate)}</p>
+                  <p><strong>Application End Date:</strong></p>
+                  <p>{formatDate(content.applicationEndDate)}</p>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Reviews Section - New */}
             <div ref={sectionRefs[6]} id="reviews" className="mb-6">
