@@ -6,28 +6,33 @@ const GalleryInfo = ({ instituteData }) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
-  const Images=import.meta.env.VITE_IMAGE_BASE_URL;
-
+  const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        if (!instituteData?.data?.gallery) {
+        if (!instituteData?.data?.gallery || instituteData.data.gallery.length === 0) {
           console.warn('No gallery images available');
           return;
         }
 
         const imageUrls = await Promise.all(
           instituteData.data.gallery.map(async (imageFilename) => {
-            const imageResponse = await axios.get(
-              `${Images}/${imageFilename}`,
-              { responseType: 'blob' }
-            );
-            return URL.createObjectURL(imageResponse.data);
+            try {
+              const imageResponse = await axios.get(
+                `${Images}/${imageFilename}`,
+                { responseType: 'blob' }
+              );
+              return URL.createObjectURL(imageResponse.data);
+            } catch (error) {
+              console.error(`Error fetching image ${imageFilename}:`, error);
+              return null; // Return null for failed images
+            }
           })
         );
 
-        setPreviewUrls(imageUrls);
+        // Filter out any null values from failed image fetches
+        setPreviewUrls(imageUrls.filter(url => url !== null));
       } catch (error) {
         console.error('Error fetching images:', error);
       }
@@ -35,6 +40,11 @@ const GalleryInfo = ({ instituteData }) => {
 
     fetchImages();
   }, [instituteData]);
+
+  // If no gallery data or no images were successfully loaded, don't render the component
+  if (!instituteData?.data?.gallery || instituteData.data.gallery.length === 0 || previewUrls.length === 0) {
+    return null;
+  }
 
   const openGallery = (index) => {
     setCurrentImage(index);
@@ -66,6 +76,10 @@ const GalleryInfo = ({ instituteData }) => {
 
   return (
     <div className="w-full">
+      <div className="mb-6">
+        <h3 className="text-lg font-bold mb-4">Gallery</h3>
+      </div>
+      
       {/* Initial 6 images grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {previewUrls.slice(0, 6).map((url, index) => (
@@ -97,17 +111,17 @@ const GalleryInfo = ({ instituteData }) => {
         </div>
       )}
 
-{isGalleryOpen && (
+      {isGalleryOpen && (
         <div className="fixed inset-0 z-40 mt-20 flex items-center justify-center overflow-hidden bg-black/60">
           <div className="relative bg-white rounded-xl w-[95%] h-[90%] max-w-6xl m-4 overflow-hidden">
             {/* Close button */}
             <button
               onClick={closeGallery}
-              className="absolute  -right-1 w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors z-50"
+              className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors z-50"
               aria-label="Close gallery"
             >
               <span className="text-gray-800 text-xl">&times;</span>
-            </button>-
+            </button>
 
             {/* Header */}
             <div className="sticky top-0 z-40 bg-white shadow-sm px-6 py-3">

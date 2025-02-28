@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../ApiFunctions/axios";
-import { format } from "date-fns";
 import axios from "axios";
+import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
 const Webinars = ({ instituteData }) => {
@@ -51,6 +50,28 @@ const Webinars = ({ instituteData }) => {
 
         fetchWebinars();
     }, [instituteData, baseURL]);
+
+    // If loading, error, or no webinars, return early
+    if (loading) {
+        return (
+            <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
+                <p className="text-gray-600">Loading webinars...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
+                <p className="text-red-500">Error: {error}</p>
+            </div>
+        );
+    }
+
+    // Conditional rendering based on availability of webinars
+    if (!webinarData || webinarData.length === 0) {
+        return null; // Return nothing if no webinars are available
+    }
 
     const handleSeeMore = () => {
         setCurrentPage(prev => prev + 1);
@@ -184,34 +205,10 @@ const Webinars = ({ instituteData }) => {
         );
     };
 
-    if (loading) {
-        return (
-            <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
-                <p className="text-gray-600">Loading webinars...</p>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
-                <p className="text-red-500">Error: {error}</p>
-            </div>
-        );
-    }
-
-    if (!displayedWebinars.length) {
-        return (
-            <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
-                <p className="text-gray-600">No webinars available.</p>
-            </div>
-        );
-    }
-
     return (
         <div className="w-full p-6 border border-gray-200 rounded-lg">
             <LoginDialog />
-            <h3 className="text-xl font-bold mb-8">changes in webinarinars</h3>
+            <h3 className="text-xl font-bold mb-8">Upcoming Webinars</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                 {displayedWebinars.map((webinar) => (
                     <WebinarCard key={webinar?._id || Math.random()} webinar={webinar} />

@@ -11,7 +11,7 @@ const InstituteCourses = ({ instituteData }) => {
   const tabs = ["All", "Part Time", "Full Time", "Online"];
 
   useEffect(() => {
-    if (instituteData?.data?.courses) {
+    if (instituteData?.data?.courses?.length) {
       setFilteredCourses(instituteData.data.courses);
     }
   }, [instituteData]);
@@ -38,6 +38,11 @@ const InstituteCourses = ({ instituteData }) => {
     }
     setIsExpanded(!isExpanded); // Toggle "See More" / "See Less"
   };
+
+  // Conditional rendering: return null if no courses available
+  if (!instituteData?.data?.courses?.length) {
+    return null;
+  }
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between bg-white rounded-xl mb-5 sm:p-4">

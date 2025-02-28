@@ -34,47 +34,52 @@ const Faqs = ({instituteData}) => {
 
   const renderContent = () => {
     if (isLoading) return <div>Loading FAQs...</div>;
-    if (error) return <div>Error loading FAQs</div>;
-    if (!faqs || faqs.length === 0) return <div>No FAQs available</div>;
+    if (error) return null; // Return null instead of error message
+    if (!faqs || faqs.length === 0) return null; // Return null instead of "No FAQs available"
 
     return (
       <>
-      <div
-        className="border-2 rounded-xl p-3 overflow-hidden transition-all"
-        style={{ maxHeight: showMore ? '1000px' : 'calc(8 * 60px)' }}
-      >
-        {faqs.slice(0, showMore ? faqs.length : 8).map((faq, index) => (
-        <div key={index} className="border-b last:border-b-0 py-2">
-          <div
-          className="flex justify-between items-center cursor-pointer"
-          onClick={() => {
-            const details = document.getElementById(`faq-details-${index}`);
-            details?.classList.toggle('hidden');
-          }}
-          >
-          <h4 className="text-md font-semibold">{faq?.question || 'Untitled Question'}</h4>
-          <ChevronDown className="text-gray-500" />
-          </div>
-          <div
-          id={`faq-details-${index}`}
-          className="hidden mt-2 text-gray-600"
-          dangerouslySetInnerHTML={{ __html: faq?.answer || 'No answer available' }}
-          />
-        </div>
-        ))}
-      </div>
-
-      {faqs.length > 8 && (
-        <button
-        onClick={() => setShowMore(!showMore)}
-        className="text-blue-600 mt-2"
+        <div
+          className="border-2 rounded-xl p-3 overflow-hidden transition-all"
+          style={{ maxHeight: showMore ? '1000px' : 'calc(8 * 60px)' }}
         >
-        {showMore ? 'Show Less' : 'Show More'}
-        </button>
-      )}
+          {faqs.slice(0, showMore ? faqs.length : 8).map((faq, index) => (
+            <div key={index} className="border-b last:border-b-0 py-2">
+              <div
+                className="flex justify-between items-center cursor-pointer"
+                onClick={() => {
+                  const details = document.getElementById(`faq-details-${index}`);
+                  details?.classList.toggle('hidden');
+                }}
+              >
+                <h4 className="text-md font-semibold">{faq?.question || 'Untitled Question'}</h4>
+                <ChevronDown className="text-gray-500" />
+              </div>
+              <div
+                id={`faq-details-${index}`}
+                className="hidden mt-2 text-gray-600"
+                dangerouslySetInnerHTML={{ __html: faq?.answer || 'No answer available' }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {faqs.length > 8 && (
+          <button
+            onClick={() => setShowMore(!showMore)}
+            className="text-blue-600 mt-2"
+          >
+            {showMore ? 'Show Less' : 'Show More'}
+          </button>
+        )}
       </>
     );
   };
+
+  // If loading is complete and there are no FAQs or there was an error, don't render anything
+  if (!isLoading && (error || !faqs || faqs.length === 0)) {
+    return null;
+  }
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4">
@@ -96,6 +101,6 @@ const Faqs = ({instituteData}) => {
       {renderContent()}
     </div>
   );
-}
+};
 
 export default Faqs;

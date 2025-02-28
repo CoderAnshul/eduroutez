@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const News = ({ instituteData }) => {
+const News = ({ instituteData, showNews = true }) => {
+    // If showNews is false, don't render the component
+    if (!showNews) {
+        return null;
+    }
+
     const [newsData, setNewsData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

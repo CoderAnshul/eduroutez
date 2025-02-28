@@ -68,34 +68,37 @@ const RecruitersSlider = ({instituteData}) => {
   }, [recruiters]);
 
   return (
-    <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4">
-      <h3 className="text-xl font-bold">{`Top Recruiters At ${instituteData?.data?.instituteName}`}</h3>
-      <Swiper
-        slidesPerView={'auto'}
-        navigation={true}
-        spaceBetween={30}
-        loop={true}
-        mousewheel={true}
-        autoplay={{
-          delay: 1,
-          disableOnInteraction: false,
-        }}
-        speed={3000}
-        modules={[Navigation, Mousewheel, Autoplay]}
-        className="myRecruitersSwiper"
-      >
-        {recruiters.map((recruiter, index) => (
-          <SwiperSlide key={recruiter._id || index}>
-            <img
-              src={imageUrls[recruiter._id]}
-              alt={`Recruiter ${index + 1} at ${instituteData?.data?.name}`}
-              className="w-full h-auto object-contain"
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+    recruiters.length > 0 && (
+      <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4">
+        <h3 className="text-xl font-bold">{`Top Recruiters At ${instituteData?.data?.instituteName}`}</h3>
+        <Swiper
+          slidesPerView={'auto'}
+          navigation={true}
+          spaceBetween={30}
+          loop={true}
+          mousewheel={true}
+          autoplay={{
+            delay: 1,
+            disableOnInteraction: false,
+          }}
+          speed={3000}
+          modules={[Navigation, Mousewheel, Autoplay]}
+          className="myRecruitersSwiper"
+        >
+          {recruiters.map((recruiter, index) => (
+            <SwiperSlide key={recruiter._id || index}>
+              <img
+                src={imageUrls[recruiter._id]}
+                alt={`Recruiter ${index + 1} at ${instituteData?.data?.name}`}
+                className="w-full h-auto object-contain"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    )
   );
+  
 };
 
 export default RecruitersSlider;

@@ -3,6 +3,9 @@ import DOMPurify from 'dompurify';
 
 const Placementinfo = ({ instituteData }) => {
   const sanitizedPlacementInfo = DOMPurify.sanitize(instituteData?.data?.placementInfo || '');
+  if (!instituteData?.data?.placementInfo) {
+    return null; // Return null to not render anything if data doesn't exist
+  }
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl mb-2">
