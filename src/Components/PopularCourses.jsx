@@ -77,7 +77,7 @@ const PopularCourses = () => {
             </Link>
 
             {/* Social stats row with views, likes, and share button - OUTSIDE the Link */}
-            <div className="flex items-center justify-between px-4 pb-4">
+            <div className="flex items-center justify-between px-4 ">
               <div className="flex items-center gap-4">
                 {box.views && (
                   <div className="flex items-center gap-2 text-gray-600">
@@ -100,11 +100,11 @@ const PopularCourses = () => {
               </div>
               
               {/* Share button */}
-              <div className="relative" onClick={handleShareClick}>
+              <div onClick={handleShareClick}>
                 
                 
                 {/* Social share component that appears only when clicked */}
-                  <div className="absolute right-0 z-10">
+                  <div className="right-0 z-10">
                     <SocialShare 
                       title={box.courseTitle} 
                       url={`${window.location.origin}/coursesinfopage/${box._id}`} 

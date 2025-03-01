@@ -373,7 +373,7 @@ const SubNavbar = ({ categories }) => {
                   onMouseEnter={(e) => handleMouseEnter(category, e)}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <h5 className="text-xs gap-2 font-[500] group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer">
+                  <h5 className="text-xs gap-2 font-[500] group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer whitespace-nowrap">
                     {category.label}
                     <img
                       className="h-3 group-hover:rotate-180 transition-all"
