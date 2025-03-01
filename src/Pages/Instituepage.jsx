@@ -231,25 +231,25 @@ const Instituepage = () => {
                             <InstituteCourses instituteData = {instituteData} />
                           </div>
                           {instituteData?.data?.examAccepted && (
-  <div className="px-4 py-5 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-    <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-      </svg>
-      Accepted Exams
-    </h3>
-    <div className="flex flex-wrap gap-2">
-      {instituteData?.data?.examAccepted.split(',').map((exam, index) => (
-        <span 
-          key={index}
-          className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-sm font-medium hover:bg-red-100 transition-colors duration-200"
-        >
-          {exam.trim()}
-        </span>
-      ))}
-    </div>
-  </div>
-)}
+                          <div className="px-4 py-5 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                              Accepted Exams
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {instituteData?.data?.examAccepted.split(',').map((exam, index) => (
+                                <span 
+                                  key={index}
+                                  className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-sm font-medium hover:bg-red-100 transition-colors duration-200"
+                                >
+                                  {exam.trim()}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                           <div ref={sectionRefs[2]} className="min-h-24 py-4">
                             <Addmissioninfo instituteData={instituteData}/>
                           </div>

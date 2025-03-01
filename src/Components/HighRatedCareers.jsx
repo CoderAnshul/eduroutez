@@ -94,7 +94,7 @@ const HighRatedCareers = () => {
               </h3>
 
               <p className='text-sm mt-2' dangerouslySetInnerHTML={{ __html: box?.description?.slice(0, 80) + "..." || "No description available" }}></p>
-              <div className='flex items-center justify-between px-4 pb-4'>
+              <div className='flex items-center justify-between px-4 w-full mt-2'>
                       {box.views && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <svg

@@ -139,13 +139,7 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
               </svg>
             </button>
           )}
-          <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
-            <div className="space-x-4">
-              <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
-              <a href={`/institute/${institute._id}`} className="hover:underline">Admission</a>
-              <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a>
-            </div>
-          </div>
+          
         </div>
 
         {/* Right Section - Details */}
@@ -224,13 +218,22 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
           </div>
         </div>
             </div>
-            <div className="flex space-x-4 justify-end">
-              <button className="bg-red-600 text-white px-4 py-2 rounded-lg" onClick={handleDownloadBrochure}>
+            <div className="flex space-x-4 justify-center md:justify-between gap-4 items-center  flex-wrap">
+            <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
+            <div className="space-x-4">
+              <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Admission</a>
+              <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a>
+            </div>
+          </div>
+             <div className="flex items-center flex-wrap gap-4">
+             <button className="bg-red-600 text-white px-4 py-2 rounded-lg" onClick={handleDownloadBrochure}>
                 Download Brochure
               </button>
               <CustomButton to={`/institute/${institute._id}`} className='!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md ' text='View more'>
                 View more
               </CustomButton>
+             </div>
           </div>
         </div>
   );
