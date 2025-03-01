@@ -25,34 +25,98 @@ const Signup = () => {
     name: "",
     email: "",
     contact_number: "",
+    country: "",
     city: "",
     state: "",
     password: "",
     confirmPassword: "",
     referal_Code: "",
     role: "",
+    // Store the name values separately for display purposes
+    countryName: "",
+    stateName: "",
+    cityName: ""
   });
 
   const [role, setRole] = useState("");
+  const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
 
+  // Fetch all countries on component mount
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const res = await axiosInstance.get(`${apiUrl}/countries`);
+        setCountries(res.data?.data || []);
+      } catch (err) {
+        console.error("Failed to fetch countries:", err);
+        toast.error("Failed to fetch countries");
+      }
+    };
+    fetchCountries();
+  }, [apiUrl]);
+
+  // Fetch states when a country is selected
   useEffect(() => {
     const fetchStates = async () => {
+      if (!formData.country) {
+        setStates([]);
+        return;
+      }
+      
       try {
-        const res = await axiosInstance.get(`${apiUrl}/states`);
-        setStates(res.data?.data);
+        // Find the selected country to get its ISO code
+        const selectedCountry = countries.find(country => country.id.toString() === formData.country.toString());
+        if (selectedCountry) {
+          const res = await axiosInstance.post(`${apiUrl}/states-by-country`, {
+            countryCode: selectedCountry.iso2
+          });
+          setStates(res.data?.data || []);
+        }
       } catch (err) {
         console.error("Failed to fetch states:", err);
         toast.error("Failed to fetch states");
       }
-      
     };
-    fetchStates();
-  }, []);
+    
+    if (countries.length > 0 && formData.country) {
+      fetchStates();
+    }
+  }, [formData.country, countries, apiUrl]);
 
+  // Fetch cities when a state is selected
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (!formData.state || !formData.country) {
+        setCities([]);
+        return;
+      }
+      
+      try {
+        // Get the country and state ISO codes for the API request
+        const selectedCountry = countries.find(country => country.id.toString() === formData.country.toString());
+        const selectedState = states.find(state => state.id.toString() === formData.state.toString());
+        
+        if (selectedCountry && selectedState) {
+          const res = await axiosInstance.post(`${apiUrl}/cities-by-state`, {
+            countryCode: selectedCountry.iso2,
+            stateCode: selectedState.iso2
+          });
+          setCities(res.data?.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch cities:", err);
+        toast.error("Failed to fetch cities");
+      }
+    };
+    
+    if (states.length > 0 && formData.state) {
+      fetchCities();
+    }
+  }, [formData.state, formData.country, countries, states, apiUrl]);
 
   useEffect(() => {
     if (showOtpDialog) {
@@ -69,23 +133,6 @@ const Signup = () => {
       setCanResend(true);
     }
   }, [timer]);
-
-  useEffect(() => {
-    const fetchCities = async () => {
-      if (formData.state) {
-        try {
-          const res = await axiosInstance.get(`${apiUrl}/cities-by-state/${formData.state}`);
-          setCities(res.data?.data);
-        } catch (err) {
-          console.error("Failed to fetch cities:", err);
-          toast.error("Failed to fetch cities");
-        }
-      } else {
-        setCities([]);
-      }
-    };
-    fetchCities();
-  }, [formData.state]);
 
   const sendOtpMutation = useMutation({
     mutationFn: async (credentials) => {
@@ -110,8 +157,6 @@ const Signup = () => {
     }
   });
 
-
-  
   const handleOtpChange = (index, value) => {
     if (!/^[0-9]?$/.test(value)) return;
     const newOtp = [...otp];
@@ -164,8 +209,45 @@ const Signup = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
-    if (id === 'role') setRole(value);
+    
+    if (id === "country") {
+      // Find the selected country to get its name
+      const selectedCountry = countries.find(country => country.id.toString() === value);
+      
+      setFormData({ 
+        ...formData, 
+        [id]: value, 
+        countryName: selectedCountry?.name || "",
+        state: "", // Reset dependent fields
+        stateName: "",
+        city: "",
+        cityName: "" 
+      });
+    } else if (id === "state") {
+      // Find the selected state to get its name
+      const selectedState = states.find(state => state.id.toString() === value);
+      
+      setFormData({ 
+        ...formData, 
+        [id]: value,
+        stateName: selectedState?.name || "",
+        city: "", // Reset city when state changes
+        cityName: ""
+      });
+    } else if (id === "city") {
+      // Find the selected city to get its name
+      const selectedCity = cities.find(city => city.id.toString() === value);
+      
+      setFormData({
+        ...formData,
+        [id]: value,
+        cityName: selectedCity?.name || ""
+      });
+    } else {
+      // Normal field update
+      setFormData({ ...formData, [id]: value });
+      if (id === 'role') setRole(value);
+    }
   };
 
   const validateForm = () => {
@@ -177,7 +259,7 @@ const Signup = () => {
       toast.error("Passwords do not match");
       return false;
     }
-    if (!formData.name || !formData.role || !formData.state || !formData.city) {
+    if (!formData.name || !formData.role || !formData.country || !formData.state || !formData.city) {
       toast.error("Please fill all required fields");
       return false;
     }
@@ -195,8 +277,47 @@ const Signup = () => {
       toast.error("Please enter OTP");
       return;
     }
-    const { confirmPassword, ...signupData } = formData;
-    signupMutation.mutate({ ...signupData, otp });
+    
+    // Create the payload with nested location objects
+    const { confirmPassword, countryName, stateName, cityName, ...signupData } = formData;
+    
+    // Add location info as objects
+    const signupPayload = {
+      ...signupData,
+      otp,
+    };
+    
+    // Add country, state, city as structured objects similar to ProfilePage
+    if (formData.country) {
+      const selectedCountry = countries.find(country => country.id.toString() === formData.country.toString());
+      if (selectedCountry) {
+        signupPayload.country = {
+          name: selectedCountry.name,
+          iso2: selectedCountry.iso2
+        };
+      }
+    }
+    
+    if (formData.state) {
+      const selectedState = states.find(state => state.id.toString() === formData.state.toString());
+      if (selectedState) {
+        signupPayload.state = {
+          name: selectedState.name,
+          iso2: selectedState.iso2
+        };
+      }
+    }
+    
+    if (formData.city) {
+      const selectedCity = cities.find(city => city.id.toString() === formData.city.toString());
+      if (selectedCity) {
+        signupPayload.city = {
+          name: selectedCity.name
+        };
+      }
+    }
+    
+    signupMutation.mutate(signupPayload);
   };
 
   const roleSpecificLabel = role === 'institute'
@@ -267,6 +388,25 @@ const Signup = () => {
             />
           </div>
 
+          {/* Country Selection */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Country *</label>
+            <select
+              id="country"
+              className="w-full px-4 py-2 border rounded-lg"
+              value={formData.country}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select a Country</option>
+              {countries.map((country) => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* State Selection */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">State *</label>
@@ -276,9 +416,10 @@ const Signup = () => {
               value={formData.state}
               onChange={handleChange}
               required
+              disabled={!formData.country}
             >
               <option value="">Select a State</option>
-              {states?.map((state) => (
+              {states.map((state) => (
                 <option key={state.id} value={state.id}>
                   {state.name}
                 </option>
@@ -298,7 +439,7 @@ const Signup = () => {
               disabled={!formData.state}
             >
               <option value="">Select a City</option>
-              {cities?.map((city) => (
+              {cities.map((city) => (
                 <option key={city.id} value={city.id}>
                   {city.name}
                 </option>
