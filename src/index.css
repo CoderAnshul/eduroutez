@@ -42,6 +42,13 @@ html{
 ol{
   padding-left:25px;
 }
+.is-sticky {
+  position: sticky;
+  top: 64px; /* Same as 16 in tailwind's top-16 */
+  background: white;
+  z-index: 50;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
 input[type="text"] {
     background-color: transparent;
