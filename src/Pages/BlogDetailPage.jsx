@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { blogById, getRecentBlogs } from '../ApiFunctions/api';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import HighRatedCareers from '../Components/HighRatedCareers';
 import Events from '../Components/Events';
 import ConsellingBanner from '../Components/ConsellingBanner';
@@ -16,25 +16,93 @@ const BlogDetailPage = () => {
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
   const [view, setView] = useState('overview');
-  const { id } = useParams();
+  const { id } = useParams();  // This can be either ID or slug
+  const navigate = useNavigate();
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
   // Get current user ID from localStorage
   const currentUserId = localStorage.getItem('userId');
+
+
+  useEffect(() => {
+    if (!window.blogIdMap) {
+      try {
+        const storedBlogIdMap = JSON.parse(localStorage.getItem('blogIdMap') || '{}');
+        window.blogIdMap = storedBlogIdMap;
+      } catch (error) {
+        console.error('Error initializing blogIdMap:', error);
+        window.blogIdMap = {};
+      }
+    }
+  }, []);
   
   // Combined fetch function that gets blog data and recent blogs
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch blog details
-        const response = await blogById(id);
+        // First, determine if we're dealing with an ID or a slug
+        const isSlug = isNaN(parseInt(id)) || id.includes('-');
+        
+        // Try to get blog data - with fallback mechanisms
+        let response;
+        let blogId = id;
+        
+        if (isSlug) {
+          // Try to get the ID from blogIdMap
+          const mappedId = window.blogIdMap?.[id];
+          
+          if (mappedId) {
+            // We found the ID in the map, use it
+            blogId = mappedId;
+            response = await blogById(blogId);
+          } else {
+            // If blogIdMap doesn't exist or doesn't have the slug (like on refresh),
+            // we need to get the blog directly by its slug through a custom API call
+            try {
+              response = await axiosInstance.get(`http://localhost:4001/api/v1/blog/by-slug/${id}`);
+              
+              // If we got a response, grab the ID for future use
+              if (response && response.data) {
+                blogId = response.data._id;
+                
+                // Save this slug -> ID mapping to both window and localStorage
+                window.blogIdMap = window.blogIdMap || {};
+                window.blogIdMap[id] = blogId;
+                localStorage.setItem('blogIdMap', JSON.stringify(window.blogIdMap));
+                console.log(`Saved mapping: ${id} -> ${blogId} in localStorage`);
+              }
+            } catch (slugError) {
+              console.error('Error fetching blog by slug:', slugError);
+              
+              // As a final fallback, try using the blog ID API
+              response = await blogById(id);
+            }
+          }
+        } else {
+          // It's an ID, use it directly
+          response = await blogById(blogId);
+          
+          // If the blog has a slug, we should save that mapping too
+          if (response && response.data && response.data.slug) {
+            const slug = response.data.slug;
+            window.blogIdMap = window.blogIdMap || {};
+            window.blogIdMap[slug] = blogId;
+            localStorage.setItem('blogIdMap', JSON.stringify(window.blogIdMap));
+            console.log(`Saved mapping: ${slug} -> ${blogId} in localStorage`);
+          }
+        }
+        
         if (!response || !response.data) {
           setError(new Error('No blog data found'));
           return;
         }
+        
         setData(response.data);
+        
+        // No URL updates on refresh - we want to keep the URL exactly as it is
+        // This prevents potential loading issues on multiple refreshes
 
         // Check if user has already liked this blog
         if (response.data.likes && currentUserId) {
@@ -43,21 +111,36 @@ const BlogDetailPage = () => {
         }
 
         // Get blog image
-        if (response.data.image) {
-          const imageResponse = await fetch(`${Images}/${response.data.image}`);
-          const imageBlob = await imageResponse.blob();
-          const imageObjectURL = URL.createObjectURL(imageBlob);
-          setImageUrl(imageObjectURL);
+        if (response.data.thumbnail || response.data.image) {
+          try {
+            const imageResponse = await fetch(`${Images}/${response.data.thumbnail || response.data.image}`);
+            const imageBlob = await imageResponse.blob();
+            const imageObjectURL = URL.createObjectURL(imageBlob);
+            setImageUrl(imageObjectURL);
+          } catch (imgError) {
+            console.error('Error loading image:', imgError);
+          }
         }
         
         // Fetch recent blogs
         const recentBlogsResponse = await getRecentBlogs();
         if (recentBlogsResponse && recentBlogsResponse.data?.result) {
           const filteredBlogs = recentBlogsResponse.data?.result
-            .filter(blog => blog.id !== parseInt(id))
+            .filter(blog => blog._id !== response.data._id)
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
             .slice(0, 5);
           setRecentBlogs(filteredBlogs);
+          
+          // Save ID mappings for recent blogs too
+          filteredBlogs.forEach(blog => {
+            if (blog._id && blog.slug) {
+              window.blogIdMap = window.blogIdMap || {};
+              window.blogIdMap[blog.slug] = blog._id;
+            }
+          });
+          
+          // Update localStorage with all mappings
+          localStorage.setItem('blogIdMap', JSON.stringify(window.blogIdMap));
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -66,14 +149,8 @@ const BlogDetailPage = () => {
     };
 
     fetchData();
-
-    // Cleanup function
-    return () => {
-      if (imageUrl) {
-        URL.revokeObjectURL(imageUrl);
-      }
-    };
-  }, [id, currentUserId, Images]);
+  }, [id, currentUserId]);
+  
 
   // Handle like/dislike functionality
   const handleLike = async () => {
@@ -85,9 +162,12 @@ const BlogDetailPage = () => {
     try {
       const likeValue = isLiked ? "0" : "1"; // Toggle like value
       
+      // Use the blog's actual ID for the API call
+      const blogId = data._id;
+      
       // Call the like-dislike API
       await axiosInstance.post('http://localhost:4001/api/v1/like-dislike', {
-        id: id,
+        id: blogId,
         type: "blog",
         like: likeValue
       }, {
@@ -100,7 +180,7 @@ const BlogDetailPage = () => {
     
       // Update local state
       setIsLiked(!isLiked);
-      console.log(`Blog ${id} like status updated to ${!isLiked}`);
+      console.log(`Blog ${blogId} like status updated to ${!isLiked}`);
     } catch (error) {
       console.error('Error updating like status:', error);
     }
@@ -108,6 +188,23 @@ const BlogDetailPage = () => {
 
   // Calculate number of likes
   const likesCount = data?.likes?.length || 0;
+
+  // Handle share click to prevent navigation
+  const handleShareClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  // Helper function to get URL for display - keep exactly what was used to access the page
+  const getBlogUrl = (blog) => {
+    // Using IDs is more reliable internally
+    return `/blogdetailpage/${blog?._id}`;
+  };
+  
+  // Helper function to get actual blog ID for internal use
+  const getBlogId = (blog) => {
+    return blog?._id;
+  };
 
   if (error) {
     return (
@@ -118,7 +215,7 @@ const BlogDetailPage = () => {
   }
 
   if (!data) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   return (
@@ -149,51 +246,52 @@ const BlogDetailPage = () => {
                 <span className="font-medium">{data.views || 0}</span>
               </div>
 
-              
-              <SocialShare 
-      title={data.title} 
-      url={`${window.location.origin}/blogdetailpage/${id}`}
-      contentType="blog"
-    />
+              {/* Social Share Component - Use the current URL to maintain consistency */}
+              <div onClick={handleShareClick}>
+                <SocialShare 
+                  title={data.title} 
+                  url={window.location.href}
+                  contentType="blog"
+                />
+              </div>
               
               {/* Like Button */}
               <button
-  onClick={handleLike}
-  disabled={!currentUserId}
-  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
-    ${
-      !currentUserId
-        ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300'
-        : isLiked
-        ? 'bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200'
-        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-    } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
->
-  {/* Better Designed Thumb SVG */}
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24"
-    className={`transition-transform duration-300 ${isLiked ? 'scale-110' : ''}`}
-    fill={isLiked ? "#F59E0B" : "none"} 
-    stroke="#F59E0B" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-  >
-    <path d="M2 10h4v10H2z"></path>
-    <path d="M6 10v10h9.7c1.2 0 2.2-.9 2.4-2l1.3-7c.2-1.1-.6-2-1.7-2H12c-.5 0-1-.4-1-1V4.5c0-1.3-1-2.5-2.5-2.5S6 3.2 6 4.5V10z"></path>
-  </svg>
+                onClick={handleLike}
+                disabled={!currentUserId}
+                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
+                  ${
+                    !currentUserId
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300'
+                      : isLiked
+                      ? 'bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200'
+                      : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                  } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
+              >
+                {/* Thumb SVG */}
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="24" 
+                  height="24" 
+                  viewBox="0 0 24 24"
+                  className={`transition-transform duration-300 ${isLiked ? 'scale-110' : ''}`}
+                  fill={isLiked ? "#F59E0B" : "none"} 
+                  stroke="#F59E0B" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <path d="M2 10h4v10H2z"></path>
+                  <path d="M6 10v10h9.7c1.2 0 2.2-.9 2.4-2l1.3-7c.2-1.1-.6-2-1.7-2H12c-.5 0-1-.4-1-1V4.5c0-1.3-1-2.5-2.5-2.5S6 3.2 6 4.5V10z"></path>
+                </svg>
 
-  {/* Like Count */}
-  <span className="font-medium text-sm">{likesCount > 0 ? likesCount : "Like"}</span>
-</button>
-
+                {/* Like Count */}
+                <span className="font-medium text-sm">{likesCount > 0 ? likesCount : "Like"}</span>
+              </button>
             </div>
           </div>
 
-          {/* Rest of the component remains the same */}
+          {/* Image display with title overlay */}
           {imageUrl && (
             <div className="relative">
               <img
@@ -265,7 +363,7 @@ const BlogDetailPage = () => {
                       <h3 className="text-lg font-semibold mb-4">Recently Uploaded Blogs</h3>
                       <div className="space-y-4">
                         {recentBlogs?.map((blog) => (
-                          <Link key={blog._id} to={`/blogdetailpage/${blog?._id}`}>
+                          <Link key={blog._id} to={getBlogUrl(blog)}>
                             <div className="flex items-center p-3 bg-white rounded-lg shadow-md">
                               <div className="w-1/3">
                                 <img
@@ -275,8 +373,11 @@ const BlogDetailPage = () => {
                                 />
                               </div>
                               <div className="w-2/3 ml-3">
-                                <h4 className="text-md font-medium text-gray-800 truncate">{blog.title}</h4>
-                                <p className="text-sm text-gray-600 truncate" dangerouslySetInnerHTML={{ __html: blog.description.split(' ').slice(0, 30).join(' ') + '...' }}></p>
+                                <h4 className="text-md font-medium text-gray-800 truncate">
+                                  {blog.title.length > 30 ? `${blog.title.slice(0,30)}...` : blog.title}
+                                </h4>
+                                <p className="text-sm text-gray-600 line-clamp-2" 
+                                   dangerouslySetInnerHTML={{ __html: blog.description }}></p>
                                 <span className="text-xs text-gray-500">{new Date(blog.createdAt).toLocaleDateString()}</span>
                               </div>
                             </div>
@@ -292,7 +393,7 @@ const BlogDetailPage = () => {
               </div>
             )}
 
-            {/* Reviews Section - New */}
+            {/* Reviews Section */}
             <div ref={reviewsRef} id="reviews" className="mt-10 border-t pt-6">
               <h3 className="text-2xl font-semibold text-red-500 mb-4">Reviews</h3>
               <BlogReviewForm blog={data} />

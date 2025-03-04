@@ -12,7 +12,7 @@ import ConsellingBanner from '../Components/ConsellingBanner';
 import HighRatedCareers from '../Components/HighRatedCareers';
 import BlogComponent from '../Components/BlogComponent';
 import Promotions from '../Pages/CoursePromotions';
-import CourseReviewForm from '../Components/CourseReviewForm'; // Import the new component
+import CourseReviewForm from '../Components/CourseReviewForm';
 import axiosInstance from '../ApiFunctions/axios';
 import SocialShare from '../Components/SocialShare';
 
@@ -23,52 +23,121 @@ const tabs = [
   "Fees",
   "Opportunities",
   "Application",
-  "Reviews"  // Added new tab for reviews
+  "Reviews"
 ];
 
 const Coursesinfopage = () => {
-  const { id } = useParams();
+  const { id } = useParams();  // This can be either ID or slug
   const sectionRefs = tabs.map(() => useRef(null));
   const [isLiked, setIsLiked] = useState(false);
-
-  const { data: courseData, isLoading, isError } = useQuery(
-    ['course', id],
-    () => getCoursesById(id),
-    { 
-      enabled: Boolean(id),
-      retry: 2,
-      staleTime: 5 * 60 * 1000
-    }
-  );
+  const [courseData, setCourseData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   // Get current user ID from localStorage
   const currentUserId = localStorage.getItem('userId');
 
-  // Check if user has already liked this course
+  // Initialize courseIdMap from localStorage
   useEffect(() => {
-    if (courseData?.data?.likes && currentUserId) {
-      const userHasLiked = courseData.data.likes.includes(currentUserId);
-      setIsLiked(userHasLiked);
+    if (!window.courseIdMap) {
+      try {
+        const storedCourseIdMap = JSON.parse(localStorage.getItem('courseIdMap') || '{}');
+        window.courseIdMap = storedCourseIdMap;
+      } catch (error) {
+        console.error('Error initializing courseIdMap:', error);
+        window.courseIdMap = {};
+      }
     }
-  }, [courseData, currentUserId]);
+  }, []);
 
-  const content = courseData?.data ?? {};
+  // Combined fetch function for course data
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      if (!id) return;
+      
+      setIsLoading(true);
+      try {
+        // First, determine if we're dealing with an ID or a slug
+        const isSlug = isNaN(parseInt(id)) || id.includes('-');
+        
+        // Try to get course data - with fallback mechanisms
+        let response;
+        let courseId = id;
+        
+        if (isSlug) {
+          // Try to get the ID from courseIdMap
+          const mappedId = window.courseIdMap?.[id];
+          
+          if (mappedId) {
+            // We found the ID in the map, use it
+            courseId = mappedId;
+            const result = await getCoursesById(courseId);
+            response = result;
+          } else {
+            // If courseIdMap doesn't exist or doesn't have the slug,
+            // we need to get the course directly by its slug through a custom API call
+            try {
+              response = await axiosInstance.get(`http://localhost:4001/api/v1/course/by-slug/${id}`);
+              
+              // If we got a response, grab the ID for future use
+              if (response && response.data) {
+                courseId = response.data._id;
+                
+                // Save this slug -> ID mapping to both window and localStorage
+                window.courseIdMap = window.courseIdMap || {};
+                window.courseIdMap[id] = courseId;
+                localStorage.setItem('courseIdMap', JSON.stringify(window.courseIdMap));
+                console.log(`Saved mapping: ${id} -> ${courseId} in localStorage`);
+              }
+            } catch (slugError) {
+              console.error('Error fetching course by slug:', slugError);
+              
+              // As a final fallback, try using the course ID API
+              const result = await getCoursesById(id);
+              response = result;
+            }
+          }
+        } else {
+          // It's an ID, use it directly
+          const result = await getCoursesById(courseId);
+          response = result;
+          
+          // If the course has a slug, we should save that mapping too
+          if (response && response.data && response.data.slug) {
+            const slug = response.data.slug;
+            window.courseIdMap = window.courseIdMap || {};
+            window.courseIdMap[slug] = courseId;
+            localStorage.setItem('courseIdMap', JSON.stringify(window.courseIdMap));
+            console.log(`Saved mapping: ${slug} -> ${courseId} in localStorage`);
+          }
+        }
+        
+        if (!response || !response.data) {
+          setIsError(true);
+          return;
+        }
+        
+        setCourseData(response);
+        
+        // Check if user has already liked this course
+        if (response.data.likes && currentUserId) {
+          const userHasLiked = response.data.likes.includes(currentUserId);
+          setIsLiked(userHasLiked);
+        }
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching course data:', error);
+        setIsError(true);
+        setIsLoading(false);
+      }
+    };
 
-  if (!id) {
-    return <div className="flex justify-center items-center h-screen">Invalid course ID.</div>;
-  }
-
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
-
-  if (isError || !content) {
-    return <div className="flex justify-center items-center h-screen">Error loading course data.</div>;
-  }
+    fetchCourseData();
+  }, [id, currentUserId]);
 
   const handleLike = async () => {
     if (!currentUserId) {
-      // Redirect to login or show login modal
       alert("Please login to like this course");
       return;
     }
@@ -76,9 +145,12 @@ const Coursesinfopage = () => {
     try {
       const likeValue = isLiked ? "0" : "1"; // Toggle like value
       
+      // Use the course's actual ID for the API call
+      const courseId = courseData.data._id;
+      
       // Call the like-dislike API
       await axiosInstance.post('http://localhost:4001/api/v1/like-dislike', {
-        id: id,
+        id: courseId,
         type: "course",
         like: likeValue
       }, {
@@ -91,7 +163,7 @@ const Coursesinfopage = () => {
     
       // Update local state
       setIsLiked(!isLiked);
-      console.log(`Course ${id} like status updated to ${!isLiked}`);
+      console.log(`Course ${courseId} like status updated to ${!isLiked}`);
     } catch (error) {
       console.error('Error updating like status:', error);
     }
@@ -161,6 +233,20 @@ const Coursesinfopage = () => {
     );
   };
 
+  if (!id) {
+    return <div className="flex justify-center items-center h-screen">Invalid course ID.</div>;
+  }
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (isError || !courseData?.data) {
+    return <div className="flex justify-center items-center h-screen">Error loading course data.</div>;
+  }
+
+  const content = courseData.data;
+  
   // Calculate number of likes
   const likesCount = content.likes?.length || 0;
 
@@ -192,7 +278,7 @@ const Coursesinfopage = () => {
 
               <SocialShare 
                 title={content.courseTitle} 
-                url={`${window.location.origin}/coursesinfopage/${id}`}
+                url={window.location.href}
                 contentType="course"
               />
            </div>
@@ -209,7 +295,7 @@ const Coursesinfopage = () => {
                     : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
                 } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
             >
-              {/* Better Designed Thumb SVG */}
+              {/* Thumb SVG */}
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 width="24" 
@@ -231,7 +317,7 @@ const Coursesinfopage = () => {
             </button>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Rest of the component remains the same */}
         <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
 
         {/* Main Content Area with Sidebar */}

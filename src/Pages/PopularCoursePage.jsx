@@ -12,9 +12,13 @@ import ConsellingBanner from '../Components/ConsellingBanner';
 import Promotions from './CoursePromotions';
 import SocialShare from '../Components/SocialShare';
 
+// In-memory mapping to store course IDs by slug
+const courseIdMap = {};
+
 const PopularCourses = () => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
+  const [openShareId, setOpenShareId] = useState(null);
 
   const { data, isLoading, isError } = useQuery(
     ["popularCourses"],
@@ -22,15 +26,46 @@ const PopularCourses = () => {
     {
       enabled: true,
       onSuccess: (data) => {
-        setContent(data.data.result);
+        const courses = data.data.result;
+        
+        // Store the ID mapping for each course using the title as slug
+        courses.forEach(course => {
+          if (course.courseTitle) {
+            // Create slug from course title
+            const slug = getCourseSlug(course);
+            
+            // Store mapping
+            courseIdMap[slug] = course._id;
+          }
+        });
+        
+        // Make the mapping available globally
+        window.courseIdMap = courseIdMap;
+        
+        // Store in localStorage for persistence
+        localStorage.setItem('courseIdMap', JSON.stringify(courseIdMap));
+        
+        setContent(courses);
       },
     }
   );
 
-  const handleShareClick = (e, box) => {
+  // Helper function to get the slug for a course
+  const getCourseSlug = (course) => {
+    if (!course?.courseTitle) return course?._id;
+    
+    return course.courseTitle
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
+
+  const handleShareClick = (id, e) => {
     e.preventDefault(); // Prevent the Link navigation
     e.stopPropagation(); // Stop event from bubbling up
-    // Any additional share handling logic can go here
+    setOpenShareId(openShareId === id ? null : id);
   };
 
   useEffect(() => {
@@ -114,84 +149,87 @@ const PopularCourses = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {content.map((box) => (
-              <div key={box._id} className="flex flex-col">
-             <Link
-  to={`/coursesinfopage/${box._id}`}
-  className="bg-white rounded-lg shadow-lg  transform transition-all hover:scale-105 hover:shadow-xl flex-grow z-1"
->
-  <div className="relative">
-    <img
-      className="h-48 w-full object-cover"
-      src={images[box._id] || cardPhoto}
-      alt={box.courseTitle}
-      onError={(e) => {
-        console.warn(`Image load failed for ${box.courseTitle}, using fallback`);
-        e.target.src = cardPhoto;
-        e.target.onerror = null;
-      }}
-    />
-    {box.isCourseFree === "free" && (
-      <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-        Free
-      </span>
-    )}
-  </div>
-
-  <div className="p-4">
-    <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
-      {box.courseTitle}
-    </h3>
-    <div
-      className="text-sm text-gray-600 mt-2 line-clamp-2"
-      dangerouslySetInnerHTML={{ __html: box.longDescription }}
-    />
-
-    {/* Views, Likes, and Share - Now Inside the Card */}
-    <div className="flex items-center justify-between mt-4">
-      <div className="flex items-center gap-4 text-gray-600">
-        {box.views && (
-          <div className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-            <span>{box.views}</span>
-          </div>
-        )}
-        {box.likes && box.likes.length > 0 && (
-          <div className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
-              <path d="M9 22V12"></path>
-            </svg>
-            <span>{box.likes.length}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Share button inside card */}
-      <div className="relative"           onClick={(e) => handleShareClick(e, box)}
-      >
-
-
-        {/* Social Share Component (hidden until clicked) */}
-        <div className="absolute right-0 z-10">
-          <SocialShare 
-            title={box.courseTitle} 
-            url={`${window.location.origin}/coursesinfopage/${box._id}`} 
-            contentType="course" 
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-</Link>
-
-                
+            {content.map((box) => {
+              const courseSlug = getCourseSlug(box);
               
-              </div>
-            ))}
+              return (
+                <div key={box._id} className="flex flex-col">
+                  <Link
+                    to={`/coursesinfopage/${courseSlug}`}
+                    className="bg-white rounded-lg shadow-lg transform transition-all hover:scale-105 hover:shadow-xl flex-grow z-1"
+                  >
+                    <div className="relative">
+                      <img
+                        className="h-48 w-full object-cover"
+                        src={images[box._id] || cardPhoto}
+                        alt={box.courseTitle}
+                        onError={(e) => {
+                          console.warn(`Image load failed for ${box.courseTitle}, using fallback`);
+                          e.target.src = cardPhoto;
+                          e.target.onerror = null;
+                        }}
+                      />
+                      {box.isCourseFree === "free" && (
+                        <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                          Free
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
+                        {box.courseTitle}
+                      </h3>
+                      <div
+                        className="text-sm text-gray-600 mt-2 line-clamp-2"
+                        dangerouslySetInnerHTML={{ __html: box.longDescription }}
+                      />
+
+                      {/* Views, Likes, and Share - Now Inside the Card */}
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center gap-4 text-gray-600">
+                          {box.views && (
+                            <div className="flex items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                              </svg>
+                              <span>{box.views}</span>
+                            </div>
+                          )}
+                          {box.likes && box.likes.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
+                                <path d="M9 22V12"></path>
+                              </svg>
+                              <span>{box.likes.length}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Share button inside card */}
+                        <div 
+                          className="relative"           
+                          onClick={(e) => handleShareClick(box._id, e)}
+                        >
+                          {/* Social Share Component (shown when clicked) */}
+                          {openShareId === box._id && (
+                            <div className="absolute right-0 z-10">
+                              <SocialShare 
+                                title={box.courseTitle} 
+                                url={`${window.location.origin}/coursesinfopage/${courseSlug}`} 
+                                contentType="course" 
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -212,4 +250,6 @@ const PopularCourses = () => {
   );
 };
 
+// Export the ID mapping for use in other components
+export { courseIdMap };
 export default PopularCourses;

@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import PageBanner from '../Ui components/PageBanner';
 import BlogandCareerBox from '../Ui components/BlogandCareerBox';
 import Events from '../Components/Events';
 import ConsellingBanner from '../Components/ConsellingBanner';
 import PopularCourses from '../Components/PopularCourses';
 import HighRatedCareers from '../Components/HighRatedCareers';
+
+// Create a module-level object to store the blog ID mapping
+const blogIdMapStore = {};
 
 const Blogpage = () => {
     const [selectedCategories, setSelectedCategories] = useState([]);
@@ -29,7 +33,22 @@ const Blogpage = () => {
             });
             return response.data;
         },
-        { enabled: true }
+        { 
+            enabled: true,
+            onSuccess: (data) => {
+                // Create ID mapping for each blog using the slug from backend
+                const blogs = data?.data?.result || [];
+                
+                blogs.forEach(blog => {
+                    if (blog.slug) {
+                        blogIdMapStore[blog.slug] = blog._id;
+                    }
+                });
+                
+                // Make the mapping available globally
+                window.blogIdMap = blogIdMapStore;
+            }
+        }
     );
 
     // Fetch categories
@@ -107,6 +126,51 @@ const Blogpage = () => {
         (page - 1) * itemsPerPage,
         page * itemsPerPage
     );
+
+    // Modify the BlogandCareerBox component to use slugs
+    const BlogandCareerBoxWithSlugs = ({ blogData }) => {
+        const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+        
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {blogData.length > 0 ? (
+                    blogData.map((blog, index) => (
+                        <div key={index} className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                            {/* Use Link with slug for navigation */}
+                            <Link to={`/blogdetailpage/${blog.slug}`} className="block">
+                                <div className="h-48 overflow-hidden">
+                                    <img
+                                        className="w-full h-full object-cover rounded-t-xl"
+                                        src={`${Images}/${blog?.thumbnail}`}
+                                        alt={blog.title}
+                                    />
+                                </div>
+                                <div className="p-4">
+                                    <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
+                                        {blog.title}
+                                    </h3>
+                                    <p className="text-sm text-gray-600 mt-2 h-12 overflow-hidden line-clamp-2" 
+                                       dangerouslySetInnerHTML={{ __html: blog.description }}></p>
+                                    <div className="mt-4 flex justify-between items-center">
+                                        <button className="bg-red-600 text-white py-1 px-4 rounded-lg text-sm hover:bg-red-700 transition-all">
+                                            Read More
+                                        </button>
+                                        {blog.category && (
+                                            <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                                                {blog.category}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                    ))
+                ) : (
+                    <div className="col-span-4 text-center py-10">No blogs found matching your criteria.</div>
+                )}
+            </div>
+        );
+    };
 
     const Pagination = () => {
         const pageNumbers = [];
@@ -279,10 +343,8 @@ const Blogpage = () => {
                                 {category}
                             </span>
                         ))}
-
-                        
                     </div>
-                    <BlogandCareerBox blogData={currentItems || []} />
+                    <BlogandCareerBoxWithSlugs blogData={currentItems || []} />
                     <Pagination />
                 </div>
             </div>
@@ -297,4 +359,6 @@ const Blogpage = () => {
     );
 };
 
+// Export the ID mapping for use in other components
+export const blogIdMap = blogIdMapStore;
 export default Blogpage;

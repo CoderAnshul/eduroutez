@@ -8,47 +8,58 @@ import checklist from "../assets/Images/checklist.png";
 import { addToWishlist } from '../ApiFunctions/api';
 import axiosInstance from "../ApiFunctions/axios";
 import { MapPin, Building } from 'lucide-react';
+import { Link } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
-const SearchResultBox = ({ institute }) => {
-
+const SearchResultBox = ({ institute, url }) => {
   console.log('Institute:', institute);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const baseURL = import.meta.env.VITE_BASE_URL;
-  const Image=import.meta.env.VITE_IMAGE_BASE_URL;
+  const Image = import.meta.env.VITE_IMAGE_BASE_URL;
 
+  // Get the correct URL for the institute (using slug if available)
+  const getInstituteUrl = () => {
+    // If a URL is provided from parent component, use it
+    if (url) return url;
+    
+    // Otherwise, fall back to slug-based URL if available, or ID-based URL as last resort
+    return institute?.slug 
+      ? `/institute/${institute.slug}`
+      : `/institute/${institute?._id}`;
+  };
+
+  const instituteUrl = getInstituteUrl();
 
   const handleAddToWishlist = async () => {
-  try {
-    const userId = localStorage.getItem('userId');
-    const response = await addToWishlist(userId, institute._id, null, {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-access-token': localStorage.getItem('accessToken'),
-      'x-refresh-token': localStorage.getItem('refreshToken')  }
-    }); // Assuming courseId is null for now
-    if (response.message.includes('removed')) {
-    setIsWishlisted(false);
-    } else if (response.message.includes('added')) {
-    setIsWishlisted(true);
+    try {
+      const userId = localStorage.getItem('userId');
+      const response = await addToWishlist(userId, institute._id, null, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': localStorage.getItem('accessToken'),
+          'x-refresh-token': localStorage.getItem('refreshToken')
+        }
+      }); // Assuming courseId is null for now
+      if (response.message.includes('removed')) {
+        setIsWishlisted(false);
+      } else if (response.message.includes('added')) {
+        setIsWishlisted(true);
+      }
+    } catch (error) {
+      console.error('Error adding to wishlist:', error);
     }
-  } catch (error) {
-    console.error('Error adding to wishlist:', error);
-  }
   };
 
   const hasWishlistFeature = institute.plan?.features?.some(feature => feature.key === 'WishList' && feature.value === 'Yes');
 
-
   const overallRating = institute.reviews.length > 0 
-    ? institute?.reviews.reduce((sum, review) => sum + ( review.placementStars || 0) + 
-      ( review.campusLifeStars || 0) + 
-      ( review.facultyStars || 0) + 
+    ? institute?.reviews.reduce((sum, review) => sum + (review.placementStars || 0) + 
+      (review.campusLifeStars || 0) + 
+      (review.facultyStars || 0) + 
       (review.suggestionsStars || 0), 0) / (institute?.reviews.length * 4 || 1)
     : 0;
-console.log('h',isNaN(overallRating) ? 3 : overallRating)
-
+  console.log('h', isNaN(overallRating) ? 3 : overallRating);
 
   const handleDownloadBrochure = async () => {
     try {
@@ -103,14 +114,12 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
       toast.error("Failed to download brochure");
     }
   };
-  
-  
 
   return (
-    <div className="border rounded-lg shadow-md p-4 flex flex-col  space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2">
+    <div className="border rounded-lg shadow-md p-4 flex flex-col space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2">
       {/* Left Section - Image */}
       <div className="flex justify-between flex-col gap-3"></div>
-        <div className="flex justify-between flex-col md:flex-row gap-3">
+      <div className="flex justify-between flex-col md:flex-row gap-3">
         <div className="relative w-full md:w-2/6 !ml-0">
           <img
             src={institute.thumbnailImage ? `${Image}/${institute.thumbnailImage}` : serachBoximg}
@@ -139,11 +148,10 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
               </svg>
             </button>
           )}
-          
         </div>
 
         {/* Right Section - Details */}
-        <div className="w-full md:w-3/4 flex flex-col ">
+        <div className="w-full md:w-3/4 flex flex-col">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">{institute.instituteName}</h3>
           </div>
@@ -211,31 +219,29 @@ console.log('h',isNaN(overallRating) ? 3 : overallRating)
           <p className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{ __html: institute.about }} />
           <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">
             <div className="space-x-4">
-              {/* <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
-              <a href={`/institute/${institute._id}`} className="hover:underline">Admission</a>
-              <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a> */}
+              {/* Links updated below to use slug URLs */}
             </div>
           </div>
         </div>
-            </div>
-            <div className="flex space-x-4 justify-center md:justify-between gap-4 items-center  flex-wrap">
-            <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
-            <div className="space-x-4">
-              <a href={`/institute/${institute._id}`} className="hover:underline">Fees and Courses</a>
-              <a href={`/institute/${institute._id}`} className="hover:underline">Admission</a>
-              <a href={`/institute/${institute._id}`} className="hover:underline">Placement</a>
-            </div>
-          </div>
-             <div className="flex items-center flex-wrap gap-4">
-             <button className="bg-red-600 text-white px-4 py-2 rounded-lg" onClick={handleDownloadBrochure}>
-                Download Brochure
-              </button>
-              <CustomButton to={`/institute/${institute._id}`} className='!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md ' text='View more'>
-                View more
-              </CustomButton>
-             </div>
+      </div>
+      <div className="flex space-x-4 justify-center md:justify-between gap-4 items-center flex-wrap">
+        <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
+          <div className="space-x-4">
+            <Link to={`${instituteUrl}`} className="hover:underline">Fees and Courses</Link>
+            <Link to={`${instituteUrl}`} className="hover:underline">Admission</Link>
+            <Link to={`${instituteUrl}`} className="hover:underline">Placement</Link>
           </div>
         </div>
+        <div className="flex items-center flex-wrap gap-4">
+          <button className="bg-red-600 text-white px-4 py-2 rounded-lg" onClick={handleDownloadBrochure}>
+            Download Brochure
+          </button>
+          <CustomButton to={instituteUrl} className='!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md ' text='View more'>
+            View more
+          </CustomButton>
+        </div>
+      </div>
+    </div>
   );
 };
 

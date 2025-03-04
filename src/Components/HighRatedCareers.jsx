@@ -13,8 +13,18 @@ const HighRatedCareers = () => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
 
-  const Images=import.meta.env.VITE_IMAGE_BASE_URL;
+  const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
+  // Initialize careerIdMap from localStorage
+  useEffect(() => {
+    try {
+      const storedCareerIdMap = JSON.parse(localStorage.getItem('careerIdMap') || '{}');
+      window.careerIdMap = storedCareerIdMap;
+    } catch (error) {
+      console.error('Error loading careerIdMap from localStorage:', error);
+      window.careerIdMap = {};
+    }
+  }, []);
 
   const handleShareClick = (e, blog) => {
     e.preventDefault(); // Prevent the Link navigation
@@ -30,15 +40,33 @@ const HighRatedCareers = () => {
       onSuccess: async (data) => {
         const { result } = data?.data || {}; // safely access result
         if (result) {
+          // Update careerIdMap
+          const careerIdMap = { ...window.careerIdMap };
+          
+          result.forEach(blog => {
+            if (blog.slug) {
+              careerIdMap[blog.slug] = blog._id;
+            }
+          });
+          
+          // Save to window and localStorage
+          window.careerIdMap = careerIdMap;
+          localStorage.setItem('careerIdMap', JSON.stringify(careerIdMap));
+          
           setContent(result); // update content if result is not null or undefined
 
           // Fetch images for each career
           const imagePromises = result.map(async (career) => {
             if (career.thumbnail) {
-              const imageResponse = await fetch(`${Images}/${career.thumbnail}`);
-              const imageBlob = await imageResponse.blob();
-              const imageObjectURL = URL.createObjectURL(imageBlob);
-              return { id: career._id, url: imageObjectURL };
+              try {
+                const imageResponse = await fetch(`${Images}/${career.thumbnail}`);
+                const imageBlob = await imageResponse.blob();
+                const imageObjectURL = URL.createObjectURL(imageBlob);
+                return { id: career._id, url: imageObjectURL };
+              } catch (error) {
+                console.error(`Error fetching image for career ${career._id}:`, error);
+                return { id: career._id, url: cardPhoto };
+              }
             }
             return { id: career._id, url: cardPhoto };
           });
@@ -58,7 +86,9 @@ const HighRatedCareers = () => {
     // Cleanup function to revoke object URLs
     return () => {
       Object.values(images).forEach((url) => {
-        URL.revokeObjectURL(url);
+        if (url !== cardPhoto) {  // Don't revoke static images
+          URL.revokeObjectURL(url);
+        }
       });
     };
   }, [images]);
@@ -84,7 +114,7 @@ const HighRatedCareers = () => {
 
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
         {(content && content.length > 0) ? content.map((box, index) => (
-          <Link to={`/detailpage/${box._id}`} key={index} className="box lg:max-w-[450px] shadow-lg">
+          <Link to={`/detailpage/${box.slug}`} key={index} className="box lg:max-w-[450px] shadow-lg">
             <div className="imageContainer">
               <img className='h-full w-full object-cover' src={images[box._id] || cardPhoto} alt="boxphoto" />
             </div>
@@ -95,38 +125,33 @@ const HighRatedCareers = () => {
 
               <p className='text-sm mt-2' dangerouslySetInnerHTML={{ __html: box?.description?.slice(0, 80) + "..." || "No description available" }}></p>
               <div className='flex items-center justify-between px-4 w-full mt-2'>
-                      {box.views && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="22"
-                            height="22"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                          </svg>
-                          <span className='text-gray-500'>{box.views}</span>
-                      
-                        </div>
-                        
-
-                        
-                      )}
-                      <div className='flex items-center gap-2 text-gray-600' onClick={handleShareClick}>
-                          <SocialShare 
-        title={career.title} 
-        url={`${window.location.origin}/detailpage/${career._id}`}
-        contentType="career"
-      />
-      </div>
-                    
-                    </div>
+                {box.views && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span className='text-gray-500'>{box.views}</span>
+                  </div>
+                )}
+                <div className='flex items-center gap-2 text-gray-600' onClick={(e) => handleShareClick(e, box)}>
+                  <SocialShare 
+                    title={box.title} 
+                    url={`${window.location.origin}/detailpage/${box.slug}`}
+                    contentType="career"
+                  />
+                </div>
+              </div>
             </div>
           </Link>
         )) : <div className="w-full text-center">No careers available at the moment.</div>}

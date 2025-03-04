@@ -62,8 +62,12 @@ const App = () => {
           <Route path="/" element={<Homepage />} />
           <Route path="*" element={<PageNotFound />} />
           <Route path="/institute/:id" element={<Instituepage />} />
+          <Route path="/institute/:slug" element={<Instituepage />} />
+
           <Route path="/searchpage" element={<SearchPage />} />
           <Route path="/coursesinfopage/:id" element={<Coursesinfopage />} />
+          <Route path="/coursesinfopage/:slug" element={<Coursesinfopage />} />
+
           <Route path="/blogpage" element={<Blogpage />} />
           <Route path="/contactuspage" element={<Contactuspage />} />
           <Route path="/popularcourses" element={<PopularCourses />} />
@@ -74,7 +78,10 @@ const App = () => {
           <Route path="/counselling/:email" element={<Counselling />} />
           <Route path="/careerspage" element={<Careerspage />} />
           <Route path="/blogdetailpage/:id" element={<BlogDetailPage />} />
+          <Route path="/blogdetailpage/:slug" element={<BlogDetailPage />} />
           <Route path="/detailpage/:id" element={<Detailpage />} />
+          <Route path="/detailpage/:slug" element={<Detailpage />} />
+
           <Route path="/writereview" element={<Writereview />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -85,6 +92,7 @@ const App = () => {
           <Route path='/counselor' element={<Counselor />}></Route>
             <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/news" element={<NewsPage />} />
+          <Route path='/blog/:slug' element={<BlogDetailPage/>}></Route>
 
            {/* Protected Dashboard Routes */}
           <Route

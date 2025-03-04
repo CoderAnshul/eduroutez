@@ -43,8 +43,6 @@ const Careerspage = () => {
     { enabled: true }
   );
 
-
-
   const handleShareClick = (e, blog) => {
     e.preventDefault(); // Prevent the Link navigation
     e.stopPropagation(); // Stop event from bubbling up
@@ -219,7 +217,7 @@ const Careerspage = () => {
             {filteredData.map((career) => (
               <Link
                 key={career._id}
-                to={`/detailpage/${career._id}`}
+                to={`/detailpage/${career.slug || career._id}`}
                 className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer
                                 max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
               >
@@ -248,7 +246,7 @@ const Careerspage = () => {
                     }}
                   />
 
-<div className='flex items-center gap-2 text-gray-600'>
+                  <div className='flex items-center gap-2 text-gray-600'>
                       {career.views && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <svg
@@ -287,17 +285,17 @@ const Careerspage = () => {
                           <span className=''>{career.likes.length>0 && career.likes.length}</span>
                         </div>
                       )}
-                       <div onClick={handleShareClick}>
-      <SocialShare 
-        title={career.title} 
-        url={`${window.location.origin}/detailpage/${career._id}`}
-        contentType="career"
-      />
-    </div>
+                       <div onClick={(e) => handleShareClick(e, career)}>
+                        <SocialShare 
+                          title={career.title} 
+                          url={`${window.location.origin}/detailpage/${career.slug || career._id}`}
+                          contentType="career"
+                        />
+                      </div>
                     </div>
 
                   <div className="inline-block !mx-auto !mt-2">
-                    <CustomButton text="View More" to={`/detailpage/${career._id}`} />
+                    <CustomButton text="View More" to={`/detailpage/${career.slug || career._id}`} />
                   </div>
                 </div>
               </Link>

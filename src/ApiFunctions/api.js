@@ -47,6 +47,7 @@ export const addToWishlist = async (userId, instituteId) => {
 
 export const blogById = async (id) => {
   try {
+    console.log("iythgvbd", id);
     var count=0;
     console.log("id", count++);
     const response = await axios.get(`${baseURL}/blog/${id}`);
@@ -168,7 +169,7 @@ export const getBlogs = async () => {
     const response = await axios.get(`${baseURL}/blogs?sort={"createdAt":"desc"}`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching blogs `, error);
+    console.error(`Error fetching blogs `, error.message);
     throw error;
   }
 };
@@ -278,6 +279,7 @@ export const allbestRatedInstitute = async () => {
 
 export const trendingInstitute = async () => {
   try {
+    console.log("trendingInstitute",`${baseURL}/institutes?filters={"isTrending":true}&limit=3`);
     const response = await axios.get(
       `${baseURL}/institutes?filters={"isTrending":true}&limit=3`
     );

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import downArrow from '../assets/Images/downArrow.png';
-import axiosInstance from '../ApiFunctions/axios'
+import axiosInstance from '../ApiFunctions/axios';
+
+// Import or create the courseIdMap for reference
+// You can either import from the PopularCourses component or recreate it here
+const courseIdMap = {};
 
 const SubNavbar = ({ categories }) => {
   const [activeContent, setActiveContent] = useState({});
@@ -19,6 +23,22 @@ const SubNavbar = ({ categories }) => {
           `${import.meta.env.VITE_BASE_URL}/courses?filters={"isCoursePopular":true}`
         );
         setPopularCourses(response.data?.data);
+        
+        // Create slug mappings for courses
+        if (response.data?.data?.result) {
+          response.data.data.result.forEach(course => {
+            if (course.courseTitle) {
+              // Create slug from course title
+              const slug = getCourseSlug(course);
+              
+              // Store mapping
+              courseIdMap[slug] = course._id;
+            }
+          });
+          
+          // Update global map and localStorage
+          updateGlobalMap();
+        }
       } catch (error) {
         console.error('Error fetching popular courses:', error);
       }
@@ -34,12 +54,13 @@ const SubNavbar = ({ categories }) => {
         console.error('Error fetching careers:', error);
       }
     };
+    
     const fetchLatestNews = async () => {
       try {
         const response = await axiosInstance.get(
           `${import.meta.env.VITE_BASE_URL}/news/superadmin`
         );
-        console.log('news',response.data);
+        console.log('news', response.data);
         setLatestNews(response.data?.data || []);
       } catch (error) {
         console.error('Error fetching latest news:', error);
@@ -50,6 +71,58 @@ const SubNavbar = ({ categories }) => {
     fetchCareers();
     fetchLatestNews();
   }, []);
+
+  // Helper function to update global map and localStorage
+  const updateGlobalMap = () => {
+    // Make the mapping available globally
+    window.courseIdMap = {
+      ...window.courseIdMap,
+      ...courseIdMap
+    };
+    
+    // Get existing mappings from localStorage and merge
+    const existingMap = JSON.parse(localStorage.getItem('courseIdMap') || '{}');
+    localStorage.setItem('courseIdMap', JSON.stringify({
+      ...existingMap,
+      ...courseIdMap
+    }));
+  };
+
+  // Helper function to get the slug for a course
+  const getCourseSlug = (course) => {
+    if (!course?.courseTitle) return course?._id;
+    
+    return course.courseTitle
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
+
+  // Helper function to get the slug for a career
+  const getCareerSlug = (career) => {
+    if (!career?.title) return career?._id;
+    
+    return career.title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
+
+  // Helper function to get the slug for a news item
+  const getNewsSlug = (news) => {
+    if (!news?.title) return news?._id;
+    
+    return news.title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
 
   const handleMouseEnter = (category, event) => {
     const boundingBox = event.target.getBoundingClientRect();
@@ -68,7 +141,7 @@ const SubNavbar = ({ categories }) => {
 
     setHoveredCategory(category.label);
 
-    if (category.label !== 'Courses' && category.label !== 'Careers' && category.label !== 'Latest Updates' &&  category.sidebarItems?.length > 0) {
+    if (category.label !== 'Courses' && category.label !== 'Careers' && category.label !== 'Latest Updates' && category.sidebarItems?.length > 0) {
       const firstItemId = category.sidebarItems[0].id;
       setActiveContent((prev) => ({
         ...prev,
@@ -89,20 +162,24 @@ const SubNavbar = ({ categories }) => {
     setHoveredCategory(null);
     setDropdownAlignment('');
   };
+  
   const handleViewAllNews = () => {
     navigate('/news');  // Adjust the route as needed
   };
 
-  const handleCourseClick = (courseId) => {
-    navigate(`/coursesinfopage/${courseId}`);
+  const handleCourseClick = (course) => {
+    const courseSlug = getCourseSlug(course);
+    navigate(`/coursesinfopage/${courseSlug}`);
   };
 
-  const handleCareerClick = (careerId) => {
-    navigate(`/detailpage/${careerId}`);
+  const handleCareerClick = (career) => {
+    const careerSlug = getCareerSlug(career);
+    navigate(`/detailpage/${careerSlug}`);
   };
 
-  const handleNewsClick = (newsId) => {
-    navigate(`/news/${newsId}`);
+  const handleNewsClick = (news) => {
+    const newsSlug = getNewsSlug(news);
+    navigate(`/news/${newsSlug}`);
   };
 
   const renderCoursesContent = () => (
@@ -114,7 +191,7 @@ const SubNavbar = ({ categories }) => {
             {popularCourses?.result?.map((course) => (
               <a
                 key={course._id}
-                onClick={() => handleCourseClick(course._id)}
+                onClick={() => handleCourseClick(course)}
                 className="text-sm hover:text-red-500 cursor-pointer truncate"
               >
                 {course.courseTitle}
@@ -143,7 +220,7 @@ const SubNavbar = ({ categories }) => {
             {careers?.result?.map((career) => (
               <a
                 key={career._id}
-                onClick={() => handleCareerClick(career._id)}
+                onClick={() => handleCareerClick(career)}
                 className="text-sm hover:text-red-500 cursor-pointer truncate"
               >
                 {career.title}
@@ -163,56 +240,54 @@ const SubNavbar = ({ categories }) => {
     </div>
   );
 
-
   const renderNewsContent = () => (
-    <div className="bg-white rounded-xl shadow-lg ">
+    <div className="bg-white rounded-xl shadow-lg">
       <div className="p-4 border-b bg-gradient-to-r from-orange-500 to-red-600">
         <h3 className="text-lg font-bold text-white">Latest Updates</h3>
       </div>
   
       <div className="p-4">
         <ul className="grid grid-cols-3 gap-8">
-        {latestNews
-  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-  .slice(0, 3)
-  .map((news) => (
-    <li
-      key={news._id}
-      onClick={() => handleNewsClick(news._id)}
-      className="group hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
-    >
-      <div className="space-y-3">
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-gray-900 line-clamp-2">
-            {news.title}
-          </p>
-          <p className="text-xs text-orange-600">
-            {new Date(news.createdAt).toDateString()}
-          </p>
-        </div>
+          {latestNews
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 3)
+            .map((news) => (
+              <li
+                key={news._id}
+                onClick={() => handleNewsClick(news)}
+                className="group hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
+              >
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-gray-900 line-clamp-2">
+                      {news.title}
+                    </p>
+                    <p className="text-xs text-orange-600">
+                      {new Date(news.createdAt).toDateString()}
+                    </p>
+                  </div>
 
-        <div>
-          <img
-            src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${news.image}`}
-            alt={news.title}
-            className="w-full h-48 object-cover rounded-lg"
-          />
-        </div>
+                  <div>
+                    <img
+                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${news.image}`}
+                      alt={news.title}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                  </div>
 
-        <p className="text-sm text-gray-600 line-clamp-3">
-          {news.description}
-        </p>
-      </div>
-    </li>
-))}
-
+                  <p className="text-sm text-gray-600 line-clamp-3">
+                    {news.description}
+                  </p>
+                </div>
+              </li>
+            ))}
         </ul>
       </div>
   
       <div className="p-4 border-t bg-gray-50">
         <button
           onClick={handleViewAllNews}
-          className=" flex items-center justify-center gap-2 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
+          className="flex items-center justify-center gap-2 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
         >
           View All Updates
           <svg
@@ -232,7 +307,6 @@ const SubNavbar = ({ categories }) => {
       </div>
     </div>
   );
-
 
   const renderMoreContent = () => (
     <div className="bg-white rounded-lg shadow-lg p-6 min-w-[600px]">
@@ -296,7 +370,6 @@ const SubNavbar = ({ categories }) => {
       </div>
     </div>
   );
-  
 
   const renderRegularContent = (category) => (
     <div className="flex">
@@ -406,4 +479,6 @@ const SubNavbar = ({ categories }) => {
   );
 };
 
+// Export the courseIdMap for potential use in other components
+export { courseIdMap };
 export default SubNavbar;

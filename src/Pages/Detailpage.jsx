@@ -1,17 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import DOMPurify from 'dompurify';
 import { CarrerDetail } from "../ApiFunctions/api";
 import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import BlogComponent from "../Components/BlogComponent";
+import axiosInstance from "../ApiFunctions/axios";
 
 const DetailPage = () => {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
-  const { id } = useParams();
+  const { id } = useParams();  // This can be either ID or slug
+  const navigate = useNavigate();
 
   const tabConfig = [
     { id: "overview", name: "Overview", titleRef: useRef(null) },
@@ -21,10 +23,78 @@ const DetailPage = () => {
     { id: "topColleges", name: "Top Colleges", titleRef: useRef(null) }
   ];
 
+  // Initialize careerIdMap from localStorage
+  useEffect(() => {
+    if (!window.careerIdMap) {
+      try {
+        const storedCareerIdMap = JSON.parse(localStorage.getItem('careerIdMap') || '{}');
+        window.careerIdMap = storedCareerIdMap;
+      } catch (error) {
+        console.error('Error initializing careerIdMap:', error);
+        window.careerIdMap = {};
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const fetchCareer = async () => {
       try {
-        const response = await CarrerDetail(id);
+        // Determine if we're dealing with an ID or a slug
+        const isSlug = isNaN(parseInt(id)) || id.includes('-');
+        
+        // Initialize variables for API response and career ID
+        let response;
+        let careerId = id;
+        
+        if (isSlug) {
+          // Try to get the ID from careerIdMap
+          const mappedId = window.careerIdMap?.[id];
+          
+          if (mappedId) {
+            // We found the ID in the map, use it
+            careerId = mappedId;
+            response = await CarrerDetail(careerId);
+          } else {
+            // If careerIdMap doesn't have the slug, get the career by slug through a custom API call
+            try {
+              response = await axiosInstance.get(`/api/v1/career/by-slug/${id}`);
+              
+              // If we got a response, grab the ID for future use
+              if (response && response.data) {
+                careerId = response.data._id;
+                
+                // Save this slug -> ID mapping to both window and localStorage
+                window.careerIdMap = window.careerIdMap || {};
+                window.careerIdMap[id] = careerId;
+                localStorage.setItem('careerIdMap', JSON.stringify(window.careerIdMap));
+                console.log(`Saved mapping: ${id} -> ${careerId} in localStorage`);
+              }
+            } catch (slugError) {
+              console.error('Error fetching career by slug:', slugError);
+              
+              // As a final fallback, try using the career ID API
+              response = await CarrerDetail(id);
+            }
+          }
+        } else {
+          // It's an ID, use it directly
+          response = await CarrerDetail(careerId);
+          
+          // If the career has a slug, we should save that mapping too
+          if (response && response.data && response.data.slug) {
+            const slug = response.data.slug;
+            window.careerIdMap = window.careerIdMap || {};
+            window.careerIdMap[slug] = careerId;
+            localStorage.setItem('careerIdMap', JSON.stringify(window.careerIdMap));
+            console.log(`Saved mapping: ${slug} -> ${careerId} in localStorage`);
+          }
+        }
+
+        if (!response || !response.data) {
+          console.error('No career data found');
+          return;
+        }
+        
         setData(response.data);
       } catch (error) {
         console.error("Error fetching career:", error);

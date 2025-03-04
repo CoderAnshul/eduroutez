@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import agricultureImg from '../assets/Images/agriculture.jpg';
 import BlogCard from '../Ui components/BlogCard';
 import CustomButton from '../Ui components/CustomButton';
-import { getBlogs, blogById } from '../ApiFunctions/api'; // Import blogById
+import { getBlogs, blogById } from '../ApiFunctions/api';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import SocialShare from './SocialShare';
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+
+// In-memory mapping to store blog IDs by slug
+const blogIdMap = {};
 
 const BlogComponent = () => {
   const [content, setContent] = useState([]);
@@ -21,9 +24,20 @@ const BlogComponent = () => {
     {
       enabled: true,
       onSuccess: (data) => {
-        console.log("Received data:", data); // Check the response structure
-        const blogs = data?.data?.result || []; // Directly access the data array
-        setContent(blogs); // Set the blogs directly
+        console.log("Received data:", data);
+        const blogs = data?.data?.result || [];
+        
+        // Store the ID mapping for each blog using the slug from backend
+        blogs.forEach(blog => {
+          if (blog.slug) {
+            blogIdMap[blog.slug] = blog._id;
+          }
+        });
+        
+        // Make the mapping available globally
+        window.blogIdMap = blogIdMap;
+        
+        setContent(blogs);
       }
     }
   );
@@ -69,9 +83,8 @@ const BlogComponent = () => {
 
   // Handle share click to prevent navigation
   const handleShareClick = (e, blog) => {
-    e.preventDefault(); // Prevent the Link navigation
-    e.stopPropagation(); // Stop event from bubbling up
-    // Any additional share handling logic can go here
+    e.preventDefault();
+    e.stopPropagation();
   };
 
   return (
@@ -92,7 +105,7 @@ const BlogComponent = () => {
           content.slice(0, 3).map((blog, index) => (
             <div key={index} className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl relative">
               {/* Image and main content wrapped in Link */}
-              <Link to={`/blogdetailpage/${blog._id}`} className="block">
+              <Link to={`/blogdetailpage/${blog.slug}`} className="block">
                 {/* Image */}
                 <div className="h-56 min-h-56 max-h-56 w-full overflow-hidden">
                   <img
@@ -151,25 +164,22 @@ const BlogComponent = () => {
                     </div>
                   </div>
                   <div className="mt-4">
-  <div className="flex justify-between items-center text-gray-600">
-    <button className="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
-      Read More
-    </button>
-    {/* Social Share component */}
-    <div onClick={handleShareClick}>
-      <SocialShare 
-        title={blog.title} 
-        url={`${window.location.origin}/blogdetailpage/${blog._id}`}
-        contentType="blog"
-      />
-    </div>
-  </div>
-</div>
-
+                    <div className="flex justify-between items-center text-gray-600">
+                      <button className="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
+                        Read More
+                      </button>
+                      {/* Social Share component */}
+                      <div onClick={(e) => handleShareClick(e, blog)}>
+                        <SocialShare 
+                          title={blog.title} 
+                          url={`${window.location.origin}/blogdetailpage/${blog.slug}`}
+                          contentType="blog"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </Link>
-              
-             
             </div>
           ))
         ) : (
@@ -180,4 +190,6 @@ const BlogComponent = () => {
   );
 };
 
+// Export the ID mapping for use in other components
+export { blogIdMap };
 export default BlogComponent;

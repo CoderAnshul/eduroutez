@@ -2,6 +2,66 @@ import React, { useState, useEffect } from "react";
 import CourseCard from "../Ui components/CourseCard";
 import { Link } from "react-router-dom";
 
+// In-memory mapping to store course IDs by slug
+const courseIdMap = {};
+
+const TabNavigation = ({ tabs, activeTab, handleTabClick }) => (
+  <div className="flex border-b border-gray-200 mb-6 max-w-fit">
+    {tabs.map((tab) => (
+      <button
+        key={tab}
+        onClick={() => handleTabClick(tab)}
+        className={`text-center w-full max-w-[130px] whitespace-nowrap flex-1 transform transition-all active:scale-90 py-2 px-[2vw] text-sm font-medium border-b-[3px] ${
+          activeTab === tab
+            ? "border-black text-black"
+            : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"
+        }`}
+      >
+        {tab}
+      </button>
+    ))}
+  </div>
+);
+
+const CourseList = ({ filteredCourses, visibleCourses, getCourseSlug }) => (
+  <div
+    className="flex flex-wrap w-full sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    style={{
+      transition: "height 0.5s ease-in-out",
+      height: "auto",
+    }}
+  >
+    {filteredCourses.slice(0, visibleCourses).map((course) => (
+      <Link 
+        to={`/coursesinfopage/${getCourseSlug(course)}`} 
+        key={course._id} 
+        className="flex-1 w-full max-w-sm"
+      >
+        <CourseCard course={course} />
+      </Link>
+    ))}
+  </div>
+);
+
+const ToggleButton = ({ isExpanded, handleToggleVisibility }) => (
+  <div className="flex justify-center mt-4">
+    <button
+      onClick={handleToggleVisibility}
+      className="flex items-center justify-center text-sm text-gray-500 hover:text-black"
+    >
+      {isExpanded ? (
+        <>
+          See Less <span className="ml-2">↑</span>
+        </>
+      ) : (
+        <>
+          See More <span className="ml-2">↓</span>
+        </>
+      )}
+    </button>
+  </div>
+);
+
 const InstituteCourses = ({ instituteData }) => {
   const [activeTab, setActiveTab] = useState("All");
   const [filteredCourses, setFilteredCourses] = useState([]);
@@ -13,8 +73,49 @@ const InstituteCourses = ({ instituteData }) => {
   useEffect(() => {
     if (instituteData?.data?.courses?.length) {
       setFilteredCourses(instituteData.data.courses);
+      
+      // Initialize the courseIdMap with the courses from this institute
+      instituteData.data.courses.forEach(course => {
+        if (course.courseTitle) {
+          // Create slug from course title
+          const slug = course.courseTitle
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
+          
+          // Store mapping
+          courseIdMap[slug] = course._id;
+        }
+      });
+      
+      // Make the mapping available globally and in localStorage
+      window.courseIdMap = {
+        ...window.courseIdMap,
+        ...courseIdMap
+      };
+      
+      // Get existing mappings from localStorage and merge
+      const existingMap = JSON.parse(localStorage.getItem('courseIdMap') || '{}');
+      localStorage.setItem('courseIdMap', JSON.stringify({
+        ...existingMap,
+        ...courseIdMap
+      }));
     }
   }, [instituteData]);
+
+  // Helper function to get the slug for a course
+  const getCourseSlug = (course) => {
+    if (!course?.courseTitle) return course?._id;
+    
+    return course.courseTitle
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -26,20 +127,19 @@ const InstituteCourses = ({ instituteData }) => {
       );
       setFilteredCourses(filtered);
     }
-    setVisibleCourses(6); // Reset visible courses on tab change
-    setIsExpanded(false); // Reset to "See More"
+    setVisibleCourses(6);
+    setIsExpanded(false);
   };
 
   const handleToggleVisibility = () => {
     if (isExpanded) {
-      setVisibleCourses(6); // Show only initial 6 courses
+      setVisibleCourses(6);
     } else {
-      setVisibleCourses(filteredCourses.length); // Show all courses
+      setVisibleCourses(filteredCourses.length);
     }
-    setIsExpanded(!isExpanded); // Toggle "See More" / "See Less"
+    setIsExpanded(!isExpanded);
   };
 
-  // Conditional rendering: return null if no courses available
   if (!instituteData?.data?.courses?.length) {
     return null;
   }
@@ -49,58 +149,20 @@ const InstituteCourses = ({ instituteData }) => {
       <h3 className="text-xl font-bold mb-4">Top Courses, Fees & Eligibility</h3>
 
       <div className="w-full">
-        {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 mb-6 max-w-fit">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => handleTabClick(tab)}
-              className={`text-center w-full max-w-[130px] whitespace-nowrap flex-1 transform transition-all active:scale-90 py-2 px-[2vw] text-sm font-medium border-b-[3px] ${
-                activeTab === tab
-                  ? "border-black text-black"
-                  : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab Content */}
+        <TabNavigation tabs={tabs} activeTab={activeTab} handleTabClick={handleTabClick} />
         <div className="w-full border-2 p-3 rounded-xl max-h-fit transition-all">
-          <div
-            className="flex flex-wrap w-full sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-            style={{
-              transition: "height 0.5s ease-in-out", // Apply smooth height transition
-              height: isExpanded ? "auto" : "auto", // Allow auto height when expanded
-            }}
-          >
-            {filteredCourses.slice(0, visibleCourses).map((course) => (
-              <Link to={`/coursesinfopage/${course._id}`} key={course._id} className="flex-1 w-full max-w-sm">
-                <CourseCard course={course} />
-              </Link>
-            ))}
-          </div>
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={handleToggleVisibility}
-              className="flex items-center justify-center text-sm text-gray-500 hover:text-black"
-            >
-              {isExpanded ? (
-                <>
-                  See Less <span className="ml-2">↑</span>
-                </>
-              ) : (
-                <>
-                  See More <span className="ml-2">↓</span>
-                </>
-              )}
-            </button>
-          </div>
+          <CourseList 
+            filteredCourses={filteredCourses} 
+            visibleCourses={visibleCourses} 
+            getCourseSlug={getCourseSlug}
+          />
+          <ToggleButton isExpanded={isExpanded} handleToggleVisibility={handleToggleVisibility} />
         </div>
       </div>
     </div>
   );
 };
 
+// Export the ID mapping for use in other components
+export { courseIdMap };
 export default InstituteCourses;

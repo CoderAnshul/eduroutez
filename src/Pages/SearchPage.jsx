@@ -29,6 +29,44 @@ const SearchPage = () => {
   const baseURL = import.meta.env.VITE_BASE_URL;
   const streamFromUrl = searchParams.get('stream');
 
+  // Initialize window.instituteIdMap from localStorage on component mount
+  useEffect(() => {
+    if (!window.instituteIdMap) {
+      try {
+        const storedInstituteIdMap = JSON.parse(localStorage.getItem('instituteIdMap') || '{}');
+        window.instituteIdMap = storedInstituteIdMap;
+      } catch (error) {
+        console.error('Error loading instituteIdMap from localStorage:', error);
+        window.instituteIdMap = {};
+      }
+    }
+  }, []);
+
+  // Batch update the ID mapping when data arrives
+  const updateIdMapping = (institutes) => {
+    let hasChanges = false;
+    
+    institutes.forEach(institute => {
+      if (institute.slug && institute._id && !window.instituteIdMap[institute.slug]) {
+        window.instituteIdMap[institute.slug] = institute._id;
+        hasChanges = true;
+      }
+    });
+    
+    // Only update localStorage if there are actual changes
+    if (hasChanges) {
+      localStorage.setItem('instituteIdMap', JSON.stringify(window.instituteIdMap));
+    }
+  };
+
+  // Helper function to get URL for display - consistent with other components
+  const getInstituteUrl = (institute) => {
+    // Prefer slugs for SEO, fall back to IDs
+    return institute?.slug 
+      ? `/institute/${institute.slug}`
+      : `/institute/${institute?._id}`;
+  };
+
   const { data: streamsData } = useQuery(
     ["streams"],
     async () => {
@@ -256,6 +294,11 @@ const SearchPage = () => {
         setContent(result);
         setFilteredContent(result);
         setTotalDocuments(totalDocuments);
+        
+        // Update ID mapping when data arrives
+        if (result && result.length > 0) {
+          updateIdMapping(result);
+        }
       }
     }
   );
@@ -286,9 +329,15 @@ const SearchPage = () => {
       const queryString = `filters=${encodeURIComponent(JSON.stringify(filters))}`;
       const response = await axios.get(`${baseURL}/institutes?${queryString}`);
       if (response.data) {
-        setContent(response.data.data.result);
-        setFilteredContent(response.data.data.result);
+        const institutes = response.data.data.result;
+        setContent(institutes);
+        setFilteredContent(institutes);
         setTotalDocuments(response.data.data.totalDocuments);
+        
+        // Update ID mapping when filtered data arrives
+        if (institutes && institutes.length > 0) {
+          updateIdMapping(institutes);
+        }
       }
     } catch (error) {
       console.error('Error fetching filtered institutes:', error);
@@ -311,7 +360,7 @@ const SearchPage = () => {
 
   return (
     <>
-                    <Promotions location="SEARCH_PAGE" className="h-[320px]"></Promotions>
+      <Promotions location="SEARCH_PAGE" className="h-[320px]"></Promotions>
 
       <div className="px-[4vw] pb-[2vw] flex flex-col items-start">
 
@@ -331,10 +380,14 @@ const SearchPage = () => {
                   <span className="font-semibold text-red-500">{totalDocuments || "0"}</span> Institutes Found
                 </div>
                 <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}>
-                <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px]"></Promotions>
-</div>                {filteredContent.map((institute, index) => (
-                  
-                  <SearchResultBox key={index} institute={institute} />
+                  <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px]"></Promotions>
+                </div>                
+                {filteredContent.map((institute, index) => (
+                  <SearchResultBox 
+                    key={index} 
+                    institute={institute} 
+                    url={getInstituteUrl(institute)}  // Pass the URL with slug support
+                  />
                 ))}
               </>
             ) : (
