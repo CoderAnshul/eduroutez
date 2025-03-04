@@ -36,6 +36,7 @@ const Coursesinfopage = () => {
 
   // Get current user ID from localStorage
   const currentUserId = localStorage.getItem('userId');
+  const baseURL = import.meta.env.VITE_BASE_URL;
 
   // Initialize courseIdMap from localStorage
   useEffect(() => {
@@ -77,7 +78,7 @@ const Coursesinfopage = () => {
             // If courseIdMap doesn't exist or doesn't have the slug,
             // we need to get the course directly by its slug through a custom API call
             try {
-              response = await axiosInstance.get(`http://localhost:4001/api/v1/course/by-slug/${id}`);
+              response = await axiosInstance.get(`${baseURL}/course/by-slug/${id}`);
               
               // If we got a response, grab the ID for future use
               if (response && response.data) {
@@ -149,7 +150,7 @@ const Coursesinfopage = () => {
       const courseId = courseData.data._id;
       
       // Call the like-dislike API
-      await axiosInstance.post('http://localhost:4001/api/v1/like-dislike', {
+      await axiosInstance.post(`${baseURL}/like-dislike`, {
         id: courseId,
         type: "course",
         like: likeValue

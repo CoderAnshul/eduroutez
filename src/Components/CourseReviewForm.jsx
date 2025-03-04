@@ -87,7 +87,7 @@ const CourseReviewSection = ({ course }) => {
         comment: comment
       };
 
-      const response = await fetch('http://localhost:4001/api/v1/submit-review', {
+      const response = await fetch(`${baseURL}/submit-review`, {
         method: 'POST',
         headers: {
          'Content-Type': 'application/json',

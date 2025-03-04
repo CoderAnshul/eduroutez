@@ -49,7 +49,7 @@ const TrendingInstitute = () => {
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
         console.log('Trending Institutes:', data);
-        const institutes = data.data || [];
+        const institutes = data.data?.result || [];
         setContent(institutes);
         
         // Update ID mapping

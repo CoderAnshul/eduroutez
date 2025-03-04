@@ -13,6 +13,8 @@ const BlogReviewForm = ({ blog }) => {
     
     // Get reviews directly from the blog object
     const reviews = blog.reviews || [];
+    const baseURL = import.meta.env.VITE_BASE_URL;
+
 
     // Get current user info
     const currentUserId = localStorage.getItem('userId');
@@ -35,7 +37,7 @@ const BlogReviewForm = ({ blog }) => {
         setError(null);
         
         try {
-            const response = await axiosInstance.post('http://localhost:4001/api/v1/submit-review', {
+            const response = await axiosInstance.post(`${baseURL}/submit-review`, {
                 type: "blog",
                 id: blog._id,
                 rating,

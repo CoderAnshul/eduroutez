@@ -21,6 +21,7 @@ const BlogDetailPage = () => {
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+  const baseURL = import.meta.env.VITE_BASE_URL;
 
   // Get current user ID from localStorage
   const currentUserId = localStorage.getItem('userId');
@@ -61,7 +62,7 @@ const BlogDetailPage = () => {
             // If blogIdMap doesn't exist or doesn't have the slug (like on refresh),
             // we need to get the blog directly by its slug through a custom API call
             try {
-              response = await axiosInstance.get(`http://localhost:4001/api/v1/blog/by-slug/${id}`);
+              response = await axiosInstance.get(`${baseURL}/blog/by-slug/${id}`);
               
               // If we got a response, grab the ID for future use
               if (response && response.data) {
@@ -166,7 +167,7 @@ const BlogDetailPage = () => {
       const blogId = data._id;
       
       // Call the like-dislike API
-      await axiosInstance.post('http://localhost:4001/api/v1/like-dislike', {
+      await axiosInstance.post(`${baseURL}/like-dislike`, {
         id: blogId,
         type: "blog",
         like: likeValue

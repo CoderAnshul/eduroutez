@@ -283,6 +283,7 @@ export const trendingInstitute = async () => {
     const response = await axios.get(
       `${baseURL}/institutes?filters={"isTrending":true}&limit=3`
     );
+    console.log('tred',response.data);
     return response.data;
 
     // return response.data;
