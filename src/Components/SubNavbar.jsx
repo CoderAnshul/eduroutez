@@ -14,6 +14,10 @@ const SubNavbar = ({ categories }) => {
   const [popularCourses, setPopularCourses] = useState([]);
   const [careers, setCareers] = useState([]);
   const [latestNews, setLatestNews] = useState([]);
+  const [popularInstitutes, setPopularInstitutes] = useState({});
+  const [recentInstitutes, setRecentInstitutes] = useState({});
+  const [topColleges, setTopColleges] = useState([]);
+  const [recentColleges, setRecentColleges] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,9 +71,28 @@ const SubNavbar = ({ categories }) => {
       }
     };
 
+    const fetchTopColleges = async () => {
+      try {
+        // Fetch popular colleges (sorted by views)
+        const popularResponse = await axiosInstance.get(
+          `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"views":"desc"}&page=1&limit=10`
+        );
+        setTopColleges(popularResponse.data?.data?.result || []);
+        
+        // Fetch recent colleges (sorted by createdAt)
+        const recentResponse = await axiosInstance.get(
+          `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"createdAt":"desc"}&page=1&limit=10`
+        );
+        setRecentColleges(recentResponse.data?.data?.result || []);
+      } catch (error) {
+        console.error('Error fetching colleges:', error);
+      }
+    };
+
     fetchPopularCourses();
     fetchCareers();
     fetchLatestNews();
+    fetchTopColleges();
   }, []);
 
   // Helper function to update global map and localStorage
@@ -124,7 +147,54 @@ const SubNavbar = ({ categories }) => {
       .trim();
   };
 
-  const handleMouseEnter = (category, event) => {
+  // Function to fetch institutes by stream with different sorting
+  const fetchInstitutesByStream = async (streamName) => {
+    try {
+      // Fetch popular institutes (sorted by views)
+      const popularResponse = await axiosInstance.get(
+        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"views":"desc"}&page=1&limit=10&filters={"streams":["${streamName}"]}`
+      );
+      
+      // Fetch recent institutes (sorted by createdAt)
+      const recentResponse = await axiosInstance.get(
+        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"createdAt":"desc"}&page=1&limit=10&filters={"streams":["${streamName}"]}`
+      );
+      
+      return {
+        popular: popularResponse.data?.data,
+        recent: recentResponse.data?.data
+      };
+    } catch (error) {
+      console.error(`Error fetching institutes for ${streamName}:`, error);
+      return null;
+    }
+  };
+
+  // Function to handle stream click or hover
+  const handleStreamInteraction = async (streamName) => {
+    // Check if we already have data for this stream
+    if (!popularInstitutes[streamName] || !recentInstitutes[streamName]) {
+      const result = await fetchInstitutesByStream(streamName);
+      
+      if (result) {
+        if (result.popular) {
+          setPopularInstitutes(prev => ({
+            ...prev,
+            [streamName]: result.popular
+          }));
+        }
+        
+        if (result.recent) {
+          setRecentInstitutes(prev => ({
+            ...prev,
+            [streamName]: result.recent
+          }));
+        }
+      }
+    }
+  };
+
+  const handleMouseEnter = async (category, event) => {
     const boundingBox = event.target.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const categoryWidth = boundingBox.width;
@@ -141,12 +211,30 @@ const SubNavbar = ({ categories }) => {
 
     setHoveredCategory(category.label);
 
-    if (category.label !== 'Courses' && category.label !== 'Careers' && category.label !== 'Latest Updates' && category.sidebarItems?.length > 0) {
+    if (category.label !== 'Courses' && category.label !== 'Careers' && category.label !== 'Latest Updates' && category.label !== 'Top Colleges' && category.sidebarItems?.length > 0) {
       const firstItemId = category.sidebarItems[0].id;
       setActiveContent((prev) => ({
         ...prev,
         [category.label]: firstItemId,
       }));
+      
+      // If this is a stream category, fetch institutes
+      if (category.label === 'Colleges' || category.label === 'Exams') {
+        const streamName = category.sidebarItems[0].name;
+        handleStreamInteraction(streamName);
+      }
+    }
+  };
+
+  const handleSidebarItemClick = async (category, itemId, itemName) => {
+    setActiveContent(prev => ({
+      ...prev,
+      [category.label]: itemId
+    }));
+    
+    // If this is a stream, fetch popular institutes
+    if (category.label === 'Colleges' || category.label === 'Exams') {
+      handleStreamInteraction(itemName);
     }
   };
 
@@ -156,6 +244,10 @@ const SubNavbar = ({ categories }) => {
 
   const handleViewAllCareers = () => {
     navigate('/careerspage');
+  };
+
+  const handleViewAllColleges = () => {
+    navigate('/topcolleges');
   };
 
   const handleMouseLeave = () => {
@@ -180,6 +272,10 @@ const SubNavbar = ({ categories }) => {
   const handleNewsClick = (news) => {
     const newsSlug = getNewsSlug(news);
     navigate(`/news/${newsSlug}`);
+  };
+  
+  const handleInstituteClick = (institute) => {
+    navigate(`/institute/${institute.slug || institute._id}`);
   };
 
   const renderCoursesContent = () => (
@@ -236,6 +332,58 @@ const SubNavbar = ({ categories }) => {
             </a>
           </div>
         </div>
+      </div>
+    </div>
+  );
+
+  const renderTopCollegesContent = () => (
+    <div className="p-6 bg-white min-w-[600px]">
+      <div className="grid grid-cols-2 gap-8">
+        {/* Popular Colleges (sorted by views) */}
+        <div className="space-y-6">
+          <h3 className="font-semibold text-red-500">Popular Colleges</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-2">
+              {topColleges?.map((college) => (
+                <a
+                  key={college._id}
+                  onClick={() => handleInstituteClick(college)}
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                >
+                  <span>{college.instituteName}</span>
+                  <span className="text-gray-500 text-xs">{college.views || 0} views</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Recent Colleges (sorted by createdAt) */}
+        <div className="space-y-6">
+          <h3 className="font-semibold text-red-500">Recently Added Colleges</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-2">
+              {recentColleges?.map((college) => (
+                <a
+                  key={college._id}
+                  onClick={() => handleInstituteClick(college)}
+                  className="text-sm hover:text-red-500 cursor-pointer truncate"
+                >
+                  {college.instituteName}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="text-right mt-6">
+        <a 
+          onClick={() => handleViewAllColleges()} 
+          className="text-sm text-red-500 hover:text-red-600 cursor-pointer font-medium"
+        >
+          View All Colleges →
+        </a>
       </div>
     </div>
   );
@@ -371,6 +519,55 @@ const SubNavbar = ({ categories }) => {
     </div>
   );
 
+  const renderStreamInstitutes = (streamName) => {
+    const popular = popularInstitutes[streamName]?.result || [];
+    const recent = recentInstitutes[streamName]?.result || [];
+    
+    return (
+      <div className="p-4 flex gap-6">
+        {/* Popular Institutes (sorted by views) */}
+        <div className="min-w-48">
+          <h3 className="font-semibold text-red-500 mb-3">Popular Colleges</h3>
+          {popular.length === 0 ? (
+            <p className="text-sm text-gray-500">Loading popular institutes...</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-2">
+              {popular.slice(0, 5).map(institute => (
+                <div 
+                  key={institute._id}
+                  onClick={() => handleInstituteClick(institute)}
+                  className="cursor-pointer transition-colors hover:text-red-500 text-sm flex justify-between"
+                >
+                  <span>{institute.instituteName}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Recent Institutes (sorted by createdAt) */}
+        <div className="min-w-48">
+          <h3 className="font-semibold text-red-500 mb-3">Top Colleges</h3>
+          {recent.length === 0 ? (
+            <p className="text-sm text-gray-500">Loading recent institutes...</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-2">
+              {recent.slice(0, 5).map(institute => (
+                <div 
+                  key={institute._id}
+                  onClick={() => handleInstituteClick(institute)}
+                  className="cursor-pointer transition-colors hover:text-red-500 text-sm"
+                >
+                  {institute.instituteName}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderRegularContent = (category) => (
     <div className="flex">
       <div className="w-64 bg-white overflow-y-auto">
@@ -383,12 +580,18 @@ const SubNavbar = ({ categories }) => {
                   ? 'bg-red-400 border-l-2 border-red-500 text-white'
                   : 'bg-red-500 text-white'
               }`}
-              onMouseEnter={() =>
+              onMouseEnter={() => {
                 setActiveContent((prev) => ({
                   ...prev,
                   [category.label]: item.id,
-                }))
-              }
+                }));
+                
+                // If this is a stream category, fetch institutes on hover
+                if (category.label === 'Colleges' || category.label === 'Exams') {
+                  handleStreamInteraction(item.name);
+                }
+              }}
+              onClick={() => handleSidebarItemClick(category, item.id, item.name)}
             >
               {item.name}
               <span className="text-xs">
@@ -406,30 +609,42 @@ const SubNavbar = ({ categories }) => {
           ))}
         </ul>
       </div>
-      {activeContent[category.label] && (
-        <div
-          className="w-fit p-3 flex flex-wrap gap-4"
-          style={{
-            gridTemplateColumns: `repeat(auto-fill, minmax(200px, 1fr))`,
-          }}
-        >
-          {category.contents?.[activeContent[category.label]]?.map(
-            (subArray, columnIndex) => (
-              <div key={columnIndex} className="flex flex-col gap-1">
-                {subArray.map((item, itemIndex) => (
-                  <a
-                    key={itemIndex}
-                    href={item.link}
-                    className="block text-xs text-black hover:underline"
-                  >
-                    {item.name}
-                  </a>
-                ))}
-              </div>
-            )
-          )}
-        </div>
-      )}
+      <div className="flex flex-col">
+        {/* Show stream institutes for the active stream if this is Colleges or Exams */}
+        {(category.label === 'Colleges' || category.label === 'Exams') && 
+          activeContent[category.label] && 
+          category.sidebarItems && 
+          renderStreamInstitutes(
+            category.sidebarItems.find(item => item.id === activeContent[category.label])?.name
+          )
+        }
+        
+        {/* Show regular content */}
+        {activeContent[category.label] && category.contents?.[activeContent[category.label]] && (
+          <div
+            className="w-fit p-3 flex flex-wrap gap-4"
+            style={{
+              gridTemplateColumns: `repeat(auto-fill, minmax(200px, 1fr))`,
+            }}
+          >
+            {category.contents[activeContent[category.label]].map(
+              (subArray, columnIndex) => (
+                <div key={columnIndex} className="flex flex-col gap-1">
+                  {subArray.map((item, itemIndex) => (
+                    <a
+                      key={itemIndex}
+                      href={item.link}
+                      className="block text-xs text-black hover:underline"
+                    >
+                      {item.name}
+                    </a>
+                  ))}
+                </div>
+              )
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -464,6 +679,8 @@ const SubNavbar = ({ categories }) => {
                         ? renderCareersContent()
                         : category.label === 'Latest Updates'
                         ? renderNewsContent()
+                        : category.label === 'Top Colleges'
+                        ? renderTopCollegesContent()
                         : category.label === 'More'
                         ? renderMoreContent()
                         : renderRegularContent(category)}
