@@ -24,12 +24,13 @@ const SearchPage = () => {
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [streams, setStreams] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // Set the number of items per page
   const inputField = useSelector(store => store.input.inputField);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
   const streamFromUrl = searchParams.get('stream');
 
-  // Initialize window.instituteIdMap from localStorage on component mount
   useEffect(() => {
     if (!window.instituteIdMap) {
       try {
@@ -42,7 +43,6 @@ const SearchPage = () => {
     }
   }, []);
 
-  // Batch update the ID mapping when data arrives
   const updateIdMapping = (institutes) => {
     let hasChanges = false;
     
@@ -53,15 +53,12 @@ const SearchPage = () => {
       }
     });
     
-    // Only update localStorage if there are actual changes
     if (hasChanges) {
       localStorage.setItem('instituteIdMap', JSON.stringify(window.instituteIdMap));
     }
   };
 
-  // Helper function to get URL for display - consistent with other components
   const getInstituteUrl = (institute) => {
-    // Prefer slugs for SEO, fall back to IDs
     return institute?.slug 
       ? `/institute/${institute.slug}`
       : `/institute/${institute?._id}`;
@@ -89,6 +86,7 @@ const SearchPage = () => {
     }
   }, [streams, streamFromUrl]);
 
+  
   const staticStateLocations = [
     "Andhra Pradesh",
     "Arunachal Pradesh",
@@ -295,7 +293,6 @@ const SearchPage = () => {
         setFilteredContent(result);
         setTotalDocuments(totalDocuments);
         
-        // Update ID mapping when data arrives
         if (result && result.length > 0) {
           updateIdMapping(result);
         }
@@ -319,34 +316,34 @@ const SearchPage = () => {
 
   useEffect(() => {
     if (Object.keys(selectedFilters).length > 0) {
-      fetchFilteredInstitutes(selectedFilters);
+      fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
     }
-  }, [selectedFilters]);
+  }, [selectedFilters, currentPage]);
 
-  const fetchFilteredInstitutes = async (filters) => {
-    setLoading(true);
-    try {
-      const queryString = `filters=${encodeURIComponent(JSON.stringify(filters))}`;
-      const response = await axios.get(`${baseURL}/institutes?${queryString}`);
-      if (response.data) {
-        const institutes = response.data.data.result;
-        setContent(institutes);
-        setFilteredContent(institutes);
-        setTotalDocuments(response.data.data.totalDocuments);
-        
-        // Update ID mapping when filtered data arrives
-        if (institutes && institutes.length > 0) {
-          updateIdMapping(institutes);
-        }
+ 
+
+const fetchFilteredInstitutes = async (filters, page, limit) => {
+  setLoading(true);
+  try {
+    const queryString = `filters=${encodeURIComponent(JSON.stringify(filters))}&page=${page}&limit=${limit}`;
+    const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+    if (response.data) {
+      const institutes = response.data.data.result;
+      setContent(institutes);
+      setFilteredContent(institutes);
+      setTotalDocuments(response.data.data.totalDocuments);
+      
+      if (institutes && institutes.length > 0) {
+        updateIdMapping(institutes);
       }
-    } catch (error) {
-      console.error('Error fetching filtered institutes:', error);
-      setFetchError(true);
-    } finally {
-      setLoading(false);
     }
-  };
-
+  } catch (error) {
+    console.error('Error fetching filtered institutes:', error);
+    setFetchError(true);
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     if (searchQuery.length > 0) {
       const filtered = content.filter(item =>
@@ -357,6 +354,16 @@ const SearchPage = () => {
       setFilteredContent(content);
     }
   }, [searchQuery, content]);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const getPaginatedContent = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredContent.slice(startIndex, endIndex);
+  };
 
   return (
     <>
@@ -382,13 +389,24 @@ const SearchPage = () => {
                 <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}>
                   <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px]"></Promotions>
                 </div>                
-                {filteredContent.map((institute, index) => (
+                {getPaginatedContent().map((institute, index) => (
                   <SearchResultBox 
                     key={index} 
                     institute={institute} 
                     url={getInstituteUrl(institute)}  // Pass the URL with slug support
                   />
                 ))}
+                <div className="pagination">
+                  {Array.from({ length: Math.ceil(filteredContent.length / itemsPerPage) }, (_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handlePageChange(index + 1)}
+                      className={`px-4 py-2 ${currentPage === index + 1 ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
               </>
             ) : (
               <div className="text-center py-8 text-gray-500">No institutes found.</div>
