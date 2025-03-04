@@ -98,14 +98,27 @@ const ReviewsFilterPage = () => {
     // Function to update review
     const handleUpdateReview = async () => {
         try {
-            const response = await axios.patch(`${apiUrl}/review/${editingReview?._id}`, editingReview, {
+            // Prepare only the editable fields
+            const updatePayload = {
+                placementStars: editingReview.placementStars,
+                placementDescription: editingReview.placementDescription,
+                facultyStars: editingReview.facultyStars,
+                facultyDescription: editingReview.facultyDescription,
+                campusLifeStars: editingReview.campusLifeStars,
+                campusLifeDescription: editingReview.campusLifeDescription,
+                suggestionsStars: editingReview.suggestionsStars,
+                suggestionDescription: editingReview.suggestionDescription,
+                recommendation: editingReview.recommendation
+            };
+    
+            const response = await axios.patch(`${apiUrl}/review/${editingReview?._id}`, updatePayload, {
                 headers: {
                     'Content-Type': 'application/json',
                     'x-access-token': localStorage.getItem('accessToken'),
                     'x-refresh-token': localStorage.getItem('refreshToken')
                 },
             });
-
+    
             const updatedReviews = reviews.map(review => 
                 review._id === editingReview?._id ? response.data.data : review
             );
