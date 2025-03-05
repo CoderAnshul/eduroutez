@@ -262,7 +262,7 @@ const SearchPage = () => {
       ],
     },
     {
-      title: "Total Fees",
+      title: "Fees",
       items: ["> 5 Lakh", "3 - 5 Lakh", "1 - 3 Lakh", "< 1 Lakh"],
     },
     {
