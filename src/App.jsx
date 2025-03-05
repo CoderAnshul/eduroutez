@@ -88,6 +88,8 @@ const App = () => {
           <Route path="/forgotpassword" element={<Forgotpassword />} />
           <Route path="/become-couseller" element={<BecomeCouseller />} />
           <Route path="/institute" element={<BestRatedInstitute/>} />
+          <Route path="/institute:slug" element={<BestRatedInstitute/>} />
+
           <Route path="/trending-institute" element={<TrendingInstitute/>} />
           <Route path='/counselor' element={<Counselor />}></Route>
             <Route path="/news/:id" element={<NewsDetail />} />

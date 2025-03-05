@@ -6,11 +6,19 @@ import cardPhoto from "../assets/Images/teacher.jpg";
 import rupee from "../assets/Images/rupee.png";
 import CustomButton from "../Ui components/CustomButton";
 import { useQuery } from "react-query";
+import { useNavigate } from "react-router-dom";
 import { bestRatedInstitute } from "../ApiFunctions/api";
 
 const BestRated = () => {
   const [content, setContent] = useState([]);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+  
+  const navigate = useNavigate();
+
+  const handleViewMore = () => {
+    console.log('Navigating to institutes');
+    navigate('/institute');
+  };
 
   // Initialize window.instituteIdMap from localStorage on component mount
   useEffect(() => {
@@ -92,15 +100,17 @@ const BestRated = () => {
     );
   }
 
+
   return (
     <div className="w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
       <div className="flex items-center justify-between mb-10">
         <h3 className="text-xl font-bold">Best Rated Institutes</h3>
-        <Link to="/institute">
-          <button className="bg-red-500 text-white py-2 px-4 rounded">
-            View more
-          </button>
-        </Link>
+        <button 
+        onClick={handleViewMore} 
+        className="bg-red-500 text-white py-2 px-4 rounded"
+      >
+        View more
+      </button>
       </div>
       
       <div className="boxWrapper w-full flex flex-col md:flex-row flex-wrap items-center gap-6">
