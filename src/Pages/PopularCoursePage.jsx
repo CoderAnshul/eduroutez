@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import cardPhoto from '../assets/Images/teacher.jpg';
-import rupee from '../assets/Images/rupee.png';
 import { useQuery } from 'react-query';
-import { AllpopularCourses } from '../ApiFunctions/api';
+import axios from 'axios';
+import { AllpopularCourses, courseCategoriesList } from '../ApiFunctions/api';
 import HighRatedCareers from '../Components/HighRatedCareers';
 import BlogComponent from '../Components/BlogComponent';
 import BestRated from '../Components/BestRated';
@@ -19,14 +19,52 @@ const PopularCourses = () => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
   const [openShareId, setOpenShareId] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const { data, isLoading, isError } = useQuery(
-    ["popularCourses"],
-    () => AllpopularCourses(),
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await courseCategoriesList();
+        const extractedCategories = response.data?.data?.result.map(category => ({
+          _id: category._id,
+          name: category.title
+        }));
+        setCategories(extractedCategories);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Fetch courses with pagination and filtering
+  const { data, isLoading, isError, refetch } = useQuery(
+    ["popularCourses", page, selectedCategories, searchTerm],
+    () => {
+      // Construct filters
+      const filters = {};
+      if (selectedCategories.length > 0) {
+        filters.category = selectedCategories;
+      }
+      
+      return AllpopularCourses({
+        page,
+        filters: JSON.stringify(filters),
+        search: searchTerm
+      });
+    },
     {
       enabled: true,
       onSuccess: (data) => {
-        const courses = data.data.result;
+        console.log('try data', data);
+        const courses = data.data?.data?.result;
         
         // Store the ID mapping for each course using the title as slug
         courses.forEach(course => {
@@ -45,7 +83,13 @@ const PopularCourses = () => {
         // Store in localStorage for persistence
         localStorage.setItem('courseIdMap', JSON.stringify(courseIdMap));
         
-        setContent(courses);
+        // Update total pages
+        setTotalPages(data.data.totalPages);
+        
+        // Update content based on whether it's first page or subsequent pages
+        setContent(prevContent => 
+          page === 1 ? courses : [...prevContent, ...courses]
+        );
       },
     }
   );
@@ -62,12 +106,25 @@ const PopularCourses = () => {
       .trim();
   };
 
-  const handleShareClick = (id, e) => {
-    e.preventDefault(); // Prevent the Link navigation
-    e.stopPropagation(); // Stop event from bubbling up
-    setOpenShareId(openShareId === id ? null : id);
+  // Category change handler
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategories(prev =>
+      prev.includes(categoryId)
+        ? prev.filter(cat => cat !== categoryId)
+        : [...prev, categoryId]
+    );
+    // Reset to first page when filter changes
+    setPage(1);
   };
 
+  // Load more handler
+  const loadMore = () => {
+    if (page < totalPages) {
+      setPage(prevPage => prevPage + 1);
+    }
+  };
+
+  // Image fetching logic (similar to previous implementation)
   useEffect(() => {
     const fetchImages = async () => {
       try {
@@ -112,10 +169,19 @@ const PopularCourses = () => {
     }
   }, [content]);
 
-  if (isLoading) {
+  // Share click handler
+  const handleShareClick = (id, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpenShareId(openShareId === id ? null : id);
+  };
+
+  // Render loading state
+  if (isLoading && page === 1) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
+  // Render error state
   if (isError) {
     return <div className="flex justify-center items-center h-screen">Error loading popular courses</div>;
   }
@@ -136,27 +202,109 @@ const PopularCourses = () => {
           </div>
         </div>
 
-        {/* Popular Courses Section */}
-        <div className="max-w-7xl mx-auto px-6 py-10">
-          <div className='w-full items-center max-w-4xl h-24 mx-auto'>
-            <div className="w-full max-w-4xl h-fit mx-auto">
-              <Promotions location="COURSES_PAGE" className="h-[90px]" />
+        {/* Mobile Filter Button */}
+        <button
+          className="mx-[20px] mt-[30px] z-[500] bg-blue-600 text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
+          onClick={() => setIsFilterOpen(true)}
+        >
+          Filters
+        </button>
+
+        {/* Mobile Filter Modal */}
+        <div className={`fixed inset-0 bg-black bg-opacity-50 z-[10001] flex transition-opacity duration-300 ${isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+          <div
+            className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${isFilterOpen ? "translate-x-0" : "-translate-x-full"}`}
+          >
+            <button
+              className="text-gray-800 font-bold text-xl mb-4"
+              onClick={() => setIsFilterOpen(false)}
+            >
+              X
+            </button>
+            <h3 className="text-lg font-semibold mb-6">Filter by Category</h3>
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search courses..."
+                className="w-full p-2 border-2 border-gray-300 rounded-lg"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
+              />
+            </div>
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+              {categories.map((category) => (
+                <label
+                  key={category._id}
+                  className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg shadow hover:bg-gray-200 cursor-pointer transition-all duration-200"
+                >
+                  <input
+                    type="checkbox"
+                    value={category._id}
+                    checked={selectedCategories.includes(category._id)}
+                    onChange={() => handleCategoryChange(category._id)}
+                    className="form-checkbox h-5 w-5 text-blue-500"
+                  />
+                  <span className="text-base font-medium">{category.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div
+            className="flex-grow cursor-pointer"
+            onClick={() => setIsFilterOpen(false)}
+          ></div>
+        </div>
+
+        {/* Main Content with Sidebar */}
+        <div className={`flex px-[4vw] pt-5 mb-14 ${isFilterOpen ? "pointer-events-none" : ""}`}>
+          {/* Desktop Sidebar */}
+          <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-4">Filter by Category</h3>
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search courses..."
+                className="w-full p-2 border-2 border-gray-300 rounded-lg"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
+              {categories.map((category) => (
+                <label
+                  key={category._id}
+                  className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    value={category._id}
+                    checked={selectedCategories.includes(category._id)}
+                    onChange={() => handleCategoryChange(category._id)}
+                  />
+                  {category.name}
+                </label>
+              ))}
             </div>
           </div>
 
-          <div className="flex items-center justify-between mb-10">
-            <h3 className="text-3xl font-bold">Popular Courses</h3>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {content.map((box) => {
-              const courseSlug = getCourseSlug(box);
-              
-              return (
-                <div key={box._id} className="flex flex-col">
+          {/* Courses Grid */}
+          <div className="w-full md:w-3/4 px-6">
+            <div className="flex flex-wrap justify-start gap-8">
+              {content.map((box) => {
+                const courseSlug = getCourseSlug(box);
+                
+                return (
                   <Link
+                    key={box._id}
                     to={`/coursesinfopage/${courseSlug}`}
-                    className="bg-white rounded-lg shadow-lg transform transition-all hover:scale-105 hover:shadow-xl flex-grow z-1"
+                    className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer
+                    max-w-sm flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden"
                   >
                     <div className="relative">
                       <img
@@ -185,7 +333,7 @@ const PopularCourses = () => {
                         dangerouslySetInnerHTML={{ __html: box.longDescription }}
                       />
 
-                      {/* Views, Likes, and Share - Now Inside the Card */}
+                      {/* Views, Likes, and Share Section */}
                       <div className="flex items-center justify-between mt-4">
                         <div className="flex items-center gap-4 text-gray-600">
                           {box.views && (
@@ -222,34 +370,46 @@ const PopularCourses = () => {
                                 contentType="course" 
                               />
                             </div>
-                          )}
+                          )}</div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </Link>
+                      </Link>
+                    );
+                  })}
                 </div>
-              );
-            })}
+    
+                {/* Load More Button */}
+                <div className="flex justify-center mt-6">
+                  {page < totalPages && content.length > 0 && (
+                    <button
+                      className="bg-red-600 text-white rounded-lg px-4 py-2 shadow-lg"
+                      onClick={loadMore}
+                    >
+                      Load More
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      
-      <div className='w-full items-center max-w-4xl h-fit mx-auto'>
-        <Promotions location="COURSES_PAGE" className="h-[90px]" />
-      </div>
-
-      <HighRatedCareers />
-      <BlogComponent />      
-      <BestRated />
-      
-      <div className="w-full flex items-start mt-10">
-        <Events />
-        <ConsellingBanner />
-      </div>
-    </>
-  );
-};
-
-// Export the ID mapping for use in other components
-export { courseIdMap };
-export default PopularCourses;
+          
+          {/* Additional Components */}
+          <div className='w-full items-center max-w-4xl h-fit mx-auto'>
+            <Promotions location="COURSES_PAGE" className="h-[90px]" />
+          </div>
+    
+          <HighRatedCareers />
+          <BlogComponent />      
+          <BestRated />
+          
+          <div className="w-full flex items-start mt-10">
+            <Events />
+            <ConsellingBanner />
+          </div>
+        </>
+      );
+    };
+    
+    // Export the ID mapping for use in other components
+    export { courseIdMap };
+    export default PopularCourses;

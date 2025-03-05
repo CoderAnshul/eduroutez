@@ -234,17 +234,54 @@ export const popularCourses = async () => {
   }
 };
 
-export const AllpopularCourses = async () => {
+export const AllpopularCourses = async (params = {}) => {
   try {
-    const response = await axios.get(
-      `${baseURL}/courses?filters={"isCoursePopular":true}`
+    // Destructure with default values
+    const { 
+      page = 1, 
+      limit = 10, 
+      filters = {}, 
+      search = '' 
+    } = params;
+
+    // Prepare query parameters
+    const queryParams = {
+      page: page - 1, // Convert to 0-indexed
+      limit,
+      filters: typeof filters === 'object' ? JSON.stringify(filters) : filters,
+      search
+    };
+
+    // Remove undefined or null values
+    Object.keys(queryParams).forEach(key => 
+      queryParams[key] === undefined && delete queryParams[key]
     );
-    return response.data;
 
-    // return response.data;
+    const response = await axios.get( `${baseURL}/courses`, {
+      params: queryParams
+    });
+    
+
+    return response;
   } catch (error) {
-    console.error(`Error fetching Popular courses `, error);
+    console.error('Error fetching courses:', error);
+    throw error;
+  }
+};
 
+export const courseCategoriesList = async (params = {}) => {
+  try {
+    const { page = 0 } = params;
+
+    const response = await axios.get(`${baseURL}/course-categories`, {
+      params: { page }
+    });
+
+    console.log('courseCategoriesList', response);
+
+    return response;
+  } catch (error) {
+    console.error('Error fetching course categories:', error);
     throw error;
   }
 };
