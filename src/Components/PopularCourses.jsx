@@ -1,166 +1,238 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import cardPhoto from '../assets/Images/teacher.jpg';
-import rupee from '../assets/Images/rupee.png';
+import axios from 'axios';
 import { useQuery } from 'react-query';
-import { popularCourses } from '../ApiFunctions/api';
-import SocialShare from './SocialShare';
+import { Sparkles, ArrowRight, BookOpen, Award, Users } from 'lucide-react';
 
-// In-memory mapping to store course IDs by slug
-const courseIdMap = {};
+// Function to fetch trending streams
+const fetchTrendingStreams = async () => {
+  try {
+    const response = await axios.get('http://localhost:4001/api/v1/trending-streams?page=1&limit=3');
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to fetch trending streams');
+  }
+};
 
-const PopularCourses = () => {
-  const [content, setContent] = useState([]);
-  const [images, setImages] = useState({});
-  const [openShareId, setOpenShareId] = useState(null);
-
+const TrendingStreams = () => {
   const { data, isLoading, isError } = useQuery(
-    ["popularCourses"],
-    () => popularCourses(),
+    ["trendingStreams"],
+    fetchTrendingStreams,
     {
       enabled: true,
-      onSuccess: (data) => {
-        const { result } = data?.data || {}; // safely access result
-        if (result) {
-          // Store the ID mapping for each course using the title as slug
-          result.forEach(course => {
-            if (course.courseTitle) {
-              // Create slug from course title
-              const slug = course.courseTitle
-                .toLowerCase()
-                .replace(/[^\w\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .trim();
-              
-              // Store mapping
-              courseIdMap[slug] = course._id;
-            }
-          });
-          
-          // Make the mapping available globally
-          window.courseIdMap = courseIdMap;
-          
-          // Store in localStorage for persistence
-          localStorage.setItem('courseIdMap', JSON.stringify(courseIdMap));
-          
-          setContent(result);
-        }
-      }
+      refetchOnWindowFocus: false,
     }
   );
 
-  const handleShareClick = (id, e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setOpenShareId(openShareId === id ? null : id);
-  };
-
-  // Helper function to get the slug for a course
-  const getCourseSlug = (course) => {
-    if (!course?.courseTitle) return course?._id;
-    
-    return course.courseTitle
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
+  // Get stream card design by level
+  const getStreamCardDesign = (level) => {
+    switch (level?.toLowerCase()) {
+      case 'bachelor':
+        return {
+          icon: <BookOpen className="w-5 h-5" />,
+          color: 'text-blue-500',
+          bgColor: 'bg-blue-50',
+          borderColor: 'border-blue-100',
+          hoverBg: 'hover:bg-blue-500',
+          accentColor: 'bg-blue-500'
+        };
+      case 'master':
+        return {
+          icon: <Award className="w-5 h-5" />,
+          color: 'text-purple-500',
+          bgColor: 'bg-purple-50',
+          borderColor: 'border-purple-100',
+          hoverBg: 'hover:bg-purple-500',
+          accentColor: 'bg-purple-500'
+        };
+      case 'phd':
+        return {
+          icon: <Users className="w-5 h-5" />,
+          color: 'text-green-500',
+          bgColor: 'bg-green-50',
+          borderColor: 'border-green-100',
+          hoverBg: 'hover:bg-green-500',
+          accentColor: 'bg-green-500'
+        };
+      default:
+        return {
+          icon: <BookOpen className="w-5 h-5" />,
+          color: 'text-gray-500',
+          bgColor: 'bg-gray-50',
+          borderColor: 'border-gray-100',
+          hoverBg: 'hover:bg-gray-500',
+          accentColor: 'bg-gray-500'
+        };
+    }
   };
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="flex space-x-2 animate-pulse">
+          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+        </div>
+      </div>
+    );
   }
 
   if (isError) {
-    return <div className="flex justify-center items-center h-screen">Error loading popular courses</div>;
+    return (
+      <div className="flex flex-col justify-center items-center h-64 text-red-500">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <p>Error loading trending streams</p>
+      </div>
+    );
   }
+
+  const trendingStreams = data?.data?.result || [];
 
   return (
     <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
       <div className="flex items-center justify-between mb-10">
-        <h3 className="text-xl font-bold">Popular Courses</h3>
-        <Link to="/popularcourses">
-          <button className="bg-red-500 text-white py-2 px-4 rounded">View more</button>
+        <div className="flex items-center gap-2">
+          <Sparkles className="text-red-500 w-6 h-6" />
+          <h3 className="text-xl font-bold">Trending Streams</h3>
+        </div>
+        <Link to="/trending-stream">
+          <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2 transform hover:scale-105 shadow-md">
+            View all
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </Link>
       </div>
 
-      <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
-        {content.length > 0 ? content.map((box) => {
-          const courseSlug = getCourseSlug(box);
-          
-          return (
-            <div key={box?._id} className="relative box lg:max-w-[500px] shadow-lg rounded-lg ">
-              <Link to={`/coursesinfopage/${courseSlug}`} className="block">
-                <div className="imageContainer h-48 relative">
-                  <img
-                    className="h-full w-full object-cover"
-                    src={images[box?._id] || `${import.meta.env.VITE_IMAGE_BASE_URL}/${box?.coursePreviewCover}`}
-                    alt={box?.courseTitle || "Course Image"}
-                    onError={(e) => { e.target.src = cardPhoto; }}
-                  />
-                </div>
-                <div className="textContainer p-4">
-                  <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A] line-clamp-2">
-                    {box?.courseTitle ? (box.courseTitle.length > 20 ? box.courseTitle.slice(0, 22) + "..." : box.courseTitle) : "Untitled Course"}
-                  </h3>
-                  <div className="text-sm mt-2 line-clamp-3 text-gray-600" dangerouslySetInnerHTML={{
-                    __html: box?.longDescription?.slice(0, 80) + "..." || "No description available"
-                  }} />
-                  {box?.price && (
-                    <h3 className="flex items-center mt-4 text-2xl font-bold text-[#000000c4]">
-                      <img className="h-5 mt-1 opacity-70" src={rupee} alt="rupee" />
-                      {box?.isCourseFree === "free" ? "0" : box?.price || "N/A"}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {trendingStreams.length > 0 ? (
+          trendingStreams.map((item) => {
+            const streamDetails = item.streamDetails[0] || {};
+            const level = item._id.level;
+            const design = getStreamCardDesign(level);
+            
+            // Generate a pattern for the card background
+            const patternNumber = (streamDetails._id?.charAt(0)?.charCodeAt(0) || 0) % 5;
+            
+            return (
+              <Link 
+                key={`${streamDetails._id}-${level}`} 
+                to={`/popularcourses?stream=${streamDetails._id}&level=${level}`}
+                className="block group"
+              >
+                <div className="h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">
+                  {/* Decorative pattern header */}
+                  <div className={`h-36 ${design.bgColor} relative overflow-hidden`}>
+                    <div className="absolute inset-0 opacity-10">
+                      {patternNumber === 0 && (
+                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="10" cy="10" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="30" cy="10" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="50" cy="10" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="70" cy="10" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="90" cy="10" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="20" cy="20" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="40" cy="20" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="60" cy="20" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="80" cy="20" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="10" cy="30" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="30" cy="30" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="50" cy="30" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="70" cy="30" r="2" fill="currentColor" className={design.color} />
+                          <circle cx="90" cy="30" r="2" fill="currentColor" className={design.color} />
+                        </svg>
+                      )}
+                      {patternNumber === 1 && (
+                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0,0 L100,100 M20,0 L100,80 M0,20 L80,100 M40,0 L100,60 M0,40 L60,100 M60,0 L100,40 M0,60 L40,100 M80,0 L100,20 M0,80 L20,100" stroke="currentColor" strokeWidth="1" className={design.color} />
+                        </svg>
+                      )}
+                      {patternNumber === 2 && (
+                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                          <rect x="0" y="0" width="20" height="20" fill="currentColor" className={design.color} />
+                          <rect x="40" y="0" width="20" height="20" fill="currentColor" className={design.color} />
+                          <rect x="80" y="0" width="20" height="20" fill="currentColor" className={design.color} />
+                          <rect x="20" y="20" width="20" height="20" fill="currentColor" className={design.color} />
+                          <rect x="60" y="20" width="20" height="20" fill="currentColor" className={design.color} />
+                          <rect x="0" y="40" width="20" height="20" fill="currentColor" className={design.color} />
+                          <rect x="40" y="40" width="20" height="20" fill="currentColor" className={design.color} />
+                          <rect x="80" y="40" width="20" height="20" fill="currentColor" className={design.color} />
+                        </svg>
+                      )}
+                      {patternNumber === 3 && (
+                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
+                          <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
+                          <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
+                          <circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
+                        </svg>
+                      )}
+                      {patternNumber === 4 && (
+                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M10,10 L90,10 L90,90 L10,90 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
+                          <path d="M20,20 L80,20 L80,80 L20,80 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
+                          <path d="M30,30 L70,30 L70,70 L30,70 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
+                          <path d="M40,40 L60,40 L60,60 L40,60 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
+                        </svg>
+                      )}
+                    </div>
+                  
+                    {/* Level badge floating at top-right */}
+                    <div className="absolute bottom-0 right-0 transform translate-y-1/2 mr-4">
+                      <div className={`${design.bgColor} ${design.color} ${design.borderColor} border rounded-full p-3 shadow-lg group-hover:shadow-xl transition-all duration-300`}>
+                        {design.icon}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="px-6 pt-8 pb-6">
+                    {/* Level indicator */}
+                    <div className="mb-3">
+                      <span className={`text-xs font-semibold tracking-wider uppercase ${design.color}`}>
+                        {level?.charAt(0).toUpperCase() + level?.slice(1) || "Unknown Level"}
+                      </span>
+                    </div>
+                    
+                    {/* Stream title */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 transition-colors duration-300 group-hover:text-red-500">
+                      {streamDetails.name || "Unnamed Stream"}
                     </h3>
-                  )}
-                </div>
-              </Link>
-
-              {/* Social stats row with views, likes, and share button - OUTSIDE the Link */}
-              <div className="flex items-center justify-between px-4 ">
-                <div className="flex items-center gap-4">
-                  {box.views && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                      </svg>
-                      <span className="text-gray-500">{box.views}</span>
+                    
+                    {/* Short description - placeholder text based on stream name */}
+                    <p className="text-gray-600 mb-6 line-clamp-2">
+                      {`Explore ${streamDetails.name || "this stream"} and discover comprehensive courses and resources designed to enhance your knowledge and skills.`}
+                    </p>
+                    
+                    {/* Explore button */}
+                    <div className="flex items-center">
+                      <button className={`flex items-center ${design.color} ${design.bgColor} ${design.borderColor} border rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${design.hoverBg} hover:text-white`}>
+                        Explore Stream
+                        <ArrowRight className="ml-2 w-4 h-4 transform transition-transform duration-300 group-hover:translate-x-1" />
+                      </button>
                     </div>
-                  )}
-                  {box.likes && box.likes.length > 0 && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
-                        <path d="M9 22V12"></path>
-                      </svg>
-                      <span>{box.likes.length}</span>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Share button */}
-                <div onClick={(e) => handleShareClick(box._id, e)}>
-                  {/* Social share component that appears only when clicked */}
-                  <div className="right-0 z-10">
-                    <SocialShare 
-                      title={box.courseTitle} 
-                      url={`${window.location.origin}/course/${courseSlug}`} 
-                      contentType="course" 
-                    />
                   </div>
                 </div>
-              </div>
+              </Link>
+            );
+          })
+        ) : (
+          <div className="col-span-full text-center py-12 bg-white rounded-xl shadow-md">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
-          );
-        }) : (
-          <div className="w-full text-center">No popular courses available.</div>
+            <p className="text-gray-600">No trending streams available.</p>
+            <button className="mt-4 bg-red-50 text-red-500 py-2 px-6 rounded-lg border border-red-100 hover:bg-red-500 hover:text-white transition-colors">
+              Refresh
+            </button>
+          </div>
         )}
       </div>
     </div>
   );
 };
 
-// Export the ID mapping for use in other components
-export { courseIdMap };
-export default PopularCourses;
+export default TrendingStreams;

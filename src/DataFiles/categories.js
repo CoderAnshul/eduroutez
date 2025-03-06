@@ -164,63 +164,7 @@ const useCategories = () => {
       },
     },
     
-    {
-      label: 'Exams',
-      sidebarItems:examItems,
-
-      contents: {
-        1: [
-          [
-            { name: 'Top Engineering Colleges in India', link: '#' },
-            { name: 'Top Engineering Colleges in Delhi', link: '#' },
-          ],
-          [
-            { name: 'Top Engineering Colleges in Mumbai', link: '#' },
-            { name: 'Top Engineering Colleges in Bangalore', link: '#' },
-          ],
-        ],
-        2: [
-          [
-            { name: 'BTech in Computer Science', link: '#' },
-            { name: 'BTech in Mechanical Engineering', link: '#' },
-          ],
-          [
-            { name: 'BTech in Civil Engineering', link: '#' },
-            { name: 'BTech in Electrical Engineering', link: '#' },
-          ],
-        ],
-        3: [
-          [
-            { name: 'GATE Exam', link: '#' },
-            { name: 'JEE Main', link: '#' },
-          ],
-          [
-            { name: 'JEE Advanced', link: '#' },
-            { name: 'BITSAT', link: '#' },
-          ],
-        ],
-        4: [
-          [
-            { name: 'Colleges in Delhi', link: '#' },
-            { name: 'Colleges in Mumbai', link: '#' },
-          ],
-          [
-            { name: 'Colleges in Bangalore', link: '#' },
-            { name: 'Colleges in Pune', link: '#' },
-          ],
-        ],
-        5: [
-          [
-            { name: 'College A vs College B', link: '#' },
-            { name: 'College C vs College D', link: '#' },
-          ],
-          [
-            { name: 'College E vs College F', link: '#' },
-            { name: 'College G vs College H', link: '#' },
-          ],
-        ],
-      },
-    },
+  
     {
       label: 'Courses',
     },

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import instituteLogo from "../assets/Images/instituteLogo.png";
 import location from "../assets/Images/location.png";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
@@ -9,9 +9,9 @@ import { Building } from 'lucide-react';
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 const baseURL = import.meta.env.VITE_BASE_URL;
 
-const 
-InstitueName = ({ instituteData }) => {
+const InstitueName = ({ instituteData }) => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [streams, setStreams] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,8 +19,31 @@ InstitueName = ({ instituteData }) => {
     message: "",
     city: "",
     queryRelatedTo: "",
-    instituteId:""
+    instituteId: "",
+    stream: "",
+    level: ""
   });
+
+  // Fetch streams on component mount
+  useEffect(() => {
+    const fetchStreams = async () => {
+      try {
+        const response = await axiosInstance.get(`${baseURL}/streams?limit=8`, {
+          headers: {
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          }
+        });
+        console.log("Streams:", response.data.data);
+        setStreams(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching streams:", error);
+        toast.error("Failed to load streams");
+      }
+    };
+
+    fetchStreams();
+  }, []);
 
   const handleDownloadBrochure = async () => {
     try {
@@ -92,7 +115,9 @@ InstitueName = ({ instituteData }) => {
         city: formData.city,
         query: formData.message,
         queryRelatedTo: formData.queryRelatedTo,
-        instituteId:instituteData?.data?._id
+        instituteId: instituteData?.data?._id,
+        stream: formData.stream,
+        level: formData.level
       };
 
       await axiosInstance.post(`${baseURL}/query`, queryPayload, {
@@ -111,6 +136,8 @@ InstitueName = ({ instituteData }) => {
         message: "",
         city: "",
         queryRelatedTo: "",
+        stream: "",
+        level: ""
       });
     } catch (error) {
       console.error("Submit error:", error);
@@ -146,9 +173,9 @@ InstitueName = ({ instituteData }) => {
               {instituteData?.data?.city?.name}
             </p>
             <p className="text-sm font-semibold opacity-75 flex items-center">
-  <Building size={16} className="text-gray-500 mr-2" />
-  {instituteData?.data?.organisationType}
-</p>
+              <Building size={16} className="text-gray-500 mr-2" />
+              {instituteData?.data?.organisationType}
+            </p>
 
             <p className="text-sm font-semibold opacity-75">
               ● {instituteData?.data?.establishedYear}
@@ -232,6 +259,45 @@ InstitueName = ({ instituteData }) => {
                   onChange={handleChange}
                   required
                 />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="stream">
+                  Stream
+                </label>
+                <select
+                  id="stream"
+                  name="stream"
+                  className="w-full border rounded-lg px-3 py-2"
+                  value={formData.stream}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Stream</option>
+                  {streams?.result.map((stream) => (
+                    <option key={stream._id} value={stream._id}>
+                      {stream.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="level">
+                  Level
+                </label>
+                <select
+                  id="level"
+                  name="level"
+                  className="w-full border rounded-lg px-3 py-2"
+                  value={formData.level}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Level</option>
+                  <option value="bachelor">Bachelor</option>
+                  <option value="masters">Masters</option>
+                  <option value="diploma">Diploma</option>
+                  <option value="phd">PhD</option>
+                </select>
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1" htmlFor="queryRelatedTo">
