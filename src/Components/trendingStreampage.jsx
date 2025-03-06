@@ -12,7 +12,7 @@ import ConsellingBanner from '../Components/ConsellingBanner';
 // Function to fetch trending streams
 const fetchTrendingStreams = async (page) => {
     try {
-        const response = await axios.get(`http://localhost:4001/api/v1/trending-streams?page=${page}&limit=9`);
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/trending-streams?page=${page}&limit=9`);
         console.log('Trending Streams:', response.data);
         return response.data;
     } catch (error) {

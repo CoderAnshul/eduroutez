@@ -7,7 +7,7 @@ import { Sparkles, ArrowRight, BookOpen, Award, Users } from 'lucide-react';
 // Function to fetch trending streams
 const fetchTrendingStreams = async () => {
   try {
-    const response = await axios.get('http://localhost:4001/api/v1/trending-streams?page=1&limit=3');
+    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/trending-streams?page=1&limit=3`);
     return response.data;
   } catch (error) {
     throw new Error('Failed to fetch trending streams');
