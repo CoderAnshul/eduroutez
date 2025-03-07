@@ -615,13 +615,13 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="bg-white w-[40rem] rounded-xl shadow-lg">
+    <div className="bg-white rounded-xl shadow-lg">
       <div className="p-4 border-b bg-gradient-to-r from-orange-500 to-red-600">
         <h3 className="text-lg font-bold text-white">Latest Updates</h3>
       </div>
 
       <div className="p-4">
-        <ul className="grid grid-cols-3 gap-2">
+        <ul className="grid grid-cols-3 gap-8">
           {latestNews
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 3)
@@ -629,7 +629,7 @@ const SubNavbar = ({ categories }) => {
               <li
                 key={news._id}
                 onClick={() => handleNewsClick(news)}
-                className="group  hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
+                className="group hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
               >
                 <div className="space-y-3">
                   <div className="space-y-1">
