@@ -138,7 +138,7 @@ const Feedback = ({ setFormData, setIsSubmit }) => {
         </p>
 
         {/* Form */}
-        <form className="mt-14 space-y-8 mx-auto md:px-10" onSubmit={handleSubmit}>
+        <form className="mt-14 space-y-8 mx-auto md:px-10 mb-10" onSubmit={handleSubmit}>
           {formSections.map((section, index) => (
             <div key={index}>
               <h2 className="text-lg font-medium text-gray-700">{section.title}</h2>
@@ -157,13 +157,13 @@ const Feedback = ({ setFormData, setIsSubmit }) => {
               </div>
             </div>
           ))}
-          <button
+          {/* <button
             type="submit"
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             onClick={handleSubmit}
           >
             Submit
-          </button>
+          </button> */}
         </form>
       </div>
     </div>
