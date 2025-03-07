@@ -88,7 +88,7 @@ const Banner = () => {
 
           console.log('Filtered Results:', filteredResults);
 
-          setSuggestions(filteredResults.slice(0, 5));
+          setSuggestions(filteredResults);
           setShowSuggestions(filteredResults.length > 0);
         }
       } catch (error) {

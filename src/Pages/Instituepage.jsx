@@ -253,16 +253,16 @@ const reviews = [
               <div ref={sectionRefs[11]} className="min-h-24 py-4">
                 <InstituteFacilites instituteData={instituteData}/>
               </div>
-              <div className="min-h-24 py-4">
+              <div ref={sectionRefs[12]} className="min-h-24 py-4">
                 <RecruitersSlider instituteData={instituteData}/>
               </div>
-              <div ref={sectionRefs[12]} className="min-h-24 py-4">
-                <Faqs instituteData={instituteData}/>
-              </div>
               <div ref={sectionRefs[13]} className="min-h-24 py-4">
+  <Faqs instituteData={instituteData}/>
+</div>
+              <div ref={sectionRefs[14]} className="min-h-24 py-4">
                 <News instituteData={instituteData}/>
               </div>
-              <div ref={sectionRefs[14]} className="min-h-24 py-4">
+              <div ref={sectionRefs[15]} className="min-h-24 py-4">
                 <Webinar instituteData={instituteData}/>
               </div>
             </div>

@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import axiosInstance from '../ApiFunctions/axios';
 
 const Faqs = ({instituteData}) => {
-  console.log('df',instituteData);
+  console.log('d gfhgjkl faqf',instituteData.data?._id);
   const [faqs, setFaqs] = useState([]);
   const [showMore, setShowMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -17,7 +17,8 @@ const Faqs = ({instituteData}) => {
     const fetchFaqs = async () => {
       try {
         setIsLoading(true);
-        const response = await axiosInstance.get(`${apiUrl}/faq-by-institute/${id}`);
+        const response = await axiosInstance.get(`${apiUrl}/faq-by-institute/${instituteData?.data?._id}`);
+        console.log('faq data ghj',response);
         const faqData = response?.data?.data || [];
         setFaqs(Array.isArray(faqData) ? faqData : []);
         setIsLoading(false);
