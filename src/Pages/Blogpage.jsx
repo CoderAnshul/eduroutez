@@ -1,362 +1,410 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery } from 'react-query';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import PageBanner from '../Ui components/PageBanner';
-import BlogandCareerBox from '../Ui components/BlogandCareerBox';
-import Events from '../Components/Events';
-import ConsellingBanner from '../Components/ConsellingBanner';
-import PopularCourses from '../Components/PopularCourses';
-import HighRatedCareers from '../Components/HighRatedCareers';
+import React, { useState, useEffect } from "react";
+import { useQuery } from "react-query";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import PageBanner from "../Ui components/PageBanner";
+import BlogandCareerBox from "../Ui components/BlogandCareerBox";
+import Events from "../Components/Events";
+import ConsellingBanner from "../Components/ConsellingBanner";
+import PopularCourses from "../Components/PopularCourses";
+import HighRatedCareers from "../Components/HighRatedCareers";
 
 // Create a module-level object to store the blog ID mapping
 const blogIdMapStore = {};
 
 const Blogpage = () => {
-    const [selectedCategories, setSelectedCategories] = useState([]);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [page, setPage] = useState(1);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filteredData, setFilteredData] = useState([]);
-    const itemsPerPage = 8;
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  const itemsPerPage = 8;
 
-    const baseURL = import.meta.env.VITE_BASE_URL;
+  const baseURL = import.meta.env.VITE_BASE_URL;
 
-    // Fetch all blogs at once
-    const { data: blogData, isLoading: blogLoading, isError: blogError, error: blogFetchError } = useQuery(
-        ['all-blogs'],
-        async () => {
-            const response = await axios.get(`${baseURL}/blogs?sort={"createdAt":"desc"}`, {
-                params: {
-                    limit: 1000 // Fetch a large number of blogs
-                }
-            });
-            return response.data;
-        },
-        { 
-            enabled: true,
-            onSuccess: (data) => {
-                // Create ID mapping for each blog using the slug from backend
-                const blogs = data?.data?.result || [];
-                
-                blogs.forEach(blog => {
-                    if (blog.slug) {
-                        blogIdMapStore[blog.slug] = blog._id;
-                    }
-                });
-                
-                // Make the mapping available globally
-                window.blogIdMap = blogIdMapStore;
-            }
+  // Fetch all blogs at once
+  const {
+    data: blogData,
+    isLoading: blogLoading,
+    isError: blogError,
+    error: blogFetchError,
+  } = useQuery(
+    ["all-blogs"],
+    async () => {
+      const response = await axios.get(
+        `${baseURL}/blogs?sort={"createdAt":"desc"}`,
+        {
+          params: {
+            limit: 1000, // Fetch a large number of blogs
+          },
         }
-    );
+      );
+      return response.data;
+    },
+    {
+      enabled: true,
+      onSuccess: (data) => {
+        // Create ID mapping for each blog using the slug from backend
+        const blogs = data?.data?.result || [];
 
-    // Fetch categories
-    const { data: categoryData, isLoading: categoryLoading, isError: categoryError } = useQuery(
-        ['blog-categories'],
-        async () => {
-            const response = await axios.get(`${baseURL}/blog-category`);
-            return response.data;
-        },
-        { enabled: true }
-    );
+        blogs.forEach((blog) => {
+          if (blog.slug) {
+            blogIdMapStore[blog.slug] = blog._id;
+          }
+        });
 
-    // Filter and paginate data
-    useEffect(() => {
-        if (!blogData?.data?.result) return;
+        // Make the mapping available globally
+        window.blogIdMap = blogIdMapStore;
+      },
+    }
+  );
 
-        let filtered = blogData.data.result;
+  // Fetch categories
+  const {
+    data: categoryData,
+    isLoading: categoryLoading,
+    isError: categoryError,
+  } = useQuery(
+    ["blog-categories"],
+    async () => {
+      const response = await axios.get(`${baseURL}/blog-category`);
+      return response.data;
+    },
+    { enabled: true }
+  );
 
-        // Apply category filter
-        if (selectedCategories.length > 0) {
-            filtered = filtered.filter(blog => 
-                blog && blog.category && selectedCategories.includes(blog.category)
-            );
-        }
+  // Filter and paginate data
+  useEffect(() => {
+    if (!blogData?.data?.result) return;
 
-        // Apply search filter
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase().trim();
-            filtered = filtered.filter(blog =>
-                blog?.title?.toLowerCase()?.includes(term) ||
-                blog?.category?.toLowerCase()?.includes(term)
-            );
-        }
+    let filtered = blogData.data.result;
 
-        setFilteredData(filtered);
-        setPage(1); // Reset to first page when filters change
-    }, [blogData, selectedCategories, searchTerm]);
-
-    const handleCategoryChange = (category) => {
-        if (!category) return;
-        setSelectedCategories(prev =>
-            prev.includes(category)
-                ? prev.filter(cat => cat !== category)
-                : [...prev, category]
-        );
-    };
-
-    const handleSearch = (value) => {
-        setSearchTerm(value);
-    };
-
-    const handlePageChange = (newPage) => {
-        setPage(newPage);
-        window.scrollTo(0, 0);
-    };
-
-    if (blogLoading || categoryLoading) {
-        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    // Apply category filter
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(
+        (blog) =>
+          blog && blog.category && selectedCategories.includes(blog.category)
+      );
     }
 
-    if (blogError || categoryError) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                Error: {blogFetchError?.message || 'Something went wrong'}
-            </div>
-        );
+    // Apply search filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(
+        (blog) =>
+          blog?.title?.toLowerCase()?.includes(term) ||
+          blog?.category?.toLowerCase()?.includes(term)
+      );
     }
 
-    const categories = categoryData?.data?.result || [];
-    const totalItems = filteredData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    setFilteredData(filtered);
+    setPage(1); // Reset to first page when filters change
+  }, [blogData, selectedCategories, searchTerm]);
 
-    // Get current page items
-    const currentItems = filteredData.slice(
-        (page - 1) * itemsPerPage,
-        page * itemsPerPage
+  const handleCategoryChange = (category) => {
+    if (!category) return;
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((cat) => cat !== category)
+        : [...prev, category]
     );
+  };
 
-    // Modify the BlogandCareerBox component to use slugs
-    const BlogandCareerBoxWithSlugs = ({ blogData }) => {
-        const Images = import.meta.env.VITE_IMAGE_BASE_URL;
-        
-        return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {blogData.length > 0 ? (
-                    blogData.map((blog, index) => (
-                        <div key={index} className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                            {/* Use Link with slug for navigation */}
-                            <Link to={`/blogdetailpage/${blog.slug}`} className="block">
-                                <div className="h-48 overflow-hidden">
-                                    <img
-                                        className="w-full h-full object-cover rounded-t-xl"
-                                        src={`${Images}/${blog?.thumbnail}`}
-                                        alt={blog.title}
-                                    />
-                                </div>
-                                <div className="p-4">
-                                    <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
-                                        {blog.title}
-                                    </h3>
-                                    <p className="text-sm text-gray-600 mt-2 h-12 overflow-hidden line-clamp-2" 
-                                       dangerouslySetInnerHTML={{ __html: blog.description }}></p>
-                                    <div className="mt-4 flex justify-between items-center">
-                                        <button className="bg-red-600 text-white py-1 px-4 rounded-lg text-sm hover:bg-red-700 transition-all">
-                                            Read More
-                                        </button>
-                                        {blog.category && (
-                                            <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
-                                                {blog.category}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            </Link>
-                        </div>
-                    ))
-                ) : (
-                    <div className="col-span-4 text-center py-10">No blogs found matching your criteria.</div>
-                )}
-            </div>
-        );
-    };
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
-    const Pagination = () => {
-        const pageNumbers = [];
-        const maxVisiblePages = 5;
-        
-        let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-        
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    window.scrollTo(0, 0);
+  };
 
-        for (let i = startPage; i <= endPage; i++) {
-            pageNumbers.push(i);
-        }
+  if (blogLoading || categoryLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
-        return (
-            <div className="flex items-center justify-center space-x-2 mt-8">
-                <button
-                    onClick={() => handlePageChange(page - 1)}
-                    disabled={page === 1}
-                    className={`px-3 py-1 rounded-md ${
-                        page === 1 
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                        : 'bg-red-600 text-white hover:bg-red-700'
-                    }`}
-                >
-                    Previous
-                </button>
-                
-                {startPage > 1 && (
-                    <>
-                        <button
-                            onClick={() => handlePageChange(1)}
-                            className="px-3 py-1 rounded-md hover:bg-gray-200"
-                        >
-                            1
-                        </button>
-                        {startPage > 2 && <span>...</span>}
-                    </>
-                )}
+  if (blogError || categoryError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Error: {blogFetchError?.message || "Something went wrong"}
+      </div>
+    );
+  }
 
-                {pageNumbers.map(number => (
-                    <button
-                        key={number}
-                        onClick={() => handlePageChange(number)}
-                        className={`px-3 py-1 rounded-md ${
-                            page === number 
-                            ? 'bg-red-600 text-white' 
-                            : 'hover:bg-gray-200'
-                        }`}
-                    >
-                        {number}
-                    </button>
-                ))}
+  const categories = categoryData?.data?.result || [];
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-                {endPage < totalPages && (
-                    <>
-                        {endPage < totalPages - 1 && <span>...</span>}
-                        <button
-                            onClick={() => handlePageChange(totalPages)}
-                            className="px-3 py-1 rounded-md hover:bg-gray-200"
-                        >
-                            {totalPages}
-                        </button>
-                    </>
-                )}
+  // Get current page items
+  const currentItems = filteredData.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
 
-                <button
-                    onClick={() => handlePageChange(page + 1)}
-                    disabled={page === totalPages}
-                    className={`px-3 py-1 rounded-md ${
-                        page === totalPages 
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                        : 'bg-red-600 text-white hover:bg-red-700'
-                    }`}
-                >
-                    Next
-                </button>
-            </div>
-        );
-    };
+  // Modify the BlogandCareerBox component to use slugs
+  const BlogandCareerBoxWithSlugs = ({ blogData }) => {
+    const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
     return (
-        <>
-            <PageBanner pageName="Blog" currectPage="blog" />
-            
-            {/* Filter button for mobile */}
-            <button
-                className="mx-[20px] mt-[30px] z-[500] bg-red-600 text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
-                onClick={() => setIsFilterOpen(true)}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {blogData.length > 0 ? (
+          blogData.map((blog, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
             >
-                Filters
-            </button>
+              {/* Use Link with slug for navigation */}
+              <Link
+                to={`/blogdetailpage/${blog.slug}`}
+                className=" flex flex-col  justify-between"
+              >
+                <div className="h-fit overflow-hidden">
+                  <img
+                    className="w-fit h-40 mx-auto object-cover rounded-t-xl"
+                    src={`${Images}/${blog?.thumbnail}`}
+                    alt={blog.title}
+                  />
 
-            {/* Sidebar Overlay for Mobile */}
-            <div className={`fixed inset-0 bg-black bg-opacity-50 z-[10001] flex transition-opacity duration-300 ${isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-                <div
-                    className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${isFilterOpen ? "translate-x-0" : "-translate-x-full"}`}
-                >
-                    <button
-                        className="text-gray-800 font-bold text-xl mb-4"
-                        onClick={() => setIsFilterOpen(false)}
-                    >
-                        X
-                    </button>
-                    <h3 className="text-lg font-semibold mb-6">Filter by Category</h3>
-                    <div className="space-y-4">
-                        {categories.map((category) => category && (
-                            <label
-                                key={category._id}
-                                className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg shadow hover:bg-gray-200 cursor-pointer transition-all duration-200"
-                            >
-                                <input
-                                    type="checkbox"
-                                    value={category.name}
-                                    checked={selectedCategories.includes(category.name)}
-                                    onChange={() => handleCategoryChange(category.name)}
-                                    className="form-checkbox h-5 w-5 text-red-500"
-                                />
-                                <span className="text-base font-medium">{category.name}</span>
-                            </label>
-                        ))}
-                    </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
+                      {blog.title}
+                    </h3>
+                    <p
+                      className="text-sm text-gray-600 mt-2 h-fit  overflow-hidden  line-clamp-3"
+                      dangerouslySetInnerHTML={{ __html: blog.description }}
+                    ></p>
+                  </div>
                 </div>
-                <div
-                    className="flex-grow cursor-pointer"
-                    onClick={() => setIsFilterOpen(false)}
-                ></div>
-            </div>
-
-            {/* Main Content */}
-            <div className={`flex px-[4vw] pb-[2vw] mt-10 ${isFilterOpen ? "pointer-events-none" : ""}`}>
-                {/* Desktop Sidebar */}
-                <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
-                    <h3 className="text-lg font-semibold mb-4">Filter by Category</h3>
-                    <div className="mb-4">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="w-full p-2 border-2 border-gray-300 rounded-lg"
-                            onChange={(e) => handleSearch(e.target.value)}
-                            value={searchTerm}
-                        />
-                    </div>
-                    <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
-                        {categories.map((category) => category && (
-                            <label
-                                key={category._id}
-                                className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
-                            >
-                                <input
-                                    type="checkbox"
-                                    value={category.name}
-                                    checked={selectedCategories.includes(category.name)}
-                                    onChange={() => handleCategoryChange(category.name)}
-                                />
-                                {category.name}
-                            </label>
-                        ))}
-                    </div>
+                <div className="px-4 pb-4 mt-2 flex flex-col  gap-4 justify-between items-start h-full ">
+                  {blog.category && (
+                    <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                      {blog.category}
+                    </span>
+                  )}
+                  <button className="bg-red-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-red-700 transition-all">
+                    Read More
+                  </button>
                 </div>
-
-                {/* Content */}
-                <div className="w-full md:w-3/4 pl-6">
-                    {/* Display selected categories as red badges */}
-                    <div className="mb-4">
-                        {selectedCategories.map((category) => (
-                            <span key={category} className="inline-block bg-red-500 text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
-                                {category}
-                            </span>
-                        ))}
-                    </div>
-                    <BlogandCareerBoxWithSlugs blogData={currentItems || []} />
-                    <Pagination />
-                </div>
+              </Link>
             </div>
-
-            <PopularCourses />
-            <HighRatedCareers />
-            <div className="flex gap-2 items-center">
-                <Events />
-                <ConsellingBanner />
-            </div>
-        </>
+          ))
+        ) : (
+          <div className="col-span-4 text-center py-10">
+            No blogs found matching your criteria.
+          </div>
+        )}
+      </div>
     );
+  };
+
+  const Pagination = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return (
+      <div className="flex items-center justify-center space-x-2 mt-8">
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1}
+          className={`px-3 py-1 rounded-md ${
+            page === 1
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-red-600 text-white hover:bg-red-700"
+          }`}
+        >
+          Previous
+        </button>
+
+        {startPage > 1 && (
+          <>
+            <button
+              onClick={() => handlePageChange(1)}
+              className="px-3 py-1 rounded-md hover:bg-gray-200"
+            >
+              1
+            </button>
+            {startPage > 2 && <span>...</span>}
+          </>
+        )}
+
+        {pageNumbers.map((number) => (
+          <button
+            key={number}
+            onClick={() => handlePageChange(number)}
+            className={`px-3 py-1 rounded-md ${
+              page === number ? "bg-red-600 text-white" : "hover:bg-gray-200"
+            }`}
+          >
+            {number}
+          </button>
+        ))}
+
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span>...</span>}
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              className="px-3 py-1 rounded-md hover:bg-gray-200"
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          disabled={page === totalPages}
+          className={`px-3 py-1 rounded-md ${
+            page === totalPages
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-red-600 text-white hover:bg-red-700"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <PageBanner pageName="Blog" currectPage="blog" />
+
+      {/* Filter button for mobile */}
+      <button
+        className="mx-[20px] mt-[30px] z-[500] bg-red-600 text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
+        onClick={() => setIsFilterOpen(true)}
+      >
+        Filters
+      </button>
+
+      {/* Sidebar Overlay for Mobile */}
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-50 z-[10001] flex transition-opacity duration-300 ${
+          isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <div
+          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${
+            isFilterOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <button
+            className="text-gray-800 font-bold text-xl mb-4"
+            onClick={() => setIsFilterOpen(false)}
+          >
+            X
+          </button>
+          <h3 className="text-lg font-semibold mb-6">Filter by Category</h3>
+          <div className="space-y-4">
+            {categories.map(
+              (category) =>
+                category && (
+                  <label
+                    key={category._id}
+                    className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg shadow hover:bg-gray-200 cursor-pointer transition-all duration-200"
+                  >
+                    <input
+                      type="checkbox"
+                      value={category.name}
+                      checked={selectedCategories.includes(category.name)}
+                      onChange={() => handleCategoryChange(category.name)}
+                      className="form-checkbox h-5 w-5 text-red-500"
+                    />
+                    <span className="text-base font-medium">
+                      {category.name}
+                    </span>
+                  </label>
+                )
+            )}
+          </div>
+        </div>
+        <div
+          className="flex-grow cursor-pointer"
+          onClick={() => setIsFilterOpen(false)}
+        ></div>
+      </div>
+
+      {/* Main Content */}
+      <div
+        className={`flex px-[4vw] pb-[2vw] mt-10 ${
+          isFilterOpen ? "pointer-events-none" : ""
+        }`}
+      >
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
+          <h3 className="text-lg font-semibold mb-4">Filter by Category</h3>
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full p-2 border-2 border-gray-300 rounded-lg"
+              onChange={(e) => handleSearch(e.target.value)}
+              value={searchTerm}
+            />
+          </div>
+          <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
+            {categories.map(
+              (category) =>
+                category && (
+                  <label
+                    key={category._id}
+                    className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      value={category.name}
+                      checked={selectedCategories.includes(category.name)}
+                      onChange={() => handleCategoryChange(category.name)}
+                    />
+                    {category.name}
+                  </label>
+                )
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="w-full md:w-3/4 pl-6">
+          {/* Display selected categories as red badges */}
+          <div className="mb-4">
+            {selectedCategories.map((category) => (
+              <span
+                key={category}
+                className="inline-block bg-red-500 text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded"
+              >
+                {category}
+              </span>
+            ))}
+          </div>
+          <BlogandCareerBoxWithSlugs blogData={currentItems || []} />
+          <Pagination />
+        </div>
+      </div>
+
+      <PopularCourses />
+      <HighRatedCareers />
+      <div className="flex gap-2 items-center">
+        <Events />
+        <ConsellingBanner />
+      </div>
+    </>
+  );
 };
 
 // Export the ID mapping for use in other components
