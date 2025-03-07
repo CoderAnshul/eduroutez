@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import downArrow from '../assets/Images/downArrow.png';
-import axiosInstance from '../ApiFunctions/axios';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import downArrow from "../assets/Images/downArrow.png";
+import axiosInstance from "../ApiFunctions/axios";
 
 // Import or create the courseIdMap for reference
 // You can either import from the PopularCourses component or recreate it here
@@ -10,7 +10,7 @@ const courseIdMap = {};
 const SubNavbar = ({ categories }) => {
   const [activeContent, setActiveContent] = useState({});
   const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [dropdownAlignment, setDropdownAlignment] = useState('left-0');
+  const [dropdownAlignment, setDropdownAlignment] = useState("left-0");
   const [popularCourses, setPopularCourses] = useState([]);
   const [careers, setCareers] = useState([]);
   const [latestNews, setLatestNews] = useState([]);
@@ -21,12 +21,12 @@ const SubNavbar = ({ categories }) => {
   const [collegesByCity, setCollegesByCity] = useState({});
   const [collegesByState, setCollegesByState] = useState({});
   const [activeStream, setActiveStream] = useState(null);
-const [hoveredCity, setHoveredCity] = useState(null);
-const [hoveredState, setHoveredState] = useState(null);
-const [hoveredStream, setHoveredStream] = useState(null);
-const [examBlogs, setExamBlogs] = useState({});
+  const [hoveredCity, setHoveredCity] = useState(null);
+  const [hoveredState, setHoveredState] = useState(null);
+  const [hoveredStream, setHoveredStream] = useState(null);
+  const [examBlogs, setExamBlogs] = useState({});
 
-const [hoveredInstitute, setHoveredInstitute] = useState(null);
+  const [hoveredInstitute, setHoveredInstitute] = useState(null);
   const navigate = useNavigate();
 
   // Static data for Maharashtra cities
@@ -38,7 +38,7 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
     { name: "Bangalore", count: 53 },
     { name: "Chennai", count: 45 },
     { name: "Amravati", count: 38 },
-    { name: "Solapur", count: 32 }
+    { name: "Solapur", count: 32 },
   ];
 
   // Static data for states
@@ -50,71 +50,79 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
     { name: "Uttar Pradesh", count: 465 },
     { name: "Gujarat", count: 412 },
     { name: "West Bengal", count: 345 },
-    { name: "Telangana", count: 322 }
+    { name: "Telangana", count: 322 },
   ];
 
   useEffect(() => {
     const fetchPopularCourses = async () => {
       try {
         const response = await axiosInstance.get(
-          `${import.meta.env.VITE_BASE_URL}/courses?filters={"isCoursePopular":true}`
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/courses?filters={"isCoursePopular":true}`
         );
         setPopularCourses(response.data?.data);
-        
+
         // Create slug mappings for courses
         if (response.data?.data?.result) {
-          response.data.data.result.forEach(course => {
+          response.data.data.result.forEach((course) => {
             if (course.courseTitle) {
               // Create slug from course title
               const slug = getCourseSlug(course);
-              
+
               // Store mapping
               courseIdMap[slug] = course._id;
             }
           });
-          
+
           // Update global map and localStorage
           updateGlobalMap();
         }
       } catch (error) {
-        console.error('Error fetching popular courses:', error);
+        console.error("Error fetching popular courses:", error);
       }
     };
 
     const fetchExamBlogsByStream = async (streamId) => {
       try {
         const response = await axiosInstance.get(
-          `${import.meta.env.VITE_BASE_URL}/blogs?filters={"category":["Exam"],"stream":["${streamId}"]}&sort={"createdAt":"desc"}`
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/blogs?filters={"category":["Exam"],"stream":["${streamId}"]}&sort={"createdAt":"desc"}`
         );
-        
+
         return response.data?.data?.result || [];
       } catch (error) {
-        console.error(`Error fetching exam blogs for stream ${streamId}:`, error);
+        console.error(
+          `Error fetching exam blogs for stream ${streamId}:`,
+          error
+        );
         return [];
       }
     };
-    
 
     const fetchCareers = async () => {
       try {
         const response = await axiosInstance.get(
-          `${import.meta.env.VITE_BASE_URL}/careers?sort={"createdAt":"desc"}&page=1&limit=8`
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/careers?sort={"createdAt":"desc"}&page=1&limit=8`
         );
         setCareers(response.data?.data);
       } catch (error) {
-        console.error('Error fetching careers:', error);
+        console.error("Error fetching careers:", error);
       }
     };
-    
+
     const fetchLatestNews = async () => {
       try {
         const response = await axiosInstance.get(
           `${import.meta.env.VITE_BASE_URL}/news/superadmin`
         );
-        console.log('news', response.data);
+        console.log("news", response.data);
         setLatestNews(response.data?.data || []);
       } catch (error) {
-        console.error('Error fetching latest news:', error);
+        console.error("Error fetching latest news:", error);
       }
     };
 
@@ -122,17 +130,21 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
       try {
         // Fetch popular colleges (sorted by views)
         const popularResponse = await axiosInstance.get(
-          `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"views":"desc"}&page=1&limit=10`
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/institutes?select=["_id","slug","instituteName","views"]&sort={"views":"desc"}&page=1&limit=10`
         );
         setTopColleges(popularResponse.data?.data?.result || []);
-        
+
         // Fetch recent colleges (sorted by createdAt)
         const recentResponse = await axiosInstance.get(
-          `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"createdAt":"desc"}&page=1&limit=10`
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/institutes?select=["_id","slug","instituteName","views"]&sort={"createdAt":"desc"}&page=1&limit=10`
         );
         setRecentColleges(recentResponse.data?.data?.result || []);
       } catch (error) {
-        console.error('Error fetching colleges:', error);
+        console.error("Error fetching colleges:", error);
       }
     };
 
@@ -148,50 +160,53 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
     // Make the mapping available globally
     window.courseIdMap = {
       ...window.courseIdMap,
-      ...courseIdMap
+      ...courseIdMap,
     };
-    
+
     // Get existing mappings from localStorage and merge
-    const existingMap = JSON.parse(localStorage.getItem('courseIdMap') || '{}');
-    localStorage.setItem('courseIdMap', JSON.stringify({
-      ...existingMap,
-      ...courseIdMap
-    }));
+    const existingMap = JSON.parse(localStorage.getItem("courseIdMap") || "{}");
+    localStorage.setItem(
+      "courseIdMap",
+      JSON.stringify({
+        ...existingMap,
+        ...courseIdMap,
+      })
+    );
   };
 
   // Helper function to get the slug for a course
   const getCourseSlug = (course) => {
     if (!course?.courseTitle) return course?._id;
-    
+
     return course.courseTitle
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
       .trim();
   };
 
   // Helper function to get the slug for a career
   const getCareerSlug = (career) => {
     if (!career?.title) return career?._id;
-    
+
     return career.title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
       .trim();
   };
 
   // Helper function to get the slug for a news item
   const getNewsSlug = (news) => {
     if (!news?.title) return news?._id;
-    
+
     return news.title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
       .trim();
   };
 
@@ -200,17 +215,21 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
     try {
       // Fetch popular institutes (sorted by views)
       const popularResponse = await axiosInstance.get(
-        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"views":"desc"}&page=1&limit=10&filters={"streams":["${streamName}"]}`
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/institutes?select=["_id","slug","instituteName","views"]&sort={"views":"desc"}&page=1&limit=10&filters={"streams":["${streamName}"]}`
       );
-      
+
       // Fetch recent institutes (sorted by createdAt)
       const recentResponse = await axiosInstance.get(
-        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"createdAt":"desc"}&page=1&limit=10&filters={"streams":["${streamName}"]}`
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/institutes?select=["_id","slug","instituteName","views"]&sort={"createdAt":"desc"}&page=1&limit=10&filters={"streams":["${streamName}"]}`
       );
-      
+
       return {
         popular: popularResponse.data?.data,
-        recent: recentResponse.data?.data
+        recent: recentResponse.data?.data,
       };
     } catch (error) {
       console.error(`Error fetching institutes for ${streamName}:`, error);
@@ -222,12 +241,17 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
   const fetchCollegesByLocation = async (locationType, locationName) => {
     try {
       const response = await axiosInstance.get(
-        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"views":"desc"}&page=1&limit=10&filters={"${locationType}":"${locationName}"}`
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/institutes?select=["_id","slug","instituteName","views"]&sort={"views":"desc"}&page=1&limit=10&filters={"${locationType}":"${locationName}"}`
       );
-      
+
       return response.data?.data?.result || [];
     } catch (error) {
-      console.error(`Error fetching colleges for ${locationType} ${locationName}:`, error);
+      console.error(
+        `Error fetching colleges for ${locationType} ${locationName}:`,
+        error
+      );
       return [];
     }
   };
@@ -235,24 +259,27 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
   // Function to handle location click
   const handleLocationClick = async (locationType, locationName) => {
     const stateKey = `${locationType}_${locationName}`;
-    
+
     // Check if we already have data for this location
     if (!collegesByCity[stateKey] && !collegesByState[stateKey]) {
-      const colleges = await fetchCollegesByLocation(locationType, locationName);
-      
-      if (locationType === 'city') {
-        setCollegesByCity(prev => ({
+      const colleges = await fetchCollegesByLocation(
+        locationType,
+        locationName
+      );
+
+      if (locationType === "city") {
+        setCollegesByCity((prev) => ({
           ...prev,
-          [stateKey]: colleges
+          [stateKey]: colleges,
         }));
-      } else if (locationType === 'state') {
-        setCollegesByState(prev => ({
+      } else if (locationType === "state") {
+        setCollegesByState((prev) => ({
           ...prev,
-          [stateKey]: colleges
+          [stateKey]: colleges,
         }));
       }
     }
-    
+
     // Navigate to the colleges filtered by location
     navigate(`/searchpage?${locationType}=${encodeURIComponent(locationName)}`);
   };
@@ -262,82 +289,92 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
     // Check if we already have data for this stream
     if (!popularInstitutes[streamName] || !recentInstitutes[streamName]) {
       const result = await fetchInstitutesByStream(streamName);
-      
+
       if (result) {
         if (result.popular) {
-          setPopularInstitutes(prev => ({
+          setPopularInstitutes((prev) => ({
             ...prev,
-            [streamName]: result.popular
+            [streamName]: result.popular,
           }));
         }
-        
+
         if (result.recent) {
-          setRecentInstitutes(prev => ({
+          setRecentInstitutes((prev) => ({
             ...prev,
-            [streamName]: result.recent
+            [streamName]: result.recent,
           }));
         }
       }
     }
-    
+
     // Fetch exam blogs if this is for the Exams category and we don't have data yet
-    if (hoveredCategory === 'Exams' && !examBlogs[streamId]) {
+    if (hoveredCategory === "Exams" && !examBlogs[streamId]) {
       const blogs = await fetchExamBlogsByStream(streamId);
-      setExamBlogs(prev => ({
+      setExamBlogs((prev) => ({
         ...prev,
-        [streamId]: blogs
+        [streamId]: blogs,
       }));
     }
   };
-  
 
   const handleMouseEnter = async (category, event) => {
     const boundingBox = event.target.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const categoryWidth = boundingBox.width;
 
-    if (category.label === 'MEDIA') {
-      setDropdownAlignment('transform translate-x-[-50%]');
+    if (category.label === "MEDIA") {
+      setDropdownAlignment("transform translate-x-[-50%]");
     } else if (boundingBox.left <= categoryWidth) {
-      setDropdownAlignment('left-0');
+      setDropdownAlignment("left-0");
     } else if (viewportWidth - boundingBox.right <= categoryWidth) {
-      setDropdownAlignment('right-0');
+      setDropdownAlignment("right-0");
     } else {
-      setDropdownAlignment('left-0');
+      setDropdownAlignment("left-0");
     }
 
     setHoveredCategory(category.label);
 
-    if (category.label !== 'Courses' && category.label !== 'Careers' && category.label !== 'Latest Updates' && category.label !== 'Top Colleges' && category.sidebarItems?.length > 0) {
+    if (
+      category.label !== "Courses" &&
+      category.label !== "Careers" &&
+      category.label !== "Latest Updates" &&
+      category.label !== "Top Colleges" &&
+      category.sidebarItems?.length > 0
+    ) {
       const firstItemId = category.sidebarItems[0].id;
       setActiveContent((prev) => ({
         ...prev,
         [category.label]: firstItemId,
       }));
-      
+
       // If this is a stream category, fetch institutes
-      if (category.label === 'Colleges' || category.label === 'Exams') {
+      if (category.label === "Colleges" || category.label === "Exams") {
         const streamName = category.sidebarItems[0].name;
         handleStreamInteraction(streamName);
       }
     }
   };
 
-  const handleSidebarItemClick = async (category, itemId, itemName, streamId) => {
-    setActiveContent(prev => ({
+  const handleSidebarItemClick = async (
+    category,
+    itemId,
+    itemName,
+    streamId
+  ) => {
+    setActiveContent((prev) => ({
       ...prev,
-      [category.label]: itemId
+      [category.label]: itemId,
     }));
-    
+
     // If this is a stream, fetch popular institutes
-    if (category.label === 'Colleges' || category.label === 'Exams') {
+    if (category.label === "Colleges" || category.label === "Exams") {
       handleStreamInteraction(itemName, streamId);
     }
   };
 
   const renderExamBlogs = (streamId) => {
     const blogs = examBlogs[streamId] || [];
-    
+
     return (
       <div className="p-4 min-w-64">
         <h3 className="font-semibold text-red-500 mb-3">Latest Exam Updates</h3>
@@ -345,21 +382,25 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
           <p className="text-sm text-gray-500">Loading exam updates...</p>
         ) : blogs.length > 0 ? (
           <div className="grid grid-cols-1 gap-3">
-            {blogs.slice(0, 5).map(blog => (
-              <div 
+            {blogs.slice(0, 5).map((blog) => (
+              <div
                 key={blog._id}
                 onClick={() => navigate(`/blog/${blog.slug || blog._id}`)}
                 className="cursor-pointer hover:bg-gray-50 p-2 rounded"
               >
-                <div className="text-sm font-medium text-gray-800 hover:text-red-500">{blog.title}</div>
+                <div className="text-sm font-medium text-gray-800 hover:text-red-500">
+                  {blog.title}
+                </div>
                 <div className="text-xs text-gray-500 mt-1">
                   {new Date(blog.createdAt).toLocaleDateString()}
                 </div>
               </div>
             ))}
             <div className="text-right mt-2">
-              <a 
-                onClick={() => navigate(`/blogs?category=Exam&stream=${streamId}`)}
+              <a
+                onClick={() =>
+                  navigate(`/blogs?category=Exam&stream=${streamId}`)
+                }
                 className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
               >
                 View All Exam Updates →
@@ -374,32 +415,32 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
   };
 
   const handleViewAllCourses = () => {
-    navigate('/popularcourses');
+    navigate("/popularcourses");
   };
 
   const handleViewAllCareers = () => {
-    navigate('/careerspage');
+    navigate("/careerspage");
   };
 
   const handleViewAllColleges = () => {
-    navigate('/topcolleges');
+    navigate("/topcolleges");
   };
 
   const handleAllCollegesByCity = () => {
-    navigate('/searchpage');
+    navigate("/searchpage");
   };
-  
+
   const handleAllCollegesByState = () => {
-    navigate('/searchpage');
+    navigate("/searchpage");
   };
 
   const handleMouseLeave = () => {
     setHoveredCategory(null);
-    setDropdownAlignment('');
+    setDropdownAlignment("");
   };
-  
+
   const handleViewAllNews = () => {
-    navigate('/news');  // Adjust the route as needed
+    navigate("/news"); // Adjust the route as needed
   };
 
   const handleCourseClick = (course) => {
@@ -416,13 +457,13 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
     const newsSlug = getNewsSlug(news);
     navigate(`/news/${newsSlug}`);
   };
-  
+
   const handleInstituteClick = (institute) => {
     navigate(`/institute/${institute.slug || institute._id}`);
   };
 
   const renderCoursesContent = () => (
-    <div className="p-6 bg-white min-w-[400px]">
+    <div className="p-6 bg-white min-w-[400px] ">
       <div className="space-y-8">
         <h3 className="font-semibold text-red-500">Popular Courses</h3>
         <div className="space-y-6">
@@ -438,8 +479,8 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
             ))}
           </div>
           <div className="text-right">
-            <a 
-              onClick={() => handleViewAllCourses()} 
+            <a
+              onClick={() => handleViewAllCourses()}
               className="text-sm text-red-500 hover:text-red-600 cursor-pointer font-medium"
             >
               View All Courses →
@@ -467,455 +508,519 @@ const [hoveredInstitute, setHoveredInstitute] = useState(null);
             ))}
           </div>
           <div className="text-right">
-            <a 
-             onClick={() => handleViewAllCareers()} 
-             className="text-sm text-red-500 hover:text-red-600 cursor-pointer font-medium"
-           >
-             View All Careers →
-           </a>
-         </div>
-       </div>
-       </div>
-   </div>
- );
+            <a
+              onClick={() => handleViewAllCareers()}
+              className="text-sm text-red-500 hover:text-red-600 cursor-pointer font-medium"
+            >
+              View All Careers →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
- const renderTopCollegesContent = () => (
-   <div className="p-6 bg-white min-w-[900px]">
-     <div className="grid grid-cols-3 gap-6">
-       {/* Popular Colleges (sorted by views) */}
-       <div className="space-y-6">
-         <h3 className="font-semibold text-red-500">Popular Colleges</h3>
-         <div className="space-y-4">
-           <div className="grid grid-cols-1 gap-2">
-             {topColleges?.map((college) => (
-               <a
-                 key={college._id}
-                 onClick={() => handleInstituteClick(college)}
-                 className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
-               >
-                 <span>{college.instituteName}</span>
-                 <span className="text-gray-500 text-xs">{college.views || 0} views</span>
-               </a>
-             ))}
-           </div>
-         </div>
-       </div>
-       
-       {/* Top Cities - Now using static data */}
-       <div className="space-y-6">
-         <h3 className="font-semibold text-red-500">Colleges by City</h3>
-         <div className="space-y-4">
-           <div className="grid grid-cols-1 gap-2">
-             {staticTopCities.map((city, index) => (
-               <a
-                 key={index}
-                 onClick={() => handleLocationClick('city', city.name)}
-                 className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
-               >
-                 <span>{city.name}</span>
-                 <span className="text-gray-500 text-xs">{city.count} colleges</span>
-               </a>
-             ))}
-           </div>
-           <div className="text-right">
-             <a 
-               onClick={handleAllCollegesByCity} 
-               className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
-             >
-               View All Cities →
-             </a>
-           </div>
-         </div>
-       </div>
-       
-       {/* Top States - Now using static data */}
-       <div className="space-y-6">
-         <h3 className="font-semibold text-red-500">Colleges by State</h3>
-         <div className="space-y-4">
-           <div className="grid grid-cols-1 gap-2">
-             {staticTopStates.map((state, index) => (
-               <a
-                 key={index}
-                 onClick={() => handleLocationClick('state', state.name)}
-                 className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
-               >
-                 <span>{state.name}</span>
-                 <span className="text-gray-500 text-xs">{state.count} colleges</span>
-               </a>
-             ))}
-           </div>
-           <div className="text-right">
-             <a 
-               onClick={handleAllCollegesByState} 
-               className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
-             >
-               View All States →
-             </a>
-           </div>
-         </div>
-       </div>
-     </div>
-     
-     <div className="text-right mt-6">
-       <a 
-         onClick={() => handleViewAllColleges()} 
-         className="text-sm text-red-500 hover:text-red-600 cursor-pointer font-medium"
-       >
-         View All Colleges →
-       </a>
-     </div>
-   </div>
- );
+  const renderTopCollegesContent = () => (
+    <div className="p-6 bg-white min-w-[900px]">
+      <div className="grid grid-cols-3 gap-6">
+        {/* Popular Colleges (sorted by views) */}
+        <div className="space-y-6">
+          <h3 className="font-semibold text-red-500">Popular Colleges</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-2">
+              {topColleges?.map((college) => (
+                <a
+                  key={college._id}
+                  onClick={() => handleInstituteClick(college)}
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                >
+                  <span>{college.instituteName}</span>
+                  <span className="text-gray-500 text-xs">
+                    {college.views || 0} views
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
 
+        {/* Top Cities - Now using static data */}
+        <div className="space-y-6">
+          <h3 className="font-semibold text-red-500">Colleges by City</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-2">
+              {staticTopCities.map((city, index) => (
+                <a
+                  key={index}
+                  onClick={() => handleLocationClick("city", city.name)}
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                >
+                  <span>{city.name}</span>
+                  <span className="text-gray-500 text-xs">
+                    {city.count} colleges
+                  </span>
+                </a>
+              ))}
+            </div>
+            <div className="text-right">
+              <a
+                onClick={handleAllCollegesByCity}
+                className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
+              >
+                View All Cities →
+              </a>
+            </div>
+          </div>
+        </div>
 
- 
+        {/* Top States - Now using static data */}
+        <div className="space-y-6">
+          <h3 className="font-semibold text-red-500">Colleges by State</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-2">
+              {staticTopStates.map((state, index) => (
+                <a
+                  key={index}
+                  onClick={() => handleLocationClick("state", state.name)}
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                >
+                  <span>{state.name}</span>
+                  <span className="text-gray-500 text-xs">
+                    {state.count} colleges
+                  </span>
+                </a>
+              ))}
+            </div>
+            <div className="text-right">
+              <a
+                onClick={handleAllCollegesByState}
+                className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
+              >
+                View All States →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
 
- const renderNewsContent = () => (
-   <div className="bg-white rounded-xl shadow-lg">
-     <div className="p-4 border-b bg-gradient-to-r from-orange-500 to-red-600">
-       <h3 className="text-lg font-bold text-white">Latest Updates</h3>
-     </div>
- 
-     <div className="p-4">
-       <ul className="grid grid-cols-3 gap-8">
-         {latestNews
-           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-           .slice(0, 3)
-           .map((news) => (
-             <li
-               key={news._id}
-               onClick={() => handleNewsClick(news)}
-               className="group hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
-             >
-               <div className="space-y-3">
-                 <div className="space-y-1">
-                   <p className="text-sm font-medium text-gray-900 line-clamp-2">
-                     {news.title}
-                   </p>
-                   <p className="text-xs text-orange-600">
-                     {new Date(news.createdAt).toDateString()}
-                   </p>
-                 </div>
+      <div className="text-right mt-6">
+        <a
+          onClick={() => handleViewAllColleges()}
+          className="text-sm text-red-500 hover:text-red-600 cursor-pointer font-medium"
+        >
+          View All Colleges →
+        </a>
+      </div>
+    </div>
+  );
 
-                 <div>
-                   <img
-                     src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${news.image}`}
-                     alt={news.title}
-                     className="w-full h-48 object-cover rounded-lg"
-                   />
-                 </div>
+  const renderNewsContent = () => (
+    <div className="bg-white rounded-xl shadow-lg">
+      <div className="p-4 border-b bg-gradient-to-r from-orange-500 to-red-600">
+        <h3 className="text-lg font-bold text-white">Latest Updates</h3>
+      </div>
 
-                 <p className="text-sm text-gray-600 line-clamp-3">
-                   {news.description}
-                 </p>
-               </div>
-             </li>
-           ))}
-       </ul>
-     </div>
- 
-     <div className="p-4 border-t bg-gray-50">
-       <button
-         onClick={handleViewAllNews}
-         className="flex items-center justify-center gap-2 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
-       >
-         View All Updates
-         <svg
-           className="w-4 h-4"
-           fill="none"
-           stroke="currentColor"
-           viewBox="0 0 24 24"
-         >
-           <path
-             strokeLinecap="round"
-             strokeLinejoin="round"
-             strokeWidth={2}
-             d="M9 5l7 7-7 7"
-           />
-         </svg>
-       </button>
-     </div>
-   </div>
- );
+      <div className="p-4">
+        <ul className="grid grid-cols-3 gap-8">
+          {latestNews
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 3)
+            .map((news) => (
+              <li
+                key={news._id}
+                onClick={() => handleNewsClick(news)}
+                className="group hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
+              >
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-gray-900 line-clamp-2">
+                      {news.title}
+                    </p>
+                    <p className="text-xs text-orange-600">
+                      {new Date(news.createdAt).toDateString()}
+                    </p>
+                  </div>
 
- const renderMoreContent = () => (
-   <div className="bg-white rounded-lg shadow-lg p-6 min-w-[600px]">
-     <div className="grid grid-cols-3 gap-8">
-       {/* Resources Section */}
-       <div className="space-y-4">
-         <h3 className="font-semibold text-red-500 border-b pb-2">Resources</h3>
-         <ul className="space-y-2">
-           <li>
-             <a href="/exams" className="text-sm hover:text-red-500">Entrance Exams</a>
-           </li>
-           <li>
-             <a href="/colleges" className="text-sm hover:text-red-500">Top Colleges</a>
-           </li>
-           <li>
-             <a href="/scholarships" className="text-sm hover:text-red-500">Scholarships</a>
-           </li>
-           <li>
-             <a href="/study-material" className="text-sm hover:text-red-500">Study Material</a>
-           </li>
-         </ul>
-       </div>
+                  <div>
+                    <img
+                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${
+                        news.image
+                      }`}
+                      alt={news.title}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                  </div>
 
-       {/* Tools Section */}
-       <div className="space-y-4">
-         <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
-         <ul className="space-y-2">
-           <li>
-             <a href="/college-predictor" className="text-sm hover:text-red-500">College Predictor</a>
-           </li>
-           <li>
-             <a href="/rank-predictor" className="text-sm hover:text-red-500">Rank Predictor</a>
-           </li>
-           <li>
-             <a href="/compare-colleges" className="text-sm hover:text-red-500">Compare Colleges</a>
-           </li>
-           <li>
-             <a href="/career-tests" className="text-sm hover:text-red-500">Career Assessment</a>
-           </li>
-         </ul>
-       </div>
+                  <p className="text-sm text-gray-600 line-clamp-3">
+                    {news.description}
+                  </p>
+                </div>
+              </li>
+            ))}
+        </ul>
+      </div>
 
-       {/* Quick Links Section */}
-       <div className="space-y-4">
-         <h3 className="font-semibold text-red-500 border-b pb-2">Quick Links</h3>
-         <ul className="space-y-2">
-           <li>
-             <a href="/about-us" className="text-sm hover:text-red-500">About Us</a>
-           </li>
-           <li>
-             <a href="/contact" className="text-sm hover:text-red-500">Contact Us</a>
-           </li>
-           <li>
-             <a href="/faqs" className="text-sm hover:text-red-500">FAQs</a>
-           </li>
-           <li>
-             <a href="/feedback" className="text-sm hover:text-red-500">Feedback</a>
-           </li>
-         </ul>
-       </div>
-     </div>
-   </div>
- );
-
- const renderStreamInstitutes = (streamName) => {
-   const popular = popularInstitutes[streamName]?.result || [];
-   const recent = recentInstitutes[streamName]?.result || [];
-   
-   return (
-     <div className="p-4 flex gap-6">
-       {/* Popular Institutes (sorted by views) */}
-       <div className="min-w-48">
-         <h3 className="font-semibold text-red-500 mb-3">Popular Colleges</h3>
-         {popular.length === 0 ? (
-           <p className="text-sm text-gray-500">Loading popular institutes...</p>
-         ) : (
-           <div className="grid grid-cols-1 gap-2">
-             {popular.slice(0, 5).map(institute => (
-               <div 
-                 key={institute._id}
-                 onClick={() => handleInstituteClick(institute)}
-                 className="cursor-pointer transition-colors hover:text-red-500 text-sm flex justify-between"
-               >
-                 <span>{institute.instituteName}</span>
-               </div>
-             ))}
-           </div>
-         )}
-       </div>
-       
-       {/* Recent Institutes (sorted by createdAt) */}
-       <div className="min-w-48">
-         <h3 className="font-semibold text-red-500 mb-3">Top Colleges</h3>
-         {recent.length === 0 ? (
-           <p className="text-sm text-gray-500">Loading recent institutes...</p>
-         ) : (
-           <div className="grid grid-cols-1 gap-2">
-             {recent.slice(0, 5).map(institute => (
-               <div 
-                 key={institute._id}
-                 onClick={() => handleInstituteClick(institute)}
-                 className="cursor-pointer transition-colors hover:text-red-500 text-sm"
-               >
-                 {institute.instituteName}
-               </div>
-             ))}
-           </div>
-         )}
-       </div>
-     </div>
-   );
- };
-
- const renderRegularContent = (category) => (
-  <div className="flex">
-    <div className="w-64 bg-white overflow-y-auto">
-      <ul>
-        {category?.sidebarItems?.map((item) => (
-          <li
-            key={item.id}
-            className={`px-2 py-2 group text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
-              activeContent[category.label] === item.id
-                ? 'bg-red-400 border-l-2 border-red-500 text-white'
-                : 'bg-red-500 text-white'
-            }`}
-            onMouseEnter={() => {
-              setActiveContent((prev) => ({
-                ...prev,
-                [category.label]: item.id,
-              }));
-              
-              // If this is a stream category, fetch institutes on hover
-              if (category.label === 'Colleges' || category.label === 'Exams') {
-                handleStreamInteraction(item.name);
-                // Store the active stream name in state
-                setActiveStream(item.name);
-              }
-            }}
-            onClick={() => handleSidebarItemClick(category, item.id, item.name)}
+      <div className="p-4 border-t bg-gray-50">
+        <button
+          onClick={handleViewAllNews}
+          className="flex items-center justify-center gap-2 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
+        >
+          View All Updates
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            {item.name}
-            <span className="text-xs">
-              <img
-                className={`h-3 transform transition-transform duration-300 ${
-                  activeContent[category.label] === item.id
-                    ? '-rotate-0'
-                    : '-rotate-90'
-                }`}
-                src={downArrow}
-                alt=""
-              />
-            </span>
-          </li>
-        ))}
-      </ul>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
-    <div className="flex flex-col">
-      {/* Show stream institutes for the active stream if this is Colleges or Exams */}
-      {(category.label === 'Colleges' || category.label === 'Exams') && 
-        activeContent[category.label] && 
-        category.sidebarItems && 
-        renderStreamInstitutes(
-          category.sidebarItems.find(item => item.id === activeContent[category.label])?.name
-        )
-      }
-    </div>
+  );
 
-    {/* City and State sections with stream-based display */}
-    <div className="ml-4">
-      {/* Top Cities - Now showing stream-specific data */}
-      <div className="space-y-6">
-        <h3 className="font-semibold text-red-500">
-          {activeStream ? `${activeStream} Colleges by City` : 'Colleges by City'}
-        </h3>
+  const renderMoreContent = () => (
+    <div className="bg-white rounded-lg shadow-lg p-6 min-w-[600px]">
+      <div className="grid grid-cols-3 gap-8">
+        {/* Resources Section */}
         <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-2">
-            {staticTopCities.map((city, index) => (
-              <a
-                key={index}
-                onClick={() => handleLocationClick('city', city.name, activeStream)}
-                className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
-                onMouseEnter={() => {
-                  // Show stream-specific college count if available
-                  if (activeStream) {
-                    setHoveredCity(city.name);
-                  }
-                }}
-                onMouseLeave={() => setHoveredCity(null)}
-              >
-                <span> {activeStream} in  {city.name}</span>
-                
+          <h3 className="font-semibold text-red-500 border-b pb-2">
+            Resources
+          </h3>
+          <ul className="space-y-2">
+            <li>
+              <a href="/exams" className="text-sm hover:text-red-500">
+                Entrance Exams
               </a>
-            ))}
-          </div>
-          <div className="text-right">
-            <a 
-              onClick={() => handleAllCollegesByCity(activeStream)} 
-              className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
+            </li>
+            <li>
+              <a href="/colleges" className="text-sm hover:text-red-500">
+                Top Colleges
+              </a>
+            </li>
+            <li>
+              <a href="/scholarships" className="text-sm hover:text-red-500">
+                Scholarships
+              </a>
+            </li>
+            <li>
+              <a href="/study-material" className="text-sm hover:text-red-500">
+                Study Material
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Tools Section */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
+          <ul className="space-y-2">
+            <li>
+              <a
+                href="/college-predictor"
+                className="text-sm hover:text-red-500"
+              >
+                College Predictor
+              </a>
+            </li>
+            <li>
+              <a href="/rank-predictor" className="text-sm hover:text-red-500">
+                Rank Predictor
+              </a>
+            </li>
+            <li>
+              <a
+                href="/compare-colleges"
+                className="text-sm hover:text-red-500"
+              >
+                Compare Colleges
+              </a>
+            </li>
+            <li>
+              <a href="/career-tests" className="text-sm hover:text-red-500">
+                Career Assessment
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Quick Links Section */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-red-500 border-b pb-2">
+            Quick Links
+          </h3>
+          <ul className="space-y-2">
+            <li>
+              <a href="/about-us" className="text-sm hover:text-red-500">
+                About Us
+              </a>
+            </li>
+            <li>
+              <a href="/contact" className="text-sm hover:text-red-500">
+                Contact Us
+              </a>
+            </li>
+            <li>
+              <a href="/faqs" className="text-sm hover:text-red-500">
+                FAQs
+              </a>
+            </li>
+            <li>
+              <a href="/feedback" className="text-sm hover:text-red-500">
+                Feedback
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStreamInstitutes = (streamName) => {
+    const popular = popularInstitutes[streamName]?.result || [];
+    const recent = recentInstitutes[streamName]?.result || [];
+
+    return (
+      <div className="p-4 flex gap-6">
+        {/* Popular Institutes (sorted by views) */}
+        <div className="min-w-48">
+          <h3 className="font-semibold text-red-500 mb-3">Popular Colleges</h3>
+          {popular.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              Loading popular institutes...
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-2">
+              {popular.slice(0, 5).map((institute) => (
+                <div
+                  key={institute._id}
+                  onClick={() => handleInstituteClick(institute)}
+                  className="cursor-pointer transition-colors hover:text-red-500 text-sm flex justify-between"
+                >
+                  <span>{institute.instituteName}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Recent Institutes (sorted by createdAt) */}
+        <div className="min-w-48">
+          <h3 className="font-semibold text-red-500 mb-3">Top Colleges</h3>
+          {recent.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              Loading recent institutes...
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-2">
+              {recent.slice(0, 5).map((institute) => (
+                <div
+                  key={institute._id}
+                  onClick={() => handleInstituteClick(institute)}
+                  className="cursor-pointer transition-colors hover:text-red-500 text-sm"
+                >
+                  {institute.instituteName}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderRegularContent = (category) => (
+    <div className="flex w-">
+      <div className="w-[400px] bg-white overflow-y-auto">
+        <ul>
+          {category?.sidebarItems?.map((item) => (
+            <li
+              key={item.id}
+              className={`px-2 py-2 group text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
+                activeContent[category.label] === item.id
+                  ? "bg-red-400 border-l-2 border-red-500 text-white"
+                  : "bg-red-500 text-white"
+              }`}
+              onMouseEnter={() => {
+                setActiveContent((prev) => ({
+                  ...prev,
+                  [category.label]: item.id,
+                }));
+
+                // If this is a stream category, fetch institutes on hover
+                if (
+                  category.label === "Colleges" ||
+                  category.label === "Exams"
+                ) {
+                  handleStreamInteraction(item.name);
+                  // Store the active stream name in state
+                  setActiveStream(item.name);
+                }
+              }}
+              onClick={() =>
+                handleSidebarItemClick(category, item.id, item.name)
+              }
             >
-              {activeStream ? `View All ${activeStream} Cities →` : 'View All Cities →'}
-            </a>
+              {item.name}
+              <span className="text-xs">
+                <img
+                  className={`h-3 transform transition-transform duration-300 ${
+                    activeContent[category.label] === item.id
+                      ? "-rotate-0"
+                      : "-rotate-90"
+                  }`}
+                  src={downArrow}
+                  alt=""
+                />
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="flex flex-col">
+        {/* Show stream institutes for the active stream if this is Colleges or Exams */}
+        {(category.label === "Colleges" || category.label === "Exams") &&
+          activeContent[category.label] &&
+          category.sidebarItems &&
+          renderStreamInstitutes(
+            category.sidebarItems.find(
+              (item) => item.id === activeContent[category.label]
+            )?.name
+          )}
+      </div>
+
+      {/* City and State sections with stream-based display */}
+      <div className="ml-4 mt-4 flex gap-24 mr-10 w-full">
+        {/* Top Cities - Now showing stream-specific data */}
+        <div className="space-y-6">
+          <h3 className="font-semibold text-red-500">
+            {activeStream
+              ? `${activeStream} Colleges by City`
+              : "Colleges by City"}
+          </h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-2">
+              {staticTopCities.map((city, index) => (
+                <a
+                  key={index}
+                  onClick={() =>
+                    handleLocationClick("city", city.name, activeStream)
+                  }
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                  onMouseEnter={() => {
+                    // Show stream-specific college count if available
+                    if (activeStream) {
+                      setHoveredCity(city.name);
+                    }
+                  }}
+                  onMouseLeave={() => setHoveredCity(null)}
+                >
+                  <span>
+                    {" "}
+                    {activeStream} in {city.name}
+                  </span>
+                </a>
+              ))}
+            </div>
+            <div className="text-right mr-4">
+              <a
+                onClick={() => handleAllCollegesByCity(activeStream)}
+                className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
+              >
+                {activeStream
+                  ? `View All ${activeStream} Cities →`
+                  : "View All Cities →"}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Top States - Now showing stream-specific data */}
+        <div className="space-y-6">
+          <h3 className="font-semibold text-red-500">
+            {activeStream
+              ? `${activeStream} Colleges by State`
+              : "Colleges by State"}
+          </h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-2">
+              {staticTopStates.map((state, index) => (
+                <a
+                  key={index}
+                  onClick={() =>
+                    handleLocationClick("state", state.name, activeStream)
+                  }
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                  onMouseEnter={() => {
+                    // Show stream-specific college count if available
+                    if (activeStream) {
+                      setHoveredState(state.name);
+                    }
+                  }}
+                  onMouseLeave={() => setHoveredState(null)}
+                >
+                  <span>
+                    {" "}
+                    {activeStream} in {state.name}
+                  </span>
+                </a>
+              ))}
+            </div>
+            <div className="text-right mr-4">
+              <a
+                onClick={() => handleAllCollegesByState(activeStream)}
+                className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
+              >
+                {activeStream
+                  ? `View All ${activeStream} States →`
+                  : "View All States →"}
+              </a>
+            </div>
           </div>
         </div>
       </div>
-      
-      {/* Top States - Now showing stream-specific data */}
-      <div className="space-y-6">
-        <h3 className="font-semibold text-red-500">
-          {activeStream ? `${activeStream} Colleges by State` : 'Colleges by State'}
-        </h3>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-2">
-            {staticTopStates.map((state, index) => (
-              <a
-                key={index}
-                onClick={() => handleLocationClick('state', state.name, activeStream)}
-                className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
-                onMouseEnter={() => {
-                  // Show stream-specific college count if available
-                  if (activeStream) {
-                    setHoveredState(state.name);
-                  }
-                }}
-                onMouseLeave={() => setHoveredState(null)}
-              >
-                <span> {activeStream} in {state.name}</span>
-                
-              </a>
-            ))}
-          </div>
-          <div className="text-right">
-            <a 
-              onClick={() => handleAllCollegesByState(activeStream)} 
-              className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
-            >
-              {activeStream ? `View All ${activeStream} States →` : 'View All States →'}
-            </a>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-);
+  );
 
- return (
-   <div>
-     <div className="w-full h-auto bg-white">
-       <div className="w-full px-5 py-2 h-full mx-auto flex justify-between">
-         <div className=" h-full flex flex-col justify-between">
-           <div className="h-1/2 w-fit px-1 flex relative items-center justify-start gap-7">
-             {categories?.map((category, index) => (
-               <div
-                 key={index}
-                 className="group"
-                 onMouseEnter={(e) => handleMouseEnter(category, e)}
-                 onMouseLeave={handleMouseLeave}
-               >
-                 <h5 className="text-xs gap-2 font-[500] group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer whitespace-nowrap">
-                   {category.label}
-                   <img
-                     className="h-3 group-hover:rotate-180 transition-all"
+  return (
+    <div>
+      <div className="w-full h-auto bg-white">
+        <div className="w-full px-5 pt-2 h-full mx-auto flex justify-between">
+          <div className=" h-full flex flex-col justify-between">
+            <div className="h-1/2 w-fit px-1 flex relative items-center justify-start gap-7">
+              {categories?.map((category, index) => (
+                <div
+                  key={index}
+                  className="group"
+                  onMouseEnter={(e) => handleMouseEnter(category, e)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <h5 className="text-xs gap-2 font-[500] pb-2 group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer whitespace-nowrap">
+                    {category.label}
+                    <img
+                      className="h-3 group-hover:rotate-180 transition-all"
                       src={downArrow}
                       alt=""
                     />
-                     
                   </h5>
                   {hoveredCategory === category.label && (
                     <div
-                      className={`absolute top-full z-50 bg-white shadow-lg ${dropdownAlignment}`}
+                      className={`absolute top-6 z-50 bg-white   shadow-lg ${dropdownAlignment}`}
                     >
-                      {category.label === 'Courses' 
+                      {category.label === "Courses"
                         ? renderCoursesContent()
-                        : category.label === 'Careers'
+                        : category.label === "Careers"
                         ? renderCareersContent()
-                        : category.label === 'Latest Updates'
+                        : category.label === "Latest Updates"
                         ? renderNewsContent()
-                        : category.label === 'Colleges'
+                        : category.label === "Colleges"
                         ? renderRegularContent(category)
-                        : category.label === 'More'
+                        : category.label === "More"
                         ? renderMoreContent()
                         : renderRegularContent(category)}
                     </div>
