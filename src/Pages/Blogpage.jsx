@@ -8,6 +8,7 @@ import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import PopularCourses from "../Components/PopularCourses";
 import HighRatedCareers from "../Components/HighRatedCareers";
+import SocialShare from "../Components/SocialShare";
 
 // Create a module-level object to store the blog ID mapping
 const blogIdMapStore = {};
@@ -144,23 +145,27 @@ const Blogpage = () => {
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
+  const handleShareClick = (e, blog) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   // Modify the BlogandCareerBox component to use slugs
   const BlogandCareerBoxWithSlugs = ({ blogData }) => {
     const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {blogData.length > 0 ? (
           blogData.map((blog, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+              className="bg-white rounded-xl shadow-lg relative transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
             >
               {/* Use Link with slug for navigation */}
               <Link
                 to={`/blogdetailpage/${blog.slug}`}
-                className=" flex flex-col  justify-between"
+                className=" flex flex-col  justify-between "
               >
                 <div className="h-fit overflow-hidden">
                   <img
@@ -185,9 +190,22 @@ const Blogpage = () => {
                       {blog.category}
                     </span>
                   )}
-                  <button className="bg-red-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-red-700 transition-all">
-                    Read More
-                  </button>
+                  <div className="flex items-center w-full justify-between gap-4">
+                    <button className="bg-red-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-red-700 transition-all">
+                      Read More
+                    </button>
+                    <div
+                      className="z-50 "
+                      onClick={(e) => handleShareClick(e, blog)}
+                    >
+                      <SocialShare
+                        title={blog.title}
+                        url={`${window.location.origin}/blogdetailpage/${blog.slug}`}
+                        contentType="blog"
+                        className="z-50"
+                      />
+                    </div>
+                  </div>
                 </div>
               </Link>
             </div>
@@ -399,7 +417,7 @@ const Blogpage = () => {
 
       <PopularCourses />
       <HighRatedCareers />
-      <div className="flex gap-2 items-center">
+      <div className="flex max-sm:flex-col gap-2 items-center">
         <Events />
         <ConsellingBanner />
       </div>
