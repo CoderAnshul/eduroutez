@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import logo from '../assets/Images/logo.png';
-import searchImg from '../assets/Images/searchLogo.png';
-import edit from '../assets/Images/editBtn.png';
-import explore from '../assets/Images/explore.png';
-import notification from '../assets/Images/notification.png';
-import menu from '../assets/Images/menuBar.png';
-import menubar from '../assets/Images/secondMenu.png';
-import SecondMenu from './SubNavbar';
-import MobileNavbar from './MobileNavbar';
-import categories from '../DataFiles/categories';
-import Cookies from 'js-cookie';
-import { ContactPageSharp } from '@mui/icons-material';
-import axiosInstance from '../ApiFunctions/axios'
-import { ArrowRight } from "lucide-react"; 
-import { useNavigate } from 'react-router-dom';;
-import useCategories from '../DataFiles/categories';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import logo from "../assets/Images/logo.png";
+import searchImg from "../assets/Images/searchLogo.png";
+import edit from "../assets/Images/editBtn.png";
+import explore from "../assets/Images/explore.png";
+import notification from "../assets/Images/notification.png";
+import menu from "../assets/Images/menuBar.png";
+import menubar from "../assets/Images/secondMenu.png";
+import SecondMenu from "./SubNavbar";
+import MobileNavbar from "./MobileNavbar";
+import categories from "../DataFiles/categories";
+import Cookies from "js-cookie";
+import { ContactPageSharp } from "@mui/icons-material";
+import axiosInstance from "../ApiFunctions/axios";
+import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import useCategories from "../DataFiles/categories";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,17 +23,16 @@ const Navbar = () => {
   const location = useLocation();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const { categoriesData, loading, error } = useCategories();
-  console.log('categoriesData', categoriesData);
+  console.log("categoriesData", categoriesData);
   useEffect(() => {
     if (error) {
-      console.error('Navbar Error:', error);
+      console.error("Navbar Error:", error);
     }
   }, [error]);
 
-  const accessToken = localStorage.getItem('accessToken');
-  console.log('accessToken', accessToken);
+  const accessToken = localStorage.getItem("accessToken");
+  console.log("accessToken", accessToken);
   const navigate = useNavigate();
-
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -47,7 +46,7 @@ const Navbar = () => {
   };
 
   const handleQuestion = () => {
-    navigate('/question-&-answers');
+    navigate("/question-&-answers");
   };
 
   const handleLoginPopupClose = () => {
@@ -56,38 +55,41 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance(`${import.meta.env.VITE_BASE_URL}/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken')
-        },
-        credentials: 'true',
-      });
+      const response = await axiosInstance(
+        `${import.meta.env.VITE_BASE_URL}/logout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
+          credentials: "true",
+        }
+      );
 
-      if(response) {  
+      if (response) {
         localStorage.clear();
         window.location.reload();
       }
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error("Error during logout:", error);
     }
   };
 
   // Prevent scrolling on background when menu is open
   useEffect(() => {
     if (isMenuOpen) {
-      document.body.classList.add('overflow-hidden');
+      document.body.classList.add("overflow-hidden");
     } else {
-      document.body.classList.remove('overflow-hidden');
+      document.body.classList.remove("overflow-hidden");
     }
     return () => {
-      document.body.classList.remove('overflow-hidden');
+      document.body.classList.remove("overflow-hidden");
     };
   }, [isMenuOpen]);
 
-  if (location.pathname.startsWith('/dashboard')) {
+  if (location.pathname.startsWith("/dashboard")) {
     return null;
   }
 
@@ -96,16 +98,9 @@ const Navbar = () => {
       {/* Main Navbar - Fixed */}
       <nav className="fixed top-0 left-0 right-0 z-[999] bg-white ">
         <div className="h-16 w-full p-5 flex items-center justify-between">
-          <div className='flex items-center gap-2'>
-            <button
-              onClick={toggleMenu}
-              className="md:hidden"
-            >
-              <img
-                className="h-6"
-                src={menubar}
-                alt="open menu"
-              />
+          <div className="flex items-center gap-2">
+            <button onClick={toggleMenu} className="md:hidden">
+              <img className="h-6" src={menubar} alt="open menu" />
             </button>
             <Link to="/">
               <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
@@ -113,7 +108,7 @@ const Navbar = () => {
           </div>
 
           <div className="CustomFlex gap-3 opacity-80">
-            <div className=''>
+            <div className="">
               <button
                 onClick={handleQuestion}
                 className="md:flex hidden items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition-colors"
@@ -180,7 +175,7 @@ const Navbar = () => {
 
                 {/* Dropdown menu */}
                 {isDropdownOpen && (
-                  <div className="absolute z-[1000] right-0 top-[34px] w-48 bg-gray-50 backdrop-blur-sm border transition-all border-gray-300 rounded-lg shadow-lg">
+                  <div className="absolute z-[1000] right-0 top-[34px] w-50 backdrop-blur-sm border transition-all border-gray-300 rounded-lg shadow-lg">
                     <Link
                       to="/dashboard/profile-page"
                       className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
@@ -217,7 +212,7 @@ const Navbar = () => {
       <div className="h-16"></div>
 
       {/* SecondMenu - Not fixed */}
-      <div className="hidden md:block bg-white">
+      <div className="hidden md:block ">
         <SecondMenu categories={categoriesData} />
       </div>
 
@@ -230,7 +225,7 @@ const Navbar = () => {
 
       <div
         className={`fixed top-0 left-0 h-dvh p-4 w-4/5 max-w-[300px] bg-gray-100 shadow-md z-[1000] transform ${
-          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          isMenuOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300`}
       >
         <div className="flex items-center justify-between">
@@ -272,7 +267,8 @@ const Navbar = () => {
         <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
           <div className="popup bg-white p-12 m-20s rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
             <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
-              Hey there! We'd love to hear your thoughts. Please log in to share your review with us and help others make informed decisions.
+              Hey there! We'd love to hear your thoughts. Please log in to share
+              your review with us and help others make informed decisions.
             </h3>
             <div className="flex justify-center space-x-6">
               <button

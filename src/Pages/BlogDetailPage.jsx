@@ -224,7 +224,7 @@ const BlogDetailPage = () => {
       <div className="container max-w-[1300px] mx-auto mt-10 p-4">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
           {/* Blog Header - Only one instance */}
-          <div className="flex justify-between items-center p-6">
+          <div className="flex max-sm:flex-col max-sm:gap-4 justify-between items-center p-6">
             <h1 className="text-3xl font-bold">{data.title || 'Blog Post'}</h1>
             
             <div className="flex items-center gap-4">
