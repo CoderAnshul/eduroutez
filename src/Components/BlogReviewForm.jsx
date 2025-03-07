@@ -80,7 +80,7 @@ const BlogReviewForm = ({ blog }) => {
     return (
         <div className="bg-white shadow-md rounded-lg p-6">
             {/* Review Stats */}
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex max-sm:flex-col max-sm:items-start max-sm:gap-6 items-center justify-between">
                 <div>
                     <h4 className="text-xl font-semibold">OverAll Reviews</h4>
                     <div className="mt-2 flex items-center">

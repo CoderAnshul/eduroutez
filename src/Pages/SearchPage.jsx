@@ -369,7 +369,7 @@ const fetchFilteredInstitutes = async (filters, page, limit) => {
     <>
       <Promotions location="SEARCH_PAGE" className="h-[320px]"></Promotions>
 
-      <div className="px-[4vw] pb-[2vw] flex flex-col items-start">
+      <div className="px-[4vw] pb-[2vw] max-sm:overflow-x-hidden flex flex-col items-start">
 
         <div className="flex gap-4 w-full mt-6">
           <div className="filters w-[25%] hidden lg:block">
@@ -387,7 +387,7 @@ const fetchFilteredInstitutes = async (filters, page, limit) => {
                   <span className="font-semibold text-red-500">{totalDocuments || "0"}</span> Institutes Found
                 </div>
                 <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}>
-                  <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px]"></Promotions>
+                  <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px] max-sm:w-[85%]"></Promotions>
                 </div>                
                 {getPaginatedContent().map((institute, index) => (
                   <SearchResultBox 
