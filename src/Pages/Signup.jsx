@@ -189,11 +189,11 @@ const Signup = () => {
     onSuccess: (data) => {
       setIsLoading(false);
       toast.success("Registered successfully");
-      localStorage.setItem('accessToken', data.data.accessToken);
+      localStorage.setItem('accessToken', JSON.stringify(data.data.accessToken));
       localStorage.setItem('userId', data?.data?.user?._id);
       localStorage.setItem('role', data?.data?.user?.role);
       localStorage.setItem('email', data?.data?.user?.email);      
-      localStorage.setItem('refreshToken', data.data.refreshToken);
+      localStorage.setItem('accessToken', JSON.stringify(data.data.accessToken));
       
       if(data?.data?.user?.role === 'student') {
         navigate('/');

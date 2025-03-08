@@ -29,7 +29,11 @@ const SearchPage = () => {
   const inputField = useSelector(store => store.input.inputField);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
+  
+  // Get URL parameters
   const streamFromUrl = searchParams.get('stream');
+  const stateFromUrl = searchParams.get('state');
+  const cityFromUrl = searchParams.get('city');
 
   useEffect(() => {
     if (!window.instituteIdMap) {
@@ -42,6 +46,30 @@ const SearchPage = () => {
       }
     }
   }, []);
+
+  // Initialize filters from URL parameters when component mounts
+  useEffect(() => {
+    const initialFilters = {};
+    
+    if (streamFromUrl) {
+      // Handle potential comma-separated streams
+      const streamValues = streamFromUrl.split(',').map(s => s.trim());
+      initialFilters.streams = streamValues;
+    }
+    
+    if (stateFromUrl) {
+      initialFilters.state = [stateFromUrl];
+    }
+    
+    if (cityFromUrl) {
+      initialFilters.city = [cityFromUrl];
+    }
+    
+    // Only update if we have any filters
+    if (Object.keys(initialFilters).length > 0) {
+      setSelectedFilters(initialFilters);
+    }
+  }, [streamFromUrl, stateFromUrl, cityFromUrl]);
 
   const updateIdMapping = (institutes) => {
     let hasChanges = false;
@@ -80,13 +108,13 @@ const SearchPage = () => {
     }
   );
 
+  // This effect applies URL parameter filters to the UI once streams data is loaded
   useEffect(() => {
     if (streamFromUrl && streams.includes(streamFromUrl)) {
       handleFilterChange('streams', streamFromUrl);
     }
   }, [streams, streamFromUrl]);
 
-  
   const staticStateLocations = [
     "Andhra Pradesh",
     "Arunachal Pradesh",
@@ -231,7 +259,7 @@ const SearchPage = () => {
     "Kurnool",
     "Rajpur Sonarpur",
     "Bokaro"
-  ]
+  ];
 
   const filterSections = [
     {
@@ -284,7 +312,7 @@ const SearchPage = () => {
 
   const { data, isLoading, isError } = useQuery(
     ["institute"],
-    () => getInstitutes(inputField,inputField,inputField,inputField),
+    () => getInstitutes(inputField, inputField, inputField, inputField),
     {
       enabled: true,
       onSuccess: (data) => {
@@ -314,36 +342,51 @@ const SearchPage = () => {
     });
   };
 
+  // Modified effect to trigger fetching when filters change
   useEffect(() => {
     if (Object.keys(selectedFilters).length > 0) {
       fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
     }
   }, [selectedFilters, currentPage]);
 
- 
-
-const fetchFilteredInstitutes = async (filters, page, limit) => {
-  setLoading(true);
-  try {
-    const queryString = `filters=${encodeURIComponent(JSON.stringify(filters))}&page=${page}&limit=${limit}`;
-    const response = await axios.get(`${baseURL}/institutes?${queryString}`);
-    if (response.data) {
-      const institutes = response.data.data.result;
-      setContent(institutes);
-      setFilteredContent(institutes);
-      setTotalDocuments(response.data.data.totalDocuments);
+  const fetchFilteredInstitutes = async (filters, page, limit) => {
+    setLoading(true);
+    try {
+      // Create a copy of filters for API formatting
+      const apiFilters = { ...filters };
       
-      if (institutes && institutes.length > 0) {
-        updateIdMapping(institutes);
+      // Fix: Ensure we're using "streams" (plural) for the API, not "stream" (singular)
+      if (apiFilters.stream && !apiFilters.streams) {
+        apiFilters.streams = apiFilters.stream;
+        delete apiFilters.stream;
       }
+      
+      // Make sure state is correctly formatted for API
+      // This preserves the original state parameter
+      
+      console.log("Sending filters to API:", apiFilters);
+      
+      const queryString = `filters=${encodeURIComponent(JSON.stringify(apiFilters))}&page=${page}&limit=${limit}`;
+      const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+      
+      if (response.data) {
+        const institutes = response.data.data.result;
+        setContent(institutes);
+        setFilteredContent(institutes);
+        setTotalDocuments(response.data.data.totalDocuments);
+        
+        if (institutes && institutes.length > 0) {
+          updateIdMapping(institutes);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching filtered institutes:', error);
+      setFetchError(true);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error fetching filtered institutes:', error);
-    setFetchError(true);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
   useEffect(() => {
     if (searchQuery.length > 0) {
       const filtered = content.filter(item =>
@@ -370,10 +413,12 @@ const fetchFilteredInstitutes = async (filters, page, limit) => {
       <Promotions location="SEARCH_PAGE" className="h-[320px]"></Promotions>
 
       <div className="px-[4vw] pb-[2vw] max-sm:overflow-x-hidden flex flex-col items-start">
-
         <div className="flex gap-4 w-full mt-6">
           <div className="filters w-[25%] hidden lg:block">
-            <Filter filterSections={filterSections} handleFilterChange={handleFilterChange} />
+            <Filter 
+              filterSections={filterSections} 
+              handleFilterChange={handleFilterChange} 
+            />
           </div>
 
           <div className="filterResult w-full">
@@ -393,10 +438,10 @@ const fetchFilteredInstitutes = async (filters, page, limit) => {
                   <SearchResultBox 
                     key={index} 
                     institute={institute} 
-                    url={getInstituteUrl(institute)}  // Pass the URL with slug support
+                    url={getInstituteUrl(institute)}
                   />
                 ))}
-                <div className="pagination">
+            <div className="pagination">
                   {Array.from({ length: Math.ceil(filteredContent.length / itemsPerPage) }, (_, index) => (
                     <button
                       key={index}

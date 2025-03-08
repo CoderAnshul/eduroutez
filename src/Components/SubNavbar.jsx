@@ -257,16 +257,15 @@ const SubNavbar = ({ categories }) => {
   };
 
   // Function to handle location click
-  const handleLocationClick = async (locationType, locationName) => {
+  const handleLocationClick = async (locationType, locationName, stream) => {
     const stateKey = `${locationType}_${locationName}`;
-
+    console.log("locationType", locationType);
+    console.log("locationName", locationName);
+  
     // Check if we already have data for this location
     if (!collegesByCity[stateKey] && !collegesByState[stateKey]) {
-      const colleges = await fetchCollegesByLocation(
-        locationType,
-        locationName
-      );
-
+      const colleges = await fetchCollegesByLocation(locationType, locationName);
+  
       if (locationType === "city") {
         setCollegesByCity((prev) => ({
           ...prev,
@@ -279,10 +278,17 @@ const SubNavbar = ({ categories }) => {
         }));
       }
     }
-
-    // Navigate to the colleges filtered by location
-    navigate(`/searchpage?${locationType}=${encodeURIComponent(locationName)}`);
+  
+    // Ensure state is set before navigating
+    setTimeout(() => {
+      navigate(
+        `/searchpage?${locationType}=${encodeURIComponent(locationName)}${
+          stream ? `&stream=${encodeURIComponent(stream)}` : ""
+        }`
+      );
+    }, 100); // Adjust the delay as needed
   };
+  
 
   // Function to handle stream click or hover
   const handleStreamInteraction = async (streamName, streamId) => {
