@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const Filter = ({ filterSections, handleFilterChange }) => {
+const Filter = ({ filterSections, handleFilterChange, onFiltersChanged }) => {
   const [openSections, setOpenSections] = useState(
     filterSections.map(() => true)
   );
@@ -9,24 +9,102 @@ const Filter = ({ filterSections, handleFilterChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get current streams from URL
-  const getStreamsFromURL = () => {
+  // Get parameters from URL
+  const getParamFromURL = (param) => {
     const queryParams = new URLSearchParams(location.search);
-    return queryParams.get("stream")?.split(",") || [];
+    return param === "stream" 
+      ? queryParams.get(param)?.split(",") || []
+      : queryParams.get(param) || "";
   };
 
-  const [selectedStreams, setSelectedStreams] = useState(getStreamsFromURL);
+  const [selectedStreams, setSelectedStreams] = useState(getParamFromURL("stream"));
+  const [selectedCity, setSelectedCity] = useState(getParamFromURL("city"));
+  const [selectedState, setSelectedState] = useState(getParamFromURL("state"));
 
-  // Update URL when selectedStreams changes
+  // Find all selected values across all filter types
+  const getAllSelectedValues = () => {
+    const allSelected = [...selectedStreams];
+    if (selectedCity) allSelected.push(selectedCity);
+    if (selectedState) allSelected.push(selectedState);
+    return allSelected;
+  };
+
+  // Update URL when any selection changes
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
+    
+    // Handle streams (multi-select)
     if (selectedStreams.length > 0) {
       queryParams.set("stream", selectedStreams.join(","));
     } else {
       queryParams.delete("stream");
     }
+    
+    // Handle city (single select)
+    if (selectedCity) {
+      queryParams.set("city", selectedCity);
+    } else {
+      queryParams.delete("city");
+    }
+    
+    // Handle state (single select)
+    if (selectedState) {
+      queryParams.set("state", selectedState);
+    } else {
+      queryParams.delete("state");
+    }
+    
     navigate(`?${queryParams.toString()}`, { replace: true });
-  }, [selectedStreams, navigate, location.search]);
+    
+    // Create API filter object with all selected filters
+    const apiFilters = {};
+    if (selectedStreams.length > 0) apiFilters.streams = selectedStreams;
+    if (selectedCity) apiFilters.city = selectedCity;
+    if (selectedState) apiFilters.state = selectedState;
+    
+    // Pass the complete filters object to parent component
+    if (onFiltersChanged) {
+      onFiltersChanged(apiFilters);
+    }
+  }, [selectedStreams, selectedCity, selectedState, navigate, location.search]);
+
+  // Initialize component by firing handleFilterChange for URL params
+  useEffect(() => {
+    // Find the corresponding section for each parameter
+    filterSections.forEach(section => {
+      const sectionTitle = section.title.toLowerCase();
+      
+      if (sectionTitle === "streams" || sectionTitle === "stream") {
+        selectedStreams.forEach(stream => {
+          if (section.items.includes(stream)) {
+            handleFilterChange(section.title, stream);
+          }
+        });
+      }
+      
+      if (sectionTitle === "cities" || sectionTitle === "city") {
+        if (selectedCity && section.items.includes(selectedCity)) {
+          handleFilterChange(section.title, selectedCity);
+        }
+      }
+      
+      if (sectionTitle === "states" || sectionTitle === "state") {
+        if (selectedState && section.items.includes(selectedState)) {
+          handleFilterChange(section.title, selectedState);
+        }
+      }
+    });
+    
+    // Also trigger API filters when component initializes
+    const initialApiFilters = {};
+    if (selectedStreams.length > 0) initialApiFilters.streams = selectedStreams;
+    if (selectedCity) initialApiFilters.city = selectedCity;
+    if (selectedState) initialApiFilters.state = selectedState;
+    
+    if (onFiltersChanged && (selectedStreams.length > 0 || selectedCity || selectedState)) {
+      onFiltersChanged(initialApiFilters);
+    }
+  }, []);
 
   const toggleSection = (index) => {
     setOpenSections((prev) =>
@@ -35,16 +113,30 @@ const Filter = ({ filterSections, handleFilterChange }) => {
   };
 
   const handleCheckboxChange = (sectionTitle, item) => {
-    const isSelected = selectedStreams.includes(item);
-    let updatedStreams;
-
-    if (isSelected) {
-      updatedStreams = selectedStreams.filter((stream) => stream !== item);
-    } else {
-      updatedStreams = [...selectedStreams, item];
+    const sectionLower = sectionTitle.toLowerCase();
+    
+    // Handle streams (multi-select)
+    if (sectionLower === "streams" || sectionLower === "stream") {
+      const isSelected = selectedStreams.includes(item);
+      let updatedStreams;
+      
+      if (isSelected) {
+        updatedStreams = selectedStreams.filter((stream) => stream !== item);
+      } else {
+        updatedStreams = [...selectedStreams, item];
+      }
+      
+      setSelectedStreams(updatedStreams);
+    } 
+    // Handle city (single-select)
+    else if (sectionLower === "cities" || sectionLower === "city") {
+      setSelectedCity(selectedCity === item ? "" : item);
+    } 
+    // Handle state (single-select)
+    else if (sectionLower === "states" || sectionLower === "state") {
+      setSelectedState(selectedState === item ? "" : item);
     }
-
-    setSelectedStreams(updatedStreams);
+    
     handleFilterChange(sectionTitle, item);
   };
 
@@ -81,20 +173,33 @@ const Filter = ({ filterSections, handleFilterChange }) => {
           >
             <div className="p-4 space-y-3">
               {section.items.length > 0 ? (
-                section.items.map((item, idx) => (
-                  <label
-                    key={idx}
-                    className="flex items-center text-sm text-gray-600 cursor-pointer hover:text-red-500 hover:ml-1 transition-all"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedStreams.includes(item)}
-                      onChange={() => handleCheckboxChange(section.title, item)}
-                      className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
-                    />
-                    <span className="ml-2">{item}</span>
-                  </label>
-                ))
+                section.items.map((item, idx) => {
+                  const sectionLower = section.title.toLowerCase();
+                  let isChecked = false;
+                  
+                  if (sectionLower === "streams" || sectionLower === "stream") {
+                    isChecked = selectedStreams.includes(item);
+                  } else if (sectionLower === "cities" || sectionLower === "city") {
+                    isChecked = selectedCity === item;
+                  } else if (sectionLower === "states" || sectionLower === "state") {
+                    isChecked = selectedState === item;
+                  }
+                  
+                  return (
+                    <label
+                      key={idx}
+                      className="flex items-center text-sm text-gray-600 cursor-pointer hover:text-red-500 hover:ml-1 transition-all"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleCheckboxChange(section.title, item)}
+                        className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
+                      />
+                      <span className="ml-2">{item}</span>
+                    </label>
+                  );
+                })
               ) : (
                 <p className="text-sm text-gray-500">No items found</p>
               )}
