@@ -36,6 +36,20 @@ const Careerspage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [allCareerData, setAllCareerData] = useState([]);
+  const [careerIdMap, setCareerIdMap] = useState({});
+
+  // Initialize careerIdMap from localStorage
+  useEffect(() => {
+    try {
+      const storedCareerIdMap = JSON.parse(
+        localStorage.getItem("careerIdMap") || "{}"
+      );
+      setCareerIdMap(storedCareerIdMap);
+    } catch (error) {
+      console.error("Error loading careerIdMap from localStorage:", error);
+      setCareerIdMap({});
+    }
+  }, []);
 
   const {
     data: careerData,
@@ -53,8 +67,23 @@ const Careerspage = () => {
 
   useEffect(() => {
     if (careerData) {
+      const newCareerData = careerData.data.result || [];
       setTotalPages(careerData.data.totalPages);
-      setAllCareerData((prevData) => [...prevData, ...careerData.data.result]);
+      
+      // Update careerIdMap with new career data
+      const updatedCareerIdMap = { ...careerIdMap };
+      newCareerData.forEach((career) => {
+        if (career.slug) {
+          updatedCareerIdMap[career.slug] = career._id;
+        }
+      });
+      
+      // Save updated map to state and localStorage
+      setCareerIdMap(updatedCareerIdMap);
+      localStorage.setItem("careerIdMap", JSON.stringify(updatedCareerIdMap));
+      
+      // Update career data
+      setAllCareerData((prevData) => [...prevData, ...newCareerData]);
     }
   }, [careerData]);
 
@@ -292,9 +321,8 @@ const Careerspage = () => {
                   </div>
                 </div>
                
-
                 <div className="flex justify-between p-4">
-                  <div  onClick={(e) => handleShareClick(e, career)}>
+                  <div onClick={(e) => handleShareClick(e, career)}>
                     <SocialShare
                       title={career.title}
                       url={`${window.location.origin}/detailpage/${

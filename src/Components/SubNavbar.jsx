@@ -6,7 +6,7 @@ import axiosInstance from "../ApiFunctions/axios";
 // Import or create the courseIdMap for reference
 // You can either import from the PopularCourses component or recreate it here
 const courseIdMap = {};
-
+const newsIdMap = {};
 const SubNavbar = ({ categories }) => {
   const [activeContent, setActiveContent] = useState({});
   const [hoveredCategory, setHoveredCategory] = useState(null);
@@ -121,9 +121,44 @@ const SubNavbar = ({ categories }) => {
         );
         console.log("news", response.data);
         setLatestNews(response.data?.data || []);
+        
+        // Create slug mappings for news items
+        if (response.data?.data) {
+          response.data.data.forEach((news) => {
+            if (news.title) {
+              // Create slug from news title
+              const slug = getNewsSlug(news);
+              
+              // Store mapping
+              newsIdMap[slug] = news._id;
+            }
+          });
+          
+          // Update global map and localStorage
+          updateNewsIdMap();
+        }
       } catch (error) {
         console.error("Error fetching latest news:", error);
       }
+    };
+
+
+    const updateNewsIdMap = () => {
+      // Make the mapping available globally
+      window.newsIdMap = {
+        ...window.newsIdMap,
+        ...newsIdMap,
+      };
+      
+      // Get existing mappings from localStorage and merge
+      const existingMap = JSON.parse(localStorage.getItem("newsIdMap") || "{}");
+      localStorage.setItem(
+        "newsIdMap",
+        JSON.stringify({
+          ...existingMap,
+          ...newsIdMap,
+        })
+      );
     };
 
     const fetchTopColleges = async () => {
@@ -201,7 +236,7 @@ const SubNavbar = ({ categories }) => {
   // Helper function to get the slug for a news item
   const getNewsSlug = (news) => {
     if (!news?.title) return news?._id;
-
+    
     return news.title
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
@@ -464,6 +499,9 @@ const SubNavbar = ({ categories }) => {
   const handleNewsClick = (news) => {
     const newsSlug = getNewsSlug(news);
     navigate(`/news/${newsSlug}`);
+    
+    // You might want to add this debugging log
+    console.log(`News slug: ${newsSlug}, ID: ${newsIdMap[newsSlug] || news._id}`);
   };
 
   const handleInstituteClick = (institute) => {
@@ -623,7 +661,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="bg-white rounded-xl shadow-lg">
+    <div className="bg-white rounded-xl w-[50rem] shadow-lg">
       <div className="p-4 border-b bg-gradient-to-r from-orange-500 to-red-600">
         <h3 className="text-lg font-bold text-white">Latest Updates</h3>
       </div>
@@ -723,7 +761,7 @@ const SubNavbar = ({ categories }) => {
             </ul>
           </div>
 
-          {/* Tools Section */}
+        {/* Tools Section */}
         <div className="space-y-4">
           <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
           <ul className="space-y-2 ml-0">
@@ -756,7 +794,6 @@ const SubNavbar = ({ categories }) => {
                 Q/A
               </a>
             </li>
-           
           </ul>
         </div>
       </div>
@@ -864,7 +901,7 @@ const SubNavbar = ({ categories }) => {
           ))}
         </ul>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col ">
         {/* Show stream institutes for the active stream if this is Colleges or Exams */}
         {(category.label === "Colleges" || category.label === "Exams") &&
           activeContent[category.label] &&
@@ -877,7 +914,7 @@ const SubNavbar = ({ categories }) => {
       </div>
 
       {/* City and State sections with stream-based display */}
-      <div className="ml-4 mt-4 flex gap-24 mr-10 w-full">
+      <div className="ml-4 mt-4 flex gap-10 mr-10 w-full">
         {/* Top Cities - Now showing stream-specific data */}
         <div className="space-y-6">
           <h3 className="font-semibold text-red-500">
@@ -886,7 +923,7 @@ const SubNavbar = ({ categories }) => {
               : "Colleges by City"}
           </h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-1 gap-2 w-[280px] ">
               {staticTopCities.map((city, index) => (
                 <a
                   key={index}
@@ -902,14 +939,14 @@ const SubNavbar = ({ categories }) => {
                   }}
                   onMouseLeave={() => setHoveredCity(null)}
                 >
-                  <span>
+                  <span className="line-clamp-1 ">
                     {" "}
                     {activeStream} in {city.name}
                   </span>
                 </a>
               ))}
             </div>
-            <div className="text-right mr-4">
+            <div className="text-left mr-4">
               <a
                 onClick={() => handleAllCollegesByCity(activeStream)}
                 className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium text-black"
@@ -953,7 +990,7 @@ const SubNavbar = ({ categories }) => {
                 </a>
               ))}
             </div>
-            <div className="text-right mr-4">
+            <div className="text-left mr-4">
               <a
                 onClick={() => handleAllCollegesByState(activeStream)}
                 className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
