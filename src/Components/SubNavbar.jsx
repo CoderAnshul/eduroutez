@@ -261,11 +261,14 @@ const SubNavbar = ({ categories }) => {
     const stateKey = `${locationType}_${locationName}`;
     console.log("locationType", locationType);
     console.log("locationName", locationName);
-  
+
     // Check if we already have data for this location
     if (!collegesByCity[stateKey] && !collegesByState[stateKey]) {
-      const colleges = await fetchCollegesByLocation(locationType, locationName);
-  
+      const colleges = await fetchCollegesByLocation(
+        locationType,
+        locationName
+      );
+
       if (locationType === "city") {
         setCollegesByCity((prev) => ({
           ...prev,
@@ -278,7 +281,7 @@ const SubNavbar = ({ categories }) => {
         }));
       }
     }
-  
+
     // Ensure state is set before navigating
     setTimeout(() => {
       navigate(
@@ -288,7 +291,6 @@ const SubNavbar = ({ categories }) => {
       );
     }, 100); // Adjust the delay as needed
   };
-  
 
   // Function to handle stream click or hover
   const handleStreamInteraction = async (streamName, streamId) => {
@@ -841,13 +843,13 @@ const SubNavbar = ({ categories }) => {
   };
 
   const renderRegularContent = (category) => (
-    <div className="flex w-">
+    <div className="flex ">
       <div className="w-[400px] bg-white overflow-y-auto">
-        <ul>
+        <ul className="w-40">
           {category?.sidebarItems?.map((item) => (
             <li
               key={item.id}
-              className={`px-2 py-2 group text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
+              className={`px-2  py-2 group  text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
                 activeContent[category.label] === item.id
                   ? "bg-red-400 border-l-2 border-red-500 text-white"
                   : "bg-red-500 text-white"
