@@ -480,7 +480,7 @@ const SubNavbar = ({ categories }) => {
               <a
                 key={course._id}
                 onClick={() => handleCourseClick(course)}
-                className="text-sm hover:text-red-500 cursor-pointer truncate"
+                className="text-sm hover:text-red-500 cursor-pointer truncate list-none text-black"
               >
                 {course.courseTitle}
               </a>
@@ -509,7 +509,7 @@ const SubNavbar = ({ categories }) => {
               <a
                 key={career._id}
                 onClick={() => handleCareerClick(career)}
-                className="text-sm hover:text-red-500 cursor-pointer truncate"
+                className="text-sm hover:text-red-500 cursor-pointer truncate text-black"
               >
                 {career.title}
               </a>
@@ -629,7 +629,7 @@ const SubNavbar = ({ categories }) => {
       </div>
 
       <div className="p-4">
-        <ul className="grid grid-cols-3 gap-8">
+        <ul className="grid grid-cols-3 gap-8 ml-0 ">
           {latestNews
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 3)
@@ -637,7 +637,7 @@ const SubNavbar = ({ categories }) => {
               <li
                 key={news._id}
                 onClick={() => handleNewsClick(news)}
-                className="group hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
+                className="group text-black hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
               >
                 <div className="space-y-3">
                   <div className="space-y-1">
@@ -693,30 +693,30 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderMoreContent = () => (
-    <div className="bg-white rounded-lg shadow-lg p-6 min-w-[600px]">
+    <div className="bg-pink rounded-lg shadow-lg p-6 min-w-[600px]">
       <div className="grid grid-cols-3 gap-8">
-          <div className="space-y-4">
-            <h3 className="font-semibold text-red-500 border-b pb-2">
+          <div className="space-y-4 ">
+            <h3 className="font-semibold text-red-500 border-b pb-2 ">
               Resources
             </h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="/blogpage?category=Exam" className="text-sm hover:text-red-500">
+            <ul className="space-y-2 list-none ml-0">
+              <li className="!text-black">
+                <a  href="/blogpage?category=Exam" className="text-sm hover:text-red-500 text-black">
             Entrance Exams
                 </a>
               </li>
-              <li>
-                <a href="/searchpage" className="text-sm hover:text-red-500">
+              <li className="!text-black list-none">
+                <a href="/searchpage" className="text-sm hover:text-red-500 text-black">
             Top Colleges
                 </a>
               </li>
-              <li>
-                <a href="/blogdetailpage/67cab414dd3a58f74a0c6295" className="text-sm hover:text-red-500">
+              <li className="!text-black list-none">
+                <a href="/blogdetailpage/67cab414dd3a58f74a0c6295" className="text-sm hover:text-red-500 text-black">
             Scholarships
                 </a>
               </li>
-              <li>
-                <a href="/blogdetailpage/67cab637dd3a58f74a0c665f" className="text-sm hover:text-red-500">
+              <li className="!text-black list-none">
+                <a href="/blogdetailpage/67cab637dd3a58f74a0c665f" className="text-sm hover:text-red-500 text-black">
             Study Material
                 </a>
               </li>
@@ -726,9 +726,9 @@ const SubNavbar = ({ categories }) => {
           {/* Tools Section */}
         <div className="space-y-4">
           <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
-          <ul className="space-y-2">
-            <li>
-              <a href="/blogdetailpage/67cab87fdd3a58f74a0c6b99" className="text-sm hover:text-red-500">
+          <ul className="space-y-2 ml-0">
+            <li className="list-none">
+              <a href="/blogdetailpage/67cab87fdd3a58f74a0c6b99" className="text-sm hover:text-red-500 text-black">
                 Career Assessment
               </a>
             </li>
@@ -736,23 +736,23 @@ const SubNavbar = ({ categories }) => {
         </div>
 
         {/* Quick Links Section */}
-        <div className="space-y-4">
+        <div className="space-y-4 w-fit">
           <h3 className="font-semibold text-red-500 border-b pb-2">
             Quick Links
           </h3>
-          <ul className="space-y-2">
-            <li>
-              <a href="/aboutus" className="text-sm hover:text-red-500">
+          <ul className="space-y-2 ml-0">
+            <li className="list-none">
+              <a href="/aboutus" className="text-sm hover:text-red-500 text-black">
                 About Us
               </a>
             </li>
-            <li>
-              <a href="/Contactuspage" className="text-sm hover:text-red-500">
+            <li className="list-none">
+              <a href="/Contactuspage" className="text-sm hover:text-red-500 text-black">
                 Contact Us
               </a>
             </li>
-            <li>
-              <a href="/question-&-answers" className="text-sm hover:text-red-500">
+            <li className="list-none">
+              <a href="/question-&-answers" className="text-sm hover:text-red-500 text-black">
                 Q/A
               </a>
             </li>
@@ -819,7 +819,7 @@ const SubNavbar = ({ categories }) => {
   const renderRegularContent = (category) => (
     <div className="flex ">
       <div className="w-[400px] bg-white overflow-y-auto">
-        <ul className="w-40">
+        <ul className="w-40 ml-0 mb-0 pb-0 space-y-0">
           {category?.sidebarItems?.map((item) => (
             <li
               key={item.id}
@@ -893,7 +893,7 @@ const SubNavbar = ({ categories }) => {
                   onClick={() =>
                     handleLocationClick("city", city.name, activeStream)
                   }
-                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
                   onMouseEnter={() => {
                     // Show stream-specific college count if available
                     if (activeStream) {
@@ -912,7 +912,7 @@ const SubNavbar = ({ categories }) => {
             <div className="text-right mr-4">
               <a
                 onClick={() => handleAllCollegesByCity(activeStream)}
-                className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
+                className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium text-black"
               >
                 {activeStream
                   ? `View All ${activeStream} Cities →`
@@ -937,7 +937,7 @@ const SubNavbar = ({ categories }) => {
                   onClick={() =>
                     handleLocationClick("state", state.name, activeStream)
                   }
-                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
                   onMouseEnter={() => {
                     // Show stream-specific college count if available
                     if (activeStream) {
@@ -971,7 +971,7 @@ const SubNavbar = ({ categories }) => {
 
   return (
     <div>
-      <div className="w-full h-auto bg-white">
+      <div className="w-full h-auto bg-white ">
         <div className="w-full px-5 pt-2 h-full mx-auto flex justify-between">
           <div className=" h-full flex flex-col justify-between">
             <div className="h-1/2 w-fit px-1 flex relative items-center justify-start gap-7">
@@ -982,7 +982,7 @@ const SubNavbar = ({ categories }) => {
                   onMouseEnter={(e) => handleMouseEnter(category, e)}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <h5 className="text-xs gap-2 font-[500] pb-2 group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer whitespace-nowrap">
+                  <h5 className="text-xs gap-2 font-[500] pb-2 mt-0 group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer whitespace-nowrap">
                     {category.label}
                     <img
                       className="h-3 group-hover:rotate-180 transition-all"
@@ -992,7 +992,7 @@ const SubNavbar = ({ categories }) => {
                   </h5>
                   {hoveredCategory === category.label && (
                     <div
-                      className={`absolute top-6 z-50 bg-white   shadow-lg ${dropdownAlignment}`}
+                      className={`absolute top-6 z-[1000] bg-white   shadow-lg ${dropdownAlignment}`}
                     >
                       {category.label === "Courses"
                         ? renderCoursesContent()
