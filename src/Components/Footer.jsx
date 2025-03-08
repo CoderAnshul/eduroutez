@@ -166,19 +166,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        <div>
-          <h3 className="font-semibold text-red-500 mb-3">Sarkari Exams</h3>
-          <ul className="space-y-1 text-sm">
-            {rrbGroupDLinks.map((link, index) => (
-              <li key={index}>
-                <Link to={link.link} className="footerText">
-
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+      
        
 
         {/* About Eduroutez */}
