@@ -188,11 +188,11 @@ const SocialShare = ({
   };
 
   return (
-    <div className={` ${className}`} ref={menuRef}>
+    <div className={`relative`} ref={menuRef}>
       {/* Share button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-2 rounded-lg flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200"
+        className={`px-4 py-2 rounded-lg flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 `}
         aria-label="Share this content"
         title="Share"
       >
@@ -218,8 +218,8 @@ const SocialShare = ({
       
       {/* Share menu */}
       {isOpen && (
-        <div className="absolute  mt-2 w-72 left-3 bottom-3 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-          <div className="p-4">
+        <div className={` mt-2 w-72 left-[-180px] bottom-2 bg-white rounded-lg shadow-lg border border-gray-200 z-[1000] ${className} absolute `}>
+          <div className="p-4 bg-white">
             <div className="flex justify-between items-center mb-3">
               <h4 className="font-medium text-gray-800">Share this {contentType}</h4>
               <button
