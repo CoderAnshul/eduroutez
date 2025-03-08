@@ -890,7 +890,7 @@ const SubNavbar = ({ categories }) => {
           ))}
         </ul>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col ">
         {/* Show stream institutes for the active stream if this is Colleges or Exams */}
         {(category.label === "Colleges" || category.label === "Exams") &&
           activeContent[category.label] &&
@@ -903,7 +903,7 @@ const SubNavbar = ({ categories }) => {
       </div>
 
       {/* City and State sections with stream-based display */}
-      <div className="ml-4 mt-4 flex gap-24 mr-10 w-full">
+      <div className="ml-4 mt-4 flex gap-10 mr-10 w-full">
         {/* Top Cities - Now showing stream-specific data */}
         <div className="space-y-6">
           <h3 className="font-semibold text-red-500">
@@ -912,7 +912,7 @@ const SubNavbar = ({ categories }) => {
               : "Colleges by City"}
           </h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-1 gap-2 w-[280px] ">
               {staticTopCities.map((city, index) => (
                 <a
                   key={index}
@@ -928,7 +928,7 @@ const SubNavbar = ({ categories }) => {
                   }}
                   onMouseLeave={() => setHoveredCity(null)}
                 >
-                  <span>
+                  <span className="line-clamp-1 ">
                     {" "}
                     {activeStream} in {city.name}
                   </span>
