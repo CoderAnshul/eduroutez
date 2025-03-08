@@ -19,7 +19,8 @@ const ScheduledSlots = () => {
                         "Content-Type": "application/json",
                     }
                 });
-                setSlots(response.data?.data?.result || []);
+                const sortedSlots = (response.data?.data?.result || []).sort((a, b) => new Date(b.date) - new Date(a.date));
+                setSlots(sortedSlots);
                 setError(null);
             } catch (error) {
                 console.log('Error fetching scheduled slots:', error.message);
@@ -106,7 +107,7 @@ const ScheduledSlots = () => {
                                     <div className="flex items-center gap-2">
                                         <User className="h-4 w-4 text-gray-500" />
                                         <span className="text-gray-700">
-                                            {slot.counselorId?.level || 'Career Counselor'}
+                                            {typeof slot.counselorId?.level === 'string' ? slot.counselorId.level : 'Career Counselor'}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -118,14 +119,14 @@ const ScheduledSlots = () => {
                                     <div className="flex items-center gap-2">
                                         <Clock className="h-4 w-4 text-gray-500" />
                                         <span className="text-gray-700">
-                                            {slot.slot || 'Time not specified'}
+                                            {typeof slot.slot === 'string' ? slot.slot : 'Time not specified'}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <MapPin className="h-4 w-4 text-gray-500" />
                                         <span className="text-gray-700">
-                                            {slot.counselorId?.city || 'Location not specified'}, 
-                                            {slot.counselorId?.country || ''}
+                                            {typeof slot.counselorId?.city === 'string' ? slot.counselorId.city : 'Location not specified'}, 
+                                            {typeof slot.counselorId?.country === 'string' ? slot.counselorId.country : ''}
                                         </span>
                                     </div>
                                 </div>
