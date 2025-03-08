@@ -8,7 +8,6 @@ const NewsDetailPage = () => {
   const [newsDetail, setNewsDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isLiked, setIsLiked] = useState(false);
   const { id } = useParams(); // This can be either ID or slug
   const navigate = useNavigate();
   
@@ -117,10 +116,7 @@ const NewsDetailPage = () => {
         setNewsDetail(response.data.data);
 
         // Check if user has already liked this news
-        if (response.data.data.likes && currentUserId) {
-          const userHasLiked = response.data.data.likes.includes(currentUserId);
-          setIsLiked(userHasLiked);
-        }
+       
 
         setError(null);
       } catch (error) {
@@ -134,46 +130,7 @@ const NewsDetailPage = () => {
     fetchNewsData();
   }, [id, baseURL, currentUserId]);
 
-  // Handle like/dislike functionality
-  const handleLike = async () => {
-    if (!currentUserId) {
-      alert("Please login to like this news article");
-      return;
-    }
-
-    try {
-      const likeValue = isLiked ? "0" : "1"; // Toggle like value
-
-      // Use the news's actual ID for the API call
-      const newsId = newsDetail._id;
-
-      // Call the like-dislike API
-      await axios.post(
-        `${baseURL}/like-dislike`,
-        {
-          id: newsId,
-          type: "news",
-          like: likeValue,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": localStorage.getItem("accessToken"),
-            "x-refresh-token": localStorage.getItem("refreshToken"),
-          },
-        }
-      );
-
-      // Update local state
-      setIsLiked(!isLiked);
-      console.log(`News ${newsId} like status updated to ${!isLiked}`);
-    } catch (error) {
-      console.error("Error updating like status:", error);
-    }
-  };
-
-  // Calculate number of likes
-  const likesCount = newsDetail?.likes?.length || 0;
+ 
 
   // Handle share click to prevent navigation
   const handleShareClick = (e) => {
@@ -245,29 +202,7 @@ const NewsDetailPage = () => {
               />
             </div>
 
-            {/* Like Button */}
-            <button
-              onClick={handleLike}
-              disabled={!currentUserId}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
-                ${
-                  !currentUserId
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300"
-                    : isLiked
-                    ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
-                    : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-                } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
-            >
-              <ThumbsUp 
-                className={`transition-transform duration-300 ${
-                  isLiked ? "scale-110 fill-current text-yellow-500" : ""
-                }`}
-                size={20}
-              />
-              <span className="font-medium text-sm">
-                {likesCount > 0 ? likesCount : "Like"}
-              </span>
-            </button>
+        
           </div>
         </div>
 
