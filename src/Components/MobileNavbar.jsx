@@ -17,7 +17,7 @@ const MobileNavbar = ({ categories }) => {
 
   return (
     <div className="w-full bg-gray-100 h-[450px] overflow-y-auto scrollbar-thumb-transparent">
-      <ul className="space-y-2">
+      <ul className="space-y-2 ml-0">
         {categories?.map((category, index) => (
           <li key={index}>
             <div

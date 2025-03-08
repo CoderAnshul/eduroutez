@@ -6,7 +6,7 @@ import axiosInstance from "../ApiFunctions/axios";
 // Import or create the courseIdMap for reference
 // You can either import from the PopularCourses component or recreate it here
 const courseIdMap = {};
-
+const newsIdMap = {};
 const SubNavbar = ({ categories }) => {
   const [activeContent, setActiveContent] = useState({});
   const [hoveredCategory, setHoveredCategory] = useState(null);
@@ -121,9 +121,44 @@ const SubNavbar = ({ categories }) => {
         );
         console.log("news", response.data);
         setLatestNews(response.data?.data || []);
+        
+        // Create slug mappings for news items
+        if (response.data?.data) {
+          response.data.data.forEach((news) => {
+            if (news.title) {
+              // Create slug from news title
+              const slug = getNewsSlug(news);
+              
+              // Store mapping
+              newsIdMap[slug] = news._id;
+            }
+          });
+          
+          // Update global map and localStorage
+          updateNewsIdMap();
+        }
       } catch (error) {
         console.error("Error fetching latest news:", error);
       }
+    };
+
+
+    const updateNewsIdMap = () => {
+      // Make the mapping available globally
+      window.newsIdMap = {
+        ...window.newsIdMap,
+        ...newsIdMap,
+      };
+      
+      // Get existing mappings from localStorage and merge
+      const existingMap = JSON.parse(localStorage.getItem("newsIdMap") || "{}");
+      localStorage.setItem(
+        "newsIdMap",
+        JSON.stringify({
+          ...existingMap,
+          ...newsIdMap,
+        })
+      );
     };
 
     const fetchTopColleges = async () => {
@@ -201,7 +236,7 @@ const SubNavbar = ({ categories }) => {
   // Helper function to get the slug for a news item
   const getNewsSlug = (news) => {
     if (!news?.title) return news?._id;
-
+    
     return news.title
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
@@ -261,11 +296,14 @@ const SubNavbar = ({ categories }) => {
     const stateKey = `${locationType}_${locationName}`;
     console.log("locationType", locationType);
     console.log("locationName", locationName);
-  
+
     // Check if we already have data for this location
     if (!collegesByCity[stateKey] && !collegesByState[stateKey]) {
-      const colleges = await fetchCollegesByLocation(locationType, locationName);
-  
+      const colleges = await fetchCollegesByLocation(
+        locationType,
+        locationName
+      );
+
       if (locationType === "city") {
         setCollegesByCity((prev) => ({
           ...prev,
@@ -278,7 +316,7 @@ const SubNavbar = ({ categories }) => {
         }));
       }
     }
-  
+
     // Ensure state is set before navigating
     setTimeout(() => {
       navigate(
@@ -288,7 +326,6 @@ const SubNavbar = ({ categories }) => {
       );
     }, 100); // Adjust the delay as needed
   };
-  
 
   // Function to handle stream click or hover
   const handleStreamInteraction = async (streamName, streamId) => {
@@ -462,6 +499,9 @@ const SubNavbar = ({ categories }) => {
   const handleNewsClick = (news) => {
     const newsSlug = getNewsSlug(news);
     navigate(`/news/${newsSlug}`);
+    
+    // You might want to add this debugging log
+    console.log(`News slug: ${newsSlug}, ID: ${newsIdMap[newsSlug] || news._id}`);
   };
 
   const handleInstituteClick = (institute) => {
@@ -478,7 +518,7 @@ const SubNavbar = ({ categories }) => {
               <a
                 key={course._id}
                 onClick={() => handleCourseClick(course)}
-                className="text-sm hover:text-red-500 cursor-pointer truncate"
+                className="text-sm hover:text-red-500 cursor-pointer truncate list-none text-black"
               >
                 {course.courseTitle}
               </a>
@@ -507,7 +547,7 @@ const SubNavbar = ({ categories }) => {
               <a
                 key={career._id}
                 onClick={() => handleCareerClick(career)}
-                className="text-sm hover:text-red-500 cursor-pointer truncate"
+                className="text-sm hover:text-red-500 cursor-pointer truncate text-black"
               >
                 {career.title}
               </a>
@@ -621,13 +661,13 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="bg-white rounded-xl shadow-lg">
+    <div className="bg-white rounded-xl w-[50rem] shadow-lg">
       <div className="p-4 border-b bg-gradient-to-r from-orange-500 to-red-600">
         <h3 className="text-lg font-bold text-white">Latest Updates</h3>
       </div>
 
       <div className="p-4">
-        <ul className="grid grid-cols-3 gap-8">
+        <ul className="grid grid-cols-3 gap-8 ml-0 ">
           {latestNews
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 3)
@@ -635,7 +675,7 @@ const SubNavbar = ({ categories }) => {
               <li
                 key={news._id}
                 onClick={() => handleNewsClick(news)}
-                className="group hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
+                className="group text-black hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
               >
                 <div className="space-y-3">
                   <div className="space-y-1">
@@ -691,64 +731,42 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderMoreContent = () => (
-    <div className="bg-white rounded-lg shadow-lg p-6 min-w-[600px]">
+    <div className="bg-pink rounded-lg shadow-lg p-6 min-w-[600px]">
       <div className="grid grid-cols-3 gap-8">
-        {/* Resources Section */}
-        <div className="space-y-4">
-          <h3 className="font-semibold text-red-500 border-b pb-2">
-            Resources
-          </h3>
-          <ul className="space-y-2">
-            <li>
-              <a href="/exams" className="text-sm hover:text-red-500">
-                Entrance Exams
-              </a>
-            </li>
-            <li>
-              <a href="/colleges" className="text-sm hover:text-red-500">
-                Top Colleges
-              </a>
-            </li>
-            <li>
-              <a href="/scholarships" className="text-sm hover:text-red-500">
-                Scholarships
-              </a>
-            </li>
-            <li>
-              <a href="/study-material" className="text-sm hover:text-red-500">
-                Study Material
-              </a>
-            </li>
-          </ul>
-        </div>
+          <div className="space-y-4 ">
+            <h3 className="font-semibold text-red-500 border-b pb-2 ">
+              Resources
+            </h3>
+            <ul className="space-y-2 list-none ml-0">
+              <li className="!text-black">
+                <a  href="/blogpage?category=Exam" className="text-sm hover:text-red-500 text-black">
+            Entrance Exams
+                </a>
+              </li>
+              <li className="!text-black list-none">
+                <a href="/searchpage" className="text-sm hover:text-red-500 text-black">
+            Top Colleges
+                </a>
+              </li>
+              <li className="!text-black list-none">
+                <a href="/blogdetailpage/67cab414dd3a58f74a0c6295" className="text-sm hover:text-red-500 text-black">
+            Scholarships
+                </a>
+              </li>
+              <li className="!text-black list-none">
+                <a href="/blogdetailpage/67cab637dd3a58f74a0c665f" className="text-sm hover:text-red-500 text-black">
+            Study Material
+                </a>
+              </li>
+            </ul>
+          </div>
 
         {/* Tools Section */}
         <div className="space-y-4">
           <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
-          <ul className="space-y-2">
-            <li>
-              <a
-                href="/college-predictor"
-                className="text-sm hover:text-red-500"
-              >
-                College Predictor
-              </a>
-            </li>
-            <li>
-              <a href="/rank-predictor" className="text-sm hover:text-red-500">
-                Rank Predictor
-              </a>
-            </li>
-            <li>
-              <a
-                href="/compare-colleges"
-                className="text-sm hover:text-red-500"
-              >
-                Compare Colleges
-              </a>
-            </li>
-            <li>
-              <a href="/career-tests" className="text-sm hover:text-red-500">
+          <ul className="space-y-2 ml-0">
+            <li className="list-none">
+              <a href="/blogdetailpage/67cab87fdd3a58f74a0c6b99" className="text-sm hover:text-red-500 text-black">
                 Career Assessment
               </a>
             </li>
@@ -756,29 +774,24 @@ const SubNavbar = ({ categories }) => {
         </div>
 
         {/* Quick Links Section */}
-        <div className="space-y-4">
+        <div className="space-y-4 w-fit">
           <h3 className="font-semibold text-red-500 border-b pb-2">
             Quick Links
           </h3>
-          <ul className="space-y-2">
-            <li>
-              <a href="/about-us" className="text-sm hover:text-red-500">
+          <ul className="space-y-2 ml-0">
+            <li className="list-none">
+              <a href="/aboutus" className="text-sm hover:text-red-500 text-black">
                 About Us
               </a>
             </li>
-            <li>
-              <a href="/contact" className="text-sm hover:text-red-500">
+            <li className="list-none">
+              <a href="/Contactuspage" className="text-sm hover:text-red-500 text-black">
                 Contact Us
               </a>
             </li>
-            <li>
-              <a href="/faqs" className="text-sm hover:text-red-500">
-                FAQs
-              </a>
-            </li>
-            <li>
-              <a href="/feedback" className="text-sm hover:text-red-500">
-                Feedback
+            <li className="list-none">
+              <a href="/question-&-answers" className="text-sm hover:text-red-500 text-black">
+                Q/A
               </a>
             </li>
           </ul>
@@ -841,13 +854,13 @@ const SubNavbar = ({ categories }) => {
   };
 
   const renderRegularContent = (category) => (
-    <div className="flex w-">
+    <div className="flex ">
       <div className="w-[400px] bg-white overflow-y-auto">
-        <ul>
+        <ul className="w-40 ml-0 mb-0 pb-0 space-y-0">
           {category?.sidebarItems?.map((item) => (
             <li
               key={item.id}
-              className={`px-2 py-2 group text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
+              className={`px-2  py-2 group  text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
                 activeContent[category.label] === item.id
                   ? "bg-red-400 border-l-2 border-red-500 text-white"
                   : "bg-red-500 text-white"
@@ -888,7 +901,7 @@ const SubNavbar = ({ categories }) => {
           ))}
         </ul>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col ">
         {/* Show stream institutes for the active stream if this is Colleges or Exams */}
         {(category.label === "Colleges" || category.label === "Exams") &&
           activeContent[category.label] &&
@@ -901,7 +914,7 @@ const SubNavbar = ({ categories }) => {
       </div>
 
       {/* City and State sections with stream-based display */}
-      <div className="ml-4 mt-4 flex gap-24 mr-10 w-full">
+      <div className="ml-4 mt-4 flex gap-10 mr-10 w-full">
         {/* Top Cities - Now showing stream-specific data */}
         <div className="space-y-6">
           <h3 className="font-semibold text-red-500">
@@ -910,14 +923,14 @@ const SubNavbar = ({ categories }) => {
               : "Colleges by City"}
           </h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-1 gap-2 w-[280px] ">
               {staticTopCities.map((city, index) => (
                 <a
                   key={index}
                   onClick={() =>
                     handleLocationClick("city", city.name, activeStream)
                   }
-                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
                   onMouseEnter={() => {
                     // Show stream-specific college count if available
                     if (activeStream) {
@@ -926,17 +939,17 @@ const SubNavbar = ({ categories }) => {
                   }}
                   onMouseLeave={() => setHoveredCity(null)}
                 >
-                  <span>
+                  <span className="line-clamp-1 ">
                     {" "}
                     {activeStream} in {city.name}
                   </span>
                 </a>
               ))}
             </div>
-            <div className="text-right mr-4">
+            <div className="text-left mr-4">
               <a
                 onClick={() => handleAllCollegesByCity(activeStream)}
-                className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
+                className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium text-black"
               >
                 {activeStream
                   ? `View All ${activeStream} Cities →`
@@ -961,7 +974,7 @@ const SubNavbar = ({ categories }) => {
                   onClick={() =>
                     handleLocationClick("state", state.name, activeStream)
                   }
-                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between"
+                  className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
                   onMouseEnter={() => {
                     // Show stream-specific college count if available
                     if (activeStream) {
@@ -977,7 +990,7 @@ const SubNavbar = ({ categories }) => {
                 </a>
               ))}
             </div>
-            <div className="text-right mr-4">
+            <div className="text-left mr-4">
               <a
                 onClick={() => handleAllCollegesByState(activeStream)}
                 className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
@@ -995,7 +1008,7 @@ const SubNavbar = ({ categories }) => {
 
   return (
     <div>
-      <div className="w-full h-auto bg-white">
+      <div className="w-full h-auto bg-white ">
         <div className="w-full px-5 pt-2 h-full mx-auto flex justify-between">
           <div className=" h-full flex flex-col justify-between">
             <div className="h-1/2 w-fit px-1 flex relative items-center justify-start gap-7">
@@ -1006,7 +1019,7 @@ const SubNavbar = ({ categories }) => {
                   onMouseEnter={(e) => handleMouseEnter(category, e)}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <h5 className="text-xs gap-2 font-[500] pb-2 group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer whitespace-nowrap">
+                  <h5 className="text-xs gap-2 font-[500] pb-2 mt-0 group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer whitespace-nowrap">
                     {category.label}
                     <img
                       className="h-3 group-hover:rotate-180 transition-all"
@@ -1016,7 +1029,7 @@ const SubNavbar = ({ categories }) => {
                   </h5>
                   {hoveredCategory === category.label && (
                     <div
-                      className={`absolute top-6 z-50 bg-white   shadow-lg ${dropdownAlignment}`}
+                      className={`absolute top-6 z-[1000] bg-white   shadow-lg ${dropdownAlignment}`}
                     >
                       {category.label === "Courses"
                         ? renderCoursesContent()

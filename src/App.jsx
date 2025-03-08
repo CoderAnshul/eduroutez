@@ -94,6 +94,8 @@ const App = () => {
           <Route path="/trending-institute" element={<TrendingInstitute/>} />
           <Route path='/counselor' element={<Counselor />}></Route>
             <Route path="/news/:id" element={<NewsDetail />} />
+            <Route path="/news/:slug" element={<NewsDetail />} />
+
           <Route path="/news" element={<NewsPage />} />
           <Route path='/blog/:slug' element={<BlogDetailPage/>}></Route>
 

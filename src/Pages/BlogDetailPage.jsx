@@ -194,6 +194,16 @@ const BlogDetailPage = () => {
 
       // Update local state
       setIsLiked(!isLiked);
+      setData((prevData) => {
+        const updatedLikes = isLiked
+          ? prevData.likes.filter((userId) => userId !== currentUserId) // Remove user ID
+          : [...prevData.likes, currentUserId]; // Add user ID
+
+        return {
+          ...prevData,
+          likes: updatedLikes,
+        };
+      });
       console.log(`Blog ${blogId} like status updated to ${!isLiked}`);
     } catch (error) {
       console.error("Error updating like status:", error);

@@ -129,7 +129,7 @@ const Navbar = () => {
                   alt="editBtn"
                 />
               </button>
-              <h4>Write a Review</h4>
+              <span className="text-black">Write a Review</span>
             </Link>
 
             <Link
@@ -141,7 +141,7 @@ const Navbar = () => {
                 src={explore}
                 alt="exploreBtn"
               />
-              <span>Explore</span>
+              <span className="text-black">Explore</span>
             </Link>
             {!accessToken && (
               <Link
@@ -241,19 +241,19 @@ const Navbar = () => {
           </button>
         </div>
 
-        <ul className="mt-12 space-y-4">
+        <ul className="mt-12 ml-0 space-y-4">
           <li>
-            <Link to="/" onClick={toggleMenu}>
+            <Link className="text-black" to="/" onClick={toggleMenu}>
               Home
             </Link>
           </li>
           <li>
-            <Link to="/searchpage" onClick={toggleMenu}>
+            <Link className="text-black" to="/searchpage" onClick={toggleMenu}>
               Explore
             </Link>
           </li>
           <li>
-            <Link to="/writereview" onClick={handleReviewClick}>
+            <Link className="text-black" to="/writereview" onClick={handleReviewClick}>
               Write a Review
             </Link>
           </li>

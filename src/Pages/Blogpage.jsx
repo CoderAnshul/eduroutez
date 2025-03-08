@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import PageBanner from "../Ui components/PageBanner";
 import BlogandCareerBox from "../Ui components/BlogandCareerBox";
 import Events from "../Components/Events";
@@ -20,7 +20,10 @@ const Blogpage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const itemsPerPage = 8;
-
+  
+  // Get the URL location and query parameters
+  const location = useLocation();
+  
   const baseURL = import.meta.env.VITE_BASE_URL;
 
   // Fetch all blogs at once
@@ -71,8 +74,43 @@ const Blogpage = () => {
       const response = await axios.get(`${baseURL}/blog-category`);
       return response.data;
     },
-    { enabled: true }
+    { 
+      enabled: true,
+      onSuccess: (data) => {
+        // Check for category in URL params after categories have loaded
+        const queryParams = new URLSearchParams(location.search);
+        const categoryParam = queryParams.get('category');
+        
+        if (categoryParam && data?.data?.result) {
+          const categories = data.data.result;
+          const matchingCategory = categories.find(
+            cat => cat && cat.name && cat.name.toLowerCase() === categoryParam.toLowerCase()
+          );
+          
+          if (matchingCategory) {
+            setSelectedCategories([matchingCategory.name]);
+          }
+        }
+      }
+    }
   );
+
+  // Check for URL query parameters when component mounts or URL changes
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const categoryParam = queryParams.get('category');
+    
+    if (categoryParam && categoryData?.data?.result) {
+      const categories = categoryData.data.result;
+      const matchingCategory = categories.find(
+        cat => cat && cat.name && cat.name.toLowerCase() === categoryParam.toLowerCase()
+      );
+      
+      if (matchingCategory) {
+        setSelectedCategories([matchingCategory.name]);
+      }
+    }
+  }, [location.search, categoryData]);
 
   // Filter and paginate data
   useEffect(() => {
@@ -108,6 +146,21 @@ const Blogpage = () => {
       prev.includes(category)
         ? prev.filter((cat) => cat !== category)
         : [...prev, category]
+    );
+    
+    // Update URL when category filter changes
+    const queryParams = new URLSearchParams(location.search);
+    if (!prev.includes(category)) {
+      queryParams.set('category', category);
+    } else {
+      queryParams.delete('category');
+    }
+    
+    // Update the URL without refreshing the page
+    window.history.replaceState(
+      {},
+      '',
+      `${location.pathname}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
     );
   };
 
