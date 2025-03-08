@@ -524,14 +524,7 @@ const SubNavbar = ({ categories }) => {
               </a>
             ))}
           </div>
-          <div className="text-right">
-            <a
-              onClick={() => handleViewAllCourses()}
-              className="text-sm text-red-500 hover:text-red-600 cursor-pointer font-medium"
-            >
-              View All Courses →
-            </a>
-          </div>
+        
         </div>
       </div>
     </div>
