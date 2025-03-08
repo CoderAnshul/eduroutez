@@ -114,6 +114,8 @@ const CourseReviewSection = ({ course }) => {
       setTimeout(() => {
         setShowForm(false);
         setSubmitSuccess(false);
+
+        window.location.reload(); // You might want to refresh the course data here or use a callback function
         // You might want to refresh the course data here or use a callback function
       }, 2000);
     } catch (error) {
