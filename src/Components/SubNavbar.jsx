@@ -623,13 +623,13 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="bg-white rounded-xl shadow-lg">
+    <div className="bg-white rounded-xl w-[50rem] shadow-lg">
       <div className="p-4 border-b bg-gradient-to-r from-orange-500 to-red-600">
         <h3 className="text-lg font-bold text-white">Latest Updates</h3>
       </div>
 
       <div className="p-4">
-        <ul className="grid grid-cols-3 gap-8">
+        <ul className="grid grid-cols-3 gap-4">
           {latestNews
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 3)
@@ -637,7 +637,7 @@ const SubNavbar = ({ categories }) => {
               <li
                 key={news._id}
                 onClick={() => handleNewsClick(news)}
-                className="group hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
+                className="group hover:bg-orange-50  rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md"
               >
                 <div className="space-y-3">
                   <div className="space-y-1">
@@ -695,40 +695,52 @@ const SubNavbar = ({ categories }) => {
   const renderMoreContent = () => (
     <div className="bg-white rounded-lg shadow-lg p-6 min-w-[600px]">
       <div className="grid grid-cols-3 gap-8">
-          <div className="space-y-4">
-            <h3 className="font-semibold text-red-500 border-b pb-2">
-              Resources
-            </h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="/blogpage?category=Exam" className="text-sm hover:text-red-500">
-            Entrance Exams
-                </a>
-              </li>
-              <li>
-                <a href="/searchpage" className="text-sm hover:text-red-500">
-            Top Colleges
-                </a>
-              </li>
-              <li>
-                <a href="/blogdetailpage/67cab414dd3a58f74a0c6295" className="text-sm hover:text-red-500">
-            Scholarships
-                </a>
-              </li>
-              <li>
-                <a href="/blogdetailpage/67cab637dd3a58f74a0c665f" className="text-sm hover:text-red-500">
-            Study Material
-                </a>
-              </li>
-            </ul>
-          </div>
+        <div className="space-y-4">
+          <h3 className="font-semibold text-red-500 border-b pb-2">
+            Resources
+          </h3>
+          <ul className="space-y-2">
+            <li>
+              <a
+                href="/blogpage?category=Exam"
+                className="text-sm hover:text-red-500"
+              >
+                Entrance Exams
+              </a>
+            </li>
+            <li>
+              <a href="/searchpage" className="text-sm hover:text-red-500">
+                Top Colleges
+              </a>
+            </li>
+            <li>
+              <a
+                href="/blogdetailpage/67cab414dd3a58f74a0c6295"
+                className="text-sm hover:text-red-500"
+              >
+                Scholarships
+              </a>
+            </li>
+            <li>
+              <a
+                href="/blogdetailpage/67cab637dd3a58f74a0c665f"
+                className="text-sm hover:text-red-500"
+              >
+                Study Material
+              </a>
+            </li>
+          </ul>
+        </div>
 
-          {/* Tools Section */}
+        {/* Tools Section */}
         <div className="space-y-4">
           <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
           <ul className="space-y-2">
             <li>
-              <a href="/blogdetailpage/67cab87fdd3a58f74a0c6b99" className="text-sm hover:text-red-500">
+              <a
+                href="/blogdetailpage/67cab87fdd3a58f74a0c6b99"
+                className="text-sm hover:text-red-500"
+              >
                 Career Assessment
               </a>
             </li>
@@ -752,11 +764,13 @@ const SubNavbar = ({ categories }) => {
               </a>
             </li>
             <li>
-              <a href="/question-&-answers" className="text-sm hover:text-red-500">
+              <a
+                href="/question-&-answers"
+                className="text-sm hover:text-red-500"
+              >
                 Q/A
               </a>
             </li>
-           
           </ul>
         </div>
       </div>
@@ -864,7 +878,7 @@ const SubNavbar = ({ categories }) => {
           ))}
         </ul>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col ">
         {/* Show stream institutes for the active stream if this is Colleges or Exams */}
         {(category.label === "Colleges" || category.label === "Exams") &&
           activeContent[category.label] &&
@@ -877,7 +891,7 @@ const SubNavbar = ({ categories }) => {
       </div>
 
       {/* City and State sections with stream-based display */}
-      <div className="ml-4 mt-4 flex gap-24 mr-10 w-full">
+      <div className="ml-4 mt-4 flex gap-10 mr-10 w-full">
         {/* Top Cities - Now showing stream-specific data */}
         <div className="space-y-6">
           <h3 className="font-semibold text-red-500">
@@ -886,7 +900,7 @@ const SubNavbar = ({ categories }) => {
               : "Colleges by City"}
           </h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-1 gap-2 w-[280px] ">
               {staticTopCities.map((city, index) => (
                 <a
                   key={index}
@@ -902,14 +916,14 @@ const SubNavbar = ({ categories }) => {
                   }}
                   onMouseLeave={() => setHoveredCity(null)}
                 >
-                  <span>
+                  <span className="line-clamp-1 ">
                     {" "}
                     {activeStream} in {city.name}
                   </span>
                 </a>
               ))}
             </div>
-            <div className="text-right mr-4">
+            <div className="text-left mr-4">
               <a
                 onClick={() => handleAllCollegesByCity(activeStream)}
                 className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
@@ -953,7 +967,7 @@ const SubNavbar = ({ categories }) => {
                 </a>
               ))}
             </div>
-            <div className="text-right mr-4">
+            <div className="text-left mr-4">
               <a
                 onClick={() => handleAllCollegesByState(activeStream)}
                 className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
