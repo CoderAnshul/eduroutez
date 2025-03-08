@@ -7,7 +7,6 @@ import {
   bestRatedColleges,
   aboutLinks,
   otherLinks,
-  topUniversities,
   freeCourses,
   examResults,
   rrbGroupDLinks,
