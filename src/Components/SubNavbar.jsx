@@ -317,6 +317,9 @@ const SubNavbar = ({ categories }) => {
       }
     }
 
+    // Close the dropdown menu
+    setHoveredCategory(null);
+
     // Ensure state is set before navigating
     setTimeout(() => {
       navigate(
@@ -428,7 +431,10 @@ const SubNavbar = ({ categories }) => {
             {blogs.slice(0, 5).map((blog) => (
               <div
                 key={blog._id}
-                onClick={() => navigate(`/blog/${blog.slug || blog._id}`)}
+                onClick={() => {
+                  navigate(`/blog/${blog.slug || blog._id}`);
+                  setHoveredCategory(null); // Close dropdown on click
+                }}
                 className="cursor-pointer hover:bg-gray-50 p-2 rounded"
               >
                 <div className="text-sm font-medium text-gray-800 hover:text-red-500">
@@ -441,9 +447,10 @@ const SubNavbar = ({ categories }) => {
             ))}
             <div className="text-right mt-2">
               <a
-                onClick={() =>
-                  navigate(`/blogs?category=Exam&stream=${streamId}`)
-                }
+                onClick={() => {
+                  navigate(`/blogs?category=Exam&stream=${streamId}`);
+                  setHoveredCategory(null); // Close dropdown on click
+                }}
                 className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
               >
                 View All Exam Updates →
@@ -459,22 +466,27 @@ const SubNavbar = ({ categories }) => {
 
   const handleViewAllCourses = () => {
     navigate("/popularcourses");
+    setHoveredCategory(null); // Close dropdown on click
   };
 
   const handleViewAllCareers = () => {
     navigate("/careerspage");
+    setHoveredCategory(null); // Close dropdown on click
   };
 
   const handleViewAllColleges = () => {
     navigate("/topcolleges");
+    setHoveredCategory(null); // Close dropdown on click
   };
 
   const handleAllCollegesByCity = () => {
     navigate("/searchpage");
+    setHoveredCategory(null); // Close dropdown on click
   };
 
   const handleAllCollegesByState = () => {
     navigate("/searchpage");
+    setHoveredCategory(null); // Close dropdown on click
   };
 
   const handleMouseLeave = () => {
@@ -484,21 +496,25 @@ const SubNavbar = ({ categories }) => {
 
   const handleViewAllNews = () => {
     navigate("/news"); // Adjust the route as needed
+    setHoveredCategory(null); // Close dropdown on click
   };
 
   const handleCourseClick = (course) => {
     const courseSlug = getCourseSlug(course);
     navigate(`/coursesinfopage/${courseSlug}`);
+    setHoveredCategory(null); // Close dropdown on click
   };
 
   const handleCareerClick = (career) => {
     const careerSlug = getCareerSlug(career);
     navigate(`/detailpage/${careerSlug}`);
+    setHoveredCategory(null); // Close dropdown on click
   };
 
   const handleNewsClick = (news) => {
     const newsSlug = getNewsSlug(news);
     navigate(`/news/${newsSlug}`);
+    setHoveredCategory(null); // Close dropdown on click
     
     // You might want to add this debugging log
     console.log(`News slug: ${newsSlug}, ID: ${newsIdMap[newsSlug] || news._id}`);
@@ -506,6 +522,13 @@ const SubNavbar = ({ categories }) => {
 
   const handleInstituteClick = (institute) => {
     navigate(`/institute/${institute.slug || institute._id}`);
+    setHoveredCategory(null); // Close dropdown on click
+  };
+
+  // Add a general click handler for links
+  const handleLinkClick = (url) => {
+    navigate(url);
+    setHoveredCategory(null); // Close dropdown on click
   };
 
   const renderCoursesContent = () => (
@@ -732,23 +755,23 @@ const SubNavbar = ({ categories }) => {
             </h3>
             <ul className="space-y-2 list-none ml-0">
               <li className="!text-black">
-                <a  href="/blogpage?category=Exam" className="text-sm hover:text-red-500 text-black">
-            Entrance Exams
+                <a onClick={() => handleLinkClick("/blogpage?category=Exam")} className="text-sm hover:text-red-500 text-black">
+                  Entrance Exams
                 </a>
               </li>
               <li className="!text-black list-none">
-                <a href="/searchpage" className="text-sm hover:text-red-500 text-black">
-            Top Colleges
+                <a onClick={() => handleLinkClick("/searchpage")} className="text-sm hover:text-red-500 text-black">
+                  Top Colleges
                 </a>
               </li>
               <li className="!text-black list-none">
-                <a href="/blogdetailpage/67cab414dd3a58f74a0c6295" className="text-sm hover:text-red-500 text-black">
-            Scholarships
+                <a onClick={() => handleLinkClick("/blogdetailpage/67cab414dd3a58f74a0c6295")} className="text-sm hover:text-red-500 text-black">
+                  Scholarships
                 </a>
               </li>
               <li className="!text-black list-none">
-                <a href="/blogdetailpage/67cab637dd3a58f74a0c665f" className="text-sm hover:text-red-500 text-black">
-            Study Material
+                <a onClick={() => handleLinkClick("/blogdetailpage/67cab637dd3a58f74a0c665f")} className="text-sm hover:text-red-500 text-black">
+                  Study Material
                 </a>
               </li>
             </ul>
@@ -759,7 +782,7 @@ const SubNavbar = ({ categories }) => {
           <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
           <ul className="space-y-2 ml-0">
             <li className="list-none">
-              <a href="/blogdetailpage/67cab87fdd3a58f74a0c6b99" className="text-sm hover:text-red-500 text-black">
+              <a onClick={() => handleLinkClick("/blogdetailpage/67cab87fdd3a58f74a0c6b99")} className="text-sm hover:text-red-500 text-black">
                 Career Assessment
               </a>
             </li>
@@ -773,17 +796,17 @@ const SubNavbar = ({ categories }) => {
           </h3>
           <ul className="space-y-2 ml-0">
             <li className="list-none">
-              <a href="/aboutus" className="text-sm hover:text-red-500 text-black">
+              <a onClick={() => handleLinkClick("/aboutus")} className="text-sm hover:text-red-500 text-black">
                 About Us
               </a>
             </li>
             <li className="list-none">
-              <a href="/Contactuspage" className="text-sm hover:text-red-500 text-black">
+              <a onClick={() => handleLinkClick("/Contactuspage")} className="text-sm hover:text-red-500 text-black">
                 Contact Us
               </a>
             </li>
             <li className="list-none">
-              <a href="/question-&-answers" className="text-sm hover:text-red-500 text-black">
+              <a onClick={() => handleLinkClick("/question-&-answers")} className="text-sm hover:text-red-500 text-black">
                 Q/A
               </a>
             </li>
@@ -792,6 +815,7 @@ const SubNavbar = ({ categories }) => {
       </div>
     </div>
   );
+
 
   const renderStreamInstitutes = (streamName) => {
     const popular = popularInstitutes[streamName]?.result || [];

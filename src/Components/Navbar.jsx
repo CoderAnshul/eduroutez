@@ -175,7 +175,7 @@ const Navbar = () => {
 
                 {/* Dropdown menu */}
                 {isDropdownOpen && (
-                  <div className="absolute z-[1000] right-0 top-[34px] w-50 backdrop-blur-sm border transition-all border-gray-300 rounded-lg shadow-lg">
+                  <div className="absolute z-[1000] right-0 top-[34px] w-50 bg-white border transition-all border-gray-300 rounded-lg shadow-lg">
                     <Link
                       to="/dashboard/profile-page"
                       className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"

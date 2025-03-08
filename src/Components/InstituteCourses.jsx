@@ -35,7 +35,7 @@ const CourseList = ({ filteredCourses, visibleCourses, getCourseSlug }) => (
       <Link 
         to={`/coursesinfopage/${getCourseSlug(course)}`} 
         key={course._id} 
-        className="flex-1 w-full max-w-sm"
+        className="flex-1 w-full max-w-sm !text-black"
       >
         <CourseCard course={course} />
       </Link>

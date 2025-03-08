@@ -267,7 +267,7 @@ const Careerspage = () => {
               <Link
                 key={career._id}
                 to={`/detailpage/${career.slug || career._id}`}
-                className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer
+                className="group bg-white min-h-[440px] rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer
                               relative  max-w-sm flex-1 flex flex-col justify-between min-w-[300px] bg-white/50 rounded-lg shadow-lg overflow-hidden"
               >
                 <div>
