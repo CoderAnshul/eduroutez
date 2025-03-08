@@ -88,7 +88,7 @@ const ImageSlider = ({ instituteData }) => {
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
-      <div className="relative aspect-[3/2] w-full overflow-hidden">
+      <div className="relative aspect-[3/2] w-full overflow-hidden max-h-[400px]">
         <div className="relative w-full h-full">
           {allImages.map((src, index) => (
             <img
