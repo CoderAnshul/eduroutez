@@ -66,7 +66,7 @@ const NewsDetailPage = () => {
           if (mappedId) {
             // We found the ID in the map, use it
             newsId = mappedId;
-            response = await axios.get(`${baseURL}/news/${newsId}`);
+            response = await axios.get(`${baseURL}/news/data/${newsId}`);
           } else {
             // If newsIdMap doesn't exist or doesn't have the slug (like on refresh),
             // we need to get the news directly by its slug through a custom API call
@@ -92,7 +92,7 @@ const NewsDetailPage = () => {
               console.error("Error fetching news by slug:", slugError);
 
               // As a final fallback, try using the news ID API
-              response = await axios.get(`${baseURL}/news/${id}`);
+              response = await axios.get(`${baseURL}/news/data/${id}`);
             }
           }
         } else {
