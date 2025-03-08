@@ -11,6 +11,9 @@ const CourseReviewSection = ({ course }) => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
+  const baseURL = import.meta.env.VITE_BASE_URL;
+
+
   useEffect(() => {
     // Get current user ID from localStorage
     const userId = localStorage.getItem('userId');
@@ -111,6 +114,8 @@ const CourseReviewSection = ({ course }) => {
       setTimeout(() => {
         setShowForm(false);
         setSubmitSuccess(false);
+
+        window.location.reload(); // You might want to refresh the course data here or use a callback function
         // You might want to refresh the course data here or use a callback function
       }, 2000);
     } catch (error) {

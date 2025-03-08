@@ -287,6 +287,10 @@ const ReviewsFilterPage = () => {
                     <>
                         <div className="space-y-4">
                             <div>
+                                <div className='flex items-center'>
+                                    <h4 className="font-semibold text-gray-700">Counselor Name</h4>
+                                    <span className="text-gray-600 ml-2">{review?.objectName}</span>
+                                </div>
                                 <h4 className="font-semibold text-gray-700">Counseling Experience</h4>
                                 <div className="flex items-center">
                                     {renderStarRating(review.rating)}

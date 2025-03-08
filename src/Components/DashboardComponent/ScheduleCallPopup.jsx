@@ -10,6 +10,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
     studentId: localStorage.getItem("userId"),
   });
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [bookedSlots, setBookedSlots] = useState([]);
   const [counselorSchedule, setCounselorSchedule] = useState(null);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
 
@@ -34,6 +35,11 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
         const data = await response.json();
         if (data?.data) {
           setCounselorSchedule(data.data);
+          
+          // Extract booked slots from the response
+          if (data.data.scheduledSlots && Array.isArray(data.data.scheduledSlots)) {
+            setBookedSlots(data.data.scheduledSlots);
+          }
         }
       } catch (error) {
         console.error("Error fetching counselor schedule:", error);
@@ -128,6 +134,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
 
             if (bookingResponse.ok) {
               toast.success("Slot booked successfully!");
+              onClose();
             } else {
               toast.error("Failed to book slot after payment.");
             }
@@ -148,9 +155,22 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
-      console.log('erroe',error.message)
+      console.log('error', error.message);
       toast.error("Payment initialization failed. Please try again.");
     }
+  };
+
+  // Check if a slot is already booked
+  const isSlotBooked = (slot, date) => {
+    if (!date || !bookedSlots.length) return false;
+    
+    const formattedDate = new Date(date).toISOString().split('T')[0];
+    
+    return bookedSlots.some(
+      bookedSlot => 
+        bookedSlot.slot === slot && 
+        new Date(bookedSlot.date).toISOString().split('T')[0] === formattedDate
+    );
   };
 
   if (!isOpen) return null;
@@ -196,20 +216,30 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
               </label>
               {availableSlots.length > 0 ? (
                 <div className="mt-2 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-                  {availableSlots.map((time) => (
-                    <label key={time} className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        name="timeSlot"
-                        value={time}
-                        checked={formData.timeSlot === time}
-                        onChange={handleChange}
-                        className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
-                        required
-                      />
-                      <span className="text-sm text-gray-900">{time}</span>
-                    </label>
-                  ))}
+                  {availableSlots.map((time) => {
+                    const slotBooked = isSlotBooked(time, formData.date);
+                    return (
+                      <label 
+                        key={time} 
+                        className={`flex items-center space-x-2 ${slotBooked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        <input
+                          type="radio"
+                          name="timeSlot"
+                          value={time}
+                          checked={formData.timeSlot === time}
+                          onChange={handleChange}
+                          disabled={slotBooked}
+                          className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500 disabled:opacity-50"
+                          required
+                        />
+                        <span className={`text-sm ${slotBooked ? 'text-gray-400 ' : 'text-gray-900'}`}>
+                          {time}
+                          {slotBooked && ' (Booked)'}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="mt-2 text-sm text-gray-500">
@@ -256,12 +286,12 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
                 Close
               </button>
               <Link
-          to="/login"
-          onClick={() => setShowLoginDialog(false)}
-          className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
-        >
-          Log In
-        </Link>
+                to="/login"
+                onClick={() => setShowLoginDialog(false)}
+                className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+              >
+                Log In
+              </Link>
             </div>
           </div>
         </div>
