@@ -10,8 +10,8 @@ const useCategories = () => {
     const fetchData = async () => {
       try {
         const [collegeResponse, examResponse, coursesResponse] = await Promise.all([
-          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams`),
-          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams`),
+          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams?limit=15`),
+          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams?limit=15`),
           axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/courses?filters={"isCoursePopular":true}`)
         ]);
         console.log('coursesResponse',coursesResponse)

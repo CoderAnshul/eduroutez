@@ -693,62 +693,40 @@ const SubNavbar = ({ categories }) => {
   const renderMoreContent = () => (
     <div className="bg-white rounded-lg shadow-lg p-6 min-w-[600px]">
       <div className="grid grid-cols-3 gap-8">
-        {/* Resources Section */}
-        <div className="space-y-4">
-          <h3 className="font-semibold text-red-500 border-b pb-2">
-            Resources
-          </h3>
-          <ul className="space-y-2">
-            <li>
-              <a href="/exams" className="text-sm hover:text-red-500">
-                Entrance Exams
-              </a>
-            </li>
-            <li>
-              <a href="/colleges" className="text-sm hover:text-red-500">
-                Top Colleges
-              </a>
-            </li>
-            <li>
-              <a href="/scholarships" className="text-sm hover:text-red-500">
-                Scholarships
-              </a>
-            </li>
-            <li>
-              <a href="/study-material" className="text-sm hover:text-red-500">
-                Study Material
-              </a>
-            </li>
-          </ul>
-        </div>
+          <div className="space-y-4">
+            <h3 className="font-semibold text-red-500 border-b pb-2">
+              Resources
+            </h3>
+            <ul className="space-y-2">
+              <li>
+                <a href="/blogpage?category=Exam" className="text-sm hover:text-red-500">
+            Entrance Exams
+                </a>
+              </li>
+              <li>
+                <a href="/searchpage" className="text-sm hover:text-red-500">
+            Top Colleges
+                </a>
+              </li>
+              <li>
+                <a href="/blogdetailpage/67cab414dd3a58f74a0c6295" className="text-sm hover:text-red-500">
+            Scholarships
+                </a>
+              </li>
+              <li>
+                <a href="/blogdetailpage/67cab637dd3a58f74a0c665f" className="text-sm hover:text-red-500">
+            Study Material
+                </a>
+              </li>
+            </ul>
+          </div>
 
-        {/* Tools Section */}
+          {/* Tools Section */}
         <div className="space-y-4">
           <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
           <ul className="space-y-2">
             <li>
-              <a
-                href="/college-predictor"
-                className="text-sm hover:text-red-500"
-              >
-                College Predictor
-              </a>
-            </li>
-            <li>
-              <a href="/rank-predictor" className="text-sm hover:text-red-500">
-                Rank Predictor
-              </a>
-            </li>
-            <li>
-              <a
-                href="/compare-colleges"
-                className="text-sm hover:text-red-500"
-              >
-                Compare Colleges
-              </a>
-            </li>
-            <li>
-              <a href="/career-tests" className="text-sm hover:text-red-500">
+              <a href="/blogdetailpage/67cab87fdd3a58f74a0c6b99" className="text-sm hover:text-red-500">
                 Career Assessment
               </a>
             </li>
@@ -762,25 +740,21 @@ const SubNavbar = ({ categories }) => {
           </h3>
           <ul className="space-y-2">
             <li>
-              <a href="/about-us" className="text-sm hover:text-red-500">
+              <a href="/aboutus" className="text-sm hover:text-red-500">
                 About Us
               </a>
             </li>
             <li>
-              <a href="/contact" className="text-sm hover:text-red-500">
+              <a href="/Contactuspage" className="text-sm hover:text-red-500">
                 Contact Us
               </a>
             </li>
             <li>
-              <a href="/faqs" className="text-sm hover:text-red-500">
-                FAQs
+              <a href="/question-&-answers" className="text-sm hover:text-red-500">
+                Q/A
               </a>
             </li>
-            <li>
-              <a href="/feedback" className="text-sm hover:text-red-500">
-                Feedback
-              </a>
-            </li>
+           
           </ul>
         </div>
       </div>
