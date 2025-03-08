@@ -242,6 +242,7 @@ const NewsDetailPage = () => {
                 title={newsDetail.title}
                 url={window.location.href}
                 contentType="news"
+                className=" !top-full -left-44"
               />
             </div>
 
