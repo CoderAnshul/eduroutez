@@ -2,45 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
-
-@layer components{
-    .CustomFlex{
-        @apply flex items-center justify-center
-    }
-    .footerText{
-        @apply !text-white transition-all hover:!text-[#B82025]
-    }
+@layer components {
+  .CustomFlex {
+    @apply flex items-center justify-center;
+  }
+  .footerText {
+    @apply !text-white transition-all hover:!text-[#B82025];
+  }
 }
 
 @layer utilities {
-    .scrollbar-thumb-red::-webkit-scrollbar-thumb {
-      background-color: red; 
-      border-radius: 10px;
-    }
-  
-    .scrollbar-thumb-red::-webkit-scrollbar {
-      width: 8px; 
-    }
-  
-    .scrollbar-thumb-red::-webkit-scrollbar-track {
-      background-color: transparent; 
-    }
+  .scrollbar-thumb-red::-webkit-scrollbar-thumb {
+    background-color: red;
+    border-radius: 10px;
   }
-  
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    scroll-behavior: smooth;
+
+  .scrollbar-thumb-red::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-thumb-red::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
 }
 
-html{
-    min-width: 380px;
-    overflow-x: hidden;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 
-ol{
-  padding-left:25px;
+html {
+  min-width: 380px;
+  overflow-x: hidden;
+}
+
+ol {
+  padding-left: 25px;
 }
 .is-sticky {
   position: sticky;
@@ -51,63 +50,62 @@ ol{
 }
 
 input[type="text"] {
-    background-color: transparent;
-    outline: none;
-  }
-
-  button{
-    cursor: pointer;
-  }
-a{
-    text-decoration: none;
-    color: black;
-    cursor:pointer;
+  background-color: transparent;
+  outline: none;
 }
 
-.banner-img{
-    position: relative;
-    background-image: url('./assets/Images/mainBanner.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: bottom;
+button {
+  cursor: pointer;
 }
-.viewmorebtn{
-    background-color: red;
-    color: white;
-    padding: 0.6vw 2vw;
-    border-radius: 8px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.box{
-    min-height: 450px;
-    max-height: 540px;
-    flex: 1;
-    min-width: 240px;
-    max-width: 500px;
-    border-radius: 10px;
-    overflow: hidden;
+a {
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
 }
 
-.imageContainer{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height:58%;
-    height: 290px;
-    width: 100%;
-    overflow: hidden;
+.banner-img {
+  position: relative;
+  background-image: url("./assets/Images/mainBanner.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: bottom;
 }
-.textContainer{
-    display: flex;
-    padding: 10px;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
+.viewmorebtn {
+  background-color: red;
+  color: white;
+  padding: 0.6vw 2vw;
+  border-radius: 8px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.box {
+  min-height: 450px;
+  max-height: 540px;
+  flex: 1;
+  min-width: 240px;
+  max-width: 500px;
+  border-radius: 10px;
+  overflow: hidden;
+}
 
+.imageContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 58%;
+  height: 290px;
+  width: 100%;
+  overflow: hidden;
+}
+.textContainer {
+  display: flex;
+  padding: 10px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
 }
 
 /* .gradient-background {
@@ -120,92 +118,89 @@ a{
     );
 } */
 .gradient-background {
-    background-image: url('./assets/Images/categories/catbg.jpg');
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
+  background-image: url("./assets/Images/categories/catbg.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
-.instructor{
-    background-image: url('./assets/Images/instructor2.jpg');
-    background-position: center 20%;
-    background-size: cover;
-    background-repeat: no-repeat;
+.instructor {
+  background-image: url("./assets/Images/instructor2.jpg");
+  background-position: center 20%;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
-.reviews{
-    background-image: url('./assets/Images/bg.jpg');
-    background-position: center 20%;
-    background-size: cover;
-    background-repeat: no-repeat;
+.reviews {
+  background-image: url("./assets/Images/bg.jpg");
+  background-position: center 20%;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .tabsScroll {
-    overflow: scroll;
-    scrollbar-width: none; 
-    -ms-overflow-style: none; 
-  }
-  
-  .tabsScroll::-webkit-scrollbar {
-    display: none; 
-  }
-  
+  overflow: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
 
-  .scrollbar-thumb-red::-webkit-scrollbar-thumb {
-    background-color: red; /* Red scrollbar thumb */
-    border-radius: 10px; /* Optional: Rounded corners */
-  }
-  
-  .scrollbar-thumb-red::-webkit-scrollbar {
-    width: 5px; /* Set width of the scrollbar */
-  }
-  
-  .scrollbar-thumb-red::-webkit-scrollbar-track {
-    background-color: transparent; /* Transparent background */
-  }
-  .scrollbar-thumb-transparent::-webkit-scrollbar-thumb {
-    background-color: transparent; /* Red scrollbar thumb */
-    border-radius: 10px; /* Optional: Rounded corners */
-  }
-  
-  .scrollbar-thumb-transparent::-webkit-scrollbar {
-    width: 0px; /* Set width of the scrollbar */
-  }
-  
-  .scrollbar-thumb-transparent::-webkit-scrollbar-track {
-    background-color: transparent; /* Transparent background */
-  }
-  .sticky {
-    position: -webkit-sticky; /* Safari */
-    position: sticky;
-  }
+.tabsScroll::-webkit-scrollbar {
+  display: none;
+}
 
-  /* ............ new changes .............. */
+.scrollbar-thumb-red::-webkit-scrollbar-thumb {
+  background-color: red; /* Red scrollbar thumb */
+  border-radius: 10px; /* Optional: Rounded corners */
+}
 
-  p{
-    overflow-wrap:break-word;
-  }
-  
+.scrollbar-thumb-red::-webkit-scrollbar {
+  width: 5px; /* Set width of the scrollbar */
+}
 
-  .text-base table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-  
-  .text-base table th,
-  .text-base table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  .text-base table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-  }
-  
+.scrollbar-thumb-red::-webkit-scrollbar-track {
+  background-color: transparent; /* Transparent background */
+}
+.scrollbar-thumb-transparent::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Red scrollbar thumb */
+  border-radius: 10px; /* Optional: Rounded corners */
+}
 
-  /* Loader styles */
+.scrollbar-thumb-transparent::-webkit-scrollbar {
+  width: 0px; /* Set width of the scrollbar */
+}
+
+.scrollbar-thumb-transparent::-webkit-scrollbar-track {
+  background-color: transparent; /* Transparent background */
+}
+.sticky {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+}
+
+/* ............ new changes .............. */
+
+p {
+  overflow-wrap: break-word;
+}
+
+.text-base table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.text-base table th,
+.text-base table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.text-base table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+/* Loader styles */
 .loader-container {
   position: fixed;
   top: 0;
@@ -229,8 +224,12 @@ a{
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Page transition styles */
@@ -242,7 +241,15 @@ a{
   opacity: 0.5;
 }
 
-
 .overflow-hidden {
   overflow: hidden;
+}
+
+/* ............ new changes .............. */
+
+@media screen and (max-width: 768px) {
+  .text-base {
+    /* width: 1000px; */
+    overflow-x: auto;
+  }
 }

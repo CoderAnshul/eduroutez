@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import Slidebtn from './Slidebtn';
-import star from '../assets/Images/star.png';
-import gallery from '../assets/Images/galleryBtn.png';
+import { useState, useEffect, useMemo } from "react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import Slidebtn from "./Slidebtn";
+import star from "../assets/Images/star.png";
+import gallery from "../assets/Images/galleryBtn.png";
 
 const ImageSlider = ({ instituteData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -13,34 +13,39 @@ const ImageSlider = ({ instituteData }) => {
 
   // Helper function to validate image URL
   const isValidImage = (img) => {
-    return img && typeof img === 'string' && img.trim() !== '' && !imageLoadError[img];
+    return (
+      img &&
+      typeof img === "string" &&
+      img.trim() !== "" &&
+      !imageLoadError[img]
+    );
   };
 
   // Create array of valid images with strict filtering
   const allImages = useMemo(() => {
     const coverImage = instituteData?.data?.coverImage;
     const galleryImages = instituteData?.data?.gallery || [];
-    
+
     // Only include cover image if it exists and is valid
     const validImages = [];
     if (isValidImage(coverImage)) {
       validImages.push(coverImage);
     }
-    
+
     // Add valid gallery images
-    galleryImages.forEach(img => {
+    galleryImages.forEach((img) => {
       if (isValidImage(img) && img !== coverImage) {
         validImages.push(img);
       }
     });
-    
+
     return validImages;
   }, [instituteData, imageLoadError]);
 
   const handleImageError = (imgSrc) => {
-    setImageLoadError(prev => ({
+    setImageLoadError((prev) => ({
       ...prev,
-      [imgSrc]: true
+      [imgSrc]: true,
     }));
   };
 
@@ -54,22 +59,24 @@ const ImageSlider = ({ instituteData }) => {
 
   const prevSlide = (isFullScreen = false) => {
     if (isFullScreen) {
-      setFullscreenIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+      setFullscreenIndex(
+        (prev) => (prev - 1 + allImages.length) % allImages.length
+      );
     } else {
       setCurrentIndex((prev) => Math.max(prev - 1, 0));
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'ArrowLeft') prevSlide(isFullscreen);
-    if (e.key === 'ArrowRight') nextSlide(isFullscreen);
-    if (e.key === 'Escape') setIsFullscreen(false);
+    if (e.key === "ArrowLeft") prevSlide(isFullscreen);
+    if (e.key === "ArrowRight") nextSlide(isFullscreen);
+    if (e.key === "Escape") setIsFullscreen(false);
   };
 
   useEffect(() => {
-    document.body.style.overflow = isFullscreen ? 'hidden' : 'auto';
+    document.body.style.overflow = isFullscreen ? "hidden" : "auto";
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     };
   }, [isFullscreen]);
 
@@ -97,19 +104,19 @@ const ImageSlider = ({ instituteData }) => {
               alt={`Institute Image ${index + 1}`}
               className={`absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 ease-in-out ${
                 index === currentIndex
-                  ? 'translate-x-0'
+                  ? "translate-x-0"
                   : index < currentIndex
-                  ? '-translate-x-full'
-                  : 'translate-x-full'
+                  ? "-translate-x-full"
+                  : "translate-x-full"
               }`}
-              style={{ willChange: 'transform' }}
+              style={{ willChange: "transform" }}
               onError={() => handleImageError(src)}
             />
           ))}
         </div>
 
         {/* Gradient overlay */}
-        <div className="absolute top-0 right-0 p-3 lg:w-[400px] h-full bg-gradient-to-l from-black to-transparent z-10 text-white text-end">
+        <div className="absolute top-0 right-0 p-3 lg:w-[400px] ] h-full bg-gradient-to-l from-black to-transparent z-10 text-white text-end">
           <div className="bottom-4 left-4">
             <span className="text-3xl font-semibold mb-3">#12</span> <br />
             <div className="flex items-center justify-end gap-2">
@@ -122,28 +129,33 @@ const ImageSlider = ({ instituteData }) => {
 
       {/* Gallery Button */}
       {allImages.length > 1 && (
-        <Slidebtn onClick={() => setIsFullscreen(true)} ariaLabel="View gallery">
+        <Slidebtn
+          onClick={() => setIsFullscreen(true)}
+          ariaLabel="View gallery"
+        >
           <img src={gallery} alt="gallery button" />
         </Slidebtn>
       )}
 
       {/* Navigation Buttons */}
-      <div className="absolute bottom-3 w-full flex justify-end pr-4 z-20 gap-4">
+      <div className="absolute bottom-3 w-full flex justify-end  pr-4 z-20 gap-4">
         {!isFullscreen && allImages.length > 1 && (
           <>
             <button
               className={`p-3 rounded-full bg-white/80 hover:bg-white/90 ${
-                currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''
+                currentIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
               }`}
               onClick={() => prevSlide()}
               aria-label="Previous image"
               disabled={currentIndex === 0}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4 " />
             </button>
             <button
               className={`p-3 rounded-full bg-white/80 hover:bg-white/90 ${
-                currentIndex === allImages.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
+                currentIndex === allImages.length - 1
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
               onClick={() => nextSlide()}
               aria-label="Next image"
@@ -164,7 +176,10 @@ const ImageSlider = ({ instituteData }) => {
             className="max-w-full max-h-full object-contain"
             onError={() => handleImageError(allImages[fullscreenIndex])}
           />
-          <Slidebtn onClick={() => setIsFullscreen(false)} ariaLabel="Close gallery">
+          <Slidebtn
+            onClick={() => setIsFullscreen(false)}
+            ariaLabel="Close gallery"
+          >
             <X className="h-4 w-4" />
           </Slidebtn>
           {allImages.length > 1 && (

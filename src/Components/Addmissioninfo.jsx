@@ -1,7 +1,8 @@
-import React from 'react';
+import React from "react";
 
 const renderHTML = (htmlContent) => {
-  if (!htmlContent) return <p className="text-gray-500">No content available</p>;
+  if (!htmlContent)
+    return <p className="text-gray-500">No content available</p>;
   return (
     <div className="text-base prose prose-gray max-w-full">
       <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
@@ -13,7 +14,12 @@ const renderHTML = (htmlContent) => {
         li {
           margin-bottom: 0.5rem;
         }
-        h1, h2, h3, h4, h5, h6 {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
           margin-top: 1rem;
           color: #1a202c; /* Customize the color as needed */
         }
@@ -61,9 +67,15 @@ const Addmissioninfo = ({ instituteData }) => {
   }
   return (
     <div className="min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl mb-2 ">
-      <div className="mb-4  p-8 pb-2">
-        <h3 className="text-lg font-bold">Admission Information</h3>
-        {renderHTML(instituteData?.data ? instituteData?.data?.admissionInfo : 'No data found')}
+      <div className="mb-4  p-8 pb-2 ">
+        <h3 className="text-lg font-bold max-sm:overflow-x-scroll">
+          Admission Information
+        </h3>
+        {renderHTML(
+          instituteData?.data
+            ? instituteData?.data?.admissionInfo
+            : "No data found"
+        )}
       </div>
     </div>
   );
