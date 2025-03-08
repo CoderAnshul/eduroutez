@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Calendar, Eye, Clock, AlertCircle, ThumbsUp } from 'lucide-react';
 import axios from "axios";
-import SocialShare from "../Components/SocialShare";
 
 const NewsDetailPage = () => {
   const [newsDetail, setNewsDetail] = useState(null);
@@ -132,12 +131,6 @@ const NewsDetailPage = () => {
 
  
 
-  // Handle share click to prevent navigation
-  const handleShareClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
   if (loading) {
     return (
       <div className="container max-w-[1300px] mx-auto w-full h-screen flex items-center justify-center bg-gray-50">
@@ -186,24 +179,6 @@ const NewsDetailPage = () => {
         <div className="flex max-sm:flex-col max-sm:gap-4 justify-between items-center p-6">
           <h1 className="text-3xl font-bold">{newsDetail.title || "News Article"}</h1>
 
-          <div className="flex items-center gap-4">
-            {/* Views Counter */}
-            <div className="flex items-center gap-2 text-gray-600">
-              <Eye className="w-5 h-5" />
-              <span className="font-medium">{newsDetail.viewCount || 0}</span>
-            </div>
-
-            {/* Social Share Component */}
-            <div onClick={handleShareClick}>
-              <SocialShare
-                title={newsDetail.title}
-                url={window.location.href}
-                contentType="news"
-              />
-            </div>
-
-        
-          </div>
         </div>
 
         {/* Image Display */}
