@@ -1,22 +1,22 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { blogById, getRecentBlogs } from '../ApiFunctions/api';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import HighRatedCareers from '../Components/HighRatedCareers';
-import Events from '../Components/Events';
-import ConsellingBanner from '../Components/ConsellingBanner';
-import Promotions from '../Pages/CoursePromotions';
-import BlogReviewForm from '../Components/BlogReviewForm';
-import axiosInstance from '../ApiFunctions/axios';
-import SocialShare from '../Components/SocialShare';
+import React, { useEffect, useState, useRef } from "react";
+import { blogById, getRecentBlogs } from "../ApiFunctions/api";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import HighRatedCareers from "../Components/HighRatedCareers";
+import Events from "../Components/Events";
+import ConsellingBanner from "../Components/ConsellingBanner";
+import Promotions from "../Pages/CoursePromotions";
+import BlogReviewForm from "../Components/BlogReviewForm";
+import axiosInstance from "../ApiFunctions/axios";
+import SocialShare from "../Components/SocialShare";
 
 const BlogDetailPage = () => {
   const [data, setData] = useState(null);
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState("");
   const [error, setError] = useState(null);
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
-  const [view, setView] = useState('overview');
-  const { id } = useParams();  // This can be either ID or slug
+  const [view, setView] = useState("overview");
+  const { id } = useParams(); // This can be either ID or slug
   const navigate = useNavigate();
   const overviewRef = useRef(null);
   const reviewsRef = useRef(null);
@@ -24,36 +24,37 @@ const BlogDetailPage = () => {
   const baseURL = import.meta.env.VITE_BASE_URL;
 
   // Get current user ID from localStorage
-  const currentUserId = localStorage.getItem('userId');
-
+  const currentUserId = localStorage.getItem("userId");
 
   useEffect(() => {
     if (!window.blogIdMap) {
       try {
-        const storedBlogIdMap = JSON.parse(localStorage.getItem('blogIdMap') || '{}');
+        const storedBlogIdMap = JSON.parse(
+          localStorage.getItem("blogIdMap") || "{}"
+        );
         window.blogIdMap = storedBlogIdMap;
       } catch (error) {
-        console.error('Error initializing blogIdMap:', error);
+        console.error("Error initializing blogIdMap:", error);
         window.blogIdMap = {};
       }
     }
   }, []);
-  
+
   // Combined fetch function that gets blog data and recent blogs
   useEffect(() => {
     const fetchData = async () => {
       try {
         // First, determine if we're dealing with an ID or a slug
-        const isSlug = isNaN(parseInt(id)) || id.includes('-');
-        
+        const isSlug = isNaN(parseInt(id)) || id.includes("-");
+
         // Try to get blog data - with fallback mechanisms
         let response;
         let blogId = id;
-        
+
         if (isSlug) {
           // Try to get the ID from blogIdMap
           const mappedId = window.blogIdMap?.[id];
-          
+
           if (mappedId) {
             // We found the ID in the map, use it
             blogId = mappedId;
@@ -62,21 +63,28 @@ const BlogDetailPage = () => {
             // If blogIdMap doesn't exist or doesn't have the slug (like on refresh),
             // we need to get the blog directly by its slug through a custom API call
             try {
-              response = await axiosInstance.get(`${baseURL}/blog/by-slug/${id}`);
-              
+              response = await axiosInstance.get(
+                `${baseURL}/blog/by-slug/${id}`
+              );
+
               // If we got a response, grab the ID for future use
               if (response && response.data) {
                 blogId = response.data._id;
-                
+
                 // Save this slug -> ID mapping to both window and localStorage
                 window.blogIdMap = window.blogIdMap || {};
                 window.blogIdMap[id] = blogId;
-                localStorage.setItem('blogIdMap', JSON.stringify(window.blogIdMap));
-                console.log(`Saved mapping: ${id} -> ${blogId} in localStorage`);
+                localStorage.setItem(
+                  "blogIdMap",
+                  JSON.stringify(window.blogIdMap)
+                );
+                console.log(
+                  `Saved mapping: ${id} -> ${blogId} in localStorage`
+                );
               }
             } catch (slugError) {
-              console.error('Error fetching blog by slug:', slugError);
-              
+              console.error("Error fetching blog by slug:", slugError);
+
               // As a final fallback, try using the blog ID API
               response = await blogById(id);
             }
@@ -84,24 +92,24 @@ const BlogDetailPage = () => {
         } else {
           // It's an ID, use it directly
           response = await blogById(blogId);
-          
+
           // If the blog has a slug, we should save that mapping too
           if (response && response.data && response.data.slug) {
             const slug = response.data.slug;
             window.blogIdMap = window.blogIdMap || {};
             window.blogIdMap[slug] = blogId;
-            localStorage.setItem('blogIdMap', JSON.stringify(window.blogIdMap));
+            localStorage.setItem("blogIdMap", JSON.stringify(window.blogIdMap));
             console.log(`Saved mapping: ${slug} -> ${blogId} in localStorage`);
           }
         }
-        
+
         if (!response || !response.data) {
-          setError(new Error('No blog data found'));
+          setError(new Error("No blog data found"));
           return;
         }
-        
+
         setData(response.data);
-        
+
         // No URL updates on refresh - we want to keep the URL exactly as it is
         // This prevents potential loading issues on multiple refreshes
 
@@ -114,44 +122,45 @@ const BlogDetailPage = () => {
         // Get blog image
         if (response.data.thumbnail || response.data.image) {
           try {
-            const imageResponse = await fetch(`${Images}/${response.data.thumbnail || response.data.image}`);
+            const imageResponse = await fetch(
+              `${Images}/${response.data.thumbnail || response.data.image}`
+            );
             const imageBlob = await imageResponse.blob();
             const imageObjectURL = URL.createObjectURL(imageBlob);
             setImageUrl(imageObjectURL);
           } catch (imgError) {
-            console.error('Error loading image:', imgError);
+            console.error("Error loading image:", imgError);
           }
         }
-        
+
         // Fetch recent blogs
         const recentBlogsResponse = await getRecentBlogs();
         if (recentBlogsResponse && recentBlogsResponse.data?.result) {
           const filteredBlogs = recentBlogsResponse.data?.result
-            .filter(blog => blog._id !== response.data._id)
+            .filter((blog) => blog._id !== response.data._id)
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
             .slice(0, 5);
           setRecentBlogs(filteredBlogs);
-          
+
           // Save ID mappings for recent blogs too
-          filteredBlogs.forEach(blog => {
+          filteredBlogs.forEach((blog) => {
             if (blog._id && blog.slug) {
               window.blogIdMap = window.blogIdMap || {};
               window.blogIdMap[blog.slug] = blog._id;
             }
           });
-          
+
           // Update localStorage with all mappings
-          localStorage.setItem('blogIdMap', JSON.stringify(window.blogIdMap));
+          localStorage.setItem("blogIdMap", JSON.stringify(window.blogIdMap));
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         setError(error);
       }
     };
 
     fetchData();
   }, [id, currentUserId]);
-  
 
   // Handle like/dislike functionality
   const handleLike = async () => {
@@ -159,31 +168,35 @@ const BlogDetailPage = () => {
       alert("Please login to like this blog");
       return;
     }
-    
+
     try {
       const likeValue = isLiked ? "0" : "1"; // Toggle like value
-      
+
       // Use the blog's actual ID for the API call
       const blogId = data._id;
-      
+
       // Call the like-dislike API
-      await axiosInstance.post(`${baseURL}/like-dislike`, {
-        id: blogId,
-        type: "blog",
-        like: likeValue
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken')
+      await axiosInstance.post(
+        `${baseURL}/like-dislike`,
+        {
+          id: blogId,
+          type: "blog",
+          like: likeValue,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
         }
-      });
-    
+      );
+
       // Update local state
       setIsLiked(!isLiked);
       console.log(`Blog ${blogId} like status updated to ${!isLiked}`);
     } catch (error) {
-      console.error('Error updating like status:', error);
+      console.error("Error updating like status:", error);
     }
   };
 
@@ -201,7 +214,7 @@ const BlogDetailPage = () => {
     // Using IDs is more reliable internally
     return `/blogdetailpage/${blog?._id}`;
   };
-  
+
   // Helper function to get actual blog ID for internal use
   const getBlogId = (blog) => {
     return blog?._id;
@@ -216,7 +229,11 @@ const BlogDetailPage = () => {
   }
 
   if (!data) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -224,12 +241,12 @@ const BlogDetailPage = () => {
       <div className="container max-w-[1300px] mx-auto mt-10 p-4">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
           {/* Blog Header - Only one instance */}
-          <div className="flex max-sm:flex-col max-sm:gap-4 justify-between items-center p-6">
-            <h1 className="text-3xl font-bold">{data.title || 'Blog Post'}</h1>
-            
-            <div className="flex items-center gap-4">
+          <div className="flex max-sm:flex-col   max-sm:gap-4 justify-between items-center p-6">
+            <h1 className="text-3xl font-bold">{data.title || "Blog Post"}</h1>
+
+            <div className="flex items-center gap-4 ">
               {/* Views Counter */}
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex  items-center gap-2 text-gray-600">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="22"
@@ -249,13 +266,13 @@ const BlogDetailPage = () => {
 
               {/* Social Share Component - Use the current URL to maintain consistency */}
               <div onClick={handleShareClick}>
-                <SocialShare 
-                  title={data.title} 
+                <SocialShare
+                  title={data.title}
                   url={window.location.href}
                   contentType="blog"
                 />
               </div>
-              
+
               {/* Like Button */}
               <button
                 onClick={handleLike}
@@ -263,23 +280,25 @@ const BlogDetailPage = () => {
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
                   ${
                     !currentUserId
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300'
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300"
                       : isLiked
-                      ? 'bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200'
-                      : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                      ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
+                      : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
                   } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
               >
                 {/* Thumb SVG */}
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="24" 
-                  height="24" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
-                  className={`transition-transform duration-300 ${isLiked ? 'scale-110' : ''}`}
-                  fill={isLiked ? "#F59E0B" : "none"} 
-                  stroke="#F59E0B" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
+                  className={`transition-transform duration-300 ${
+                    isLiked ? "scale-110" : ""
+                  }`}
+                  fill={isLiked ? "#F59E0B" : "none"}
+                  stroke="#F59E0B"
+                  strokeWidth="2"
+                  strokeLinecap="round"
                   strokeLinejoin="round"
                 >
                   <path d="M2 10h4v10H2z"></path>
@@ -287,7 +306,9 @@ const BlogDetailPage = () => {
                 </svg>
 
                 {/* Like Count */}
-                <span className="font-medium text-sm">{likesCount > 0 ? likesCount : "Like"}</span>
+                <span className="font-medium text-sm">
+                  {likesCount > 0 ? likesCount : "Like"}
+                </span>
               </button>
             </div>
           </div>
@@ -298,17 +319,19 @@ const BlogDetailPage = () => {
               <img
                 className="w-full h-80 object-cover"
                 src={imageUrl}
-                alt={data.title || 'Blog Image'}
+                alt={data.title || "Blog Image"}
               />
               {data.title && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <h1 className="text-4xl font-bold text-white text-center">{data.title}</h1>
+                  <h1 className="text-4xl font-bold text-white text-center">
+                    {data.title}
+                  </h1>
                 </div>
               )}
             </div>
           )}
 
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-6 ">
             {data.metaImage && data.metaTitle && (
               <div className="flex space-x-4">
                 <img
@@ -327,32 +350,35 @@ const BlogDetailPage = () => {
               </div>
             )}
 
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               {data.metaDescription && (
                 <p className="text-gray-700">{data.metaDescription}</p>
               )}
 
               {data.metaKeywords && (
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {data.metaKeywords.split(",").map((keyword, index) => (
-                    keyword.trim() && (
-                      <span
-                        key={index}
-                        className="inline-block bg-red-500 text-white text-sm px-3 py-1 rounded-full"
-                      >
-                        {keyword.trim()}
-                      </span>
-                    )
-                  ))}
+                  {data.metaKeywords.split(",").map(
+                    (keyword, index) =>
+                      keyword.trim() && (
+                        <span
+                          key={index}
+                          className="inline-block bg-red-500 text-white text-sm px-3 py-1 rounded-full"
+                        >
+                          {keyword.trim()}
+                        </span>
+                      )
+                  )}
                 </div>
               )}
             </div>
 
             {data?.description && (
-              <div ref={overviewRef} className="space-y-4">
+              <div ref={overviewRef} className=" space-y-4">
                 <div className="flex flex-col lg:flex-row lg:space-x-6 mt-6 ">
                   <div className="lg:w-4/5 ">
-                    <h3 className="text-lg font-semibold border-b pb-2">Overview</h3>
+                    <h3 className="text-lg font-semibold border-b pb-2">
+                      Overview
+                    </h3>
                     <div
                       className="text-gray-700"
                       dangerouslySetInnerHTML={{ __html: data.description }}
@@ -360,8 +386,10 @@ const BlogDetailPage = () => {
                   </div>
 
                   <div className="lg:w-1/5 md:w-[30%] h-full min-w-[200px] mt-8 lg:mt-0">
-                    <div className='sticky top-20'>
-                      <h3 className="text-lg font-semibold mb-4">Recently Uploaded Blogs</h3>
+                    <div className="sticky top-20">
+                      <h3 className="text-lg font-semibold mb-4">
+                        Recently Uploaded Blogs
+                      </h3>
                       <div className="space-y-4">
                         {recentBlogs?.map((blog) => (
                           <Link key={blog._id} to={getBlogUrl(blog)}>
@@ -375,11 +403,21 @@ const BlogDetailPage = () => {
                               </div>
                               <div className="w-2/3 ml-3">
                                 <h4 className="text-md font-medium text-gray-800 truncate">
-                                  {blog.title.length > 30 ? `${blog.title.slice(0,30)}...` : blog.title}
+                                  {blog.title.length > 30
+                                    ? `${blog.title.slice(0, 30)}...`
+                                    : blog.title}
                                 </h4>
-                                <p className="text-sm text-gray-600 line-clamp-2" 
-                                   dangerouslySetInnerHTML={{ __html: blog.description }}></p>
-                                <span className="text-xs text-gray-500">{new Date(blog.createdAt).toLocaleDateString()}</span>
+                                <p
+                                  className="text-sm text-gray-600 line-clamp-2"
+                                  dangerouslySetInnerHTML={{
+                                    __html: blog.description,
+                                  }}
+                                ></p>
+                                <span className="text-xs text-gray-500">
+                                  {new Date(
+                                    blog.createdAt
+                                  ).toLocaleDateString()}
+                                </span>
                               </div>
                             </div>
                           </Link>
@@ -396,7 +434,9 @@ const BlogDetailPage = () => {
 
             {/* Reviews Section */}
             <div ref={reviewsRef} id="reviews" className="mt-10 border-t pt-6">
-              <h3 className="text-2xl font-semibold text-red-500 mb-4">Reviews</h3>
+              <h3 className="text-2xl font-semibold text-red-500 mb-4">
+                Reviews
+              </h3>
               <BlogReviewForm blog={data} />
             </div>
           </div>
