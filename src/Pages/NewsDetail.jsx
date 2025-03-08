@@ -1,17 +1,38 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
-import { Calendar, Eye, Clock, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { Calendar, Eye, Clock, AlertCircle, ThumbsUp } from 'lucide-react';
 import axios from "axios";
+import SocialShare from "../Components/SocialShare";
 
-const NewsDetail = () => {
-  const { id } = useParams();
-  const location = useLocation();
+const NewsDetailPage = () => {
   const [newsDetail, setNewsDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [isLiked, setIsLiked] = useState(false);
+  const [recentNews, setRecentNews] = useState([]);
+  const { id } = useParams(); // This can be either ID or slug
+  const navigate = useNavigate();
+  
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
   const baseURL = import.meta.env.VITE_BASE_URL;
+  
+  // Get current user ID from localStorage
+  const currentUserId = localStorage.getItem("userId");
+
+  // Initialize newsIdMap from localStorage
+  useEffect(() => {
+    if (!window.newsIdMap) {
+      try {
+        const storedNewsIdMap = JSON.parse(
+          localStorage.getItem("newsIdMap") || "{}"
+        );
+        window.newsIdMap = storedNewsIdMap;
+      } catch (error) {
+        console.error("Error initializing newsIdMap:", error);
+        window.newsIdMap = {};
+      }
+    }
+  }, []);
 
   const formatDate = (dateString) => {
     try {
@@ -27,30 +48,165 @@ const NewsDetail = () => {
     }
   };
 
+  // Combined fetch function that gets news data and recent news
   useEffect(() => {
-    const fetchNewsDetail = async () => {
+    const fetchNewsData = async () => {
       setLoading(true);
       try {
-        if (!id) {
-          throw new Error('News ID is missing');
+        // First, determine if we're dealing with an ID or a slug
+        const isSlug = isNaN(parseInt(id)) || id.includes("-");
+
+        // Try to get news data - with fallback mechanisms
+        let response;
+        let newsId = id;
+
+        if (isSlug) {
+          // Try to get the ID from newsIdMap
+          const mappedId = window.newsIdMap?.[id];
+
+          if (mappedId) {
+            // We found the ID in the map, use it
+            newsId = mappedId;
+            response = await axios.get(`${baseURL}/news/${newsId}`);
+          } else {
+            // If newsIdMap doesn't exist or doesn't have the slug (like on refresh),
+            // we need to get the news directly by its slug through a custom API call
+            try {
+              response = await axios.get(`${baseURL}/news/by-slug/${id}`);
+
+              // If we got a response, grab the ID for future use
+              if (response && response.data?.success && response.data?.data) {
+                newsId = response.data.data._id;
+
+                // Save this slug -> ID mapping to both window and localStorage
+                window.newsIdMap = window.newsIdMap || {};
+                window.newsIdMap[id] = newsId;
+                localStorage.setItem(
+                  "newsIdMap",
+                  JSON.stringify(window.newsIdMap)
+                );
+                console.log(
+                  `Saved mapping: ${id} -> ${newsId} in localStorage`
+                );
+              }
+            } catch (slugError) {
+              console.error("Error fetching news by slug:", slugError);
+
+              // As a final fallback, try using the news ID API
+              response = await axios.get(`${baseURL}/news/${id}`);
+            }
+          }
+        } else {
+          // It's an ID, use it directly
+          response = await axios.get(`${baseURL}/news/data/${newsId}`);
+
+          // If the news has a slug, we should save that mapping too
+          if (response && response.data?.success && response.data?.data && response.data.data.slug) {
+            const slug = response.data.data.slug;
+            window.newsIdMap = window.newsIdMap || {};
+            window.newsIdMap[slug] = newsId;
+            localStorage.setItem("newsIdMap", JSON.stringify(window.newsIdMap));
+            console.log(`Saved mapping: ${slug} -> ${newsId} in localStorage`);
+          }
         }
 
-        const response = await axios.get(`${baseURL}/news/data/${id}`);
-        if (!response.data?.success || !response.data?.data) {
-          throw new Error('Invalid response format');
+        // Process the response
+        if (!response || !response.data?.success || !response.data?.data) {
+          throw new Error('News article not found or invalid response format');
         }
+
         setNewsDetail(response.data.data);
+
+        // Check if user has already liked this news
+        if (response.data.data.likes && currentUserId) {
+          const userHasLiked = response.data.data.likes.includes(currentUserId);
+          setIsLiked(userHasLiked);
+        }
+
+        // Fetch recent news articles
+        const recentNewsResponse = await axios.get(`${baseURL}/news/recent`);
+        if (recentNewsResponse && recentNewsResponse.data?.success && recentNewsResponse.data?.data) {
+          const filteredNews = recentNewsResponse.data.data
+            .filter((news) => news._id !== response.data.data._id)
+            .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+            .slice(0, 5);
+          setRecentNews(filteredNews);
+
+          // Save ID mappings for recent news too
+          filteredNews.forEach((news) => {
+            if (news._id && news.slug) {
+              window.newsIdMap = window.newsIdMap || {};
+              window.newsIdMap[news.slug] = news._id;
+            }
+          });
+
+          // Update localStorage with all mappings
+          localStorage.setItem("newsIdMap", JSON.stringify(window.newsIdMap));
+        }
+
         setError(null);
       } catch (error) {
-        console.error("Error fetching news detail:", error);
+        console.error("Error fetching news data:", error);
         setError(error.message || 'An error occurred while fetching the news');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchNewsDetail();
-  }, [id, baseURL]);
+    fetchNewsData();
+  }, [id, baseURL, currentUserId]);
+
+  // Handle like/dislike functionality
+  const handleLike = async () => {
+    if (!currentUserId) {
+      alert("Please login to like this news article");
+      return;
+    }
+
+    try {
+      const likeValue = isLiked ? "0" : "1"; // Toggle like value
+
+      // Use the news's actual ID for the API call
+      const newsId = newsDetail._id;
+
+      // Call the like-dislike API
+      await axios.post(
+        `${baseURL}/like-dislike`,
+        {
+          id: newsId,
+          type: "news",
+          like: likeValue,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
+        }
+      );
+
+      // Update local state
+      setIsLiked(!isLiked);
+      console.log(`News ${newsId} like status updated to ${!isLiked}`);
+    } catch (error) {
+      console.error("Error updating like status:", error);
+    }
+  };
+
+  // Calculate number of likes
+  const likesCount = newsDetail?.likes?.length || 0;
+
+  // Handle share click to prevent navigation
+  const handleShareClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  // Helper function to get URL for display
+  const getNewsUrl = (news) => {
+    return `/news/${news?._id}`;
+  };
 
   if (loading) {
     return (
@@ -95,7 +251,54 @@ const NewsDetail = () => {
 
   return (
     <div className="container max-w-[1300px] mx-auto w-full min-h-screen bg-gray-50 py-8 px-4">
-      <div className=" mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        {/* News Header */}
+        <div className="flex max-sm:flex-col max-sm:gap-4 justify-between items-center p-6">
+          <h1 className="text-3xl font-bold">{newsDetail.title || "News Article"}</h1>
+
+          <div className="flex items-center gap-4">
+            {/* Views Counter */}
+            <div className="flex items-center gap-2 text-gray-600">
+              <Eye className="w-5 h-5" />
+              <span className="font-medium">{newsDetail.viewCount || 0}</span>
+            </div>
+
+            {/* Social Share Component */}
+            <div onClick={handleShareClick}>
+              <SocialShare
+                title={newsDetail.title}
+                url={window.location.href}
+                contentType="news"
+              />
+            </div>
+
+            {/* Like Button */}
+            <button
+              onClick={handleLike}
+              disabled={!currentUserId}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
+                ${
+                  !currentUserId
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300"
+                    : isLiked
+                    ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
+                    : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
+            >
+              <ThumbsUp 
+                className={`transition-transform duration-300 ${
+                  isLiked ? "scale-110 fill-current text-yellow-500" : ""
+                }`}
+                size={20}
+              />
+              <span className="font-medium text-sm">
+                {likesCount > 0 ? likesCount : "Like"}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Image Display */}
         <div className="relative">
           {newsDetail.image ? (
             <img
@@ -116,44 +319,88 @@ const NewsDetail = () => {
         </div>
 
         <div className="p-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            {newsDetail.title || 'Untitled'}
-          </h1>
-
-          <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600">
-            {newsDetail.date && (
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4"/>
-                <span>Published: {formatDate(newsDetail.date)}</span>
+          {/* Main Content Area with Sidebar */}
+          <div className="flex flex-col lg:flex-row lg:space-x-6 mt-6">
+            {/* Main Content */}
+            <div className="lg:w-4/5">
+              <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600">
+                {newsDetail.date && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4"/>
+                    <span>Published: {formatDate(newsDetail.date)}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4"/>
+                  <span>{newsDetail.viewCount || 0} views</span>
+                </div>
+                {newsDetail.updatedAt && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4"/>
+                    <span>Updated: {formatDate(newsDetail.updatedAt)}</span>
+                  </div>
+                )}
               </div>
-            )}
-            <div className="flex items-center gap-2">
-              <Eye className="w-4 h-4"/>
-              <span>{newsDetail.viewCount || 0} views</span>
+
+              <div className="prose max-w-none news-content">
+                {newsDetail.description ? (
+                  <div 
+                    className="text-gray-700 leading-relaxed whitespace-pre-line"
+                    dangerouslySetInnerHTML={{ 
+                      __html: newsDetail.description || 'No description available'
+                    }}
+                  />
+                ) : (
+                  <p className="text-gray-500 italic">No content available</p>
+                )}
+              </div>
             </div>
-            {newsDetail.updatedAt && (
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4"/>
-                <span>Updated: {formatDate(newsDetail.updatedAt)}</span>
-              </div>
-            )}
-          </div>
 
-          <div className="prose max-w-none news-content">
-            {newsDetail.description ? (
-             <div 
-             className="text-gray-700 leading-relaxed whitespace-pre-line"
-             dangerouslySetInnerHTML={{ 
-               __html: newsDetail.description || 'No description available'
-             }}
-           />
-           
-            ) : (
-              <p className="text-gray-500 italic">No content available</p>
-            )}
+            {/* Sidebar */}
+            <div className="lg:w-1/5 md:w-[30%] h-full min-w-[200px] mt-8 lg:mt-0">
+              <div className="sticky top-20">
+                <h3 className="text-lg font-semibold mb-4">Recent News</h3>
+                <div className="space-y-4">
+                  {recentNews?.map((news) => (
+                    <Link key={news._id} to={getNewsUrl(news)}>
+                      <div className="flex items-center p-3 bg-white rounded-lg shadow-md">
+                        <div className="w-1/3">
+                          <img
+                            src={`${Images}/${news?.image}`}
+                            alt={news.title}
+                            className="w-full h-20 object-cover rounded-md"
+                            onError={(e) => {
+                              e.target.src = '/placeholder-image.jpg';
+                              e.target.alt = 'Image not available';
+                            }}
+                          />
+                        </div>
+                        <div className="w-2/3 ml-3">
+                          <h4 className="text-md font-medium text-gray-800 truncate">
+                            {news.title.length > 30
+                              ? `${news.title.slice(0, 30)}...`
+                              : news.title}
+                          </h4>
+                          <p
+                            className="text-sm text-gray-600 line-clamp-2"
+                            dangerouslySetInnerHTML={{
+                              __html: news.description,
+                            }}
+                          ></p>
+                          <span className="text-xs text-gray-500">
+                            {formatDate(news.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
+        {/* Footer Info */}
         <div className="bg-gray-50 p-4 mt-6 text-sm text-gray-500">
           <div className="flex flex-wrap justify-between gap-2">
             <span>ID: {newsDetail._id}</span>
@@ -165,4 +412,4 @@ const NewsDetail = () => {
   );
 };
 
-export default NewsDetail;
+export default NewsDetailPage;

@@ -6,7 +6,7 @@ import axiosInstance from "../ApiFunctions/axios";
 // Import or create the courseIdMap for reference
 // You can either import from the PopularCourses component or recreate it here
 const courseIdMap = {};
-
+const newsIdMap = {};
 const SubNavbar = ({ categories }) => {
   const [activeContent, setActiveContent] = useState({});
   const [hoveredCategory, setHoveredCategory] = useState(null);
@@ -121,9 +121,44 @@ const SubNavbar = ({ categories }) => {
         );
         console.log("news", response.data);
         setLatestNews(response.data?.data || []);
+        
+        // Create slug mappings for news items
+        if (response.data?.data) {
+          response.data.data.forEach((news) => {
+            if (news.title) {
+              // Create slug from news title
+              const slug = getNewsSlug(news);
+              
+              // Store mapping
+              newsIdMap[slug] = news._id;
+            }
+          });
+          
+          // Update global map and localStorage
+          updateNewsIdMap();
+        }
       } catch (error) {
         console.error("Error fetching latest news:", error);
       }
+    };
+
+
+    const updateNewsIdMap = () => {
+      // Make the mapping available globally
+      window.newsIdMap = {
+        ...window.newsIdMap,
+        ...newsIdMap,
+      };
+      
+      // Get existing mappings from localStorage and merge
+      const existingMap = JSON.parse(localStorage.getItem("newsIdMap") || "{}");
+      localStorage.setItem(
+        "newsIdMap",
+        JSON.stringify({
+          ...existingMap,
+          ...newsIdMap,
+        })
+      );
     };
 
     const fetchTopColleges = async () => {
@@ -201,7 +236,7 @@ const SubNavbar = ({ categories }) => {
   // Helper function to get the slug for a news item
   const getNewsSlug = (news) => {
     if (!news?.title) return news?._id;
-
+    
     return news.title
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
@@ -464,6 +499,9 @@ const SubNavbar = ({ categories }) => {
   const handleNewsClick = (news) => {
     const newsSlug = getNewsSlug(news);
     navigate(`/news/${newsSlug}`);
+    
+    // You might want to add this debugging log
+    console.log(`News slug: ${newsSlug}, ID: ${newsIdMap[newsSlug] || news._id}`);
   };
 
   const handleInstituteClick = (institute) => {
