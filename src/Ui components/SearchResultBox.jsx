@@ -232,7 +232,7 @@ const SearchResultBox = ({ institute, url }) => {
             <Link to={`${instituteUrl}`} className="hover:underline">Placement</Link>
           </div>
         </div>
-        <div className="flex items-center flex-wrap gap-4">
+        <div className="flex items-center flex-wrap gap-4 !ml-0">
           <button className="bg-red-600 text-white px-4 py-2 rounded-lg" onClick={handleDownloadBrochure}>
             Download Brochure
           </button>

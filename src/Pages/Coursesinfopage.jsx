@@ -327,6 +327,7 @@ const Coursesinfopage = () => {
               title={content.courseTitle}
               url={window.location.href}
               contentType="course"
+              className=" !top-full -left-44"
             />
           </div>
 
