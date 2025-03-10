@@ -5,7 +5,7 @@ import DashboardNav from '../Components/DashboardComponent/DashboardNav';
 
 const DashboardLayout = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen min-h-fit">
       {/* Sidebar */}
       <Sidebar />
 

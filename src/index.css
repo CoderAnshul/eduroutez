@@ -256,3 +256,24 @@ p {
     overflow-x: auto;
   }
 }
+
+
+
+.hidescrollbar {
+  overflow: auto; /* Enables scrolling */
+}
+
+/* WebKit (Chrome, Safari) */
+.hidescrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+.hidescrollbar {
+  scrollbar-width: none;
+}
+
+/* Edge & IE */
+.hidescrollbar {
+  -ms-overflow-style: none;
+}

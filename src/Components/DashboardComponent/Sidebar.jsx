@@ -48,7 +48,7 @@ if(response)    {
   return (
     <>
       {/* Sidebar for medium and larger screens */}
-      <aside className="w-64 h-screen bg-gray-100 p-4 hidden md:block">
+      <aside className="w-64 h-screen min-h-fit bg-gray-100 p-4 hidden md:block">
         <div className="text-center mb-14 w-full">
           <Link to="/">
             <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
