@@ -14,8 +14,11 @@ import { toast } from "react-toastify";
 
 const SearchResultBox = ({ institute, url }) => {
   console.log('Institute:', institute);
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const baseURL = import.meta.env.VITE_BASE_URL;
+  const userId = localStorage.getItem('userId');
+
+  const [isWishlisted, setIsWishlisted] = useState(
+    institute.wishlist && institute.wishlist.includes(userId)
+  );  const baseURL = import.meta.env.VITE_BASE_URL;
   const Image = import.meta.env.VITE_IMAGE_BASE_URL;
 
   // Get the correct URL for the institute (using slug if available)
