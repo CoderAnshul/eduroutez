@@ -9,7 +9,6 @@ const InstituteReviewBox = ({
   campusLifeDescription,
   facultyDescription,
   placementDescription,
-  rating , 
   review ,
   courseRatings,
   placementStars,
@@ -29,6 +28,27 @@ const InstituteReviewBox = ({
     if (!text || typeof text !== 'string') return 'No text available.';
     return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
   }, []);
+
+
+  // Calculate average of all star ratings
+const calculateAverageRating = () => {
+  // Get all valid ratings (non-null, non-undefined, numeric values)
+  const validRatings = [
+    placementStars,
+    campusLifeStars,
+    facultyStars,
+    suggestionsStars
+  ].filter(rating => rating !== null && rating !== undefined && !isNaN(Number(rating)));
+  
+  // If no valid ratings, return 0
+  if (validRatings.length === 0) return 0;
+  
+  // Calculate the sum and divide by number of valid ratings
+  const sum = validRatings.reduce((total, current) => total + Number(current), 0);
+  return sum / validRatings.length;
+};
+
+const rating = calculateAverageRating();
 
   // Memoized course ratings categories
   const ratingCategories = useMemo(() => [
@@ -74,16 +94,18 @@ const InstituteReviewBox = ({
               </p> */}
             </div>
           </div>
+
+          
           <div className="flex items-center gap-1">
             <Rating 
               className="!text-sm" 
               name="read-only" 
-              value={Number(rating/4) || 0} 
+              value={Number(rating) || 0} 
               precision={0.1} 
               readOnly 
             />
             <span className="text-sm font-medium text-gray-600">
-              {Number(rating/4) || 0}
+              {Number(rating) || 0}
             </span>
           </div>
         </div>
@@ -100,8 +122,8 @@ const InstituteReviewBox = ({
         >
           Read More
         </button>
-      </div>
-
+        </div>
+                
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[1000] flex items-center h-dvh justify-center bg-black bg-opacity-50">
