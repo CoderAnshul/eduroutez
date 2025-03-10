@@ -34,7 +34,7 @@ const Footer = () => {
         {/* Trending Careers */}
         <div>
           <h3 className="font-semibold text-red-500 mb-3">MBA</h3>
-          <div className="flex gap-4">
+          <div className="gap-4 d-block">
             {/* First Column */}
             <ul className="space-y-1 text-sm">
               {trendingCareersFirstHalf.map((career, index) => (
@@ -61,7 +61,7 @@ const Footer = () => {
         {/* Popular Courses */}
         <div>
           <h3 className="font-semibold text-red-500 mb-3">Engineering</h3>
-          <div className="flex gap-6 justify-between">
+          <div className="d-block gap-6 justify-between">
             {/* First Column */}
             <ul className="space-y-1 text-sm">
               {popularCoursesFirstHalf.map((course, index) => (
@@ -124,7 +124,7 @@ const Footer = () => {
   {/* Other Links */}
   <div>
           <h3 className="font-semibold text-red-500 mb-3">Resources</h3>
-          <div className="flex gap-4">
+          <div className="d-block gap-4">
             {/* First Column */}
             <ul className="space-y-1 text-sm">
               {otherLinks.map((link, index) => (
