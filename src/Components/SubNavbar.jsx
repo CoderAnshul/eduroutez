@@ -872,12 +872,12 @@ const SubNavbar = ({ categories }) => {
 
   const renderRegularContent = (category) => (
     <div className="flex ">
-      <div className="w-[400px] bg-white overflow-y-auto">
-        <ul className="w-40 ml-0 mb-0 pb-0 space-y-0">
+      <div className="w-[440px] bg-red-100 overflow-y-auto">
+        <ul className="min-w-40 whitespace-nowrap md:w-fit ml-0 mb-0 pb-0 space-y-0">
           {category?.sidebarItems?.map((item) => (
             <li
               key={item.id}
-              className={`px-2  py-2 group  text-sm flex justify-between items-center cursor-pointer transition-all hover:bg-red-200 ${
+              className={`px-2  py-2 group mb-0  text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-red-200 ${
                 activeContent[category.label] === item.id
                   ? "bg-red-400 border-l-2 border-red-500 text-white"
                   : "bg-red-500 text-white"
