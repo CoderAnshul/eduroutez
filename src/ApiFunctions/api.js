@@ -45,19 +45,31 @@ export const addToWishlist = async (userId, instituteId) => {
   }
 };
 
-export const blogById = async (id) => {
+export const blogById = async (idOrSlug) => {
   try {
-    console.log("iythgvbd", id);
-    var count=0;
-    console.log("id", count++);
-    const response = await axios.get(`${baseURL}/blog/${id}`);
+    console.log("Processing request for:", idOrSlug);
+    
+    // Determine if we're dealing with an ID or a slug
+    const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
+    
+    let response;
+
+    if (isSlug) {
+      // If it's a slug, pass field="slug" in the body
+      response = await axios.get(`${baseURL}/blog/${idOrSlug}`, {
+        params: { field: "slug" }
+      });
+    } else {
+      // It's an ID, use the original endpoint
+      response = await axios.get(`${baseURL}/blog/${idOrSlug}`);
+    }
+    
     return response.data;
   } catch (error) {
-    console.error(`Error fetching blog with ID :`, error);
+    console.error(`Error fetching blog:`, error);
     throw error;
   }
 };
-
 //getRecentBlogs
 export const getRecentBlogs = async () => {
   try {
