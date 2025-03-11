@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Phone, Mail } from "lucide-react";
 import {
   trendingCareers,
   popularCourses,
@@ -195,6 +196,17 @@ const Footer = () => {
                 </div>
               </Link>
             </div>
+          <span className="text-sm mt-4 text-wrap">
+          Add: Office No. 603, 6th floor, Paradise Tower, Gokhale Rd, next to McDonaldʼs, Naupada, Thane West, Thane, Maharashtra 400602
+                  </span>
+          <div className="text-sm mt-1 text-wrap flex items-center">
+            <Phone size={16} className="mr-2 text-red-500" />
+            <a href="tel:9867877121" className="hover:text-red-400 transition-colors">9867877121</a>
+          </div>
+          <div className="text-sm mt-1 text-wrap flex items-center">
+            <Mail size={16} className="mr-2 text-red-500" />
+            <a href="mailto:contact@eduroutez.com" className="hover:text-red-400 transition-colors">contact@eduroutez.com</a>
+          </div>
           </div>
         </div>
         
