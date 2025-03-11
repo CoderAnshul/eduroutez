@@ -40,59 +40,42 @@ const BlogDetailPage = () => {
     }
   }, []);
 
-  // Combined fetch function that gets blog data and recent blogs
+ 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // First, determine if we're dealing with an ID or a slug
-        const isSlug = isNaN(parseInt(id)) || id.includes("-");
-
-        // Try to get blog data - with fallback mechanisms
+        // Try to get blog data with our updated blogById function that handles both IDs and slugs
         let response;
         let blogId = id;
-
+  
+        // Try to get the ID from blogIdMap if it's a slug
+        const isSlug = isNaN(parseInt(id)) || id.includes("-");
         if (isSlug) {
-          // Try to get the ID from blogIdMap
           const mappedId = window.blogIdMap?.[id];
-
           if (mappedId) {
-            // We found the ID in the map, use it
+            // We found the ID in the map, use it directly
             blogId = mappedId;
             response = await blogById(blogId);
           } else {
-            // If blogIdMap doesn't exist or doesn't have the slug (like on refresh),
-            // we need to get the blog directly by its slug through a custom API call
-            try {
-              response = await axiosInstance.get(
-                `${baseURL}/blog/by-slug/${id}`
-              );
-
-              // If we got a response, grab the ID for future use
-              if (response && response.data) {
-                blogId = response.data._id;
-
-                // Save this slug -> ID mapping to both window and localStorage
-                window.blogIdMap = window.blogIdMap || {};
-                window.blogIdMap[id] = blogId;
-                localStorage.setItem(
-                  "blogIdMap",
-                  JSON.stringify(window.blogIdMap)
-                );
-                console.log(
-                  `Saved mapping: ${id} -> ${blogId} in localStorage`
-                );
-              }
-            } catch (slugError) {
-              console.error("Error fetching blog by slug:", slugError);
-
-              // As a final fallback, try using the blog ID API
-              response = await blogById(id);
+            // We don't have the ID, so use the slug (our updated blogById will handle it)
+            response = await blogById(id);
+            
+            // If we got a response, grab the ID for future use
+            if (response && response.data) {
+              blogId = response.data._id;
+              
+              // Save this slug -> ID mapping to both window and localStorage
+              window.blogIdMap = window.blogIdMap || {};
+              window.blogIdMap[id] = blogId;
+              localStorage.setItem("blogIdMap", JSON.stringify(window.blogIdMap));
+              console.log(`Saved mapping: ${id} -> ${blogId} in localStorage`);
             }
           }
         } else {
           // It's an ID, use it directly
           response = await blogById(blogId);
-
+          
           // If the blog has a slug, we should save that mapping too
           if (response && response.data && response.data.slug) {
             const slug = response.data.slug;
@@ -102,23 +85,20 @@ const BlogDetailPage = () => {
             console.log(`Saved mapping: ${slug} -> ${blogId} in localStorage`);
           }
         }
-
+  
         if (!response || !response.data) {
           setError(new Error("No blog data found"));
           return;
         }
-
+  
         setData(response.data);
-
-        // No URL updates on refresh - we want to keep the URL exactly as it is
-        // This prevents potential loading issues on multiple refreshes
-
+  
         // Check if user has already liked this blog
         if (response.data.likes && currentUserId) {
           const userHasLiked = response.data.likes.includes(currentUserId);
           setIsLiked(userHasLiked);
         }
-
+  
         // Get blog image
         if (response.data.thumbnail || response.data.image) {
           try {
@@ -132,7 +112,7 @@ const BlogDetailPage = () => {
             console.error("Error loading image:", imgError);
           }
         }
-
+  
         // Fetch recent blogs
         const recentBlogsResponse = await getRecentBlogs();
         if (recentBlogsResponse && recentBlogsResponse.data?.result) {
@@ -141,7 +121,7 @@ const BlogDetailPage = () => {
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
             .slice(0, 5);
           setRecentBlogs(filteredBlogs);
-
+  
           // Save ID mappings for recent blogs too
           filteredBlogs.forEach((blog) => {
             if (blog._id && blog.slug) {
@@ -149,7 +129,7 @@ const BlogDetailPage = () => {
               window.blogIdMap[blog.slug] = blog._id;
             }
           });
-
+  
           // Update localStorage with all mappings
           localStorage.setItem("blogIdMap", JSON.stringify(window.blogIdMap));
         }
@@ -158,9 +138,12 @@ const BlogDetailPage = () => {
         setError(error);
       }
     };
-
+  
     fetchData();
   }, [id, currentUserId]);
+
+
+
 
   // Handle like/dislike functionality
   const handleLike = async () => {

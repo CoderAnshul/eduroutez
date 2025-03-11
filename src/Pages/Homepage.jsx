@@ -15,6 +15,7 @@ import { homeBanner } from '../ApiFunctions/api'
 import { useParams } from 'react-router-dom'
 import ConsellingBanner from '../Components/ConsellingBanner'
 import Promotions from './CoursePromotions'
+import TrendingCourses from '../Components/TrendingCourses'
 
 const Homepage = () => {
 
@@ -49,7 +50,9 @@ const Homepage = () => {
       <div className="p-4 flex flex-col items-center">
       <PopularCourses />
       </div>
-  
+  <div className="p-4 flex flex-col items-center">
+      <TrendingCourses/>
+      </div>
       <PopularCategories/>
       <div className='p-[4vw] flex flex-col items-center' >
          <BestRated/>
