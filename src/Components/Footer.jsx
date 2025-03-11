@@ -104,7 +104,7 @@ const Footer = () => {
 
           {/* Best Rated Colleges */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">Other Courses</h3>
+            <h3 className="font-semibold text-red-500 mb-3">Explore Courses</h3>
             <ul className="space-y-1 text-sm">
               {bestRatedColleges.map((college, index) => (
                 <li key={index}>
@@ -118,7 +118,8 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">Resources</h3>
+            <h3 className="font-semibold text-red-500 mb-3">Career Guidance
+            </h3>
             <div className="flex flex-col gap-1">
               <ul className="space-y-1 text-sm">
                 {otherLinks.map((link, index) => (
@@ -143,7 +144,8 @@ const Footer = () => {
 
           {/* Free Courses */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">Shiksha Online</h3>
+            <h3 className="font-semibold text-red-500 mb-3">Eduroutez Hub
+            </h3>
             <ul className="space-y-1 text-sm">
               {freeCourses.map((course, index) => (
                 <li key={index}>
@@ -175,27 +177,43 @@ const Footer = () => {
               <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
             </Link>
             <div className="flex mt-3 gap-4">
-              <Link to="/">
-                <div className="aspect-w-1 aspect-h-1">
-                  <img className="h-7 -mt-[2px] object-cover" src={facebook} alt="Facebook" />
-                </div>
-              </Link>
-              <Link to="/">
-                <div className="aspect-w-1 aspect-h-1">
-                  <img className="h-6 object-cover" src={instagram} alt="Instagram" />
-                </div>
-              </Link>
-              <Link to="/">
-                <div className="aspect-w-1 aspect-h-1">
-                  <img className="h-6 object-cover" src={twitter} alt="Twitter" />
-                </div>
-              </Link>
-              <Link to="/">
-                <div className="aspect-w-1 aspect-h-1">
-                  <img className="h-[38px] object-cover" src={youtube} alt="YouTube" />
-                </div>
-              </Link>
-            </div>
+            <Link to="/">
+              <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                <img 
+                  className="h-6 -mt-[2px] object-cover transition-opacity duration-300 hover:opacity-80" 
+                  src={facebook} 
+                  alt="Facebook" 
+                />
+              </div>
+            </Link>
+            <Link to="/">
+              <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                <img 
+                  className="h-5 object-cover transition-opacity duration-300 hover:opacity-80" 
+                  src={instagram} 
+                  alt="Instagram" 
+                />
+              </div>
+            </Link>
+            <Link to="/">
+              <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                <img 
+                  className="h-5 object-cover transition-opacity duration-300 hover:opacity-80" 
+                  src={twitter} 
+                  alt="Twitter" 
+                />
+              </div>
+            </Link>
+            <Link to="/">
+              <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                <img 
+                  className="h-[34px] object-cover transition-opacity duration-300 hover:opacity-80" 
+                  src={youtube} 
+                  alt="YouTube" 
+                />
+              </div>
+            </Link>
+          </div>
           <span className="text-sm mt-4 text-wrap">
           Add: Office No. 603, 6th floor, Paradise Tower, Gokhale Rd, next to McDonaldʼs, Naupada, Thane West, Thane, Maharashtra 400602
                   </span>
