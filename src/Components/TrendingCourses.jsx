@@ -2,12 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery } from 'react-query';
-import { TrendingUp, Clock, Users, BookOpen, ArrowRight, Star, Eye } from 'lucide-react';
+import { TrendingUp, Clock, Users, BookOpen, ArrowRight, Star, Eye ,ThumbsUp } from 'lucide-react';
+
+
+const baseURL = import.meta.env.VITE_BASE_URL;
 
 // Function to fetch trending courses
 const fetchTrendingCourses = async () => {
   try {
-    const response = await axios.get('http://localhost:4001/api/v1/courses?filters={"isCourseTrending":true}&limit=7');
+    const response = await axios.get(`${baseURL}/courses?filters={"isCourseTrending":true}&limit=3`);
     console.log("dfghjkdfghjk",response.data)
     return response.data;
   } catch (error) {
@@ -15,7 +18,7 @@ const fetchTrendingCourses = async () => {
   }
 };
 
-const base_Image_url=import.meta.env.VITE_IMAGE_BASE_URL;
+const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
 const TrendingCourses = () => {
   const { data, isLoading, isError } = useQuery(
@@ -123,7 +126,7 @@ const TrendingCourses = () => {
           <TrendingUp className="text-gray-700 w-6 h-6" />
           <h2 className="text-2xl font-bold text-red-600">Trending Courses</h2>
         </div>
-        <Link to="/all-courses">
+        <Link to="/trendingCourses">
           <button className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-700 transition-all shadow-md">
             <span>View All</span>
             <ArrowRight size={18} />
@@ -144,7 +147,8 @@ const TrendingCourses = () => {
                 <div className="bg-white rounded-xl shadow-md overflow-hidden h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                                   <div className="relative h-48 overflow-hidden">
                                     <img 
-                                      src={`${base_Image_url}/${thumbnailUrl}`} 
+                                     src={`${Images}/${course.coursePreviewThumbnail}`}
+
                                       alt={course.courseTitle} 
                                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
@@ -187,30 +191,34 @@ const TrendingCourses = () => {
                         {stripHtml(course.shortDescription || '')}
                       </div>
                       
-                      {/* Course info */}
-                      <div className="grid grid-cols-2 gap-3 pt-2">
-                        <div className="flex items-center text-sm text-gray-500">
-                          <BookOpen size={16} className="mr-2 text-gray-500" />
-                          <span>{courseType === 'text' ? 'Text Course' : 'Video Course'}</span>
-                        </div>
-                        
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Users size={16} className="mr-2 text-gray-500" />
-                          <span>{course.views || 0} views</span>
-                        </div>
-                      </div>
-                      
-                      {/* Application dates if available */}
-                      {course.applicationStartDate && (
-                        <div className="border-t border-gray-100 pt-4 mt-4">
-                          <div className="text-xs text-gray-500 mb-1">Application period:</div>
-                          <div className="text-sm">
-                            <span className="font-medium">{formatDate(course.applicationStartDate)}</span>
-                            <span className="mx-2">-</span>
-                            <span className="font-medium">{formatDate(course.applicationEndDate)}</span>
-                          </div>
-                        </div>
-                      )}
+                                  <div className="grid grid-cols-2 gap-3 pt-2">
+                                  <div className="flex items-center text-sm text-gray-500">
+  <ThumbsUp size={16} className="mr-2 text-gray-500" />
+  <span>{course.likes?.length}</span>
+</div>
+                                  
+                                  <div className="flex items-center text-sm text-gray-500">
+                                    <Users size={16} className="mr-2 text-gray-500" />
+                                    <span>{course.views || 0} views</span>
+                                  </div>
+                                  </div>
+                                  
+                                  {/* Application dates if available */}
+                                  {course.applicationStartDate ? (
+  <div className="border-t border-gray-100 pt-4 mt-4">
+    <div className="text-xs text-gray-500 mb-1">Application period:</div>
+    <div className="text-sm">
+      <span className="font-medium">{formatDate(course.applicationStartDate)}</span>
+      <span className="mx-2">-</span>
+      <span className="font-medium">{formatDate(course.applicationEndDate)}</span>
+    </div>
+  </div>
+) : (
+  <div className="border-t border-gray-100 pt-4 mt-4">
+    {/* Empty space - no text */}
+    <div className="h-6"></div>
+  </div>
+)}
                     </div>
                     
                     {/* Action button */}
