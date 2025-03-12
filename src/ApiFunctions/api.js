@@ -133,12 +133,28 @@ export const getInstituteById = async (idOrSlug) => {
     throw error;
   }
 };
-export const getCoursesById = async (id) => {
+export const getCoursesById = async (idOrSlug) => {
   try {
-    const response = await axios.get(`${baseURL}/course/${id}`);
+    console.log("Processing request for:", idOrSlug);
+    
+    // Determine if we're dealing with an ID or a slug
+    const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
+    
+    let response;
+
+    if (isSlug) {
+      // If it's a slug, pass field="slug" in the body
+      response = await axios.get(`${baseURL}/course/${idOrSlug}`, {
+        params: { field: "slug" }
+      });
+    } else {
+      // It's an ID, use the original endpoint
+      response = await axios.get(`${baseURL}/course/${idOrSlug}`);
+    }
+    
     return response.data;
   } catch (error) {
-    console.error(`Error fetching institute with ID ${id}:`, error);
+    console.error(`Error fetching course detail:`, error);
     throw error;
   }
 };

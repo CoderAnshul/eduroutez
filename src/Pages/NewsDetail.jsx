@@ -217,12 +217,7 @@ const NewsDetailPage = () => {
                   <Eye className="w-4 h-4"/>
                   <span>{newsDetail.viewCount || 0} views</span>
                 </div>
-                {newsDetail.updatedAt && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4"/>
-                    <span>Updated: {formatDate(newsDetail.updatedAt)}</span>
-                  </div>
-                )}
+               
               </div>
 
               <div className="prose max-w-none news-content">
@@ -244,7 +239,6 @@ const NewsDetailPage = () => {
         {/* Footer Info */}
         <div className="bg-gray-50 p-4 mt-6 text-sm text-gray-500">
           <div className="flex flex-wrap justify-between gap-2">
-            <span>ID: {newsDetail._id}</span>
             <span>Created: {formatDate(newsDetail.createdAt)}</span>
           </div>
         </div>

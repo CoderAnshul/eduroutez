@@ -21,16 +21,11 @@ const CardContent = ({ children }) => (
 
 const CategoryFilter = ({ onFilterChange }) => {
   const categories = [
-    'Career Guidance',
-    'Study Tips & Tricks',
-    'Exam Preparation Guides',
-    'Scholarships & Financial Aid',
-    'Online Learning & E-Learning Trends',
-    'computer science',
-    'Exam',
-    'MBA',
-    'Medicine',
-    'Resources'
+    'Courses',
+    'Career',
+    'Institute',
+    'Placement',
+    'Admission'
   ];
   
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -78,7 +73,7 @@ const CombinedQuestionsPage = () => {
   const [activeFilters, setActiveFilters] = useState([]);
 
   const grades = ['8th', '9th', '10th', '11th', '12th'];
-  const labels = ['Academic', 'Career', 'College', 'Personal'];
+  const labels = ['Courses', 'Career', 'Institute', 'Placement', 'Admission'];
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const userEmail = localStorage.getItem('email') || 'user@example.com';
 

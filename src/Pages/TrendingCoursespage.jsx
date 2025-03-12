@@ -356,7 +356,7 @@ const TrendingCourses = () => {
                   const levelBadge = getLevelBadge(course.courseLevel);
                   
                   return (
-                    <Link key={course._id} to={`/coursesinfopage/${course._id}`} className="group">
+                    <Link key={course._id} to={`/coursesinfopage/${course?.slug}`} className="group">
                       <div className="bg-white rounded-xl shadow-md overflow-hidden h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                         <div className="relative h-48 overflow-hidden">
                           <img 

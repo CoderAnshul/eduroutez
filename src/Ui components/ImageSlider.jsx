@@ -118,7 +118,7 @@ const ImageSlider = ({ instituteData }) => {
         {/* Gradient overlay */}
         <div className="absolute top-0 right-0 p-3 lg:w-[400px] ] h-full bg-gradient-to-l from-black to-transparent z-10 text-white text-end">
           <div className="bottom-4 left-4">
-            <span className="text-3xl font-semibold mb-3">#12</span> <br />
+            <span className="text-3xl font-semibold mb-3">#{instituteData?.data?.rank}</span> <br />
             <div className="flex items-center justify-end gap-2">
               <img className="h-4" src={star} alt="star" />
               <span className="text-md mt-2">(4.3)</span>

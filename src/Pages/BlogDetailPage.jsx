@@ -16,6 +16,7 @@ const BlogDetailPage = () => {
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
   const [view, setView] = useState("overview");
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const { id } = useParams(); // This can be either ID or slug
   const navigate = useNavigate();
   const overviewRef = useRef(null);
@@ -39,8 +40,6 @@ const BlogDetailPage = () => {
       }
     }
   }, []);
-
- 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -142,13 +141,11 @@ const BlogDetailPage = () => {
     fetchData();
   }, [id, currentUserId]);
 
-
-
-
   // Handle like/dislike functionality
   const handleLike = async () => {
     if (!currentUserId) {
-      alert("Please login to like this blog");
+      // Show login popup instead of alert
+      setShowLoginPopup(true);
       return;
     }
 
@@ -193,6 +190,18 @@ const BlogDetailPage = () => {
     }
   };
 
+  // Handle redirect to login page
+  const handleRedirectToLogin = () => {
+    setShowLoginPopup(false);
+    // Navigate to login page
+    navigate('/login', { state: { returnUrl: window.location.pathname } });
+  };
+
+  // Close the login popup
+  const handleClosePopup = () => {
+    setShowLoginPopup(false);
+  };
+
   // Calculate number of likes
   const likesCount = data?.likes?.length || 0;
 
@@ -234,12 +243,12 @@ const BlogDetailPage = () => {
       <div className="container max-w-[1300px] mx-auto mt-10 p-4">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
           {/* Blog Header - Only one instance */}
-          <div className="flex max-sm:flex-col   max-sm:gap-4 justify-between items-center p-6">
+          <div className="flex max-sm:flex-col max-sm:gap-4 justify-between items-center p-6">
             <h1 className="text-3xl font-bold">{data.title || "Blog Post"}</h1>
 
             <div className="flex items-center gap-4 ">
               {/* Views Counter */}
-              <div className="flex  items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2 text-gray-600">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="22"
@@ -266,15 +275,12 @@ const BlogDetailPage = () => {
                 />
               </div>
 
-              {/* Like Button */}
+              {/* Like Button - Not disabled for non-logged in users */}
               <button
                 onClick={handleLike}
-                disabled={!currentUserId}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
                   ${
-                    !currentUserId
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300"
-                      : isLiked
+                    isLiked
                       ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
                       : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
                   } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
@@ -441,6 +447,45 @@ const BlogDetailPage = () => {
         <Events />
         <ConsellingBanner />
       </div>
+
+      {/* Login Popup Modal */}
+      {showLoginPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Login Required</h2>
+              <button 
+                onClick={handleClosePopup}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            
+            <div className="text-gray-600 mb-6">
+              <p>You need to be logged in to like this blog. Would you like to log in now?</p>
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleClosePopup}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRedirectToLogin}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+              >
+                Login
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
