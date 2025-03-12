@@ -98,9 +98,8 @@ const Instituepage = () => {
           // If instituteIdMap doesn't exist or doesn't have the slug,
           // we need to get the institute directly by its slug through a custom API call
           try {
-            response = await axiosInstance.get(
-              `/api/v1/institute/by-slug/${id}`
-            );
+            response = await getInstituteById(instituteId);
+
 
             // If we got a response, grab the ID for future use
             if (response && response.data) {
