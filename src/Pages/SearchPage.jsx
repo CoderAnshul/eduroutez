@@ -11,11 +11,12 @@ import HighRatedCareers from '../Components/HighRatedCareers';
 import { useQuery } from 'react-query';
 import { getInstitutes } from '../ApiFunctions/api';
 import { useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import Promotions from './CoursePromotions';
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [selectedFilters, setSelectedFilters] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [content, setContent] = useState([]);
@@ -27,6 +28,7 @@ const SearchPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set the number of items per page
   const inputField = useSelector(store => store.input.inputField);
+  const [initialFilterApplied, setInitialFilterApplied] = useState(false);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
   
@@ -47,12 +49,15 @@ const SearchPage = () => {
     }
   }, []);
 
-  // Initialize filters from URL parameters when component mounts
+  // This effect handles location changes and URL parameters
   useEffect(() => {
+    setCurrentPage(1);
+    setInitialFilterApplied(false);
+    
+    // Build initial filters from URL parameters
     const initialFilters = {};
     
     if (streamFromUrl) {
-      // Handle potential comma-separated streams
       const streamValues = streamFromUrl.split(',').map(s => s.trim());
       initialFilters.streams = streamValues;
     }
@@ -65,11 +70,33 @@ const SearchPage = () => {
       initialFilters.city = [cityFromUrl];
     }
     
-    // Only update if we have any filters
+    // Apply URL filters or fetch default data
     if (Object.keys(initialFilters).length > 0) {
       setSelectedFilters(initialFilters);
+      fetchFilteredInstitutes(initialFilters, 1, itemsPerPage);
+    } else {
+      // If no URL parameters, fetch default data and reset filters
+      setSelectedFilters({});
+      setLoading(true);
+      getInstitutes(inputField, inputField, inputField, inputField)
+        .then(data => {
+          const { result, totalDocuments } = data.data;
+          setContent(result);
+          setFilteredContent(result);
+          setTotalDocuments(totalDocuments);
+          
+          if (result && result.length > 0) {
+            updateIdMapping(result);
+          }
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching institutes:', error);
+          setFetchError(true);
+          setLoading(false);
+        });
     }
-  }, [streamFromUrl, stateFromUrl, cityFromUrl]);
+  }, [location.key, streamFromUrl, stateFromUrl, cityFromUrl]);
 
   const updateIdMapping = (institutes) => {
     let hasChanges = false;
@@ -108,12 +135,13 @@ const SearchPage = () => {
     }
   );
 
-  // This effect applies URL parameter filters to the UI once streams data is loaded
+  // Apply URL filters to UI once streams data is loaded
   useEffect(() => {
-    if (streamFromUrl && streams.includes(streamFromUrl)) {
-      handleFilterChange('streams', streamFromUrl);
+    if (!initialFilterApplied && streams.length > 0 && streamFromUrl && streams.includes(streamFromUrl)) {
+      // Apply the filter in UI without triggering another fetch
+      setInitialFilterApplied(true);
     }
-  }, [streams, streamFromUrl]);
+  }, [streams, streamFromUrl, initialFilterApplied]);
 
   const staticStateLocations = [
     "Andhra Pradesh",
@@ -310,59 +338,59 @@ const SearchPage = () => {
     },
   ];
 
-  const { data, isLoading, isError } = useQuery(
-    ["institute"],
-    () => getInstitutes(inputField, inputField, inputField, inputField),
-    {
-      enabled: true,
-      onSuccess: (data) => {
-        const { result, totalDocuments } = data.data;
-        setContent(result);
-        setFilteredContent(result);
-        setTotalDocuments(totalDocuments);
-        
-        if (result && result.length > 0) {
-          updateIdMapping(result);
-        }
-      }
-    }
-  );
-
   const handleFilterChange = (filterCategory, filterValue) => {
     setSelectedFilters(prevFilters => {
       const newFilters = { ...prevFilters };
-      if (!newFilters[filterCategory]) newFilters[filterCategory] = [];
-      if (newFilters[filterCategory].includes(filterValue)) {
-        newFilters[filterCategory] = newFilters[filterCategory].filter(value => value !== filterValue);
-        if (newFilters[filterCategory].length === 0) delete newFilters[filterCategory];
+      
+      if (!newFilters[filterCategory]) {
+        newFilters[filterCategory] = [];
+      }
+      
+      // Handle case sensitivity for filter values
+      const normalizedValue = filterValue.toLowerCase();
+      const existingIndex = newFilters[filterCategory].findIndex(
+        val => val.toLowerCase() === normalizedValue
+      );
+      
+      if (existingIndex !== -1) {
+        // Remove the filter if it exists
+        newFilters[filterCategory].splice(existingIndex, 1);
+        if (newFilters[filterCategory].length === 0) {
+          delete newFilters[filterCategory];
+        }
       } else {
+        // Add the filter if it doesn't exist
         newFilters[filterCategory].push(filterValue);
       }
+      
+      // Reset to page 1 when filters change
+      setCurrentPage(1);
+      
       return newFilters;
     });
   };
 
-  // Modified effect to trigger fetching when filters change
+  // Effect to fetch data when filters or pagination changes
   useEffect(() => {
-    if (Object.keys(selectedFilters).length > 0) {
+    // Don't trigger a fetch if we're applying initial filters from URL
+    if (initialFilterApplied && Object.keys(selectedFilters).length > 0) {
       fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
     }
-  }, [selectedFilters, currentPage]);
+  }, [selectedFilters, currentPage, initialFilterApplied]);
 
   const fetchFilteredInstitutes = async (filters, page, limit) => {
     setLoading(true);
+    setFetchError(false);
+    
     try {
-      // Create a copy of filters for API formatting
-      const apiFilters = { ...filters };
+      // Create a deep copy of filters to avoid modifying the original
+      const apiFilters = JSON.parse(JSON.stringify(filters));
       
-      // Fix: Ensure we're using "streams" (plural) for the API, not "stream" (singular)
+      // Ensure we're using "streams" (plural) for the API
       if (apiFilters.stream && !apiFilters.streams) {
         apiFilters.streams = apiFilters.stream;
         delete apiFilters.stream;
       }
-      
-      // Make sure state is correctly formatted for API
-      // This preserves the original state parameter
       
       console.log("Sending filters to API:", apiFilters);
       
@@ -418,6 +446,7 @@ const SearchPage = () => {
             <Filter 
               filterSections={filterSections} 
               handleFilterChange={handleFilterChange} 
+              selectedFilters={selectedFilters}
             />
           </div>
 
@@ -441,7 +470,7 @@ const SearchPage = () => {
                     url={getInstituteUrl(institute)}
                   />
                 ))}
-            <div className="pagination">
+                <div className="pagination">
                   {Array.from({ length: Math.ceil(filteredContent.length / itemsPerPage) }, (_, index) => (
                     <button
                       key={index}
