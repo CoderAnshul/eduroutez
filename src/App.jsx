@@ -27,6 +27,7 @@ import ScheduledSlots from './Pages/ScheduledSlots';
 import Payout from './Pages/Payout';
 import NewsPage from './Pages/NewsPage';
 import TrendingStreams from './Components/trendingStreampage';
+import TrendingCourses from './Pages/TrendingCoursespage';
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -64,7 +65,7 @@ const App = () => {
           <Route path="*" element={<PageNotFound />} />
           <Route path="/institute/:id" element={<Instituepage />} />
           <Route path="/institute/:slug" element={<Instituepage />} />
-
+<Route path='/trendingCourses' element={<TrendingCourses></TrendingCourses>}></Route>
           <Route path="/searchpage" element={<SearchPage />} />
           <Route path="/coursesinfopage/:id" element={<Coursesinfopage />} />
           <Route path="/coursesinfopage/:slug" element={<Coursesinfopage />} />

@@ -319,7 +319,9 @@ const CounselorListPage = () => {
                                 </div>
                               </div>
 
-                              <div className="space-y-2.5">
+                              <span className="text-gray-600 mb-4">{counselor?.about}</span>
+
+                              <div className="space-y-2.5 mt-4">
                                 {counselor?.language && (
                                   <div className="flex items-center text-sm text-gray-600">
                                     <svg
@@ -396,6 +398,9 @@ const CounselorListPage = () => {
                                     <span className="">Counsellor</span>
                                   </button>
                                 </div>
+
+                           
+
 
                                 {counselor.ExperienceYear && (
                                   <div className="flex items-center gap-4 font-bold text-sm text-gray-600">

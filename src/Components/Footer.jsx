@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Phone, Mail } from "lucide-react";
 import {
   trendingCareers,
   popularCourses,
@@ -29,42 +30,124 @@ const Footer = () => {
   const popularCoursesSecondHalf = popularCourses.slice(halfIndexCourses);
 
   return (
-    <footer className="bg-black lg:whitespace-nowrap text-white py-8 px-4 ">
-      <div className="flex justify-between flex-wrap gap-4 px-[4vw] mx-auto w-full mb-4  max-w-[1300px]">
-        {/* Trending Careers */}
-        <div>
-          <h3 className="font-semibold text-red-500 mb-3">MBA</h3>
-          <div className="gap-4 d-block">
-            {/* First Column */}
+    <footer className="bg-black lg:whitespace-nowrap text-white py-8 px-4">
+      <div className="px-[4vw] mx-auto w-full max-w-[1300px]">
+        {/* Using grid for consistent column layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Trending Careers */}
+          <div>
+            <h3 className="font-semibold text-red-500 mb-3">MBA</h3>
+            <div className="flex flex-col gap-1">
+              {/* First Column */}
+              <ul className="space-y-1 text-sm">
+                {trendingCareersFirstHalf.map((career, index) => (
+                  <li key={index}>
+                    <Link to={career.link} className="footerText">
+                      {career.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {/* Second Column */}
+              <ul className="space-y-1 text-sm">
+                {trendingCareersSecondHalf.map((career, index) => (
+                  <li key={index}>
+                    <Link to={career.link} className="footerText">
+                      {career.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Popular Courses */}
+          <div>
+            <h3 className="font-semibold text-red-500 mb-3">Engineering</h3>
+            <div className="flex flex-col gap-1">
+              {/* First Column */}
+              <ul className="space-y-1 text-sm">
+                {popularCoursesFirstHalf.map((course, index) => (
+                  <li key={index}>
+                    <Link to={course.link} className="footerText">
+                      {course.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {/* Second Column */}
+              <ul className="space-y-1 text-sm">
+                {popularCoursesSecondHalf.map((course, index) => (
+                  <li key={index}>
+                    <Link to={course.link} className="footerText">
+                      {course.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Medicine */}
+          <div>
+            <h3 className="font-semibold text-red-500 mb-3">Medicine</h3>
             <ul className="space-y-1 text-sm">
-              {trendingCareersFirstHalf.map((career, index) => (
+              {topInstitutes.map((institute, index) => (
                 <li key={index}>
-                  <Link to={career.link} className="footerText">
-                    {career.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            {/* Second Column */}
-            <ul className="space-y-1 text-sm">
-              {trendingCareersSecondHalf.map((career, index) => (
-                <li key={index}>
-                  <Link to={career.link} className="footerText">
-                    {career.name}
+                  <Link to={institute.link} className="footerText">
+                    {institute.name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-        </div>
 
-        {/* Popular Courses */}
-        <div>
-          <h3 className="font-semibold text-red-500 mb-3">Engineering</h3>
-          <div className="d-block gap-6 justify-between">
-            {/* First Column */}
+          {/* Best Rated Colleges */}
+          <div>
+            <h3 className="font-semibold text-red-500 mb-3">Explore Courses</h3>
             <ul className="space-y-1 text-sm">
-              {popularCoursesFirstHalf.map((course, index) => (
+              {bestRatedColleges.map((college, index) => (
+                <li key={index}>
+                  <Link to={college.link} className="footerText">
+                    {college.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h3 className="font-semibold text-red-500 mb-3">Career Guidance
+            </h3>
+            <div className="flex flex-col gap-1">
+              <ul className="space-y-1 text-sm">
+                {otherLinks.map((link, index) => (
+                  <li key={index}>
+                    <Link to={link.link} className="footerText">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <ul className="space-y-1 text-sm mt-1">
+                {examResults.map((result, index) => (
+                  <li key={index}>
+                    <Link to={result.link} className="footerText">
+                      {result.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Free Courses */}
+          <div>
+            <h3 className="font-semibold text-red-500 mb-3">Eduroutez Hub
+            </h3>
+            <ul className="space-y-1 text-sm">
+              {freeCourses.map((course, index) => (
                 <li key={index}>
                   <Link to={course.link} className="footerText">
                     {course.name}
@@ -72,62 +155,13 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-            {/* Second Column */}
-            <ul className="space-y-1 text-sm">
-              {popularCoursesSecondHalf.map((course, index) => (
-                <li key={index}>
-                  <Link to={course.link} className="footerText">
-                    {course.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </div>
-        </div>
 
-
-        <div>
-          <h3 className="font-semibold text-red-500 mb-3">Medicine</h3>
-          <ul className="space-y-1 text-sm">
-            {topInstitutes.map((institute, index) => (
-              <li key={index}>
-                <Link to={institute.link} className="footerText">
-                  {institute.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-
-         {/* Best Rated Colleges */}
-         <div>
-          <h3 className="font-semibold text-red-500 mb-3">Other Courses</h3>
-          <ul className="space-y-1 text-sm">
-            {bestRatedColleges.map((college, index) => (
-              <li key={index}>
-                <Link to={college.link} className="footerText">
-                  {college.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-      
-      </div>
-
-      <div className="flex justify-between gap-4 flex-wrap px-[4vw] mx-auto w-full  max-w-[1300px]">
-        {/* Top Institutes */}
-    
-
-  {/* Other Links */}
-  <div>
-          <h3 className="font-semibold text-red-500 mb-3">Resources</h3>
-          <div className="d-block gap-4">
-            {/* First Column */}
+          {/* About Eduroutez */}
+          <div>
+            <h3 className="font-semibold text-red-500 mb-3">Study Abroad</h3>
             <ul className="space-y-1 text-sm">
-              {otherLinks.map((link, index) => (
+              {aboutLinks.map((link, index) => (
                 <li key={index}>
                   <Link to={link.link} className="footerText">
                     {link.name}
@@ -136,76 +170,92 @@ const Footer = () => {
               ))}
             </ul>
           </div>
-        </div>
 
-        {/* Free Courses */}
-        <div>
-          <h3 className="font-semibold text-red-500 mb-3">Shiksha Online</h3>
-          <ul className="space-y-1 text-sm">
-            {freeCourses.map((course, index) => (
-              <li key={index}>
-                <Link to={course.link} className="footerText">
-                  {course.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-red-500 mb-3">Important Updates</h3>
-          <ul className="space-y-1 text-sm">
-            {examResults.map((result, index) => (
-              <li key={index}>
-                <Link to={result.link} className="footerText">
-                  {result.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-      
-       
-
-        {/* About Eduroutez */}
-        <div>
-          <h3 className="font-semibold text-red-500 mb-3">Study Abroad</h3>
-          <ul className="space-y-1 text-sm">
-            {aboutLinks.map((link, index) => (
-              <li key={index}>
-                <Link to={link.link} className="footerText">
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4">
+          {/* Logo and Social Media */}
+          <div>
             <Link to="/">
-                <img className='h-6 md:h-8' src={logo} alt="mainLogo" />
+              <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
             </Link>
-            <div className="flex mt-3 justify-between w-full gap-4">
-                <Link to="/">
-                    <div className="aspect-w-1 aspect-h-1">
-                        <img className='h-7 -mt-[2px] object-cover' src={facebook} alt="Facebook" />
-                    </div>
-                </Link>
-                <Link to="/">
-                    <div className="aspect-w-1 aspect-h-1">
-                        <img className='h-6 object-cover' src={instagram} alt="Instagram" />
-                    </div>
-                </Link>
-                <Link to="/">
-                    <div className="aspect-w-1 aspect-h-1">
-                        <img className='h-6 object-cover' src={twitter} alt="Twitter" />
-                    </div>
-                </Link>
-                <Link to="/">
-                    <div className="aspect-w-1 aspect-h-1">
-                        <img className='h-[38px] object-cover' src={youtube} alt="YouTube" />
-                    </div>
-                </Link>
+            <div className="mt-3">
+              <div className="flex items-start">
+                <div className="transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 24 24" 
+                    fill="red" 
+                    className="w-5 h-5 mt-0.5 mr-2 transition-opacity duration-300 hover:opacity-80"
+                  >
+                    <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span className="text-sm text-wrap">
+                  Office No. 603, 6th floor, Paradise Tower, Gokhale Rd, next to McDonaldʼs, Naupada, Thane West, Thane, Maharashtra 400602
+                </span>
+              </div>
             </div>
+           
+          
+          <div className="text-sm mt-1 text-wrap flex items-center">
+            <Phone size={16} className="mr-2 text-red-500" />
+            <a href="tel:9867877121" className="hover:text-red-400 transition-colors">9867877121</a>
+          </div>
+          <div className="text-sm mt-1 text-wrap flex items-center">
+            <Mail size={16} className="mr-2 text-red-500" />
+            <a href="mailto:contact@eduroutez.com" className="hover:text-red-400 transition-colors">contact@eduroutez.com</a>
+          </div>
+
+          <div className="flex gap-4 mt-6">
+            <Link to="/">
+              <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                <img 
+                  className="h-6 -mt-[2px] object-cover transition-opacity duration-300 hover:opacity-80" 
+                  src={facebook} 
+                  alt="Facebook" 
+                />
+              </div>
+            </Link>
+            <Link to="/">
+              <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                <img 
+                  className="h-5 object-cover transition-opacity duration-300 hover:opacity-80" 
+                  src={instagram} 
+                  alt="Instagram" 
+                />
+              </div>
+            </Link>
+            <Link to="/">
+              <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                <img 
+                  className="h-5 object-cover transition-opacity duration-300 hover:opacity-80" 
+                  src={twitter} 
+                  alt="Twitter" 
+                />
+              </div>
+            </Link>
+            <Link to="/">
+              <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                <img 
+                  className="h-[34px] object-cover transition-opacity duration-300 hover:opacity-80" 
+                  src={youtube} 
+                  alt="YouTube" 
+                />
+              </div>
+            </Link>
+          </div>
+
+          </div>
+        </div>
+        
+        {/* Copyright and Policy Links */}
+        <div className="pt-6 mt-4 border-t border-gray-700">
+          <div className="flex flex-wrap items-center justify-center text-center gap-x-4 gap-y-2 text-xs text-gray-400">
+            <span>&copy; {new Date().getFullYear()} Eduroutez. All rights reserved.</span>
+            <span className="hidden sm:inline">|</span>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link>
+            <span className="hidden sm:inline">|</span>
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <span className="hidden sm:inline">|</span>
+            <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
           </div>
         </div>
       </div>

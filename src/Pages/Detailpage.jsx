@@ -57,8 +57,7 @@ const DetailPage = () => {
           } else {
             // If careerIdMap doesn't have the slug, get the career by slug through a custom API call
             try {
-              response = await axiosInstance.get(`/api/v1/career/by-slug/${id}`);
-              
+  response = await CarrerDetail(careerId);              
               // If we got a response, grab the ID for future use
               if (response && response.data) {
                 careerId = response.data._id;

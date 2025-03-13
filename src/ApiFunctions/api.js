@@ -45,19 +45,31 @@ export const addToWishlist = async (userId, instituteId) => {
   }
 };
 
-export const blogById = async (id) => {
+export const blogById = async (idOrSlug) => {
   try {
-    console.log("iythgvbd", id);
-    var count=0;
-    console.log("id", count++);
-    const response = await axios.get(`${baseURL}/blog/${id}`);
+    console.log("Processing request for:", idOrSlug);
+    
+    // Determine if we're dealing with an ID or a slug
+    const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
+    
+    let response;
+
+    if (isSlug) {
+      // If it's a slug, pass field="slug" in the body
+      response = await axios.get(`${baseURL}/blog/${idOrSlug}`, {
+        params: { field: "slug" }
+      });
+    } else {
+      // It's an ID, use the original endpoint
+      response = await axios.get(`${baseURL}/blog/${idOrSlug}`);
+    }
+    
     return response.data;
   } catch (error) {
-    console.error(`Error fetching blog with ID :`, error);
+    console.error(`Error fetching blog:`, error);
     throw error;
   }
 };
-
 //getRecentBlogs
 export const getRecentBlogs = async () => {
   try {
@@ -70,31 +82,79 @@ export const getRecentBlogs = async () => {
 };
 
 
-export const CarrerDetail = async (id) => {
+export const CarrerDetail = async (idOrSlug) => {
   try {
-    const response = await axios.get(`${baseURL}/career/${id}`);
+    console.log("Processing request for:", idOrSlug);
+    
+    // Determine if we're dealing with an ID or a slug
+    const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
+    
+    let response;
+
+    if (isSlug) {
+      // If it's a slug, pass field="slug" in the body
+      response = await axios.get(`${baseURL}/career/${idOrSlug}`, {
+        params: { field: "slug" }
+      });
+    } else {
+      // It's an ID, use the original endpoint
+      response = await axios.get(`${baseURL}/career/${idOrSlug}`);
+    }
+    
     return response.data;
   } catch (error) {
-    console.error(`Error fetching blog with ID :`, error);
+    console.error(`Error fetching career detail:`, error);
     throw error;
   }
 };
 
-export const getInstituteById = async (id) => {
+export const getInstituteById = async (idOrSlug) => {
   try {
-    const response = await axios.get(`${baseURL}/institute/${id}`);
+    console.log("Processing request for:", idOrSlug);
+    
+    // Determine if we're dealing with an ID or a slug
+    const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
+    
+    let response;
+
+    if (isSlug) {
+      // If it's a slug, pass field="slug" in the body
+      response = await axios.get(`${baseURL}/institute/${idOrSlug}`, {
+        params: { field: "slug" }
+      });
+    } else {
+      // It's an ID, use the original endpoint
+      response = await axios.get(`${baseURL}/institute/${idOrSlug}`);
+    }
+    
     return response.data;
   } catch (error) {
-    console.error(`Error fetching institute with ID ${id}:`, error);
+    console.error(`Error fetching institute detail:`, error);
     throw error;
   }
 };
-export const getCoursesById = async (id) => {
+export const getCoursesById = async (idOrSlug) => {
   try {
-    const response = await axios.get(`${baseURL}/course/${id}`);
+    console.log("Processing request for:", idOrSlug);
+    
+    // Determine if we're dealing with an ID or a slug
+    const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
+    
+    let response;
+
+    if (isSlug) {
+      // If it's a slug, pass field="slug" in the body
+      response = await axios.get(`${baseURL}/course/${idOrSlug}`, {
+        params: { field: "slug" }
+      });
+    } else {
+      // It's an ID, use the original endpoint
+      response = await axios.get(`${baseURL}/course/${idOrSlug}`);
+    }
+    
     return response.data;
   } catch (error) {
-    console.error(`Error fetching institute with ID ${id}:`, error);
+    console.error(`Error fetching course detail:`, error);
     throw error;
   }
 };
