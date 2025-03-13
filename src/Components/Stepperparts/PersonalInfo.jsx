@@ -9,7 +9,6 @@ import Promotions from "../../Pages/CoursePromotions";
 const SearchableDropdown = ({ options, onChange }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
-
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -45,16 +44,19 @@ const SearchableDropdown = ({ options, onChange }) => {
 
 const PersonalInfo = ({ setFormData, setIsSubmit }) => {
   const [colleges, setColleges] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const dispatch = useDispatch();
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
+  const apiUrl = import.meta.env.VITE_BASE_URL; // Using the same base URL for consistency
+  
   // Fetch student data
   const { data: studentData } = useQuery(
     ["student"],
     async () => {
-      const id=localStorage.getItem('userId')
+      const id = localStorage.getItem('userId')
       const response = await axiosInstance.get(`${VITE_BASE_URL}/student/${id}`);
       return response.data;
     },
@@ -85,6 +87,21 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
       enabled: true,
     }
   );
+
+  // Fetch countries
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const res = await axiosInstance.get(`${apiUrl}/countries`);
+        setCountries(res.data?.data || []);
+      } catch (err) {
+        console.error("Failed to fetch countries:", err);
+        // If you have toast imported, uncomment the following line
+        // toast.error("Failed to fetch countries");
+      }
+    };
+    fetchCountries();
+  }, [apiUrl]);
 
   useEffect(() => {
     if (data?.success === true) {
@@ -167,7 +184,6 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none bg-gray-100"
             />
           </div>
-          {/* Other fields remain the same */}
           <div>
             <label
               htmlFor="contactNumber"
@@ -184,7 +200,6 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none bg-gray-100"
             />
           </div>
-          {/* Rest of the form fields remain unchanged */}
           <div>
             <label
               htmlFor="gender"
@@ -215,10 +230,12 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
               onChange={handleInputChange}
             >
-              <option>Select Country</option>
-              <option>India</option>
-              <option>USA</option>
-              <option>UK</option>
+              <option value="">Select Country</option>
+              {countries.map((country, index) => (
+                <option key={index} value={country._id || country.id || country.name}>
+                  {country.name}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -264,6 +281,9 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               <option>2020</option>
               <option>2021</option>
               <option>2022</option>
+              <option>2023</option>
+              <option>2024</option>
+              <option>2025</option>
             </select>
           </div>
         </form>
