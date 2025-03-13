@@ -118,6 +118,8 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
     }
   }, [email, name, mobile, dispatch]);
 
+
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     
@@ -132,14 +134,31 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
       case "mobileNumber":
         setMobile(value);
         break;
+      case "country":
+        // Find the selected country object
+        const selectedCountry = countries.find(country => 
+          (country._id || country.id || '').toString() === value.toString()
+        );
+        
+        // Update form data with structured country object
+        setFormData(prevData => ({
+          ...prevData,
+          country: value,
+          country: selectedCountry ? {
+            name: selectedCountry.name,
+            iso2: selectedCountry.iso2
+          } : null
+        }));
+        return; // Skip the general formData update at the end
     }
-
-    // Update form data
+  
+    // Update form data for other fields
     setFormData((prevData) => ({
       ...prevData,
       [id]: value,
     }));
   };
+
 
   return (
     <div className="flex flex-col items-center h-full">
