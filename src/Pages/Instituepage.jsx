@@ -30,22 +30,23 @@ import BlogComponent from "../Components/BlogComponent";
 import Promotions from "../Pages/CoursePromotions";
 import axiosInstance from "../ApiFunctions/axios";
 
-const tabs = [
-  "College Info",
-  "Courses",
-  "Admissions",
-  "Placements",
-  "Campus",
-  "Fees",
-  "Scholarship",
-  "Cut-offs",
-  "Ranking",
-  "Gallery",
-  "Review",
-  "Facilities",
-  "Q & A",
-  "News",
-  "Webinar",
+// Base tabs array - we'll filter this based on available data
+const allPossibleTabs = [
+  { key: "College Info", dataKey: "collegeInfo" },
+  { key: "Courses", dataKey: "courses" },
+  { key: "Admissions", dataKey: "admissionInfo" },
+  { key: "Placements", dataKey: "placementInfo" },
+  { key: "Campus", dataKey: "campusInfo" },
+  { key: "Fees", dataKey: "fee" },
+  { key: "Scholarship", dataKey: "scholarshipInfo" },
+  { key: "Cut-offs", dataKey: "cutoff" },
+  { key: "Ranking", dataKey: "ranking" },
+  { key: "Gallery", dataKey: "gallery" },
+  { key: "Review", dataKey: null },
+  { key: "Facilities", dataKey: "facilities" },
+  { key: "Q & A", dataKey: null }, // Always show
+  { key: "News", dataKey: "news" }, // Always show
+  { key: "Webinar", dataKey: "webinar" }, // Always show
 ];
 
 const reviews = [
@@ -55,9 +56,10 @@ const reviews = [
 const Instituepage = () => {
   const { id } = useParams(); // This can be either ID or slug
   const [ratings, setRatings] = useState([]);
-  const sectionRefs = tabs.map(() => useRef(null));
+  const [tabs, setTabs] = useState([]);
   const navigate = useNavigate();
   const [instituteIdMap, setInstituteIdMap] = useState({});
+  const [sectionRefs, setSectionRefs] = useState([]);
 
   useEffect(() => {
     if (!window.instituteIdMap) {
@@ -99,7 +101,6 @@ const Instituepage = () => {
           // we need to get the institute directly by its slug through a custom API call
           try {
             response = await getInstituteById(instituteId);
-
 
             // If we got a response, grab the ID for future use
             if (response && response.data) {
@@ -167,6 +168,44 @@ const Instituepage = () => {
     refetchOnMount: true,
   });
 
+  // Filter tabs based on available data
+  useEffect(() => {
+    if (instituteData?.data) {
+      const data = instituteData.data;
+      
+      // Filter tabs based on whether they have corresponding data
+      const filteredTabs = allPossibleTabs.filter(tabInfo => {
+        // If no dataKey specified, always include the tab
+        if (tabInfo.dataKey === null) return true;
+        
+        // Check if the corresponding data exists and is not empty
+        const hasData = (() => {
+          const value = data[tabInfo.dataKey];
+          
+          // Handle arrays
+          if (Array.isArray(value)) {
+            return value.length > 0;
+          }
+          
+          // Handle strings
+          if (typeof value === 'string') {
+            return value && value.trim() !== '';
+          }
+          
+          // Handle objects and other types
+          return value !== null && value !== undefined;
+        })();
+        
+        return hasData;
+      }).map(tabInfo => tabInfo.key); // Extract just the key names
+      
+      setTabs(filteredTabs);
+      
+      // Create refs for each tab
+      setSectionRefs(filteredTabs.map(() => React.createRef()));
+    }
+  }, [instituteData]);
+
   useEffect(() => {
     const fetchRatings = async () => {
       const data = [
@@ -182,10 +221,9 @@ const Instituepage = () => {
     fetchRatings();
   }, []);
 
-  // Helper function to get URL for display
-  const getInstituteUrl = (institute) => {
-    // If we have a slug, use it for SEO purposes
-    return `/institute/${institute?._id}`;
+  // Helper function to get index of a tab
+  const getTabIndex = (tabName) => {
+    return tabs.indexOf(tabName);
   };
 
   if (isLoading) {
@@ -210,20 +248,28 @@ const Instituepage = () => {
 
   return (
     <>
-      <div className=" px-[4vw] py-[2vw] flex flex-col items-start">
+      <div className="px-[4vw] py-[2vw] flex flex-col items-start">
         <ImageSlider instituteData={instituteData} />
         <InstitueName instituteData={instituteData} />
         <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
         <div className="w-full flex gap-4">
           <div className="w-full lg:w-[calc(100%-400px)]">
             <div className="w-full min-h-24">
-              <div ref={sectionRefs[0]} className="min-h-24 pt-4 ">
-                <CollegeInfo instituteData={instituteData} />
-              </div>
-              {/* Rest of component sections remain unchanged */}
-              <div ref={sectionRefs[1]} className="min-h-24 py-4">
-                <InstituteCourses instituteData={instituteData} />
-              </div>
+              {/* College Info */}
+              {tabs.includes("College Info") && (
+                <div ref={sectionRefs[getTabIndex("College Info")]} className="min-h-24 pt-4">
+                  <CollegeInfo instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Courses */}
+              {tabs.includes("Courses") && (
+                <div ref={sectionRefs[getTabIndex("Courses")]} className="min-h-24 py-4">
+                  <InstituteCourses instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Exams Accepted */}
               {instituteData?.data?.examAccepted && (
                 <div className="px-4 py-5 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -255,57 +301,115 @@ const Instituepage = () => {
                   </div>
                 </div>
               )}
-              <div ref={sectionRefs[2]} className="min-h-24 py-4">
-                <Addmissioninfo instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[3]} className="min-h-24 pt-4">
-                <Placementinfo instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[4]} className="min-h-24 pt-4">
-                <CampusInfo instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[5]} className="min-h-24 pt-4">
-                <FeeInfo ref={sectionRefs[5]} instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[6]} className="min-h-24  pt-4">
-                <ScholarshipInfo instituteData={instituteData} />
-              </div>
+              
+              {/* Admissions */}
+              {tabs.includes("Admissions") && (
+                <div ref={sectionRefs[getTabIndex("Admissions")]} className="min-h-24 py-4">
+                  <Addmissioninfo instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Placements */}
+              {tabs.includes("Placements") && (
+                <div ref={sectionRefs[getTabIndex("Placements")]} className="min-h-24 pt-4">
+                  <Placementinfo instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Campus */}
+              {tabs.includes("Campus") && (
+                <div ref={sectionRefs[getTabIndex("Campus")]} className="min-h-24 pt-4">
+                  <CampusInfo instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Fees */}
+              {tabs.includes("Fees") && (
+                <div ref={sectionRefs[getTabIndex("Fees")]} className="min-h-24 pt-4">
+                  <FeeInfo instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Scholarship */}
+              {tabs.includes("Scholarship") && (
+                <div ref={sectionRefs[getTabIndex("Scholarship")]} className="min-h-24 pt-4">
+                  <ScholarshipInfo instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Promotions */}
               <Promotions
                 location="INSTITUTE_PAGE_RECTANGLE"
                 className="h-[90px]"
-              ></Promotions>
-              <div ref={sectionRefs[7]} className="min-h-24 pt-4">
-                <CutTOffInfo instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[8]} className="min-h-24 pt-4">
-                <Ranking instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[9]} className="min-h-24 pt-4">
-                <GalleryInfo instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[10]} className="min-h-24 pt-4">
-                <ReviewandRating
-                  ratings={ratings}
-                  reviews={reviews}
-                  instituteId={instituteData._id}
-                  instituteData={instituteData}
-                />
-              </div>
-              <div ref={sectionRefs[11]} className="min-h-24 py-4">
-                <InstituteFacilites instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[12]} className="min-h-24 py-4">
-                <RecruitersSlider instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[13]} className="min-h-24 py-4">
-                <Faqs instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[14]} className="min-h-24 py-4">
-                <News instituteData={instituteData} />
-              </div>
-              <div ref={sectionRefs[15]} className="min-h-24 py-4">
-                <Webinar instituteData={instituteData} />
-              </div>
+              />
+              
+              {/* Cut-offs */}
+              {tabs.includes("Cut-offs") && (
+                <div ref={sectionRefs[getTabIndex("Cut-offs")]} className="min-h-24 pt-4">
+                  <CutTOffInfo instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Ranking */}
+              {tabs.includes("Ranking") && (
+                <div ref={sectionRefs[getTabIndex("Ranking")]} className="min-h-24 pt-4">
+                  <Ranking instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Gallery */}
+              {tabs.includes("Gallery") && (
+                <div ref={sectionRefs[getTabIndex("Gallery")]} className="min-h-24 pt-4">
+                  <GalleryInfo instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Review */}
+              {tabs.includes("Review") && (
+                <div ref={sectionRefs[getTabIndex("Review")]} className="min-h-24 pt-4">
+                  <ReviewandRating
+                    ratings={ratings}
+                    reviews={reviews}
+                    instituteId={instituteData.data._id}
+                    instituteData={instituteData}
+                  />
+                </div>
+              )}
+              
+             {/* Facilities */}
+             {tabs.includes("Facilities") && (
+                <div ref={sectionRefs[getTabIndex("Facilities")]} className="min-h-24 py-4">
+                  <InstituteFacilites instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Q & A */}
+              {tabs.includes("Q & A") && (
+                <div ref={sectionRefs[getTabIndex("Q & A")]} className="min-h-24 py-4">
+                  <Faqs instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* News */}
+              {tabs.includes("News") && (
+                <div ref={sectionRefs[getTabIndex("News")]} className="min-h-24 py-4">
+                  <News instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Webinar */}
+              {tabs.includes("Webinar") && (
+                <div ref={sectionRefs[getTabIndex("Webinar")]} className="min-h-24 py-4">
+                  <Webinar instituteData={instituteData} />
+                </div>
+              )}
+              
+              {/* Recruiters */}
+              {tabs.includes("Q & A") && (
+                <div className="min-h-24 py-4">
+                  <RecruitersSlider instituteData={instituteData} />
+                </div>
+              )}
             </div>
           </div>
           <div className="w-[300px] h-[250px]">
@@ -313,8 +417,8 @@ const Instituepage = () => {
             <Promotions location="INSTITUTE_PAGE " className="h-[250px]" />
           </div>
         </div>
-        <HighRatedCareers></HighRatedCareers>
-        <BlogComponent></BlogComponent>
+        <HighRatedCareers />
+        <BlogComponent />
         <BestRated />
         <Events className="!w-full" />
       </div>
