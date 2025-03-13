@@ -28,7 +28,8 @@ const SearchPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set the number of items per page
   const inputField = useSelector(store => store.input.inputField);
-  const [initialFilterApplied, setInitialFilterApplied] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [filtersApplied, setFiltersApplied] = useState(false);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
   
@@ -36,6 +37,11 @@ const SearchPage = () => {
   const streamFromUrl = searchParams.get('stream');
   const stateFromUrl = searchParams.get('state');
   const cityFromUrl = searchParams.get('city');
+  const examFromUrl = searchParams.get('Exam');
+  const feesFromUrl = searchParams.get('Fees');
+  const ratingsFromUrl = searchParams.get('Ratings');
+  const organizationTypeFromUrl = searchParams.get('organisationType');
+  const specializationFromUrl = searchParams.get('specialization');
 
   useEffect(() => {
     if (!window.instituteIdMap) {
@@ -49,17 +55,16 @@ const SearchPage = () => {
     }
   }, []);
 
-  // This effect handles location changes and URL parameters
+  // This effect builds initial filters from URL parameters only once on component mount
   useEffect(() => {
-    setCurrentPage(1);
-    setInitialFilterApplied(false);
-    
     // Build initial filters from URL parameters
     const initialFilters = {};
     
     if (streamFromUrl) {
-      const streamValues = streamFromUrl.split(',').map(s => s.trim());
-      initialFilters.streams = streamValues;
+      const streamValues = streamFromUrl.split(',').map(s => s.trim()).filter(Boolean);
+      if (streamValues.length > 0) {
+        initialFilters.streams = streamValues;
+      }
     }
     
     if (stateFromUrl) {
@@ -70,9 +75,30 @@ const SearchPage = () => {
       initialFilters.city = [cityFromUrl];
     }
     
+    if (examFromUrl) {
+      initialFilters.Exam = [examFromUrl];
+    }
+    
+    if (feesFromUrl) {
+      initialFilters.Fees = [feesFromUrl];
+    }
+    
+    if (ratingsFromUrl) {
+      initialFilters.Ratings = [ratingsFromUrl];
+    }
+    
+    if (organizationTypeFromUrl) {
+      initialFilters.organisationType = [organizationTypeFromUrl];
+    }
+    
+    if (specializationFromUrl) {
+      initialFilters.specialization = [specializationFromUrl];
+    }
+    
     // Apply URL filters or fetch default data
     if (Object.keys(initialFilters).length > 0) {
       setSelectedFilters(initialFilters);
+      setFiltersApplied(true);
       fetchFilteredInstitutes(initialFilters, 1, itemsPerPage);
     } else {
       // If no URL parameters, fetch default data and reset filters
@@ -89,14 +115,16 @@ const SearchPage = () => {
             updateIdMapping(result);
           }
           setLoading(false);
+          setInitialLoadComplete(true);
         })
         .catch(error => {
           console.error('Error fetching institutes:', error);
           setFetchError(true);
           setLoading(false);
+          setInitialLoadComplete(true);
         });
     }
-  }, [location.key, streamFromUrl, stateFromUrl, cityFromUrl]);
+  }, []); // Empty dependency array means this runs once on mount
 
   const updateIdMapping = (institutes) => {
     let hasChanges = false;
@@ -134,14 +162,6 @@ const SearchPage = () => {
       },
     }
   );
-
-  // Apply URL filters to UI once streams data is loaded
-  useEffect(() => {
-    if (!initialFilterApplied && streams.length > 0 && streamFromUrl && streams.includes(streamFromUrl)) {
-      // Apply the filter in UI without triggering another fetch
-      setInitialFilterApplied(true);
-    }
-  }, [streams, streamFromUrl, initialFilterApplied]);
 
   const staticStateLocations = [
     "Andhra Pradesh",
@@ -338,45 +358,32 @@ const SearchPage = () => {
     },
   ];
 
+  // Add this function to prevent scroll reset
+  const handleFilterChangeWithoutScroll = (filterCategory, filterValue) => {
+    // Save current scroll position
+    const scrollPosition = window.scrollY;
+    
+    // Apply filter change
+    handleFilterChange(filterCategory, filterValue);
+    
+    // Restore scroll position after state update
+    setTimeout(() => {
+      window.scrollTo(0, scrollPosition);
+    }, 0);
+  };
   const handleFilterChange = (filterCategory, filterValue) => {
-    setSelectedFilters(prevFilters => {
-      const newFilters = { ...prevFilters };
-      
-      if (!newFilters[filterCategory]) {
-        newFilters[filterCategory] = [];
-      }
-      
-      // Handle case sensitivity for filter values
-      const normalizedValue = filterValue.toLowerCase();
-      const existingIndex = newFilters[filterCategory].findIndex(
-        val => val.toLowerCase() === normalizedValue
-      );
-      
-      if (existingIndex !== -1) {
-        // Remove the filter if it exists
-        newFilters[filterCategory].splice(existingIndex, 1);
-        if (newFilters[filterCategory].length === 0) {
-          delete newFilters[filterCategory];
-        }
-      } else {
-        // Add the filter if it doesn't exist
-        newFilters[filterCategory].push(filterValue);
-      }
-      
-      // Reset to page 1 when filters change
-      setCurrentPage(1);
-      
-      return newFilters;
-    });
+    // This function should do nothing or be removed entirely
+    // Let Filter component handle all filter state
+    console.log("Filter changed:", filterCategory, filterValue);
+    // Do not update selectedFilters here - it will be updated via onFiltersChanged
   };
 
-  // Effect to fetch data when filters or pagination changes
+  // Effect to fetch data when filters change - this is now separate from the initialization effect
   useEffect(() => {
-    // Don't trigger a fetch if we're applying initial filters from URL
-    if (initialFilterApplied && Object.keys(selectedFilters).length > 0) {
+    if (initialLoadComplete && filtersApplied) {
       fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
     }
-  }, [selectedFilters, currentPage, initialFilterApplied]);
+  }, [selectedFilters, currentPage, initialLoadComplete, filtersApplied]);
 
   const fetchFilteredInstitutes = async (filters, page, limit) => {
     setLoading(true);
@@ -392,6 +399,14 @@ const SearchPage = () => {
         delete apiFilters.stream;
       }
       
+      // Make sure all filter arrays are properly formatted
+      Object.keys(apiFilters).forEach(key => {
+        // If the value is not already an array, convert it to an array
+        if (!Array.isArray(apiFilters[key])) {
+          apiFilters[key] = [apiFilters[key]];
+        }
+      });
+      
       console.log("Sending filters to API:", apiFilters);
       
       const queryString = `filters=${encodeURIComponent(JSON.stringify(apiFilters))}&page=${page}&limit=${limit}`;
@@ -403,8 +418,7 @@ const SearchPage = () => {
         setFilteredContent(institutes);
         setTotalDocuments(response.data.data.totalDocuments);
         
-        if (institutes && institutes.length > 0) {
-          updateIdMapping(institutes);
+        if (institutes && institutes.length > 0) {updateIdMapping(institutes);
         }
       }
     } catch (error) {
@@ -436,6 +450,13 @@ const SearchPage = () => {
     return filteredContent.slice(startIndex, endIndex);
   };
 
+  const handleFiltersChanged = (filters) => {
+    console.log("Filters changed in Filter component:", filters);
+    setSelectedFilters(filters);
+    setFiltersApplied(true);
+    // No need to call fetchFilteredInstitutes here, the useEffect will handle it
+  };
+
   return (
     <>
       <Promotions location="SEARCH_PAGE" className="h-[320px]"></Promotions>
@@ -445,8 +466,9 @@ const SearchPage = () => {
           <div className="filters w-[25%] hidden lg:block">
             <Filter 
               filterSections={filterSections} 
-              handleFilterChange={handleFilterChange} 
+              handleFilterChange={handleFilterChangeWithoutScroll} 
               selectedFilters={selectedFilters}
+              onFiltersChanged={handleFiltersChanged}
             />
           </div>
 

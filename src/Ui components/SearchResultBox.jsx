@@ -167,11 +167,12 @@ const SearchResultBox = ({ institute, url }) => {
             )}
             <span>{institute.reviews.length} Reviews</span>
             <span className="flex items-center gap-2 text-gray-600">
-              <MapPin size={16} className="text-gray-500" />
-              <span>{institute.state?.name}</span>
-              <span className="mx-1">•</span>
-              <Building size={16} className="text-gray-500" />
-              <span>{institute.organisationType}</span>
+            {institute.state?.name && (
+              <><MapPin size={16} className="text-gray-500" /><span>{institute.state?.name}</span></>
+            )}
+            {institute.organisationType && (
+              <><Building size={16} className="text-gray-500" /><span>{institute.organisationType}</span></>
+            )}
             </span>
           </div>
 

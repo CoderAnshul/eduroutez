@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const Filter = ({ filterSections, handleFilterChange, onFiltersChanged }) => {
+const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFiltersChanged }) => {
   const [openSections, setOpenSections] = useState(
     filterSections.map(() => true)
   );
@@ -9,28 +9,80 @@ const Filter = ({ filterSections, handleFilterChange, onFiltersChanged }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get parameters from URL
-  const getParamFromURL = (param) => {
-    const queryParams = new URLSearchParams(location.search);
-    return param === "stream" 
-      ? queryParams.get(param)?.split(",") || []
-      : queryParams.get(param) || "";
-  };
+  // Create state variables for each filter type
+  const [selectedStreams, setSelectedStreams] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedOrganisationType, setSelectedOrganisationType] = useState("");
+  const [selectedSpecialization, setSelectedSpecialization] = useState("");
+  const [selectedFees, setSelectedFees] = useState("");
+  const [selectedExam, setSelectedExam] = useState("");
+  const [selectedRatings, setSelectedRatings] = useState("");
+  
+  // Initialize local state from selectedFilters prop when it changes
+// In Filter.jsx, modify your useEffect to prevent the loop:
+useEffect(() => {
+  // Don't update if initialized with empty values
+  if (!selectedStreams.length && !selectedCity && !selectedState && 
+      !selectedOrganisationType && !selectedSpecialization && !selectedFees && 
+      !selectedExam && !selectedRatings) {
+    return;
+  }
+  
+  // Create filter object for API
+  const apiFilters = {};
+  if (selectedStreams.length > 0) apiFilters.streams = selectedStreams;
+  if (selectedCity) apiFilters.city = [selectedCity];
+  if (selectedState) apiFilters.state = [selectedState];
+  if (selectedOrganisationType) apiFilters.organisationType = [selectedOrganisationType];
+  if (selectedSpecialization) apiFilters.specialization = [selectedSpecialization];
+  if (selectedFees) apiFilters.Fees = [selectedFees];
+  if (selectedExam) apiFilters.Exam = [selectedExam];
+  if (selectedRatings) apiFilters.Ratings = [selectedRatings];
+  
+  // Update URL without reloading
+  const queryParams = new URLSearchParams();
+  if (selectedStreams.length > 0) queryParams.set("stream", selectedStreams.join(","));
+  if (selectedCity) queryParams.set("city", selectedCity);
+  if (selectedState) queryParams.set("state", selectedState);
+  if (selectedOrganisationType) queryParams.set("organisationType", selectedOrganisationType);
+  if (selectedSpecialization) queryParams.set("specialization", selectedSpecialization);
+  if (selectedFees) queryParams.set("Fees", selectedFees);
+  if (selectedExam) queryParams.set("Exam", selectedExam);
+  if (selectedRatings) queryParams.set("Ratings", selectedRatings);
+  
+  navigate(`?${queryParams.toString()}`, { replace: true });
+  
+  // Add a condition to prevent the feedback loop
+  const currentFilters = JSON.stringify(selectedFilters);
+  const newFilters = JSON.stringify(apiFilters);
+  
+  // Only notify parent if filters actually changed
+  if (onFiltersChanged && currentFilters !== newFilters) {
+    onFiltersChanged(apiFilters);
+  }
+}, [
+  selectedStreams, 
+  selectedCity, 
+  selectedState, 
+  selectedOrganisationType, 
+  selectedSpecialization,
+  selectedFees,
+  selectedExam,
+  selectedRatings,
+  // Add this dependency:
+  selectedFilters
+]);
 
-  const [selectedStreams, setSelectedStreams] = useState(getParamFromURL("stream"));
-  const [selectedCity, setSelectedCity] = useState(getParamFromURL("city"));
-  const [selectedState, setSelectedState] = useState(getParamFromURL("state"));
-
-  // Find all selected values across all filter types
-  const getAllSelectedValues = () => {
-    const allSelected = [...selectedStreams];
-    if (selectedCity) allSelected.push(selectedCity);
-    if (selectedState) allSelected.push(selectedState);
-    return allSelected;
-  };
-
-  // Update URL when any selection changes
+  // Update URL when selections change
   useEffect(() => {
+    // Don't update if initialized with empty values
+    if (!selectedStreams.length && !selectedCity && !selectedState && 
+        !selectedOrganisationType && !selectedSpecialization && !selectedFees && 
+        !selectedExam && !selectedRatings) {
+      return;
+    }
+    
     const queryParams = new URLSearchParams(location.search);
     
     // Handle streams (multi-select)
@@ -40,71 +92,59 @@ const Filter = ({ filterSections, handleFilterChange, onFiltersChanged }) => {
       queryParams.delete("stream");
     }
     
-    // Handle city (single select)
-    if (selectedCity) {
-      queryParams.set("city", selectedCity);
-    } else {
-      queryParams.delete("city");
-    }
+    // Handle other filter types (single-select)
+    const singleFilters = [
+      { name: "city", value: selectedCity },
+      { name: "state", value: selectedState },
+      { name: "organisationType", value: selectedOrganisationType },
+      { name: "specialization", value: selectedSpecialization },
+      { name: "Fees", value: selectedFees },
+      { name: "Exam", value: selectedExam },
+      { name: "Ratings", value: selectedRatings }
+    ];
     
-    // Handle state (single select)
-    if (selectedState) {
-      queryParams.set("state", selectedState);
-    } else {
-      queryParams.delete("state");
-    }
-    
-    navigate(`?${queryParams.toString()}`, { replace: true });
-    
-    // Create API filter object with all selected filters
-    const apiFilters = {};
-    if (selectedStreams.length > 0) apiFilters.streams = selectedStreams;
-    if (selectedCity) apiFilters.city = selectedCity;
-    if (selectedState) apiFilters.state = selectedState;
-    
-    // Pass the complete filters object to parent component
-    if (onFiltersChanged) {
-      onFiltersChanged(apiFilters);
-    }
-  }, [selectedStreams, selectedCity, selectedState, navigate, location.search]);
-
-  // Initialize component by firing handleFilterChange for URL params
-  useEffect(() => {
-    // Find the corresponding section for each parameter
-    filterSections.forEach(section => {
-      const sectionTitle = section.title.toLowerCase();
-      
-      if (sectionTitle === "streams" || sectionTitle === "stream") {
-        selectedStreams.forEach(stream => {
-          if (section.items.includes(stream)) {
-            handleFilterChange(section.title, stream);
-          }
-        });
-      }
-      
-      if (sectionTitle === "cities" || sectionTitle === "city") {
-        if (selectedCity && section.items.includes(selectedCity)) {
-          handleFilterChange(section.title, selectedCity);
-        }
-      }
-      
-      if (sectionTitle === "states" || sectionTitle === "state") {
-        if (selectedState && section.items.includes(selectedState)) {
-          handleFilterChange(section.title, selectedState);
-        }
+    singleFilters.forEach(filter => {
+      if (filter.value) {
+        queryParams.set(filter.name, filter.value);
+      } else {
+        queryParams.delete(filter.name);
       }
     });
     
-    // Also trigger API filters when component initializes
-    const initialApiFilters = {};
-    if (selectedStreams.length > 0) initialApiFilters.streams = selectedStreams;
-    if (selectedCity) initialApiFilters.city = selectedCity;
-    if (selectedState) initialApiFilters.state = selectedState;
+    // Replace URL without reloading
+    navigate(`?${queryParams.toString()}`, { replace: true });
     
-    if (onFiltersChanged && (selectedStreams.length > 0 || selectedCity || selectedState)) {
-      onFiltersChanged(initialApiFilters);
+    // Skip onFiltersChanged call during initial render
+    if (selectedStreams.length || selectedCity || selectedState || 
+        selectedOrganisationType || selectedSpecialization || selectedFees || 
+        selectedExam || selectedRatings) {
+      
+      // Create filter object for API
+      const apiFilters = {};
+      if (selectedStreams.length > 0) apiFilters.streams = selectedStreams;
+      if (selectedCity) apiFilters.city = [selectedCity];
+      if (selectedState) apiFilters.state = [selectedState];
+      if (selectedOrganisationType) apiFilters.organisationType = [selectedOrganisationType];
+      if (selectedSpecialization) apiFilters.specialization = [selectedSpecialization];
+      if (selectedFees) apiFilters.Fees = [selectedFees];
+      if (selectedExam) apiFilters.Exam = [selectedExam];
+      if (selectedRatings) apiFilters.Ratings = [selectedRatings];
+      
+      // Notify parent component about filter changes if callback exists
+      if (onFiltersChanged && Object.keys(apiFilters).length > 0) {
+        onFiltersChanged(apiFilters);
+      }
     }
-  }, []);
+  }, [
+    selectedStreams, 
+    selectedCity, 
+    selectedState, 
+    selectedOrganisationType, 
+    selectedSpecialization,
+    selectedFees,
+    selectedExam,
+    selectedRatings
+  ]);
 
   const toggleSection = (index) => {
     setOpenSections((prev) =>
@@ -128,34 +168,55 @@ const Filter = ({ filterSections, handleFilterChange, onFiltersChanged }) => {
       
       setSelectedStreams(updatedStreams);
     } 
-    // Handle city (single-select)
-    else if (sectionLower === "cities" || sectionLower === "city") {
+    // Handle other filter types (all single-select)
+    else if (sectionLower === "city") {
       setSelectedCity(selectedCity === item ? "" : item);
     } 
-    // Handle state (single-select)
-    else if (sectionLower === "states" || sectionLower === "state") {
+    else if (sectionLower === "state") {
       setSelectedState(selectedState === item ? "" : item);
     }
+    else if (sectionLower === "organisationtype") {
+      setSelectedOrganisationType(selectedOrganisationType === item ? "" : item);
+    }
+    else if (sectionLower === "specialization") {
+      setSelectedSpecialization(selectedSpecialization === item ? "" : item);
+    }
+    else if (sectionLower === "fees") {
+      setSelectedFees(selectedFees === item ? "" : item);
+    }
+    else if (sectionLower === "exam") {
+      setSelectedExam(selectedExam === item ? "" : item);
+    }
+    else if (sectionLower === "ratings") {
+      setSelectedRatings(selectedRatings === item ? "" : item);
+    }
     
-    handleFilterChange(sectionTitle, item);
+    // Call parent component's handleFilterChange
+    if (handleFilterChange) {
+      handleFilterChange(sectionTitle, item);
+    }
   };
 
   return (
     <div className="space-y-2">
       {filterSections.map((section, index) => (
-        <div key={index} className="w-full border rounded-lg">
+        <div
+          key={index}
+          className="border border-gray-300 rounded-lg overflow-hidden"
+        >
           <button
+            className="flex justify-between items-center w-full bg-white p-4 hover:bg-gray-50"
             onClick={() => toggleSection(index)}
-            className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 text-sm font-medium text-gray-700"
           >
-            <span>{section.title}</span>
+            <span className="font-medium capitalize">{section.title}</span>
             <svg
-              className={`h-5 w-5 transform transition-transform ${
-                openSections[index] ? "rotate-180" : ""
+              className={`w-5 h-5 transition-transform ${
+                openSections[index] ? "transform rotate-180" : ""
               }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 strokeLinecap="round"
@@ -179,10 +240,20 @@ const Filter = ({ filterSections, handleFilterChange, onFiltersChanged }) => {
                   
                   if (sectionLower === "streams" || sectionLower === "stream") {
                     isChecked = selectedStreams.includes(item);
-                  } else if (sectionLower === "cities" || sectionLower === "city") {
+                  } else if (sectionLower === "city") {
                     isChecked = selectedCity === item;
-                  } else if (sectionLower === "states" || sectionLower === "state") {
+                  } else if (sectionLower === "state") {
                     isChecked = selectedState === item;
+                  } else if (sectionLower === "organisationtype") {
+                    isChecked = selectedOrganisationType === item;
+                  } else if (sectionLower === "specialization") {
+                    isChecked = selectedSpecialization === item;
+                  } else if (sectionLower === "fees") {
+                    isChecked = selectedFees === item;
+                  } else if (sectionLower === "exam") {
+                    isChecked = selectedExam === item;
+                  } else if (sectionLower === "ratings") {
+                    isChecked = selectedRatings === item;
                   }
                   
                   return (
