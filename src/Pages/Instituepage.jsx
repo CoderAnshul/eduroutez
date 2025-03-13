@@ -32,7 +32,7 @@ import axiosInstance from "../ApiFunctions/axios";
 
 // Base tabs array - we'll filter this based on available data
 const allPossibleTabs = [
-  { key: "College Info", dataKey: "collegeInfo" },
+  { key: "College Info", dataKey: "about" },
   { key: "Courses", dataKey: "courses" },
   { key: "Admissions", dataKey: "admissionInfo" },
   { key: "Placements", dataKey: "placementInfo" },
