@@ -16,8 +16,8 @@ const useCategories = () => {
         ]);
         console.log('coursesResponse',coursesResponse)
 
-        // Transform API data to match required format
-        const collegeItems = collegeResponse.data?.data?.result?.map((item, index) => ({
+        // Transform API data to match required format and filter out inactive items
+        const collegeItems = collegeResponse.data?.data?.result?.filter(item => item.status == true).map((item, index) => ({
           id: index + 1,
           name: item.name,
         }));
