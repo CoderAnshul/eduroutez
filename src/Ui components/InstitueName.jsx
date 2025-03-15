@@ -168,18 +168,25 @@ const InstitueName = ({ instituteData }) => {
 
         <div className="text-container flex justify-between items-center flex-wrap gap-2 mt-1">
           <div className="flex mt-2 gap-3 whitespace-nowrap">
-            <p className="flex items-center text-sm font-semibold opacity-75">
-              <img className="h-3" src={location} alt="location" />
-              {instituteData?.data?.city?.name}
-            </p>
-            <p className="text-sm font-semibold opacity-75 flex items-center">
-              <Building size={16} className="text-gray-500 mr-2" />
-              {instituteData?.data?.organisationType}
-            </p>
+          {instituteData?.data?.city?.name && (
+  <p className="flex items-center text-sm font-semibold opacity-75">
+    <img className="h-3" src={location} alt="location" />
+    {instituteData.data.city.name}
+  </p>
+)}
 
-            <p className="text-sm font-semibold opacity-75">
-              ● {instituteData?.data?.establishedYear}
-            </p>
+{instituteData?.data?.organisationType && (
+  <p className="text-sm font-semibold opacity-75 flex items-center">
+    <Building size={16} className="text-gray-500 mr-2" />
+    {instituteData.data.organisationType}
+  </p>
+)}
+
+{instituteData?.data?.establishedYear && (
+  <p className="text-sm font-semibold opacity-75">
+    ● {instituteData.data.establishedYear}
+  </p>
+)}
           </div>
 
           <div className="flex gap-3">
