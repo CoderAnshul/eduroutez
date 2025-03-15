@@ -239,7 +239,7 @@ const CounselorListPage = () => {
             </div>
             <Promotions
               location="COUNSELING_PAGE_SIDEBAR"
-              className="h-[250px]"
+              className="h-[250px] w-fit "
             />
           </div>
 
