@@ -37,6 +37,9 @@ const Careerspage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [allCareerData, setAllCareerData] = useState([]);
   const [careerIdMap, setCareerIdMap] = useState({});
+  const [isLoadingAllData, setIsLoadingAllData] = useState(false);
+  const [displayedItems, setDisplayedItems] = useState(6); // Number of items to show initially
+  const itemsPerPage = 6; // Number of items to load each time "Load More" is clicked
 
   // Initialize careerIdMap from localStorage
   useEffect(() => {
@@ -51,28 +54,59 @@ const Careerspage = () => {
     }
   }, []);
 
+  // Fetch all career data for the first page
   const {
-    data: careerData,
-    isLoading,
+    data: initialCareerData,
+    isLoading: isLoadingInitial,
     isError,
     error,
-    refetch,
-  } = useQuery(["careers", page], () => careers(page), { enabled: true });
+  } = useQuery(["careers", 1], () => careers(1), { enabled: true });
 
-  const handleShareClick = (e, blog) => {
-    e.preventDefault(); // Prevent the Link navigation
-    e.stopPropagation(); // Stop event from bubbling up
-    // Any additional share handling logic can go here
-  };
-
+  // Effect to load all pages of data once we know how many pages there are
   useEffect(() => {
-    if (careerData) {
-      const newCareerData = careerData.data.result || [];
-      setTotalPages(careerData.data.totalPages);
+    if (initialCareerData && initialCareerData.data.totalPages > 0) {
+      setTotalPages(initialCareerData.data.totalPages);
       
-      // Update careerIdMap with new career data
+      // Add first page data to allCareerData
+      const firstPageData = initialCareerData.data.result || [];
+      setAllCareerData(firstPageData);
+      
+      // Update careerIdMap with first page data
       const updatedCareerIdMap = { ...careerIdMap };
-      newCareerData.forEach((career) => {
+      firstPageData.forEach((career) => {
+        if (career.slug) {
+          updatedCareerIdMap[career.slug] = career._id;
+        }
+      });
+      setCareerIdMap(updatedCareerIdMap);
+      localStorage.setItem("careerIdMap", JSON.stringify(updatedCareerIdMap));
+      
+      // If there are more pages, fetch them all
+      if (initialCareerData.data.totalPages > 1) {
+        fetchAllPages(initialCareerData.data.totalPages);
+      }
+    }
+  }, [initialCareerData]);
+
+  // Function to fetch all pages of career data
+  const fetchAllPages = async (totalPageCount) => {
+    setIsLoadingAllData(true);
+    
+    try {
+      // Start from page 2 since we already have page 1
+      const pagePromises = [];
+      for (let pageNum = 2; pageNum <= totalPageCount; pageNum++) {
+        pagePromises.push(careers(pageNum));
+      }
+      
+      const responses = await Promise.all(pagePromises);
+      
+      // Extract data and update state
+      const newData = responses.flatMap(response => response.data.result || []);
+      
+      // Update careerIdMap with all new data
+      const updatedCareerIdMap = { ...careerIdMap };
+      newData.forEach((career) => {
         if (career.slug) {
           updatedCareerIdMap[career.slug] = career._id;
         }
@@ -82,10 +116,20 @@ const Careerspage = () => {
       setCareerIdMap(updatedCareerIdMap);
       localStorage.setItem("careerIdMap", JSON.stringify(updatedCareerIdMap));
       
-      // Update career data
-      setAllCareerData((prevData) => [...prevData, ...newCareerData]);
+      // Update career data (append new data to existing first page data)
+      setAllCareerData(prevData => [...prevData, ...newData]);
+    } catch (error) {
+      console.error("Error fetching all career data:", error);
+    } finally {
+      setIsLoadingAllData(false);
     }
-  }, [careerData]);
+  };
+
+  const handleShareClick = (e, blog) => {
+    e.preventDefault(); // Prevent the Link navigation
+    e.stopPropagation(); // Stop event from bubbling up
+    // Any additional share handling logic can go here
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -122,7 +166,10 @@ const Careerspage = () => {
     const loadImages = async () => {
       const filteredData = getFilteredData();
       if (filteredData) {
-        const imagePromises = filteredData.map(async (career) => {
+        // Only load images for currently displayed items to improve performance
+        const visibleItems = filteredData.slice(0, displayedItems);
+        
+        const imagePromises = visibleItems.map(async (career) => {
           if (!imageUrls[career.thumbnail]) {
             const url = await fetchImage(career.thumbnail);
             return { [career.thumbnail]: url };
@@ -146,7 +193,7 @@ const Careerspage = () => {
         if (url) URL.revokeObjectURL(url);
       });
     };
-  }, [allCareerData, searchTerm, selectedCategories]);
+  }, [allCareerData, searchTerm, selectedCategories, displayedItems]);
 
   const handleCategoryChange = (category) => {
     setSelectedCategories((prev) =>
@@ -154,23 +201,28 @@ const Careerspage = () => {
         ? prev.filter((cat) => cat !== category)
         : [...prev, category]
     );
+    // Reset displayed items when filtering changes
+    setDisplayedItems(itemsPerPage);
   };
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
+    // Reset displayed items when search changes
+    setDisplayedItems(itemsPerPage);
   };
 
   const loadMore = () => {
-    if (page < totalPages) {
-      setPage((prevPage) => prevPage + 1);
-      refetch();
-    }
+    setDisplayedItems(prev => prev + itemsPerPage);
   };
 
-  if (isLoading && page === 1) return <p>Loading...</p>;
-  if (isError) return <p>Error: {error.message}</p>;
+  if ((isLoadingInitial && !allCareerData.length) || (isLoadingAllData && !allCareerData.length)) {
+    return <p className="text-center py-16">Loading careers...</p>;
+  }
+  
+  if (isError) return <p className="text-center py-16">Error: {error.message}</p>;
 
   const filteredData = getFilteredData();
+  const visibleData = filteredData.slice(0, displayedItems);
 
   return (
     <>
@@ -203,6 +255,15 @@ const Careerspage = () => {
             X
           </button>
           <h3 className="text-lg font-semibold mb-6">Filter by Category</h3>
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full p-2 border-2 border-gray-300 rounded-lg"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
           <div className="space-y-4">
             {categories.map((category) => (
               <label
@@ -259,89 +320,101 @@ const Careerspage = () => {
               </label>
             ))}
           </div>
+          {isLoadingAllData && (
+            <p className="mt-4 text-blue-600">Loading all career data...</p>
+          )}
+          <p className="mt-4 text-gray-600">
+            Found {filteredData.length} careers
+          </p>
         </div>
 
         <div className="w-full md:w-3/4 px-6">
-          <div className="flex flex-wrap justify-start gap-6">
-            {filteredData.map((career) => (
-              <Link
-                key={career._id}
-                to={`/detailpage/${career.slug || career._id}`}
-                className="group bg-white min-h-[440px] rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer
-                              relative  max-w-sm flex-1 flex flex-col justify-between min-w-[300px] bg-white/50 rounded-lg shadow-lg overflow-hidden"
-              >
-                <div>
-                  <div className="relative group h-48">
-                    {career.views && (
-                      <div className="absolute  hidden top-2 right-2 group-hover:flex items-center gap-2 text-gray-600">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="white"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        <span className="text-white">{career.views}</span>
-                      </div>
-                    )}
-                    {!imageUrls[career.thumbnail] ? (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                        <p>Loading image...</p>
-                      </div>
-                    ) : (
-                      <img
-                        src={imageUrls[career.thumbnail]}
-                        alt={career.title}
-                        className="w-full h-full rounded-xl object-cover"
+          {isLoadingAllData && !visibleData.length ? (
+            <p className="text-center py-8">Loading all career data...</p>
+          ) : visibleData.length === 0 ? (
+            <p className="text-center py-8">No careers found matching your criteria.</p>
+          ) : (
+            <div className="flex flex-wrap justify-start gap-6">
+              {visibleData.map((career) => (
+                <Link
+                  key={career._id}
+                  to={`/detailpage/${career.slug || career._id}`}
+                  className="group bg-white min-h-[440px] rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer
+                                relative  max-w-sm flex-1 flex flex-col justify-between min-w-[300px] bg-white/50 rounded-lg shadow-lg overflow-hidden"
+                >
+                  <div>
+                    <div className="relative group h-48">
+                      {career.views && (
+                        <div className="absolute  hidden top-2 right-2 group-hover:flex items-center gap-2 text-gray-600">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                          <span className="text-white">{career.views}</span>
+                        </div>
+                      )}
+                      {!imageUrls[career.thumbnail] ? (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                          <p>Loading image...</p>
+                        </div>
+                      ) : (
+                        <img
+                          src={imageUrls[career.thumbnail]}
+                          alt={career.title}
+                          className="w-full h-full rounded-xl object-cover"
+                        />
+                      )}
+                    </div>
+
+                    <div className="px-4 mt-4 ">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {career.title}
+                      </h3>
+                      <p
+                        className="text-sm text-gray-600 mt-2"
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            career.description.split(" ").slice(0, 25).join(" ") +
+                            (career.description.split(" ").length > 25
+                              ? "..."
+                              : ""),
+                        }}
                       />
-                    )}
+                    </div>
                   </div>
-
-                  <div className="px-4 mt-4 ">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      {career.title}
-                    </h3>
-                    <p
-                      className="text-sm text-gray-600 mt-2"
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          career.description.split(" ").slice(0, 25).join(" ") +
-                          (career.description.split(" ").length > 25
-                            ? "..."
-                            : ""),
-                      }}
-                    />
-                  </div>
-                </div>
                
-                <div className="flex justify-between p-4">
-                  <div onClick={(e) => handleShareClick(e, career)}>
-                    <SocialShare
-                      title={career.title}
-                      url={`${window.location.origin}/detailpage/${
-                        career.slug || career._id
-                      }`}
-                      contentType="career"
-                    />
-                  </div>
+                  <div className="flex justify-between p-4">
+                    <div onClick={(e) => handleShareClick(e, career)}>
+                      <SocialShare
+                        title={career.title}
+                        url={`${window.location.origin}/detailpage/${
+                          career.slug || career._id
+                        }`}
+                        contentType="career"
+                      />
+                    </div>
 
-                  <div className="inline-block">
-                    <CustomButton
-                      text="View More"
-                      to={`/detailpage/${career.slug || career._id}`}
-                    />
+                    <div className="inline-block">
+                      <CustomButton
+                        text="View More"
+                        to={`/detailpage/${career.slug || career._id}`}
+                      />
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
           <div className="flex mt-10 justify-center">
             {page < totalPages && filteredData.length > 0 && (
               <button
