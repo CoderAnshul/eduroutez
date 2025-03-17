@@ -503,18 +503,20 @@ const Signup = () => {
             />
           </div>
 
-          {/* Referral Code Field */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Referral Code</label>
-            <input
-              type="text"
-              id="referal_Code"
-              placeholder="Enter your Referral Code"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.referal_Code}
-              onChange={handleChange}
-            />
-          </div>
+          {role === 'student' && (
+  <div className="mb-4">
+    <label className="block text-sm font-medium mb-1">Referral Code</label>
+    <input
+      type="text"
+      id="referal_Code"
+      placeholder="Enter your Referral Code"
+      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+      value={formData.referal_Code}
+      onChange={handleChange}
+    />
+  </div>
+)}
+
 
           <button
             type="button"

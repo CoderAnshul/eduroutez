@@ -105,7 +105,7 @@ const BlogComponent = () => {
           content.slice(0, 3).map((blog, index) => (
             <div key={index} className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl relative">
               {/* Image and main content wrapped in Link */}
-              <Link to={`/blogdetailpage/${blog.slug}`} className="block">
+              <Link to={`/blogdetailpage/${blog.slug}`} className="block text-black">
                 {/* Image */}
                 <div className="h-56 min-h-56 max-h-56 w-full overflow-hidden">
                   <img
