@@ -28,6 +28,7 @@ import Payout from './Pages/Payout';
 import NewsPage from './Pages/NewsPage';
 import TrendingStreams from './Components/trendingStreampage';
 import TrendingCourses from './Pages/TrendingCoursespage';
+import TermsAndConditions from './Pages/TermsAndConditions ';
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -40,6 +41,7 @@ const Aboutus = React.lazy(() => import('./Pages/Aboutus'));
 const Counselingpage = React.lazy(() => import('./Pages/Counselingpage'));
 const QuestionandAnswer = React.lazy(() => import('./Pages/QuestionandAnswer'));
 const Careerspage = React.lazy(() => import('./Pages/Careerspage'));
+const Policy = React.lazy(() => import('./Pages/Policy'));
 const Detailpage = React.lazy(() => import('./Pages/Detailpage'));
 const BlogDetailPage= React.lazy(() => import('./Pages/BlogDetailPage'));
 const Writereview = React.lazy(() => import('./Pages/Writereview'));
@@ -85,6 +87,8 @@ const App = () => {
           <Route path="/detailpage/:slug" element={<Detailpage />} />
 
           <Route path="/writereview" element={<Writereview />} />
+          <Route path="/policy" element={<Policy/>} />
+          <Route path="/terms-&-conditions" element={<TermsAndConditions/>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<Forgotpassword />} />
