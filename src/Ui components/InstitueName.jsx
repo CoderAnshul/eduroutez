@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import instituteLogo from "../assets/Images/instituteLogo.png";
 import location from "../assets/Images/location.png";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import axiosInstance from "../ApiFunctions/axios";
@@ -120,12 +119,15 @@ const InstitueName = ({ instituteData }) => {
         level: formData.level
       };
 
+      console.log("Query payload:", queryPayload);  
+
       await axiosInstance.post(`${baseURL}/query`, queryPayload, {
         headers: {
           "x-access-token": localStorage.getItem("accessToken"),
           "x-refresh-token": localStorage.getItem("refreshToken"),
         },
       });
+      
 
       toast.success("Application submitted successfully!");
       setIsPopupVisible(false);
@@ -437,7 +439,6 @@ const InstitueName = ({ instituteData }) => {
               </div>
               
               {/* Submit button */}
-            </form>
               <div className="mt-8 flex justify-end">
                 <button
                   type="submit"
@@ -450,6 +451,7 @@ const InstitueName = ({ instituteData }) => {
                   Submit Application
                 </button>
               </div>
+            </form>
           </div>
         </div>
       )}

@@ -194,12 +194,12 @@ const Navbar = () => {
                     >
                       Dashboard
                     </Link>
-                    <button
+                    {/* <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
                     >
                       Logout
-                    </button>
+                    </button> */}
                   </div>
                 )}
               </div>
