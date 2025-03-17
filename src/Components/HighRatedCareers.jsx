@@ -145,7 +145,7 @@ const HighRatedCareers = () => {
                 </h3>
 
                 <p
-                  className="text-sm mt-2"
+                  className="text-sm text-black mt-2"
                   dangerouslySetInnerHTML={{
                     __html:
                       box?.description?.slice(0, 80) + "..." ||
