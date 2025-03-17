@@ -459,7 +459,8 @@ const SearchPage = () => {
 
   return (
     <>
-      <Promotions location="SEARCH_PAGE" className="h-[320px]"></Promotions>
+      <Promotions location="SEARCH_PAGE" className="!h-fit"></Promotions>
+      {/* <Promotions location="SEARCH_PAGE" className="!h-[320px]"></Promotions> */}
 
       <div className="px-[4vw] pb-[2vw] max-sm:overflow-x-hidden flex flex-col items-start">
         <div className="flex gap-4 w-full mt-6">
@@ -482,14 +483,16 @@ const SearchPage = () => {
                 <div className="text-sm text-gray-700 mb-2">
                   <span className="font-semibold text-red-500">{totalDocuments || "0"}</span> Institutes Found
                 </div>
-                <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}>
-                  <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px] max-sm:w-[85%]"></Promotions>
+                {/* <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}> */}
+                <div style={{ width: 'fit-content'}}>
+                  <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px] w-full max-sm:w-[100%] !p-0"></Promotions>
                 </div>                
                 {getPaginatedContent().map((institute, index) => (
                   <SearchResultBox 
                     key={index} 
                     institute={institute} 
-                    url={getInstituteUrl(institute)}
+                    url={getInstituteUrl(institute)} 
+                    className='!mt-4'
                   />
                 ))}
                 <div className="pagination">

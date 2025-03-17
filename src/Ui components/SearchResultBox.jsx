@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
-const SearchResultBox = ({ institute, url }) => {
+const SearchResultBox = ({ institute, url , className="" }) => {
   console.log('Institute:', institute);
   const userId = localStorage.getItem('userId');
 
@@ -119,7 +119,7 @@ const SearchResultBox = ({ institute, url }) => {
   };
 
   return (
-    <div className="border rounded-lg shadow-md p-4 flex flex-col space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2">
+    <div className={`border rounded-lg shadow-md p-4 flex flex-col space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2 ${className}`}>
       {/* Left Section - Image */}
       <div className="flex justify-between flex-col gap-3"></div>
       <div className="flex justify-between flex-col md:flex-row gap-3">

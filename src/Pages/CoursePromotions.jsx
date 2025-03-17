@@ -66,22 +66,24 @@ const Promotions = ({ location , className }) => {
   }
 
   return (
-    <div className={`w-full overflow-hidden ${className}`}>
-      <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+    <div className={`w-full mt-4   ${className}`}>
+      <div className={`w-full  ${className}`}>
         <div 
-          className={`relative overflow-hidden rounded-lg cursor-pointer group ${className}`}
+          className={`relative rounded-lg cursor-pointer group ${className}`}
           onClick={() => {
             if (randomPromo.link) {
               window.location.href = randomPromo.link;
             }
           }}
         >
-          <div className={`relative aspect-video overflow-hidden w-full ${className}`}>
+          <div className={`relative  w-full ${className}`}>
+          {/* <div className={`relative aspect-video w-full ${className}`}> */}
             {randomPromo.image && (
               <img
                 src={`${imageUrl}/${randomPromo.image}`}
                 alt={randomPromo.title}
-                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-contain transform transition-transform duration-500"
+                // className="w-full h-full object-contain transform group-hover:scale-95 transition-transform duration-500"
               />
             )}
             <div className=" inset-0 bg-gradient-to-t from-black/60 to-transparent" />

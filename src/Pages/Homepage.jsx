@@ -44,7 +44,7 @@ const Homepage = () => {
       <Counselling />
       </div>
       {/* Using standard Tailwind classes for width and height instead of arbitrary values */}
-      <div className="w-full max-w-4xl h-fit mx-auto">
+      <div className="w-full max-w-fit h-fit mx-auto">
         <Promotions location="HOME_PAGE" className="h-[90px]" />
       </div>
       <div className="p-4 flex flex-col items-center">
