@@ -238,19 +238,19 @@ const TrendingStreams = () => {
             <div className="flex justify-between items-center mt-8">
             <button
     onClick={() => setPage((old) => Math.max(old - 1, 1))}
-    disabled={page === 1}
+    disabled={page <= 1}
     className="bg-red-600 text-white py-2 px-4 rounded-l-lg hover:bg-red-700 disabled:opacity-50"
 >
     Previous
 </button>
 
 <span className="bg-gray-100 text-gray-800 py-2 px-4 font-medium">
-    Page {page}
+    Page {page} of {data?.data?.totalPages || 1}
 </span>
 
 <button
-    onClick={() => setPage((old) => (!data || !data.data || data.data.result.length < 10 ? old : old + 1))}
-    disabled={!data || !data.data || data.data.result.length < 10}
+    onClick={() => setPage((old) => (old < data?.data?.totalPages ? old + 1 : old))}
+    disabled={!data || page >= data?.data?.totalPages}
     className="bg-red-600 text-white py-2 px-4 rounded-r-lg hover:bg-red-700 disabled:opacity-50"
 >
     Next
