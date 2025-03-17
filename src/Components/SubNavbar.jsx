@@ -872,7 +872,7 @@ const SubNavbar = ({ categories }) => {
 
   const renderRegularContent = (category) => (
     <div className="flex ">
-      <div className="w-[440px] bg-red-100 overflow-y-auto">
+      <div className="w-[440px]  overflow-y-auto">
         <ul className="min-w-40 whitespace-nowrap md:w-fit ml-0 mb-0 pb-0 space-y-0">
           {category?.sidebarItems?.map((item) => (
             <li

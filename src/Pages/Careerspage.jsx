@@ -394,6 +394,14 @@ const Careerspage = () => {
                   </div>
                
                   <div className="flex justify-between p-4">
+                    
+
+                    <div className="inline-block">
+                      <CustomButton
+                        text="View More"
+                        to={`/detailpage/${career.slug || career._id}`}
+                      />
+                    </div>
                     <div onClick={(e) => handleShareClick(e, career)}>
                       <SocialShare
                         title={career.title}
@@ -401,13 +409,6 @@ const Careerspage = () => {
                           career.slug || career._id
                         }`}
                         contentType="career"
-                      />
-                    </div>
-
-                    <div className="inline-block">
-                      <CustomButton
-                        text="View More"
-                        to={`/detailpage/${career.slug || career._id}`}
                       />
                     </div>
                   </div>

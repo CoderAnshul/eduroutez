@@ -272,6 +272,7 @@ const BlogDetailPage = () => {
                   title={data.title}
                   url={window.location.href}
                   contentType="blog"
+                  className="top-10"
                 />
               </div>
 

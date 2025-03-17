@@ -40,7 +40,13 @@ html {
 
 ol {
   padding-left: 25px;
+  list-style:decimal;
 }
+ol[type="A"] { list-style-type: upper-alpha; }
+ol[type="a"] { list-style-type: lower-alpha; }
+ol[type="I"] { list-style-type: upper-roman; }
+ol[type="i"] { list-style-type: lower-roman; }
+ol[type="1"] { list-style-type: decimal; }
 .is-sticky {
   position: sticky;
   top: 64px; /* Same as 16 in tailwind's top-16 */
