@@ -25,7 +25,7 @@ const ProsandCons = ({ course }) => {
         {course?.cons && (
           <div className="flex-1 bg-red-100 min-w-[300px] rounded-lg border-red-500 p-4">
             <div className="flex items-center text-red-500 mb-2">
-              <img className='h-4' src={dislikeIcon} alt="Dislikes" />
+              <img className='h-4 mb-[-1em]' src={dislikeIcon} alt="Dislikes" />
               <h3 className="ml-2 font-bold">Dislikes</h3>
             </div>
             <ul className="list-disc pl-5 text-sm text-gray-700">
@@ -40,7 +40,7 @@ const ProsandCons = ({ course }) => {
         {course?.pros && (
           <div className="flex-1 bg-green-100 min-w-[300px] rounded-xl border-green-500 p-4">
             <div className="flex items-center text-green-500 mb-2">
-              <img className='h-4' src={prosIcon} alt="Likes" />
+              <img className='h-4 mb-[-1em]' src={prosIcon} alt="Likes" />
               <h3 className="ml-2 font-bold">Likes</h3>
             </div>
             <ul className="list-disc pl-5 text-sm text-gray-700">
