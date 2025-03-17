@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from 'react-query';
-import { Send, Loader2, MessageCircle, Clock, Tag, School, User } from 'lucide-react';
+import { Send, Loader2, MessageCircle, Clock, Tag, School, User, ArrowUp, ArrowDown } from 'lucide-react';
 import axiosInstance from '../ApiFunctions/axios';
 import { toast, ToastContainer } from "react-toastify";
 import Promotions from './CoursePromotions';
@@ -71,6 +71,7 @@ const CombinedQuestionsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilters, setActiveFilters] = useState([]);
+  const [sortOrder, setSortOrder] = useState('desc'); // Default to newest first
 
   const grades = ['8th', '9th', '10th', '11th', '12th'];
   const labels = ['Courses', 'Career', 'Institute', 'Placement', 'Admission'];
@@ -78,15 +79,27 @@ const CombinedQuestionsPage = () => {
   const userEmail = localStorage.getItem('email') || 'user@example.com';
 
   const { data: questionsData, isLoading, error, refetch } = useQuery({
-    queryKey: ['questions', currentPage, searchQuery, activeFilters],
+    queryKey: ['questions', currentPage, searchQuery, activeFilters, sortOrder],
     queryFn: async () => {
+      // Create filters object in the requested format
+      let queryParams = {
+        page: currentPage,
+        search: searchQuery,
+        sort: JSON.stringify({ createdAt: sortOrder }), // Add sort parameter
+        searchFields: JSON.stringify({ question: searchQuery }) // Add searchFields parameter
+      };
+      // Add filters in the JSON format if there are active filters
+      if (activeFilters.length > 0) {
+        // Create the filters object with label containing the pipe-separated categories
+        queryParams.filters = JSON.stringify({
+          label: [activeFilters.join('|')]
+        });
+      }
+      
       const response = await axiosInstance.get(`${apiUrl}/question-answers`, {
-        params: {
-          page: currentPage,
-          search: searchQuery,
-          categories: activeFilters.join(',')
-        },
+        params: queryParams
       });
+      
       return response.data.data;
     },
   });
@@ -137,6 +150,11 @@ const CombinedQuestionsPage = () => {
   const handleFilterChange = (categories) => {
     setActiveFilters(categories);
     setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    setCurrentPage(1); // Reset to first page when sort order changes
   };
 
   const formatDate = (dateString) => {
@@ -266,15 +284,33 @@ const CombinedQuestionsPage = () => {
 
         {/* Right Column - Questions List */}
         <div className="lg:w-3/4">
-          {/* Search Bar (Sticky) */}
+          {/* Search Bar and Sort Controls (Sticky) */}
           <div className="sticky top-16 z-20 bg-white pb-4">
-            <input
-              type="text"
-              placeholder="Search questions..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            />
+            <div className="flex items-center gap-4">
+              <input
+                type="text"
+                placeholder="Search questions..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              />
+              <button 
+                onClick={toggleSortOrder}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              >
+                {sortOrder === 'desc' ? (
+                  <>
+                    <ArrowDown className="w-4 h-4" />
+                    Newest First
+                  </>
+                ) : (
+                  <>
+                    <ArrowUp className="w-4 h-4" />
+                    Oldest First
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Questions List (Scrollable) */}
@@ -342,15 +378,15 @@ const CombinedQuestionsPage = () => {
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50"
+                    className="px-4 py-2 bg-gray-300 text-
+                  white rounded-lg hover:bg-gray-400 transition-colors"
                   >
                     Previous
                   </button>
-                  <span>Page {currentPage} of {questionsData?.totalPages || 1}</span>
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === questionsData?.totalPages}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50"
+                    disabled={questionsData?.hasNextPage === false}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
                     Next
                   </button>
@@ -362,6 +398,6 @@ const CombinedQuestionsPage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default CombinedQuestionsPage;
