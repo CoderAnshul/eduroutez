@@ -412,10 +412,10 @@ const Coursesinfopage = () => {
                       </>
                     )}
                   </p>
-                  <p>
+                  {/* <p>
                     <strong>Cost:</strong>{" "}
                     {content.isCourseFree === "free" ? "Free" : "Paid"}
-                  </p>
+                  </p> */}
                   <p>
                     <strong>Category:</strong>{" "}
                     {content.category?.title || "Not specified"}

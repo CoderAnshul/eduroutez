@@ -251,11 +251,11 @@ const Footer = () => {
           <div className="flex flex-wrap items-center justify-center text-center gap-x-4 gap-y-2 text-xs text-gray-400">
             <span>&copy; {new Date().getFullYear()} Eduroutez. All rights reserved.</span>
             <span className="hidden sm:inline">|</span>
-            <Link to="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link>
+            <Link to="/terms-&-conditions" className="hover:text-white transition-colors">Terms & Conditions</Link>
             <span className="hidden sm:inline">|</span>
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <span className="hidden sm:inline">|</span>
-            <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
+            <Link to="/policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            {/* <span className="hidden sm:inline">|</span> */}
+            {/* <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link> */}
           </div>
         </div>
       </div>
