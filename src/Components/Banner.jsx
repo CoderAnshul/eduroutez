@@ -3,12 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { setInput } from '../config/inputSlice';
 import axios from 'axios';
-import mainBanner from '../assets/Images/mainBanner.jpg';
-import banner3 from '../assets/Images/pageBanner.png';
-import banner2 from '../assets/Images/img3.png';
+import Promotions from '../Pages/CoursePromotions'; // Import the Promotions component
 
 const Banner = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [inputField, setInputField] = useState("");
   const [searchType, setSearchType] = useState("course");
   const [suggestions, setSuggestions] = useState([]);
@@ -17,21 +14,6 @@ const Banner = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const baseURL = import.meta.env.VITE_BASE_URL;
-
-  const banners = [
-    { id: 1, imageUrl: mainBanner },
-    { id: 2, imageUrl: banner3 },
-    { id: 3, imageUrl: banner2 }
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === banners.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Fetch suggestions based on input
   useEffect(() => {
@@ -158,21 +140,8 @@ const Banner = () => {
 
   return (
     <div className="h-[480px] w-full relative">
-      <div className="h-full w-full absolute top-0 left-0 z-0">
-        {banners.map((banner, index) => (
-          <div 
-            key={banner.id} 
-            className={`h-full w-full absolute top-0 left-0 transition-opacity duration-1000 ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            }`} 
-            style={{ 
-              backgroundImage: `url(${banner.imageUrl})`, 
-              backgroundSize: "cover", 
-              backgroundPosition: "center" 
-            }}
-          />
-        ))}
-      </div>
+      {/* Dynamic Promotions component instead of static banners */}
+        <Promotions location="HOME_MAIN_PAGE" />
 
       <div className="h-full w-full bg-[#00000049] p-2 absolute top-0 overflow-hidden z-10 flex flex-col items-center justify-center">
         <h1 className="text-4xl text-white text-center font-semibold mb-5">

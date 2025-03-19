@@ -19,7 +19,7 @@ const fetchPromotions = async () => {
   return response.data;
 };
 
-const Promotions = ({ location , className }) => {
+const Promotions = ({ location, className }) => {
   const [randomPromo, setRandomPromo] = useState(null);
 
   const { data: promotionsData, isLoading, isError } = useQuery(
@@ -44,6 +44,31 @@ const Promotions = ({ location , className }) => {
     }
   }, [promotionsData, location]);
 
+  // Fix the handler to properly handle the link redirect
+  const handlePromoClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (randomPromo && randomPromo.link) {
+      // Check if link is a valid URL
+      let url = randomPromo.link;
+      
+      // Add http:// if it doesn't have a protocol
+      if (!/^https?:\/\//i.test(url)) {
+        url = 'https://' + url;
+      }
+      
+      try {
+        // Open in a new tab
+        window.open(url, '_blank');
+      } catch (error) {
+        console.error('Error opening link:', error);
+        // Fallback to direct navigation if window.open fails
+        window.location.href = url;
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="w-full">
@@ -65,46 +90,76 @@ const Promotions = ({ location , className }) => {
     return null;
   }
 
-  return (
-    <div className={`w-full mt-4   ${className}`}>
-      <div className={`w-full  ${className}`}>
-        <div 
-          className={`relative rounded-lg cursor-pointer group ${className}`}
-          onClick={() => {
-            if (randomPromo.link) {
-              window.location.href = randomPromo.link;
-            }
-          }}
-        >
-          <div className={`relative  w-full ${className}`}>
-          {/* <div className={`relative aspect-video w-full ${className}`}> */}
-            {randomPromo.image && (
-              <img
-                src={`${imageUrl}/${randomPromo.image}`}
-                alt={randomPromo.title}
-                className="w-full h-full object-contain transform transition-transform duration-500"
-                // className="w-full h-full object-contain transform group-hover:scale-95 transition-transform duration-500"
-              />
-            )}
-            <div className=" inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          </div>
+  // Determine if we should show the banner as clickable
+  const isClickable = Boolean(randomPromo.link);
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-            {/* <h3 className="text-2xl font-bold mb-2">
-              {randomPromo.title}
-            </h3> */}
-            {randomPromo.description && (
-              <p className="text-sm text-white/90 mb-2">
-                {randomPromo.description}
-              </p>
-            )}
-            {randomPromo.link && (
+  return (
+    <div className={`w-full mt-4 ${className || ''}`}>
+      <div className={`w-full ${className || ''}`}>
+        {isClickable ? (
+          <a 
+            href={randomPromo.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`relative rounded-lg block cursor-pointer hover:opacity-95 ${className || ''}`}
+            onClick={handlePromoClick}
+          >
+            <div className={`relative w-full`}>
+              {randomPromo.image && (
+                <img
+                  src={`${imageUrl}/${randomPromo.image}`}
+                  alt={randomPromo.title || 'Promotion'}
+                  className="w-full h-full object-contain rounded-lg"
+                />
+              )}
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg" />
+            </div>
+
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+              {randomPromo.title && (
+                <h3 className="text-2xl font-bold mb-2">
+                  {randomPromo.title}
+                </h3>
+              )}
+              {randomPromo.description && (
+                <p className="text-sm text-white/90 mb-2">
+                  {randomPromo.description}
+                </p>
+              )}
               <p className="text-sm text-white/90 underline hover:text-white">
                 Learn more
               </p>
-            )}
+            </div>
+          </a>
+        ) : (
+          <div className={`relative rounded-lg ${className || ''}`}>
+            <div className={`relative w-full`}>
+              {randomPromo.image && (
+                <img
+                  src={`${imageUrl}/${randomPromo.image}`}
+                  alt={randomPromo.title || 'Promotion'}
+                  className="w-full h-full object-contain rounded-lg"
+                />
+              )}
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg" />
+            </div>
+
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+              {randomPromo.title && (
+                <h3 className="text-2xl font-bold mb-2">
+                  {randomPromo.title}
+                </h3>
+              )}
+              {randomPromo.description && (
+                <p className="text-sm text-white/90 mb-2">
+                  {randomPromo.description}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

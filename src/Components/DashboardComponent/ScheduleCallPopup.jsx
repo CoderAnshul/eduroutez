@@ -132,11 +132,23 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
               }),
             });
 
+            const bookingData = await bookingResponse.json();
+            
             if (bookingResponse.ok) {
+              console.log('Booking successful:', bookingData);
+              // Add newly booked slot to local state
+              const newBookedSlot = {
+                date: formData.date,
+                slot: formData.timeSlot
+              };
+              setBookedSlots(prev => [...prev, newBookedSlot]);
+              
+              // Ensure toast is shown
               toast.success("Slot booked successfully!");
-              onClose();
+              setTimeout(() => onClose(), 2000); // Close after showing toast
             } else {
-              toast.error("Failed to book slot after payment.");
+              console.error("Booking failed:", bookingData);
+              toast.error(bookingData.message || "Failed to book slot after payment.");
             }
           } catch (error) {
             console.error("Error booking slot:", error);
@@ -144,11 +156,16 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
           }
         },
         prefill: {
-          email: formData.studentEmail,
-          contact: formData.phone,
+          email: localStorage.getItem("userEmail") || "",
+          contact: "",
         },
         theme: {
           color: "#3399cc",
+        },
+        modal: {
+          ondismiss: function() {
+            toast.info("Payment cancelled");
+          },
         },
       };
 
@@ -297,7 +314,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
         </div>
       )}
 
-      <ToastContainer />
+      <ToastContainer position="top-right" autoClose={5000} />
     </>
   );
 };
