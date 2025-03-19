@@ -24,7 +24,7 @@ const ReviewandRating = ({ instituteData }) => {
         setIsLoading(true);
         const response = await axios.get(`${baseURL}/review-by-institute/${instituteData?.data?._id}`);
         setRatings(response.data.ratings || []);
-        setReviews(response.data.data || []);
+        setReviews(response.data.data.result || []);
       } catch (err) {
         console.error('Error fetching reviews:', err);
         setError('Failed to load reviews. Please try again later.');
@@ -50,8 +50,8 @@ const ReviewandRating = ({ instituteData }) => {
   };
 
   const averageRating = useMemo(() => {
-    if (reviews.length === 0) return 0;
-    return reviews.slice(0, 6).reduce((total, review) => total + review.rating, 0) / Math.min(reviews.length, 6);
+    if (reviews?.length === 0) return 0;
+    return reviews?.slice(0, 6)?.reduce((total, review) => total + review?.rating, 0) / Math.min(reviews?.length, 6);
   }, [reviews]);
 
   const toggleModal = useCallback(() => {
