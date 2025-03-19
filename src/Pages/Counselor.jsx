@@ -116,7 +116,7 @@ const CounselorListPage = () => {
   useEffect(() => {
     const fetchStreams = async () => {
       try {
-        const response = await axios.get(`${VITE_BASE_URL}/streams`);
+        const response = await axios.get(`${VITE_BASE_URL}/streams?&page=0`);
         setStreams(response.data.data.result || []);
       } catch (error) {
         console.error("Error fetching streams:", error.message);
@@ -289,7 +289,7 @@ const CounselorListPage = () => {
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-2">
                                 <h2 className="text-lg font-semibold text-gray-900">
-                                  {counselor.firstname} {counselor.lastname}
+                                  {counselor.firstname +" " }{counselor.lastname}
                                 </h2>
                                 <div className="flex items-center gap-1.5">
                                   <div className="flex">

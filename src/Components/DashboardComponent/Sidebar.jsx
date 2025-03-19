@@ -11,11 +11,11 @@ const Sidebar = () => {
     { name: 'My Documents', path: '/dashboard/documents', icon: '📄' },
     { name: 'Talk to Counselor', path: '/dashboard/counselor', icon: '👤' },
     {name: 'My Reviews',path:'/dashboard/reviews',icon:'📝'},
-    {name: 'Scheduled Slots',path:'/dashboard/slots',icon:'📝'},
-    {name:'Payout', path:'/dashboard/payout',icon:'💰'},
+    {name: 'Scheduled Slots', path: '/dashboard/slots', icon: '📅'},
+        {name:'Payout', path:'/dashboard/payout',icon:'💰'},
     {name:'Refer & Earn',path:'/dashboard/refer&earn',icon:'🏫'},
-    { name: 'Redeem', path: '/dashboard/redeem', icon: '👤' },
-    { name: 'Settings', path: '/dashboard/settings', icon: '⚙️' },
+    {name: 'Redeem', path: '/dashboard/redeem', icon: '🎁'},
+        { name: 'Settings', path: '/dashboard/settings', icon: '⚙️' },
     { name: 'Logout', path: '/dashboard/logout', icon: '🚪' },
   ];
 

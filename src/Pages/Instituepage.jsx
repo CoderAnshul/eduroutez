@@ -45,8 +45,8 @@ const allPossibleTabs = [
   { key: "Review", dataKey: null },
   { key: "Facilities", dataKey: "facilities" },
   { key: "Q & A", dataKey: null }, // Always show
-  { key: "News", dataKey: "news" }, // Always show
-  { key: "Webinar", dataKey: "webinar" }, // Always show
+  { key: "News", dataKey: null}, // Always show
+  { key: "Webinar", dataKey: null }, // Always show
 ];
 
 const reviews = [
@@ -384,11 +384,9 @@ const Instituepage = () => {
               )}
               
               {/* Q & A */}
-              {tabs.includes("Q & A") && (
                 <div ref={sectionRefs[getTabIndex("Q & A")]} className="min-h-24 py-4">
                   <Faqs instituteData={instituteData} />
                 </div>
-              )}
               
               {/* News */}
               {tabs.includes("News") && (

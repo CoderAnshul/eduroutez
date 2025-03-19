@@ -10,6 +10,7 @@ const Wishlist = () => {
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 6;
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
+  const Image_URL = import.meta.env.VITE_IMAGE_BASE_URL;
 
   useEffect(() => {
     const fetchWishlists = async () => {
@@ -99,7 +100,7 @@ const Wishlist = () => {
                 <div className="relative">
                   <img
                     src={college.thumbnailImage
-                      ? `${VITE_BASE_URL}/${college.thumbnailImage}`
+                      ? `${Image_URL}/${college.thumbnailImage}`
                       : searchBoximg}
                     alt={college.instituteName}
                     className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"

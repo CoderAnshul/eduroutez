@@ -3,7 +3,7 @@ import location from "../assets/Images/location.png";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import axiosInstance from "../ApiFunctions/axios";
 import { toast } from "react-toastify";
-import { Building } from 'lucide-react';
+import { Building, Calendar } from 'lucide-react';
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 const baseURL = import.meta.env.VITE_BASE_URL;
@@ -185,8 +185,9 @@ const InstitueName = ({ instituteData }) => {
 )}
 
 {instituteData?.data?.establishedYear && (
-  <p className="text-sm font-semibold opacity-75">
-    ● {instituteData.data.establishedYear}
+  <p className="text-sm font-semibold opacity-75  flex items-center">
+    <Calendar size={16} className="text-gray-500 mr-2" />
+    {instituteData.data.establishedYear}
   </p>
 )}
           </div>
@@ -226,7 +227,7 @@ const InstitueName = ({ instituteData }) => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="max-h-[400px] hidescrollbar overflow-y-auto pr-2">
+            <form onSubmit={handleSubmit} className="max-h-[700px] hidescrollbar overflow-y-auto pr-2">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Left column */}
                 <div className="space-y-5">
