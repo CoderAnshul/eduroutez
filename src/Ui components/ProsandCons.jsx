@@ -28,7 +28,7 @@ const ProsandCons = ({ course }) => {
               <img className='h-4 mb-[-1em]' src={dislikeIcon} alt="Dislikes" />
               <h3 className="ml-2 font-bold">Dislikes</h3>
             </div>
-            <ul className="list-disc pl-5 text-sm text-gray-700">
+            <ul className="list-disc ml-0 text-sm text-gray-700">
               {parse(course.cons)}
             </ul>
             <div className="flex justify-center">
@@ -43,7 +43,7 @@ const ProsandCons = ({ course }) => {
               <img className='h-4 mb-[-1em]' src={prosIcon} alt="Likes" />
               <h3 className="ml-2 font-bold">Likes</h3>
             </div>
-            <ul className="list-disc pl-5 text-sm text-gray-700">
+            <ul className="list-disc ml-0 text-sm text-gray-700">
               {parse(course.pros)}
             </ul>
             <div className="flex justify-center">

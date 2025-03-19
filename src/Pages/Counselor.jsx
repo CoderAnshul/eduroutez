@@ -219,31 +219,33 @@ const CounselorListPage = () => {
         </div>
 
         <div className="flex">
-          <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Filter by Stream</h3>
-            <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
-              {streams.map((stream) => (
-                <label
-                  key={stream._id}
-                  className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    value={stream.name}
-                    checked={selectedStreams.includes(stream.name)}
-                    onChange={() => handleStreamChange(stream.name)}
-                  />
-                  {stream.name}
-                </label>
-              ))}
-            </div>
-            <Promotions
-              location="COUNSELING_PAGE_SIDEBAR"
-              className="h-[250px] w-fit "
-            />
+          <div className="hidden md:block w-1/4">
+            <div className=" bg-gray-100 p-4 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4">Filter by Stream</h3>
+              <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
+                {streams.map((stream) => (
+                  <label
+                    key={stream._id}
+                    className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      value={stream.name}
+                      checked={selectedStreams.includes(stream.name)}
+                      onChange={() => handleStreamChange(stream.name)}
+                    />
+                    {stream.name}
+                  </label>
+                ))}
+              </div>
+          </div>
+              <Promotions
+                location="COUNSELING_PAGE_SIDEBAR"
+                className="h-[250px] w-fit "
+              />
           </div>
 
-          <div className="w-full md:w-3/4 pl-6">
+          <div className="w-full md:w-3/4 md:pl-6">
             {loading ? (
               <div className="flex justify-center items-center h-64">
                 <div className="w-16 h-16 border-4 border-red-600 border-t-transparent  animate-spin"></div>
@@ -257,7 +259,7 @@ const CounselorListPage = () => {
                         key={index}
                         className="bg-white shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300"
                       >
-                        <div className="p-6">
+                        <div className="p-2 md:p-6">
                           <div className="flex gap-6">
                             {counselor.profilePhoto ? (
                               <img

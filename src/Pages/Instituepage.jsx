@@ -29,6 +29,7 @@ import HighRatedCareers from "../Components/HighRatedCareers";
 import BlogComponent from "../Components/BlogComponent";
 import Promotions from "../Pages/CoursePromotions";
 import axiosInstance from "../ApiFunctions/axios";
+import ConsellingBanner from "../Components/ConsellingBanner";
 
 // Base tabs array - we'll filter this based on available data
 const allPossibleTabs = [
@@ -418,8 +419,12 @@ const Instituepage = () => {
         <HighRatedCareers />
         <BlogComponent />
         <BestRated />
-        <Events className="!w-full" />
+        {/* <Events className="!w-full" /> */}
       </div>
+      <div className="flex gap-2 flex-col sm:flex-row items-center">
+          <Events />
+          <ConsellingBanner />
+          </div>
     </>
   );
 };
