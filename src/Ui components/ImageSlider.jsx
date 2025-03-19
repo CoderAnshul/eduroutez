@@ -138,7 +138,7 @@ const ImageSlider = ({ instituteData }) => {
       )}
 
       {/* Navigation Buttons */}
-      <div className="absolute bottom-3 w-full flex justify-end  pr-4 z-20 gap-4">
+      {/* <div className="absolute bottom-3 w-full flex justify-end  pr-4 z-20 gap-4">
         {!isFullscreen && allImages.length > 1 && (
           <>
             <button
@@ -165,7 +165,7 @@ const ImageSlider = ({ instituteData }) => {
             </button>
           </>
         )}
-      </div>
+      </div> */}
 
       {/* Fullscreen View */}
       {isFullscreen && (

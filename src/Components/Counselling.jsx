@@ -1,9 +1,9 @@
 import React from 'react';
-import img1 from '../assets/Images/mbbs.jpg';
-import img2 from '../assets/Images/btech2.jpg';
-import img3 from '../assets/Images/msc.png';
-import img4 from '../assets/Images/masters.png';
-import img5 from '../assets/Images/mch.png';
+import img1 from '../assets/Images/Information Technology.jpg';
+import img2 from '../assets/Images/Medical.jpg';
+import img3 from '../assets/Images/Engineering.jpg';
+import img4 from '../assets/Images/Hospitality & Tourism.jpg';
+import img5 from '../assets/Images/Management.jpg';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { useNavigate } from 'react-router-dom';
@@ -13,11 +13,11 @@ import 'swiper/css/navigation';
 import '../assets/swipers/counselling.css';
 
 const imagesArray = [
-  { img: img1, title: "MBBS", title2: "India", category: "MBBS" },
-  { img: img2, title: "B.Tech", title2: "India", category: "B.Tech" },
-  { img: img3, title: "MSC", title2: "India", category: "MSC" },
-  { img: img4, title: "Masters", title2: "India", category: "Masters" },
-  { img: img5, title: "MCH", title2: "India", category: "MCH" }
+  { img: img1, title: "Information Technology", title2: "", category: "Information Technology" },
+  { img: img2, title: "Medical", title2: "", category: "Medical" },
+  { img: img3, title: "Engineering", title2: "", category: "Engineering" },
+  { img: img4, title: "Hospitality & Tourism", title2: "", category: "Hospitality & Tourism" },
+  { img: img5, title: "Management", title2: "", category: "Management" }
 ];
 
 const Counselling = () => {

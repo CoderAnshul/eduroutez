@@ -29,6 +29,7 @@ import HighRatedCareers from "../Components/HighRatedCareers";
 import BlogComponent from "../Components/BlogComponent";
 import Promotions from "../Pages/CoursePromotions";
 import axiosInstance from "../ApiFunctions/axios";
+import ConsellingBanner from "../Components/ConsellingBanner";
 
 // Base tabs array - we'll filter this based on available data
 const allPossibleTabs = [
@@ -45,8 +46,8 @@ const allPossibleTabs = [
   { key: "Review", dataKey: null },
   { key: "Facilities", dataKey: "facilities" },
   { key: "Q & A", dataKey: null }, // Always show
-  { key: "News", dataKey: "news" }, // Always show
-  { key: "Webinar", dataKey: "webinar" }, // Always show
+  { key: "News", dataKey: null}, // Always show
+  { key: "Webinar", dataKey: null }, // Always show
 ];
 
 const reviews = [
@@ -384,11 +385,9 @@ const Instituepage = () => {
               )}
               
               {/* Q & A */}
-              {tabs.includes("Q & A") && (
                 <div ref={sectionRefs[getTabIndex("Q & A")]} className="min-h-24 py-4">
                   <Faqs instituteData={instituteData} />
                 </div>
-              )}
               
               {/* News */}
               {tabs.includes("News") && (
@@ -420,8 +419,12 @@ const Instituepage = () => {
         <HighRatedCareers />
         <BlogComponent />
         <BestRated />
-        <Events className="!w-full" />
+        {/* <Events className="!w-full" /> */}
       </div>
+      <div className="flex gap-2 flex-col sm:flex-row items-center">
+          <Events />
+          <ConsellingBanner />
+          </div>
     </>
   );
 };

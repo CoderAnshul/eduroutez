@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import axiosInstance from '../ApiFunctions/axios';
 
@@ -7,6 +7,7 @@ const QuestionandAnswer = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [expandedQuestion, setExpandedQuestion] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const { email } = useParams();
 
@@ -38,7 +39,7 @@ const QuestionandAnswer = () => {
       // Handle API response structure
       if (!response.data || !response.data.data) return [];
 
-      // Process questions, handle potential null/undefined cases
+      // Process questions and answers
       return (response.data.data || []).map(question => ({
         id: question._id || null,
         question: question.question || 'No question available',
@@ -47,8 +48,9 @@ const QuestionandAnswer = () => {
         askedBy: question.askedBy || 'Anonymous',
         instituteEmail: question.instituteEmail || '',
         createdAt: question.createdAt || new Date().toISOString(),
-        answer: '', // No answer field in the current response
-        answered: false
+        answers: question.answers || [],
+        hasAnswers: (question.answers && question.answers.length > 0) || false,
+        updatedAt: question.updatedAt || new Date().toISOString()
       }));
     },
     {
@@ -60,9 +62,30 @@ const QuestionandAnswer = () => {
     }
   );
 
-  const handleApplyFilter = () => {
-    console.log("Selected Interests:", selectedInterests);
-  };
+  // Filter questions based on selected interests and search term
+  const filteredQuestions = useMemo(() => {
+    if (!questionsAndAnswers) return [];
+    
+    return questionsAndAnswers.filter(item => {
+      // Interest filter
+      const interestMatch = selectedInterests.length === 0 || selectedInterests.includes(item.label);
+      
+      // Search term filter (case insensitive regex)
+      let searchMatch = true;
+      if (searchTerm.trim()) {
+        const regex = new RegExp(searchTerm.trim(), 'i');
+        searchMatch = regex.test(item.question) || 
+                     regex.test(item.askedBy) || 
+                     regex.test(item.label) ||
+                     // Search in answers as well
+                     item.answers.some(answer => 
+                       regex.test(answer.answer) || regex.test(answer.answeredBy)
+                     );
+      }
+      
+      return interestMatch && searchMatch;
+    });
+  }, [questionsAndAnswers, selectedInterests, searchTerm]);
 
   const handleInterestChange = (event) => {
     const { value, checked } = event.target;
@@ -71,6 +94,15 @@ const QuestionandAnswer = () => {
         ? [...prev, value]
         : prev.filter(interest => interest !== value)
     );
+  };
+
+  const clearFilters = () => {
+    setSelectedInterests([]);
+    setSearchTerm('');
+  };
+
+  const toggleExpandQuestion = (id) => {
+    setExpandedQuestion(expandedQuestion === id ? null : id);
   };
 
   const [form, setForm] = useState({});
@@ -154,23 +186,42 @@ const QuestionandAnswer = () => {
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 p-4 relative">
-      {/* Sidebar and form components remain the same as in previous implementation */}
-       {/* Toggle Button for Sidebar (Small Screens) */}
-       <div className="block lg:hidden mb-4">
+      {/* Toggle Button for Sidebar (Small Screens) */}
+      <div className="block lg:hidden mb-4">
         <button
           onClick={() => setSidebarOpen(!isSidebarOpen)}
           className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
         >
-          {isSidebarOpen ? 'Close Interests' : 'Choose Your Interest'}
+          {isSidebarOpen ? 'Close Filters' : 'Open Filters'}
         </button>
       </div>
 
       {/* Sidebar for larger screens */}
       <aside className="hidden lg:block w-full lg:w-1/4 bg-white shadow-lg rounded-lg p-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Select your Interest</h2>
+          <h2 className="text-lg font-semibold">Filters</h2>
+          <button 
+            onClick={clearFilters}
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Clear All
+          </button>
         </div>
 
+        {/* Search input */}
+        <div className="mb-4">
+          <label htmlFor="search" className="block text-sm font-medium mb-1">Search</label>
+          <input
+            type="text"
+            id="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search questions or answers..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+          />
+        </div>
+
+        <h3 className="text-md font-medium mb-2">Interests</h3>
         <ul className="space-y-2 max-h-[300px] overflow-y-auto">
           {options.map((item) => (
             <li key={item} className="flex items-center space-x-2">
@@ -178,6 +229,7 @@ const QuestionandAnswer = () => {
                 type="checkbox"
                 id={item}
                 value={item}
+                checked={selectedInterests.includes(item)}
                 onChange={handleInterestChange}
                 className="text-blue-600 focus:ring-blue-500"
               />
@@ -188,53 +240,80 @@ const QuestionandAnswer = () => {
           ))}
         </ul>
 
-        {/* Apply Filter Button */}
-        <div className="mt-4">
-          <button
-            onClick={handleApplyFilter}
-            className="w-full px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-green-600"
-          >
-            Apply Filter
-          </button>
-        </div>
+        {/* Active filters display */}
+        {(selectedInterests.length > 0 || searchTerm) && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <h3 className="text-sm font-medium mb-2">Active Filters:</h3>
+            <div className="flex flex-wrap gap-2">
+              {searchTerm && (
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                  Search: {searchTerm}
+                </span>
+              )}
+              {selectedInterests.map(interest => (
+                <span 
+                  key={interest} 
+                  className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center"
+                >
+                  {interest}
+                  <button 
+                    onClick={() => setSelectedInterests(prev => prev.filter(i => i !== interest))}
+                    className="ml-1 text-xs"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </aside>
 
-      {/* Dropdown for smaller screens with checkboxes */}
-      <div className={`lg:hidden w-full bg-white shadow-lg h-80 rounded-lg p-4 ${isSidebarOpen ? 'block' : 'hidden'}`}>
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Choose Your Interest</h2>
+      {/* Dropdown for smaller screens with filters */}
+      <div className={`lg:hidden w-full bg-white shadow-lg rounded-lg p-4 ${isSidebarOpen ? 'block' : 'hidden'}`}>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Filters</h2>
+          <button 
+            onClick={clearFilters}
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Clear All
+          </button>
         </div>
         
+        {/* Search input for mobile */}
+        <div className="mb-4">
+          <label htmlFor="mobile-search" className="block text-sm font-medium mb-1">Search</label>
+          <input
+            type="text"
+            id="mobile-search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search questions or answers..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+          />
+        </div>
+
+        <h3 className="text-md font-medium mb-2">Interests</h3>
         <div className="space-y-2 max-h-[300px] overflow-y-auto">
           {options.map((item) => (
             <div key={item} className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                id={item}
+                id={`mobile-${item}`}
                 value={item}
                 onChange={handleInterestChange}
                 checked={selectedInterests.includes(item)}
                 className="text-blue-600 focus:ring-blue-500"
               />
-              <label htmlFor={item} className="text-sm text-gray-700">
+              <label htmlFor={`mobile-${item}`} className="text-sm text-gray-700">
                 {item}
               </label>
             </div>
           ))}
         </div>
-
-        {/* Apply Filter Button */}
-        <div className="mt-4">
-          <button
-            onClick={handleApplyFilter}
-            className="w-full px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-green-600"
-          >
-            Apply Filter
-          </button>
-        </div>
       </div>
 
-      
       <main className="w-full lg:w-1/2 relative">
         {/* Question submission form */}
         <form 
@@ -242,7 +321,6 @@ const QuestionandAnswer = () => {
           className="mb-6 bg-white shadow-lg rounded-lg p-4" 
           onSubmit={handleSubmit}
         >
-          {/* Form inputs remain the same */}
           <h2 className="text-lg font-semibold mb-2">
             Need guidance on career and education? Ask our experts
           </h2>
@@ -289,14 +367,25 @@ const QuestionandAnswer = () => {
           </button>
         </form>
 
+        {/* Results count and filtering info */}
+        <div className="mb-4 px-2">
+          <p className="text-sm text-gray-600">
+            Showing {filteredQuestions.length} of {questionsAndAnswers.length} questions
+            {(selectedInterests.length > 0 || searchTerm) && " (filtered)"}
+          </p>
+        </div>
+
         {/* Question list */}
         <div className="space-y-4 max-h-[470px] overflow-y-scroll">
-          {questionsAndAnswers.length === 0 ? (
+          {filteredQuestions.length === 0 ? (
             <div className="text-center text-gray-500 p-6 bg-gray-100 rounded-lg">
-              No questions found for this email. Be the first to ask!
+              {questionsAndAnswers.length === 0 ? 
+                "No questions found for this email. Be the first to ask!" : 
+                "No questions match your current filters."
+              }
             </div>
           ) : (
-            questionsAndAnswers.map((item) => (
+            filteredQuestions.map((item) => (
               <div 
                 key={item.id} 
                 className="bg-red-100 shadow-lg rounded-lg p-4 space-y-2"
@@ -311,6 +400,38 @@ const QuestionandAnswer = () => {
                   <span>Label: {item.label}</span>
                   <span className="ml-2">Grade: {item.grade}</span>
                 </div>
+                
+                {/* Answers Section */}
+                {item.hasAnswers && (
+                  <div className="mt-2">
+                    <h4 className="mb-4 p-4 text-md">Answers:</h4>
+                    <div className="ml-2 space-y-2">
+                      {/* Show top 3 answers by default */}
+                      {item.answers.slice(0, expandedQuestion === item.id ? item.answers.length : 3).map((answer, index) => (
+                        <div key={index} className="bg-white p-3 rounded-lg">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <div className="w-6 h-6 bg-blue-200 rounded-full"></div>
+                            <span className="text-sm font-medium">{answer.answeredBy}</span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(answer.answeredAt).toLocaleString()}
+                            </span>
+                          </div>
+                          <div dangerouslySetInnerHTML={{ __html: answer.answer }} />
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* View More/Less button */}
+                    {item.answers.length > 3 && (
+                      <button 
+                        onClick={() => toggleExpandQuestion(item.id)}
+                        className="mt-2 text-blue-500 text-sm hover:underline"
+                      >
+                        {expandedQuestion === item.id ? 'View Less' : 'View More Answers'}
+                      </button>
+                    )}
+                  </div>
+                )}
                 
                 <div className="flex justify-end text-xs text-gray-400">
                   {new Date(item.createdAt).toLocaleString()}

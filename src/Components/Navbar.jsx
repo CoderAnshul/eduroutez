@@ -111,7 +111,7 @@ const Navbar = () => {
             <div className="">
               <button
                 onClick={handleQuestion}
-                className="md:flex hidden items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition-colors"
+                className="md:flex hidden items-center text-xs font-medium gap-2 px-4 hover:scale-95 py-2 bg-red-500 uppercase text-white rounded-md hover:bg-red-700 transition-colors"
               >
                 Ask Question
                 <ArrowRight className="h-4 w-4 hidden md:flex" />
@@ -146,7 +146,7 @@ const Navbar = () => {
             {!accessToken && (
               <Link
                 to="/login"
-                className="CustomFlex gap-1 bg-red-500 px-4 py-2 rounded-sm text-white text-xs  hover:scale-95 group transform transition-all font-medium cursor-pointer"
+                className="CustomFlex gap-1 bg-red-500 px-4 py-2 rounded-md text-white text-xs  hover:scale-95 group transform transition-all font-medium cursor-pointer"
               >
                 <span>LOGIN</span>
               </Link>

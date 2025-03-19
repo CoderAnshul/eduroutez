@@ -201,7 +201,7 @@ const TrendingCourses = () => {
                         <div className={`${levelBadge.color} text-xs font-semibold px-3 py-1 rounded-full`}>
                           {levelBadge.label}
                         </div>
-                        
+{/*                         
                         {course.isCourseFree === "free" ? (
                           <div className="bg-white text-green-600 text-xs font-bold px-3 py-1 rounded-full">
                             Free
@@ -210,7 +210,7 @@ const TrendingCourses = () => {
                           <div className="bg-white text-red-600 text-xs font-bold px-3 py-1 rounded-full">
                             Paid
                           </div>
-                        )}
+                        )} */}
                       </div>
                       
                       <div>
@@ -246,21 +246,21 @@ const TrendingCourses = () => {
                       </div>
                       
                       {/* Application dates if available */}
-                      {course.applicationStartDate ? (
-                        <div className="border-t border-gray-100 pt-4 mt-4">
-                          <div className="text-xs text-gray-500 mb-1">Application period:</div>
-                          <div className="text-sm">
-                            <span className="font-medium">{formatDate(course.applicationStartDate)}</span>
-                            <span className="mx-2">-</span>
-                            <span className="font-medium">{formatDate(course.applicationEndDate)}</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="border-t border-gray-100 pt-4 mt-4">
-                          {/* Empty space - no text */}
-                          <div className="h-6"></div>
-                        </div>
-                      )}
+                      {/* {course.applicationStartDate ? ( */}
+                      {/* //   <div className="border-t border-gray-100 pt-4 mt-4">
+                      //     <div className="text-xs text-gray-500 mb-1">Application period:</div>
+                      //     <div className="text-sm">
+                      //       <span className="font-medium">{formatDate(course.applicationStartDate)}</span>
+                      //       <span className="mx-2">-</span>
+                      //       <span className="font-medium">{formatDate(course.applicationEndDate)}</span>
+                      //     </div>
+                      //   </div>
+                      // ) : (
+                      //   <div className="border-t border-gray-100 pt-4 mt-4">
+                      //     {/* Empty space - no text */}
+                      {/* //     <div className="h-6"></div>
+                      //   </div> */}
+                      
                     </div>
                     
                     {/* Action button */}
@@ -289,6 +289,8 @@ const TrendingCourses = () => {
         </div>
       )}
     </div>
+
+
   );
 };
 

@@ -86,7 +86,7 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
                 ref={tabContainerRef}
                 className={`${className}`}
                 style={{
-                    position: isFixed ? 'fixed' : 'static',
+                    position: isFixed ? 'fixed' : 'relative',
                     top: isFixed ? '64px' : 'auto', // Equivalent to top-16
                     width: isFixed ? containerWidth : '100%',
                     zIndex: 998,
@@ -102,7 +102,7 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
                         {tabs.map((tab, index) => (
                             <li
                                 key={index}
-                                className={`px-4 py-2 border-r-[1.5px] border-l-[1.5px] border-opacity-65 flex-1 whitespace-nowrap min-w-32 cursor-pointer text-center text-xs font-medium transition-all duration-300
+                                className={`px-4 mb-0 py-2 border-r-[1.5px] border-l-[1.5px] border-opacity-65 flex-1 whitespace-nowrap min-w-32 cursor-pointer text-center text-xs font-medium transition-all duration-300
                                 ${activeIndex === index ? "bg-red-500 text-white rounded-md border-none mx-1" : "hover:bg-gray-200 border-gray-400"}`}
                                 onClick={() => handleTabClick(index)}
                             >

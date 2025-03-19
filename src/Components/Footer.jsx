@@ -172,7 +172,7 @@ const Footer = () => {
           </div>
 
           {/* Logo and Social Media */}
-          <div>
+          <div className="pt-4">
             <Link to="/">
               <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
             </Link>
@@ -197,11 +197,11 @@ const Footer = () => {
           
           <div className="text-sm mt-1 text-wrap flex items-center">
             <Phone size={16} className="mr-2 text-red-500" />
-            <a href="tel:9867877121" className="hover:text-red-400 transition-colors">9867877121</a>
+            <a href="tel:9867877121" className="hover:text-red-400 text-white transition-colors">9867877121</a>
           </div>
           <div className="text-sm mt-1 text-wrap flex items-center">
             <Mail size={16} className="mr-2 text-red-500" />
-            <a href="mailto:contact@eduroutez.com" className="hover:text-red-400 transition-colors">contact@eduroutez.com</a>
+            <a href="mailto:contact@eduroutez.com" className="hover:text-red-400 text-white transition-colors">contact@eduroutez.com</a>
           </div>
 
           <div className="flex gap-4 mt-6">
@@ -251,9 +251,9 @@ const Footer = () => {
           <div className="flex flex-wrap items-center justify-center text-center gap-x-4 gap-y-2 text-xs text-gray-400">
             <span>&copy; {new Date().getFullYear()} Eduroutez. All rights reserved.</span>
             <span className="hidden sm:inline">|</span>
-            <Link to="/terms-&-conditions" className="hover:text-white transition-colors">Terms & Conditions</Link>
+            <Link to="/terms-&-conditions" className="hover:text-white text-gray-400 transition-colors">Terms & Conditions</Link>
             <span className="hidden sm:inline">|</span>
-            <Link to="/policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/policy" className="hover:text-white text-gray-400 transition-colors">Privacy Policy</Link>
             {/* <span className="hidden sm:inline">|</span> */}
             {/* <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link> */}
           </div>

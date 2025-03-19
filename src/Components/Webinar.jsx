@@ -138,7 +138,7 @@ const Webinars = ({ instituteData }) => {
         )
     );
 
-    const displayedWebinars = webinarData?.slice(0, currentPage * itemsPerPage) || [];
+    const displayedWebinars = webinarData?.result?.slice(0, currentPage * itemsPerPage) || [];
 
     const WebinarCard = ({ webinar }) => {
         const [imgSrc, setImgSrc] = useState(

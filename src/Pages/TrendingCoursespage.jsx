@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery } from 'react-query';
 import { TrendingUp, Clock, Users, BookOpen, ArrowRight, Star, Eye, ChevronLeft, ChevronRight, Filter, ThumbsUp } from 'lucide-react';
+import HighRatedCareers from '../Components/HighRatedCareers';
+import BlogComponent from '../Components/BlogComponent';
+import BestRated from '../Components/BestRated';
+import Events from '../Components/Events';
+import ConsellingBanner from '../Components/ConsellingBanner';
 
 // Function to fetch trending courses
 const baseURL = import.meta.env.VITE_BASE_URL;
@@ -372,7 +377,7 @@ const TrendingCourses = () => {
                                 {levelBadge.label}
                               </div>
                               
-                              {course.isCourseFree === "free" ? (
+                              {/* {course.isCourseFree === "free" ? (
                                 <div className="bg-white text-green-600 text-xs font-bold px-3 py-1 rounded-full">
                                   Free
                                 </div>
@@ -380,7 +385,7 @@ const TrendingCourses = () => {
                                 <div className="bg-white text-red-600 text-xs font-bold px-3 py-1 rounded-full">
                                   Paid
                                 </div>
-                              )}
+                              )} */}
                             </div>
                             
                             <div>
@@ -417,7 +422,7 @@ const TrendingCourses = () => {
                             </div>
                             
                             {/* Application dates if available */}
-                            {course.applicationStartDate ? (
+                            {/* {course.applicationStartDate ? (
                               <div className="border-t border-gray-100 pt-4 mt-4">
                                 <div className="text-xs text-gray-500 mb-1">Application period:</div>
                                 <div className="text-sm">
@@ -429,9 +434,9 @@ const TrendingCourses = () => {
                             ) : (
                               <div className="border-t border-gray-100 pt-4 mt-4">
                                 {/* Empty space - no text */}
-                                <div className="h-6"></div>
+                                {/* <div className="h-6"></div>
                               </div>
-                            )}
+                            )} */}
                           </div>
                           
                           {/* Action button */}
@@ -509,6 +514,15 @@ const TrendingCourses = () => {
             </div>
           )}
         </div>
+      </div>
+            
+ <HighRatedCareers />
+        <BlogComponent />
+        <BestRated />
+
+      <div className="w-full flex items-start mt-10">
+        <Events />
+        <ConsellingBanner />
       </div>
     </div>
   );
