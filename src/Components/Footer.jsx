@@ -12,7 +12,7 @@ import {
   examResults,
   rrbGroupDLinks,
 } from "../DataFiles/footerData.js";
-import logo from '../assets/Images/logo.png';
+import logo from '../assets/Images/footer-logo.png';
 import facebook from '../assets/Images/facebook.png';
 import instagram from '../assets/Images/instagram.png';
 import twitter from '../assets/Images/twitter.png';
