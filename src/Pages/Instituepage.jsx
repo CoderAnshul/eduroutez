@@ -341,7 +341,7 @@ const Instituepage = () => {
               {/* Promotions */}
               <Promotions
                 location="INSTITUTE_PAGE_RECTANGLE"
-                className="h-[90px]"
+                // className="h-[90px]"
               />
               
               {/* Cut-offs */}

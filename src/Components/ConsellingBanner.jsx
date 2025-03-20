@@ -33,7 +33,7 @@ const ConsellingBanner = ({ className = "" }) => {
                   {slide.title}
                   <h3 className="text-3xl text-white">{slide.subtitle}</h3>
                 </h2>
-                <Link to="/counselingpage">
+                <Link to="/counselor">
                   <button className="text-white text-sm flex transition-transform transform active:scale-95 hover:scale-105 items-center py-3 mt-3 px-4 bg-blue-600 gap-1">
                     Book Counseling
                     <img className="h-5" src={uparrow} alt="arrow" />
