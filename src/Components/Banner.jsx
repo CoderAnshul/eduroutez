@@ -140,7 +140,7 @@ const Banner = () => {
 
   return (
     // <div className="h-[480px] w-full relative">
-    <div className="h-fit min-h-56 w-full relative mb-8">
+    <div className="h-fit min-h-56 max-h-96 w-full relative mb-8">
       {/* Dynamic Promotions component instead of static banners */}
         <Promotions location="HOME_MAIN_PAGE" />
 
