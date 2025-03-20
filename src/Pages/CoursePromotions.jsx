@@ -147,11 +147,11 @@ const Promotions = ({ location, className }) => {
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-              {randomPromo.title && (
+              {/* {randomPromo.title && (
                 <h3 className="text-2xl font-bold mb-2">
                   {randomPromo.title}
                 </h3>
-              )}
+              )} */}
               {randomPromo.description && (
                 <p className="text-sm text-white/90 mb-2">
                   {randomPromo.description}

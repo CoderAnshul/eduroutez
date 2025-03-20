@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from 'react-query';
-import { Send, Loader2, MessageCircle, Clock, Tag, School, User, ArrowUp, ArrowDown } from 'lucide-react';
+import { Send, Loader2, MessageCircle, Clock, Tag, School, User, ArrowUp, ArrowDown, ChevronDown } from 'lucide-react';
 import axiosInstance from '../ApiFunctions/axios';
 import { toast, ToastContainer } from "react-toastify";
 import Promotions from './CoursePromotions';
@@ -63,6 +63,53 @@ const CategoryFilter = ({ onFilterChange }) => {
         </div>
       </CardContent>
     </Card>
+  );
+};
+
+// New component for displaying answers with "View More" functionality
+const AnswersList = ({ answers }) => {
+  const [showAllAnswers, setShowAllAnswers] = useState(false);
+  
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+  
+  if (!answers || answers.length === 0) {
+    return <div className="italic text-gray-500">No answers yet</div>;
+  }
+  
+  // Show first answer or all answers based on state
+  const displayedAnswers = showAllAnswers ? answers : [answers[0]];
+  const remainingCount = answers.length - 1;
+  
+  return (
+    <div className="space-y-4">
+      {displayedAnswers.map((answer, index) => (
+        <div key={index} className="p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
+          <div dangerouslySetInnerHTML={{ __html: answer.answer }} className="text-gray-700 mb-2" />
+          <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
+            <User className="h-4 w-4" />
+            <span>{answer.answeredBy}</span>
+            <span>•</span>
+            <span>{formatDate(answer.answeredAt)}</span>
+          </div>
+        </div>
+      ))}
+      
+      {!showAllAnswers && remainingCount > 0 && (
+        <button 
+          onClick={() => setShowAllAnswers(true)}
+          className="flex items-center gap-2 text-red-600 hover:text-red-800 font-medium transition-colors"
+        >
+          <ChevronDown className="h-4 w-4" />
+          View {remainingCount} more {remainingCount === 1 ? 'answer' : 'answers'}
+        </button>
+      )}
+    </div>
   );
 };
 
@@ -345,23 +392,8 @@ const CombinedQuestionsPage = () => {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      {question.answers && question.answers.length > 0 ? (
-                        <div className="space-y-4">
-                          {question.answers.map((answer, index) => (
-                            <div key={index} className="p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
-                              <div dangerouslySetInnerHTML={{ __html: answer.answer }} className="text-gray-700 mb-2" />
-                              <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
-                                <User className="h-4 w-4" />
-                                <span>{answer.answeredBy}</span>
-                                <span>•</span>
-                                <span>{formatDate(answer.answeredAt)}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="italic text-gray-500">No answers yet</div>
-                      )}
+                      {/* Replace the existing answers section with the new AnswersList component */}
+                      <AnswersList answers={question.answers} />
                     </CardContent>
                   </Card>
                 ))}
@@ -378,15 +410,15 @@ const CombinedQuestionsPage = () => {
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 bg-gray-300 text-
-                  white rounded-lg hover:bg-gray-400 transition-colors"
+                    className={`px-4 py-2 ${currentPage === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-400'} text-gray-700 rounded-lg transition-colors`}
                   >
                     Previous
                   </button>
+                  <span className="text-gray-600">Page {currentPage}</span>
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={questionsData?.hasNextPage === false}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    className={`px-4 py-2 ${questionsData?.hasNextPage === false ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'} text-white rounded-lg transition-colors`}
                   >
                     Next
                   </button>
