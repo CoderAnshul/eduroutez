@@ -57,8 +57,8 @@ const Counselling = () => {
                   alt={item.title} 
                   className="w-full h-32 object-cover rounded-xl"
                 />
-                <div className="absolute left-3 z-50">
-                  <h4 className="text-xl mt-3 text-white font-semibold">
+                <div className="absolute left-3 bot z-50">
+                  <h4 className="text-xl  mt-3 text-white font-semibold">
                     {item.title}
                   </h4>
                   <h4 className="text-xl -mt-1 text-white font-semibold">
