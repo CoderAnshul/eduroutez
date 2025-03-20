@@ -50,8 +50,8 @@ const ReviewandRating = ({ instituteData }) => {
   };
 
   const averageRating = useMemo(() => {
-    if (reviews.length === 0) return 0;
-    return reviews.slice(0, 6).reduce((total, review) => total + review.rating, 0) / Math.min(reviews.length, 6);
+    if (reviews?.result?.length === 0) return 0;
+    return reviews?.result?.slice(0, 6).reduce((total, review) => total + review.rating, 0) / Math.min(reviews.length, 6);
   }, [reviews]);
 
   const toggleModal = useCallback(() => {
@@ -162,7 +162,7 @@ const ReviewandRating = ({ instituteData }) => {
         </div>
 
         <div className="w-full h-auto bg-white mt-8 border-2 rounded-xl flex flex-wrap p-3 gap-2">
-          {reviews.slice(0, 6).map((review, index) => (
+          {reviews?.result?.slice(0, 6).map((review, index) => (
             <InstituteReviewBox
               key={index}
               reviewerName={review.fullName}
