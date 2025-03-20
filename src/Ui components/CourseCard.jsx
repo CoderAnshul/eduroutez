@@ -4,6 +4,18 @@ const CourseCard = ({ course }) => {
 
   console.log(course);
 
+  function convertToReadableFormat(number) {
+    if (number >= 10000000) {
+      return (number / 10000000).toFixed(2).replace(/\.00$/, '') + 'Cr';
+    } else if (number >= 100000) { // Adjusted threshold to avoid incorrect 'K' formatting
+      return (number / 100000).toFixed(2).replace(/\.00$/, '') + 'L';
+    } else if (number >= 1000) {
+      return (number / 1000).toFixed(2).replace(/\.00$/, '') + 'K';
+    } else {
+      return number.toString();
+    }
+  }
+
   // Helper function to format date range
   const formatDate = (startDate, endDate) => {
     if (!startDate || !endDate) return "N/A";
@@ -76,11 +88,9 @@ const CourseCard = ({ course }) => {
         {course.coursePrice && (
           <p>
             <span
-              className="text-black flex font-semibold"
-              dangerouslySetInnerHTML={{
-                __html: "₹" + course.coursePrice,
-              }}
-            />
+              className="text-black flex font-semibold">
+              {"₹" + convertToReadableFormat(course.coursePrice)}
+                </span>
           </p>
         )}
       </div>
