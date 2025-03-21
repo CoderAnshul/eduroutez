@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import counsellor from "../assets/Images/counsellor.jpg";
+import counsellor1 from "../assets/Images/counsellor1.jpeg";
+import counsellor2 from "../assets/Images/counsellor2.jpg";
+import counsellor3 from "../assets/Images/counsellor3.jpg";
+import counsellor4 from "../assets/Images/counsellor4.jpg";
+import counsellor5 from "../assets/Images/counsellor5.jpg";
+import aditi from "../assets/Images/AditiJoshi.png";
+import  DurviKaskar from "../assets/Images/DurviKaskar.png";
+import RohanPatil from "../assets/Images/RohanPatil.png";
+import PrinceMishra from "../assets/Images/PrinceMishra.jpeg";
+import Natasha from "../assets/Images/NatashaSawant.jpeg";
 
 const ReviewBox = ({ review, onReadMore }) => {
   // Function to truncate text if too long
@@ -57,6 +68,14 @@ const ReviewBox = ({ review, onReadMore }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 flex flex-col max-w-md w-full">
       <div className="flex items-center mb-4">
+        {/* Add the image here */}
+        <div className="mr-4">
+          <img 
+            src={review.userImage} 
+            alt={`${review.name}`} 
+            className="w-12 h-12 rounded-full object-cover"
+          />
+        </div>
         <div>
           <h4 className="font-bold text-lg">{review.name}</h4>
           <p className="text-sm text-gray-600">{review.type}</p>
@@ -75,10 +94,23 @@ const ReviewModal = ({ review, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full">
-        <h4 className="font-bold text-lg mb-2">{review.name}</h4>
-        <p className="text-sm text-gray-600 mb-4">{review.type}</p>
+        <div className="flex items-center mb-4">
+          <img 
+            src={review.userImage} 
+            alt={`${review.name}`} 
+            className="w-16 h-16 rounded-full object-cover mr-4"
+          />
+          <div>
+            <h4 className="font-bold text-lg mb-2">{review.name}</h4>
+            <p className="text-sm text-gray-600 mb-1">{review.type}</p>
+            {review.company && <p className="text-xs text-gray-500 mb-2">{review.company}</p>}
+          </div>
+        </div>
         <p className="text-gray-700">{review.text}</p>
-        <button onClick={onClose} className="mt-4 text-blue-500">
+        <button 
+          onClick={onClose} 
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        >
           Close
         </button>
       </div>
@@ -94,52 +126,58 @@ const Reviews = () => {
   );
   const [selectedReview, setSelectedReview] = useState(null);
 
+  // Map of images to use for different review types
+  const imageMap = {
+    student: [aditi, RohanPatil, PrinceMishra, DurviKaskar,Natasha],
+    counselor: [ counsellor1, counsellor2,counsellor3, counsellor4, counsellor5]
+  };
+
   // Combined review data from all sources
   const allReviews = [
     // Student reviews
     {
       id: 1,
-      name: "Aarav Sharma",
+      name: "Durvi Kaskar ",
       type: "Student",
       company: "",
       text: "Eduroutez is an amazing platform for students looking for college information, career options, and entrance exam details. The career-related webinars are very helpful in understanding different fields!",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.student[3],
       rating: 5,
     },
     {
       id: 2,
-      name: "Priya Deshmukh",
+      name: "Aditi Joshi",
       type: "Student",
       company: "",
       text: "Finding the right college was so confusing until I found Eduroutez. It provides detailed insights into colleges, courses, and even connects you with expert counselors for career guidance!",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.student[0],
       rating: 5,
     },
     {
       id: 3,
-      name: "Rohan Verma",
+      name: "Natasha Sawant",
       type: "Student",
       company: "",
       text: "This website made my career search so easy! I attended a webinar and got valuable insights about the career I want to pursue. Highly recommended for students!",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.student[4],
       rating: 5,
     },
     {
       id: 4,
-      name: "Sneha Iyer",
+      name: "Prince Mishra",
       type: "Student",
       company: "",
       text: "Eduroutez helped me clear my doubts about my career path. Their paid counseling service is worth it, as I got expert advice tailored to my interests.",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.student[2],
       rating: 5,
     },
     {
       id: 5,
-      name: "Vikas Patel",
+      name: "Rohan Patil",
       type: "Student",
       company: "",
       text: "A one-stop destination for students! From college listings to career guidance, everything is available in one place. I love how user-friendly the website is.",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.student[1],
       rating: 5,
     },
 
@@ -150,7 +188,7 @@ const Reviews = () => {
       type: "Counselor",
       company: "",
       text: "As a counselor, Eduroutez has given me a great platform to connect with students and share my knowledge. It helps bridge the gap between students and experts.",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.counselor[0],
       rating: 5,
     },
     {
@@ -159,7 +197,7 @@ const Reviews = () => {
       type: "Counselor",
       company: "",
       text: "I have been able to guide many students through this platform. It provides an excellent space to reach students who genuinely need career advice.",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.counselor[1],
       rating: 5,
     },
     {
@@ -168,7 +206,7 @@ const Reviews = () => {
       type: "Counselor",
       company: "",
       text: "Eduroutez is a fantastic platform for counselors like me. It allows us to share our expertise and help students make informed decisions about their careers.",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.counselor[2],
       rating: 5,
     },
     {
@@ -177,7 +215,7 @@ const Reviews = () => {
       type: "Counselor",
       company: "",
       text: "Being a career counselor, I appreciate how Eduroutez connects students with the right mentors. It's a great opportunity for professionals to make an impact.",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.counselor[3],
       rating: 5,
     },
     {
@@ -186,47 +224,9 @@ const Reviews = () => {
       type: "Counselor",
       company: "",
       text: "I've had a great experience counseling students on Eduroutez. The platform ensures that students get authentic and expert advice for their future.",
-      userImage: "/api/placeholder/150/150",
+      userImage: imageMap.counselor[4],
       rating: 5,
-    },
-
-    // Institute reviews
-    {
-      id: 11,
-      name: "Rising Academy",
-      type: "Institute",
-      company: "",
-      text: "Listing our institute on Eduroutez has been a great decision. We have received a significant increase in student inquiries for our courses. The platform is well-structured and helps us reach the right audience easily!",
-      userImage: "/api/placeholder/150/150",
-      rating: 5,
-    },
-    {
-      id: 12,
-      name: "Columbus Academy",
-      type: "Institute",
-      company: "",
-      text: "Eduroutez has helped us connect with many aspiring students. The exposure we received through this platform has boosted our admissions, and the lead quality is excellent. Highly recommended for educational institutes!",
-      userImage: "/api/placeholder/150/150",
-      rating: 5,
-    },
-    {
-      id: 13,
-      name: "Frameboxx Thane",
-      type: "Institute",
-      company: "",
-      text: "After joining Eduroutez, we saw a noticeable increase in student inquiries for our animation and VFX courses. The platform provides great visibility, and their team is very supportive in helping us manage our listings effectively.",
-      userImage: "/api/placeholder/150/150",
-      rating: 5,
-    },
-    {
-      id: 14,
-      name: "Frameboxx Vashi",
-      type: "Institute",
-      company: "",
-      text: "Eduroutez has been instrumental in expanding our reach to students looking for creative courses. The number of leads and engagement we receive through this platform has been impressive. It's a must for any institute wanting to grow!",
-      userImage: "/api/placeholder/150/150",
-      rating: 5,
-    },
+    }
   ];
 
   // Determine how many reviews to show based on screen size

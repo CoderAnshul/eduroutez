@@ -344,8 +344,40 @@ const SearchPage = () => {
     {
       title: "Exam",
       items: [
-        "JEE Mains", "JEE Advanced", "BITSAT", "VITEEE", "SRMJEEE", 
-        "WBJEE", "COMEDK UGET", "NEET UG", "AIIMS", "JIPMER"
+        // Engineering Entrance Exams
+        "JEE Main",
+        "JEE Advanced",
+        "BITSAT",
+        "VITEEE",
+        "SRMJEEE",
+        // Medical & Pharmacy Entrance Exams
+        "NEET UG",
+        "NEET PG",
+        "AIIMS PG",
+        "GPAT",
+        // Management Entrance Exams
+        "CAT",
+        "XAT",
+        "MAT",
+        "CMAT",
+        "NMAT",
+        // Law Entrance Exams
+        "CLAT",
+        "AILET",
+        "LSAT India",
+        // Design & Architecture Entrance Exams
+        "NATA",
+        "UCEED",
+        "CEED",
+        // Education & Teaching Entrance Exams
+        "CTET",
+        "DSSSB",
+        "B.Ed Entrance Exams",
+        // Science & Research Entrance Exams
+        "IIT JAM",
+        "GATE",
+        "CSIR NET",
+        "UGC NET",
       ]
     },
     {
