@@ -307,7 +307,7 @@ const TrendingCourses = () => {
       </div>
       
       {/* Desktop Layout with Filters */}
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col md:flex-row gap-8 mb-8">
         {/* Desktop Sidebar Filter */}
         <div className="hidden md:block w-1/4 bg-white p-4 rounded-xl shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
           <h3 className="text-lg font-semibold mb-4">Filter Courses</h3>
