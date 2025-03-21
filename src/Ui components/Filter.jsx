@@ -9,67 +9,76 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Create state variables for each filter type
+  // Change all filter values to arrays for multi-select
   const [selectedStreams, setSelectedStreams] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedOrganisationType, setSelectedOrganisationType] = useState("");
-  const [selectedSpecialization, setSelectedSpecialization] = useState("");
-  const [selectedFees, setSelectedFees] = useState("");
-  const [selectedExam, setSelectedExam] = useState("");
-  const [selectedRatings, setSelectedRatings] = useState("");
+  const [selectedCities, setSelectedCities] = useState([]);
+  const [selectedStates, setSelectedStates] = useState([]);
+  const [selectedOrganisationTypes, setSelectedOrganisationTypes] = useState([]);
+  const [selectedSpecializations, setSelectedSpecializations] = useState([]);
+  const [selectedFees, setSelectedFees] = useState([]);
+  const [selectedExams, setSelectedExams] = useState([]);
+  const [selectedRatings, setSelectedRatings] = useState([]);
   
   // Initialize filters from URL parameters when component mounts
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     
-    // Handle stream parameter (multi-select)
+    // Handle all parameters as multi-select with comma separation
     const streamParam = params.get("stream");
-    if (streamParam) {
-      const streams = streamParam.split(",");
-      setSelectedStreams(streams);
-    }
+    if (streamParam) setSelectedStreams(streamParam.split(","));
     
-    // Handle single-select parameters
-    if (params.get("city")) setSelectedCity(params.get("city"));
-    if (params.get("state")) setSelectedState(params.get("state"));
-    if (params.get("organisationType")) setSelectedOrganisationType(params.get("organisationType"));
-    if (params.get("specialization")) setSelectedSpecialization(params.get("specialization"));
-    if (params.get("Fees")) setSelectedFees(params.get("Fees"));
-    if (params.get("Exam")) setSelectedExam(params.get("Exam"));
-    if (params.get("Ratings")) setSelectedRatings(params.get("Ratings"));
+    const cityParam = params.get("city");
+    if (cityParam) setSelectedCities(cityParam.split(","));
+    
+    const stateParam = params.get("state");
+    if (stateParam) setSelectedStates(stateParam.split(","));
+    
+    const orgTypeParam = params.get("organisationType");
+    if (orgTypeParam) setSelectedOrganisationTypes(orgTypeParam.split(","));
+    
+    const specParam = params.get("specialization");
+    if (specParam) setSelectedSpecializations(specParam.split(","));
+    
+    const feesParam = params.get("Fees");
+    if (feesParam) setSelectedFees(feesParam.split(","));
+    
+    const examParam = params.get("Exam");
+    if (examParam) setSelectedExams(examParam.split(","));
+    
+    const ratingsParam = params.get("Ratings");
+    if (ratingsParam) setSelectedRatings(ratingsParam.split(","));
   }, [location.search]);
   
-  // Initialize local state from selectedFilters prop when it changes
+  // Update URL and notify parent when filters change
   useEffect(() => {
-    // Don't update if initialized with empty values
-    if (!selectedStreams.length && !selectedCity && !selectedState && 
-        !selectedOrganisationType && !selectedSpecialization && !selectedFees && 
-        !selectedExam && !selectedRatings) {
+    // Don't update if all filters are empty
+    if (!selectedStreams.length && !selectedCities.length && !selectedStates.length && 
+        !selectedOrganisationTypes.length && !selectedSpecializations.length && 
+        !selectedFees.length && !selectedExams.length && !selectedRatings.length) {
       return;
     }
     
     // Create filter object for API
     const apiFilters = {};
     if (selectedStreams.length > 0) apiFilters.streams = selectedStreams;
-    if (selectedCity) apiFilters.city = [selectedCity];
-    if (selectedState) apiFilters.state = [selectedState];
-    if (selectedOrganisationType) apiFilters.organisationType = [selectedOrganisationType];
-    if (selectedSpecialization) apiFilters.specialization = [selectedSpecialization];
-    if (selectedFees) apiFilters.Fees = [selectedFees];
-    if (selectedExam) apiFilters.Exam = [selectedExam];
-    if (selectedRatings) apiFilters.Ratings = [selectedRatings];
+    if (selectedCities.length > 0) apiFilters.city = selectedCities;
+    if (selectedStates.length > 0) apiFilters.state = selectedStates;
+    if (selectedOrganisationTypes.length > 0) apiFilters.organisationType = selectedOrganisationTypes;
+    if (selectedSpecializations.length > 0) apiFilters.specialization = selectedSpecializations;
+    if (selectedFees.length > 0) apiFilters.Fees = selectedFees;
+    if (selectedExams.length > 0) apiFilters.Exam = selectedExams;
+    if (selectedRatings.length > 0) apiFilters.Ratings = selectedRatings;
     
     // Update URL without reloading
     const queryParams = new URLSearchParams();
     if (selectedStreams.length > 0) queryParams.set("stream", selectedStreams.join(","));
-    if (selectedCity) queryParams.set("city", selectedCity);
-    if (selectedState) queryParams.set("state", selectedState);
-    if (selectedOrganisationType) queryParams.set("organisationType", selectedOrganisationType);
-    if (selectedSpecialization) queryParams.set("specialization", selectedSpecialization);
-    if (selectedFees) queryParams.set("Fees", selectedFees);
-    if (selectedExam) queryParams.set("Exam", selectedExam);
-    if (selectedRatings) queryParams.set("Ratings", selectedRatings);
+    if (selectedCities.length > 0) queryParams.set("city", selectedCities.join(","));
+    if (selectedStates.length > 0) queryParams.set("state", selectedStates.join(","));
+    if (selectedOrganisationTypes.length > 0) queryParams.set("organisationType", selectedOrganisationTypes.join(","));
+    if (selectedSpecializations.length > 0) queryParams.set("specialization", selectedSpecializations.join(","));
+    if (selectedFees.length > 0) queryParams.set("Fees", selectedFees.join(","));
+    if (selectedExams.length > 0) queryParams.set("Exam", selectedExams.join(","));
+    if (selectedRatings.length > 0) queryParams.set("Ratings", selectedRatings.join(","));
     
     navigate(`?${queryParams.toString()}`, { replace: true });
     
@@ -83,15 +92,16 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     }
   }, [
     selectedStreams, 
-    selectedCity, 
-    selectedState, 
-    selectedOrganisationType, 
-    selectedSpecialization,
+    selectedCities, 
+    selectedStates, 
+    selectedOrganisationTypes, 
+    selectedSpecializations,
     selectedFees,
-    selectedExam,
+    selectedExams,
     selectedRatings,
-    // Add this dependency:
-    selectedFilters
+    selectedFilters,
+    navigate,
+    onFiltersChanged
   ]);
 
   const toggleSection = (index) => {
@@ -100,48 +110,49 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     );
   };
 
+  // Updated to handle all filters as multi-select
   const handleCheckboxChange = (sectionTitle, item) => {
     const sectionLower = sectionTitle.toLowerCase();
     
-    // Handle streams (multi-select)
+    // Handle all filter types as multi-select
     if (sectionLower === "streams" || sectionLower === "stream") {
-      const isSelected = selectedStreams.includes(item);
-      let updatedStreams;
-      
-      if (isSelected) {
-        updatedStreams = selectedStreams.filter((stream) => stream !== item);
-      } else {
-        updatedStreams = [...selectedStreams, item];
-      }
-      
-      setSelectedStreams(updatedStreams);
+      toggleArrayItem(selectedStreams, setSelectedStreams, item);
     } 
-    // Handle other filter types (all single-select)
     else if (sectionLower === "city") {
-      setSelectedCity(selectedCity === item ? "" : item);
+      toggleArrayItem(selectedCities, setSelectedCities, item);
     } 
     else if (sectionLower === "state") {
-      setSelectedState(selectedState === item ? "" : item);
+      toggleArrayItem(selectedStates, setSelectedStates, item);
     }
     else if (sectionLower === "organisationtype") {
-      setSelectedOrganisationType(selectedOrganisationType === item ? "" : item);
+      toggleArrayItem(selectedOrganisationTypes, setSelectedOrganisationTypes, item);
     }
     else if (sectionLower === "specialization") {
-      setSelectedSpecialization(selectedSpecialization === item ? "" : item);
+      toggleArrayItem(selectedSpecializations, setSelectedSpecializations, item);
     }
     else if (sectionLower === "fees") {
-      setSelectedFees(selectedFees === item ? "" : item);
+      toggleArrayItem(selectedFees, setSelectedFees, item);
     }
     else if (sectionLower === "exam") {
-      setSelectedExam(selectedExam === item ? "" : item);
+      toggleArrayItem(selectedExams, setSelectedExams, item);
     }
     else if (sectionLower === "ratings") {
-      setSelectedRatings(selectedRatings === item ? "" : item);
+      toggleArrayItem(selectedRatings, setSelectedRatings, item);
     }
     
     // Call parent component's handleFilterChange
     if (handleFilterChange) {
       handleFilterChange(sectionTitle, item);
+    }
+  };
+  
+  // Helper function to toggle items in array
+  const toggleArrayItem = (array, setArray, item) => {
+    const isSelected = array.includes(item);
+    if (isSelected) {
+      setArray(array.filter(element => element !== item));
+    } else {
+      setArray([...array, item]);
     }
   };
 
@@ -186,22 +197,23 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
                   const sectionLower = section.title.toLowerCase();
                   let isChecked = false;
                   
+                  // Check if item is selected based on section type
                   if (sectionLower === "streams" || sectionLower === "stream") {
                     isChecked = selectedStreams.includes(item);
                   } else if (sectionLower === "city") {
-                    isChecked = selectedCity === item;
+                    isChecked = selectedCities.includes(item);
                   } else if (sectionLower === "state") {
-                    isChecked = selectedState === item;
+                    isChecked = selectedStates.includes(item);
                   } else if (sectionLower === "organisationtype") {
-                    isChecked = selectedOrganisationType === item;
+                    isChecked = selectedOrganisationTypes.includes(item);
                   } else if (sectionLower === "specialization") {
-                    isChecked = selectedSpecialization === item;
+                    isChecked = selectedSpecializations.includes(item);
                   } else if (sectionLower === "fees") {
-                    isChecked = selectedFees === item;
+                    isChecked = selectedFees.includes(item);
                   } else if (sectionLower === "exam") {
-                    isChecked = selectedExam === item;
+                    isChecked = selectedExams.includes(item);
                   } else if (sectionLower === "ratings") {
-                    isChecked = selectedRatings === item;
+                    isChecked = selectedRatings.includes(item);
                   }
                   
                   return (
