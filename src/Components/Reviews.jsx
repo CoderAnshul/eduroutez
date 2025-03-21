@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import counsellor1 from "../assets/Images/counsellor1.jpeg";
-import counsellor2 from "../assets/Images/counsellor2.jpg";
-import counsellor3 from "../assets/Images/counsellor3.jpg";
-import counsellor4 from "../assets/Images/counsellor4.jpg";
-import counsellor5 from "../assets/Images/counsellor5.jpg";
+import counsellor2 from "../assets/Images/Counsellor2.jpg";
+import counsellor3 from "../assets/Images/Counsellor3.jpg";
+import counsellor4 from "../assets/Images/Counsellor4.jpg";
+import counsellor5 from "../assets/Images/Counsellor5.jpg";
 import aditi from "../assets/Images/AditiJoshi.png";
 import  DurviKaskar from "../assets/Images/DurviKaskar.png";
 import RohanPatil from "../assets/Images/RohanPatil.png";
