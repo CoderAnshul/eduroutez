@@ -80,9 +80,9 @@ console.log('responsrftgyhuje',response.data)
         </button>
         <button
           onClick={handleQuestion}
-          className="md:flex hidden items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition-colors"
+          className="md:flex hidden items-center gap-2 px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-700 transition-colors"
         >
-          Ask Question
+          Ask
           {/* <span className="hidden md:flex">Ask Question</span> */}
           <ArrowRight className="h-4 w-4 hidden md:flex" />
         </button>

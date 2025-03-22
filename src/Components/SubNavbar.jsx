@@ -117,7 +117,9 @@ const SubNavbar = ({ categories }) => {
     const fetchLatestNews = async () => {
       try {
         const response = await axiosInstance.get(
-          `${import.meta.env.VITE_BASE_URL}/news/superadmin`
+          `${import.meta.env.VITE_BASE_URL}/news/superadmin?sort=${encodeURIComponent(
+            JSON.stringify({ createdAt: "desc" })
+          )}`
         );
         console.log("news", response.data);
         setLatestNews(response.data?.data || []);
@@ -422,7 +424,7 @@ const SubNavbar = ({ categories }) => {
     const blogs = examBlogs[streamId] || [];
 
     return (
-      <div className="p-4 min-w-64">
+      <div className="p-4 max-w-[1400px]">
         <h3 className="font-semibold text-red-500 mb-3">Latest Exam Updates</h3>
         {blogs.length === 0 ? (
           <p className="text-sm text-gray-500">Loading exam updates...</p>
@@ -532,7 +534,7 @@ const SubNavbar = ({ categories }) => {
   };
 
   const renderCoursesContent = () => (
-    <div className="p-8 bg-white min-w-[600px] max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    <div className="p-8 bg-white min-w-[1500px] max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-bold text-xl text-gray-800 flex items-center">
           <span className="w-1.5 h-6 bg-red-500 rounded-full mr-3"></span>
@@ -566,7 +568,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderCareersContent = () => (
-    <div className="p-6 bg-white min-w-[400px]">
+    <div className="p-6 bg-white min-w-[1500px]">
       <div className="space-y-8">
         <h3 className="font-semibold text-red-500">Latest Careers</h3>
         <div className="space-y-6">
@@ -595,7 +597,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderTopCollegesContent = () => (
-    <div className="p-6 bg-white min-w-[900px]">
+    <div className="p-6 bg-white min-w-[1500px]">
       <div className="grid grid-cols-3 gap-6">
         {/* Popular Colleges (sorted by views) */}
         <div className="space-y-6">
@@ -689,13 +691,13 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="bg-white rounded-xl w-[50rem] shadow-lg">
-      <div className="p-4 border-b bg-gradient-to-r from-orange-500 to-red-600">
-        <h3 className="text-lg font-bold text-white">Latest Updates</h3>
+    <div className="bg-white rounded-xl min-w-[1500px] shadow-lg">
+      <div className="p-4 border-b ">
+        <h3 className="text-lg font-bold text-black">Latest Updates</h3>
       </div>
 
       <div className="p-4">
-        <ul className="grid grid-cols-3 gap-8 ml-0 ">
+        <ul className="grid grid-cols-3 gap-8 ml-0  list-none">
           {latestNews
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 3)
@@ -759,7 +761,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderMoreContent = () => (
-    <div className="bg-pink rounded-lg shadow-lg p-6 min-w-[600px]">
+    <div className="bg-pink rounded-lg shadow-lg p-6 min-w-[1500px]">
       <div className="grid grid-cols-3 gap-8">
           <div className="space-y-4 ">
             <h3 className="font-semibold text-red-500 border-b pb-2 ">
@@ -786,6 +788,11 @@ const SubNavbar = ({ categories }) => {
                   Study Material
                 </a>
               </li>
+              <li className="!text-black list-none">
+                <a onClick={() => handleLinkClick("/blogpage")} className="text-sm hover:text-red-500 text-black">
+                  Blogs
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -796,6 +803,11 @@ const SubNavbar = ({ categories }) => {
             <li className="list-none">
               <a onClick={() => handleLinkClick("/blogdetailpage/67cab87fdd3a58f74a0c6b99")} className="text-sm hover:text-red-500 text-black">
                 Career Assessment
+              </a>
+            </li>
+            <li className="list-none">
+              <a onClick={() => handleLinkClick("/counselor")} className="text-sm hover:text-red-500 text-black">
+                Book Your Counselling
               </a>
             </li>
           </ul>
@@ -820,6 +832,11 @@ const SubNavbar = ({ categories }) => {
             <li className="list-none">
               <a onClick={() => handleLinkClick("/question-&-answers")} className="text-sm hover:text-red-500 text-black">
                 Q/A
+              </a>
+            </li>
+            <li className="list-none">
+              <a onClick={() => handleLinkClick("login")} className="text-sm hover:text-red-500 text-black">
+                Login
               </a>
             </li>
           </ul>
@@ -883,7 +900,7 @@ const SubNavbar = ({ categories }) => {
   };
 
   const renderRegularContent = (category) => (
-    <div className="flex ">
+    <div className="flex min-w-[1500px]">
       <div className="w-[440px]  overflow-y-auto">
         <ul className="min-w-40 whitespace-nowrap md:w-fit ml-0 mb-0 pb-0 space-y-0">
           {category?.sidebarItems?.map((item) => (
