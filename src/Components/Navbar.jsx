@@ -103,7 +103,8 @@ const Navbar = () => {
               <img className="h-6" src={menubar} alt="open menu" />
             </button>
             <Link to="/">
-              <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
+
+              <img className="h-8 md:h-10" src={logo} alt="mainLogo" />
             </Link>
           </div>
 
@@ -111,9 +112,9 @@ const Navbar = () => {
             <div className="">
               <button
                 onClick={handleQuestion}
-                className="md:flex hidden items-center text-xs font-medium gap-2 px-4 hover:scale-95 py-2 bg-red-500 uppercase text-white rounded-md hover:bg-red-700 transition-colors"
+                className="md:flex hidden items-center text-xs font-medium gap-2 px-4 hover:scale-95 py-2 bg-red-600 uppercase text-white  hover:bg-red-500 transition-colors"
               >
-                Ask Question
+                Ask
                 <ArrowRight className="h-4 w-4 hidden md:flex" />
               </button>
             </div>
@@ -230,7 +231,7 @@ const Navbar = () => {
       >
         <div className="flex items-center justify-between">
           <Link to="/">
-            <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
+            <img className="h-12 md:h-8" src={logo} alt="mainLogo" />
           </Link>
 
           <button

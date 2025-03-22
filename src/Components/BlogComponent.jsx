@@ -120,7 +120,7 @@ const BlogComponent = () => {
                   <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-gray-800">
                     {blog.title.length > 30 ? `${blog.title.slice(0,35)}...` : blog.title}
                   </h3>
-                  <p className="text-sm h-32 text-gray-600 mt-3 line-clamp-3" dangerouslySetInnerHTML={{ __html: blog.description.slice(0,100) }}></p>
+                  <p className="text-sm  text-gray-600 mt-3 line-clamp-3" dangerouslySetInnerHTML={{ __html: blog.description.slice(0,100) }}></p>
                   <div className="mt-4">
                     <div className='flex items-center gap-2 text-gray-600'>
                       {blog.views && (

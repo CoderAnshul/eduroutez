@@ -174,7 +174,7 @@ const Footer = () => {
           {/* Logo and Social Media */}
           <div className="pt-4">
             <Link to="/">
-              <img className="h-6 md:h-8" src={logo} alt="mainLogo" />
+              <img className="h-8 md:h-10" src={logo} alt="mainLogo" />
             </Link>
             <div className="mt-3">
               <div className="flex items-start">

@@ -27,7 +27,7 @@ const InstitueName = ({ instituteData }) => {
   useEffect(() => {
     const fetchStreams = async () => {
       try {
-        const response = await axiosInstance.get(`${baseURL}/streams?limit=8`, {
+        const response = await axiosInstance.get(`${baseURL}/streams?page=0`, {
           headers: {
             "x-access-token": localStorage.getItem("accessToken"),
             "x-refresh-token": localStorage.getItem("refreshToken"),

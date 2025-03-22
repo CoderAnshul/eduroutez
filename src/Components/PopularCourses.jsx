@@ -27,6 +27,15 @@ const TrendingStreams = () => {
   // Get stream card design by level
   const getStreamCardDesign = (level) => {
     switch (level?.toLowerCase()) {
+      case 'diploma':
+        return {
+          icon: <BookOpen className="w-5 h-5" />,
+          color: 'text-red-500',
+          bgColor: 'bg-red-50',
+          borderColor: 'border-red-100',
+          hoverBg: 'hover:bg-red-500',
+          accentColor: 'bg-red-500'
+        };
       case 'bachelor':
         return {
           icon: <BookOpen className="w-5 h-5" />,
@@ -36,7 +45,7 @@ const TrendingStreams = () => {
           hoverBg: 'hover:bg-blue-500',
           accentColor: 'bg-blue-500'
         };
-      case 'master':
+      case 'masters':
         return {
           icon: <Award className="w-5 h-5" />,
           color: 'text-purple-500',
@@ -112,9 +121,7 @@ const TrendingStreams = () => {
             const streamDetails = item.streamDetails[0] || {};
             const level = item._id.level;
             const design = getStreamCardDesign(level);
-            
-            // Generate a pattern for the card background
-            const patternNumber = (streamDetails._id?.charAt(0)?.charCodeAt(0) || 0) % 5;
+            const hasImage = !!item.image;
             
             return (
               <Link 
@@ -123,63 +130,23 @@ const TrendingStreams = () => {
                 className="block group"
               >
                 <div className="h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">
-                  {/* Decorative pattern header */}
-                  <div className={`h-36 ${design.bgColor} relative overflow-hidden`}>
-                    <div className="absolute inset-0 opacity-10">
-                      {patternNumber === 0 && (
-                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="10" cy="10" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="30" cy="10" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="50" cy="10" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="70" cy="10" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="90" cy="10" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="20" cy="20" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="40" cy="20" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="60" cy="20" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="80" cy="20" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="10" cy="30" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="30" cy="30" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="50" cy="30" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="70" cy="30" r="2" fill="currentColor" className={design.color} />
-                          <circle cx="90" cy="30" r="2" fill="currentColor" className={design.color} />
-                        </svg>
-                      )}
-                      {patternNumber === 1 && (
-                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M0,0 L100,100 M20,0 L100,80 M0,20 L80,100 M40,0 L100,60 M0,40 L60,100 M60,0 L100,40 M0,60 L40,100 M80,0 L100,20 M0,80 L20,100" stroke="currentColor" strokeWidth="1" className={design.color} />
-                        </svg>
-                      )}
-                      {patternNumber === 2 && (
-                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                          <rect x="0" y="0" width="20" height="20" fill="currentColor" className={design.color} />
-                          <rect x="40" y="0" width="20" height="20" fill="currentColor" className={design.color} />
-                          <rect x="80" y="0" width="20" height="20" fill="currentColor" className={design.color} />
-                          <rect x="20" y="20" width="20" height="20" fill="currentColor" className={design.color} />
-                          <rect x="60" y="20" width="20" height="20" fill="currentColor" className={design.color} />
-                          <rect x="0" y="40" width="20" height="20" fill="currentColor" className={design.color} />
-                          <rect x="40" y="40" width="20" height="20" fill="currentColor" className={design.color} />
-                          <rect x="80" y="40" width="20" height="20" fill="currentColor" className={design.color} />
-                        </svg>
-                      )}
-                      {patternNumber === 3 && (
-                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                          <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                          <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                          <circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                        </svg>
-                      )}
-                      {patternNumber === 4 && (
-                        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M10,10 L90,10 L90,90 L10,90 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                          <path d="M20,20 L80,20 L80,80 L20,80 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                          <path d="M30,30 L70,30 L70,70 L30,70 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                          <path d="M40,40 L60,40 L60,60 L40,60 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                        </svg>
-                      )}
-                    </div>
-                  
-                    {/* Level badge floating at top-right */}
+                  {/* Image or decorative background */}
+                  <div className={`h-36 relative overflow-hidden ${!hasImage ? design.bgColor : ''}`}>
+                    {hasImage ? (
+                      <img 
+                        src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${item.image}`} 
+                        alt={streamDetails.name || "Stream image"} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className={`h-full flex items-center justify-center ${design.bgColor}`}>
+                        <div className={`p-8 ${design.color}`}>
+                          {design.icon}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Level badge floating at bottom-right */}
                     <div className="absolute bottom-0 right-0 transform translate-y-1/2 mr-4">
                       <div className={`${design.bgColor} ${design.color} ${design.borderColor} border rounded-full p-3 shadow-lg group-hover:shadow-xl transition-all duration-300`}>
                         {design.icon}
@@ -204,6 +171,7 @@ const TrendingStreams = () => {
                     <p className="text-gray-600 mb-6 line-clamp-2">
                       {`Explore ${streamDetails.name || "this stream"} and discover comprehensive courses and resources designed to enhance your knowledge and skills.`}
                     </p>
+                
                     
                     {/* Explore button */}
                     <div className="flex items-center">

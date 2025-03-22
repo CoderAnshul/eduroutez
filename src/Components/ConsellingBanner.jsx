@@ -1,22 +1,29 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import uparrow from '../assets/Images/uparrow.png';
-import banner from '../assets/Images/counsellingbanner.png';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import uparrow from "../assets/Images/uparrow.png";
+import banner from "../assets/Images/counsellingbanner.png";
 import "../assets/swipers/conseling.css";
 
 const ConsellingBanner = ({ className = "" }) => {
   const slides = [
-    { id: 1, img: banner, title: 'Still confused with career planning?', subtitle: '' },
-    { id: 2, img: banner, title: 'Explore your opportunities', subtitle: '' },
-    { id: 3, img: banner, title: 'Get expert counseling now!', subtitle: '' },
+    {
+      id: 1,
+      img: banner,
+      title: "Still confused with career planning?",
+      subtitle: "",
+    },
+    { id: 2, img: banner, title: "Explore your opportunities", subtitle: "" },
+    { id: 3, img: banner, title: "Get expert counseling now!", subtitle: "" },
   ];
 
   return (
-    <div className={`relative h-[420px] w-full sm:w-1/2 bg-gray-300 ${className}`}>
+    <div
+      className={`relative h-[420px] w-full overflow-hidden sm:w-1/2 bg-gray-300 ${className}`}
+    >
       <Swiper
         navigation={true}
         modules={[Navigation]}
@@ -26,8 +33,12 @@ const ConsellingBanner = ({ className = "" }) => {
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            <div className="relative h-[420px] w-full bg-gray-300">
-              <img className="w-full h-full object-cover" src={slide.img} alt={`slide-${slide.id}`} />
+            <div className="relative h-[420px]  bg-gray-300">
+              <img
+                className="w-full h-full object-cover"
+                src={slide.img}
+                alt={`slide-${slide.id}`}
+              />
               <div className="h-full w-full text-white flex justify-end pb-16 pl-[4vw] md:pl-[100px] flex-col absolute left-0 top-0 z-50 bg-[#00000075]">
                 <h2 className="text-[40px] font-semibold mb-6 text-red-500">
                   {slide.title}

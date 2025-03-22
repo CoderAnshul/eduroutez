@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFiltersChanged }) => {
@@ -19,57 +19,56 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
   const [selectedExams, setSelectedExams] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   
-  // Initialize filters from URL parameters when component mounts
+  // Ref to track if we need to update URL
+  const shouldUpdateUrl = useRef(false);
+  
+  // Ref to store previous URL search params
+  const prevSearchParams = useRef(location.search);
+  
+  // Initialize filters from URL parameters when component mounts or URL changes
   useEffect(() => {
+    // Skip URL update after initialization
+    shouldUpdateUrl.current = false;
+    
     const params = new URLSearchParams(location.search);
     
     // Handle all parameters as multi-select with comma separation
     const streamParam = params.get("stream");
-    if (streamParam) setSelectedStreams(streamParam.split(","));
+    setSelectedStreams(streamParam ? streamParam.split(",") : []);
     
     const cityParam = params.get("city");
-    if (cityParam) setSelectedCities(cityParam.split(","));
+    setSelectedCities(cityParam ? cityParam.split(",") : []);
     
     const stateParam = params.get("state");
-    if (stateParam) setSelectedStates(stateParam.split(","));
+    setSelectedStates(stateParam ? stateParam.split(",") : []);
     
     const orgTypeParam = params.get("organisationType");
-    if (orgTypeParam) setSelectedOrganisationTypes(orgTypeParam.split(","));
+    setSelectedOrganisationTypes(orgTypeParam ? orgTypeParam.split(",") : []);
     
     const specParam = params.get("specialization");
-    if (specParam) setSelectedSpecializations(specParam.split(","));
+    setSelectedSpecializations(specParam ? specParam.split(",") : []);
     
     const feesParam = params.get("Fees");
-    if (feesParam) setSelectedFees(feesParam.split(","));
+    setSelectedFees(feesParam ? feesParam.split(",") : []);
     
     const examParam = params.get("Exam");
-    if (examParam) setSelectedExams(examParam.split(","));
+    setSelectedExams(examParam ? examParam.split(",") : []);
     
     const ratingsParam = params.get("Ratings");
-    if (ratingsParam) setSelectedRatings(ratingsParam.split(","));
+    setSelectedRatings(ratingsParam ? ratingsParam.split(",") : []);
+    
+    // Update the prev search params ref
+    prevSearchParams.current = location.search;
   }, [location.search]);
   
-  // Update URL and notify parent when filters change
+  // Separate effect for updating URL and notifying parent
   useEffect(() => {
-    // Don't update if all filters are empty
-    if (!selectedStreams.length && !selectedCities.length && !selectedStates.length && 
-        !selectedOrganisationTypes.length && !selectedSpecializations.length && 
-        !selectedFees.length && !selectedExams.length && !selectedRatings.length) {
+    // Skip URL update if we're just initializing from URL
+    if (!shouldUpdateUrl.current) {
       return;
     }
     
-    // Create filter object for API
-    const apiFilters = {};
-    if (selectedStreams.length > 0) apiFilters.streams = selectedStreams;
-    if (selectedCities.length > 0) apiFilters.city = selectedCities;
-    if (selectedStates.length > 0) apiFilters.state = selectedStates;
-    if (selectedOrganisationTypes.length > 0) apiFilters.organisationType = selectedOrganisationTypes;
-    if (selectedSpecializations.length > 0) apiFilters.specialization = selectedSpecializations;
-    if (selectedFees.length > 0) apiFilters.Fees = selectedFees;
-    if (selectedExams.length > 0) apiFilters.Exam = selectedExams;
-    if (selectedRatings.length > 0) apiFilters.Ratings = selectedRatings;
-    
-    // Update URL without reloading
+    // Create query params
     const queryParams = new URLSearchParams();
     if (selectedStreams.length > 0) queryParams.set("stream", selectedStreams.join(","));
     if (selectedCities.length > 0) queryParams.set("city", selectedCities.join(","));
@@ -80,14 +79,26 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     if (selectedExams.length > 0) queryParams.set("Exam", selectedExams.join(","));
     if (selectedRatings.length > 0) queryParams.set("Ratings", selectedRatings.join(","));
     
-    navigate(`?${queryParams.toString()}`, { replace: true });
+    // Only update URL if it actually changed
+    const newSearchParams = queryParams.toString();
+    if (newSearchParams !== prevSearchParams.current.substring(1)) {
+      navigate(`?${newSearchParams}`, { replace: true });
+      prevSearchParams.current = `?${newSearchParams}`;
+    }
     
-    // Add a condition to prevent the feedback loop
-    const currentFilters = JSON.stringify(selectedFilters);
-    const newFilters = JSON.stringify(apiFilters);
+    // Create filters object for API
+    const apiFilters = {};
+    if (selectedStreams.length > 0) apiFilters.streams = selectedStreams;
+    if (selectedCities.length > 0) apiFilters.city = selectedCities;
+    if (selectedStates.length > 0) apiFilters.state = selectedStates;
+    if (selectedOrganisationTypes.length > 0) apiFilters.organisationType = selectedOrganisationTypes;
+    if (selectedSpecializations.length > 0) apiFilters.specialization = selectedSpecializations;
+    if (selectedFees.length > 0) apiFilters.Fees = selectedFees;
+    if (selectedExams.length > 0) apiFilters.Exam = selectedExams;
+    if (selectedRatings.length > 0) apiFilters.Ratings = selectedRatings;
     
-    // Only notify parent if filters actually changed
-    if (onFiltersChanged && currentFilters !== newFilters) {
+    // Notify parent of filter changes
+    if (onFiltersChanged) {
       onFiltersChanged(apiFilters);
     }
   }, [
@@ -99,7 +110,6 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     selectedFees,
     selectedExams,
     selectedRatings,
-    selectedFilters,
     navigate,
     onFiltersChanged
   ]);
@@ -112,6 +122,9 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
 
   // Updated to handle all filters as multi-select
   const handleCheckboxChange = (sectionTitle, item) => {
+    // Set flag to update URL on next effect run
+    shouldUpdateUrl.current = true;
+    
     const sectionLower = sectionTitle.toLowerCase();
     
     // Handle all filter types as multi-select
