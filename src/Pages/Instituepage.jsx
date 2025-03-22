@@ -30,6 +30,7 @@ import BlogComponent from "../Components/BlogComponent";
 import Promotions from "../Pages/CoursePromotions";
 import axiosInstance from "../ApiFunctions/axios";
 import ConsellingBanner from "../Components/ConsellingBanner";
+import axios from "axios";
 
 // Base tabs array - we'll filter this based on available data
 const allPossibleTabs = [
@@ -46,8 +47,8 @@ const allPossibleTabs = [
   { key: "Review", dataKey: null },
   { key: "Facilities", dataKey: "facilities" },
   { key: "Q & A", dataKey: null }, // Always show
-  { key: "News", dataKey: null}, // Always show
-  { key: "Webinar", dataKey: null }, // Always show
+  { key: "News", dataKey: null, checkData: true },
+  { key: "Webinar", dataKey: null, checkData: true }, // This is correct
 ];
 
 const reviews = [
@@ -61,6 +62,10 @@ const Instituepage = () => {
   const navigate = useNavigate();
   const [instituteIdMap, setInstituteIdMap] = useState({});
   const [sectionRefs, setSectionRefs] = useState([]);
+  const [newsData, setNewsData] = useState([]);
+  const [isNewsLoading, setIsNewsLoading] = useState(true);
+  const [webinarData, setWebinarData] = useState([]);
+  const [isWebinarLoading, setIsWebinarLoading] = useState(true);
 
   useEffect(() => {
     if (!window.instituteIdMap) {
@@ -169,6 +174,61 @@ const Instituepage = () => {
     refetchOnMount: true,
   });
 
+  // Fetch news data separately to check if it's empty
+  useEffect(() => {
+    const fetchNewsData = async () => {
+      if (instituteData?.data?._id) {
+        setIsNewsLoading(true);
+        try {
+          const baseURL = import.meta.env.VITE_BASE_URL || '';
+          const response = await axios.get(`${baseURL}/news/${instituteData.data._id}`);
+          
+          if (response?.data?.data) {
+            setNewsData(response.data.data);
+          } else {
+            setNewsData([]);
+          }
+        } catch (error) {
+          console.error("Error fetching news data:", error);
+          setNewsData([]);
+        } finally {
+          setIsNewsLoading(false);
+        }
+      }
+    };
+
+    fetchNewsData();
+  }, [instituteData]);
+
+  // Fetch webinar data separately to check if it's empty
+  useEffect(() => {
+    const fetchWebinarData = async () => {
+      if (instituteData?.data?._id) {
+        setIsWebinarLoading(true);
+        try {
+          const baseURL = import.meta.env.VITE_BASE_URL || '';
+          const response = await axios.get(`${baseURL}/webinars-by-institute/${instituteData.data._id}`);
+          console.log("Webinar data response:", response);
+
+          
+          if (response?.data?.data) {
+            console.log("Webinar data:", response.data.data);
+            setWebinarData(response.data.data);
+          } else {
+            setWebinarData([]);
+          }
+        } catch (error) {
+          console.error("Error fetching webinar data:", error);
+          setWebinarData([]);
+        } finally {
+          setIsWebinarLoading(false);
+        }
+      }
+    };
+
+    fetchWebinarData();
+  }, [instituteData]);
+
   // Filter tabs based on available data
   useEffect(() => {
     if (instituteData?.data) {
@@ -176,6 +236,17 @@ const Instituepage = () => {
       
       // Filter tabs based on whether they have corresponding data
       const filteredTabs = allPossibleTabs.filter(tabInfo => {
+        // Special case for News tab - only include if we have news data and it's not empty
+        if (tabInfo.key === "News") {
+          return !isNewsLoading && newsData.length > 0;
+        }
+        
+        // Special case for Webinar tab - only include if we have webinar data and it's not empty
+        if (tabInfo.key === "Webinar") {
+          console.log("Checking Webinar tab:", !isWebinarLoading && webinarData?.length > 0);
+          return !isWebinarLoading && webinarData?.result?.length > 0;
+        }
+        
         // If no dataKey specified, always include the tab
         if (tabInfo.dataKey === null) return true;
         
@@ -200,12 +271,13 @@ const Instituepage = () => {
         return hasData;
       }).map(tabInfo => tabInfo.key); // Extract just the key names
       
+      console.log("Filtered tabs:", filteredTabs);
       setTabs(filteredTabs);
       
       // Create refs for each tab
       setSectionRefs(filteredTabs.map(() => React.createRef()));
     }
-  }, [instituteData]);
+  }, [instituteData, newsData, isNewsLoading, webinarData, isWebinarLoading]);
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -246,6 +318,11 @@ const Instituepage = () => {
       </div>
     );
   }
+
+  // Determine if we should show the News section based on newsData
+  const shouldShowNews = tabs.includes("News");
+  // Determine if we should show the Webinar section based on webinarData
+  const shouldShowWebinar = tabs.includes("Webinar");
 
   return (
     <>
@@ -385,19 +462,21 @@ const Instituepage = () => {
               )}
               
               {/* Q & A */}
+              {tabs.includes("Q & A") && (
                 <div ref={sectionRefs[getTabIndex("Q & A")]} className="min-h-24 py-4">
                   <Faqs instituteData={instituteData} />
                 </div>
+              )}
               
-              {/* News */}
-              {tabs.includes("News") && (
+              {/* News - only shown if there's data */}
+              {shouldShowNews && (
                 <div ref={sectionRefs[getTabIndex("News")]} className="min-h-24 py-4">
                   <News instituteData={instituteData} />
                 </div>
               )}
               
-              {/* Webinar */}
-              {tabs.includes("Webinar") && (
+              {/* Webinar - only shown if there's data */}
+              {shouldShowWebinar && (
                 <div ref={sectionRefs[getTabIndex("Webinar")]} className="min-h-24 py-4">
                   <Webinar instituteData={instituteData} />
                 </div>
@@ -424,7 +503,7 @@ const Instituepage = () => {
       <div className="flex gap-2 flex-col sm:flex-row items-center">
           <Events />
           <ConsellingBanner />
-          </div>
+      </div>
     </>
   );
 };
