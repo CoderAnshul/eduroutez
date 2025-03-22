@@ -31,7 +31,7 @@ const TrendingStreams = () => {
         }
     );
 
-    // Get stream card design by level
+    // Get stream card design by level - for fallback when no image is available
     const getStreamCardDesign = (level) => {
         switch (level?.toLowerCase()) {
             case 'bachelor':
@@ -44,6 +44,7 @@ const TrendingStreams = () => {
                     accentColor: 'bg-blue-500'
                 };
             case 'master':
+            case 'masters':
                 return {
                     icon: <Award className="w-5 h-5" />,
                     color: 'text-purple-500',
@@ -60,6 +61,15 @@ const TrendingStreams = () => {
                     borderColor: 'border-green-100',
                     hoverBg: 'hover:bg-green-500',
                     accentColor: 'bg-green-500'
+                };
+            case 'diploma':
+                return {
+                    icon: <Sparkles className="w-5 h-5" />,
+                    color: 'text-orange-500',
+                    bgColor: 'bg-orange-50',
+                    borderColor: 'border-orange-100',
+                    hoverBg: 'hover:bg-orange-500',
+                    accentColor: 'bg-orange-500'
                 };
             default:
                 return {
@@ -102,21 +112,20 @@ const TrendingStreams = () => {
         <>
         <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
             <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
-                        <h1 className="text-4xl font-bold mb-4">Trending Streams</h1>
-                        <p className="text-xl">
-                            Discover trending streams to opt for and enhance your knowledge
-                        </p>
-                    </div>
+                <h1 className="text-4xl font-bold mb-4">Trending Streams</h1>
+                <p className="text-xl">
+                    Discover trending streams to opt for and enhance your knowledge
+                </p>
+            </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {trendingStreams.length > 0 ? (
-                            trendingStreams.map((item) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {trendingStreams.length > 0 ? (
+                    trendingStreams.map((item) => {
                         const streamDetails = item.streamDetails[0] || {};
                         const level = item._id.level;
                         const design = getStreamCardDesign(level);
-                        
-                        // Generate a pattern for the card background
-                        const patternNumber = (streamDetails._id?.charAt(0)?.charCodeAt(0) || 0) % 5;
+                        const hasImage = !!item.image;
+                        const imageUrl = hasImage ? `${import.meta.env.VITE_IMAGE_BASE_URL}/${item.image}` : null;
                         
                         return (
                             <Link 
@@ -125,63 +134,27 @@ const TrendingStreams = () => {
                                 className="block group"
                             >
                                 <div className="h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">
-                                    {/* Decorative pattern header */}
-                                    <div className={`h-36 ${design.bgColor} relative overflow-hidden`}>
-                                        <div className="absolute inset-0 opacity-10">
-                                            {patternNumber === 0 && (
-                                                <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                                    <circle cx="10" cy="10" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="30" cy="10" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="50" cy="10" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="70" cy="10" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="90" cy="10" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="20" cy="20" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="40" cy="20" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="60" cy="20" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="80" cy="20" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="10" cy="30" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="30" cy="30" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="50" cy="30" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="70" cy="30" r="2" fill="currentColor" className={design.color} />
-                                                    <circle cx="90" cy="30" r="2" fill="currentColor" className={design.color} />
-                                                </svg>
-                                            )}
-                                            {patternNumber === 1 && (
-                                                <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M0,0 L100,100 M20,0 L100,80 M0,20 L80,100 M40,0 L100,60 M0,40 L60,100 M60,0 L100,40 M0,60 L40,100 M80,0 L100,20 M0,80 L20,100" stroke="currentColor" strokeWidth="1" className={design.color} />
-                                                </svg>
-                                            )}
-                                            {patternNumber === 2 && (
-                                                <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                                    <rect x="0" y="0" width="20" height="20" fill="currentColor" className={design.color} />
-                                                    <rect x="40" y="0" width="20" height="20" fill="currentColor" className={design.color} />
-                                                    <rect x="80" y="0" width="20" height="20" fill="currentColor" className={design.color} />
-                                                    <rect x="20" y="20" width="20" height="20" fill="currentColor" className={design.color} />
-                                                    <rect x="60" y="20" width="20" height="20" fill="currentColor" className={design.color} />
-                                                    <rect x="0" y="40" width="20" height="20" fill="currentColor" className={design.color} />
-                                                    <rect x="40" y="40" width="20" height="20" fill="currentColor" className={design.color} />
-                                                    <rect x="80" y="40" width="20" height="20" fill="currentColor" className={design.color} />
-                                                </svg>
-                                            )}
-                                            {patternNumber === 3 && (
+                                    {/* Image or Pattern Header */}
+                                    <div className={`h-36 relative overflow-hidden ${hasImage ? '' : design.bgColor}`}>
+                                        {hasImage ? (
+                                            <img 
+                                                src={imageUrl} 
+                                                alt={streamDetails.name || "Stream image"}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            // Fallback to pattern design if no image
+                                            <div className="absolute inset-0 opacity-10">
                                                 <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                                                     <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
                                                     <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
                                                     <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
                                                     <circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
                                                 </svg>
-                                            )}
-                                            {patternNumber === 4 && (
-                                                <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M10,10 L90,10 L90,90 L10,90 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                                                    <path d="M20,20 L80,20 L80,80 L20,80 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                                                    <path d="M30,30 L70,30 L70,70 L30,70 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                                                    <path d="M40,40 L60,40 L60,60 L40,60 Z" fill="none" stroke="currentColor" strokeWidth="1" className={design.color} />
-                                                </svg>
-                                            )}
-                                        </div>
-                                    
-                                        {/* Level badge floating at top-right */}
+                                            </div>
+                                        )}
+                                        
+                                        {/* Level badge floating at right */}
                                         <div className="absolute bottom-0 right-0 transform translate-y-1/2 mr-4">
                                             <div className={`${design.bgColor} ${design.color} ${design.borderColor} border rounded-full p-3 shadow-lg group-hover:shadow-xl transition-all duration-300`}>
                                                 {design.icon}
@@ -202,10 +175,11 @@ const TrendingStreams = () => {
                                             {streamDetails.name || "Unnamed Stream"}
                                         </h3>
                                         
-                                        {/* Short description - placeholder text based on stream name */}
+                                        {/* Course count */}
                                         <p className="text-gray-600 mb-6 line-clamp-2">
                                             {`Explore ${streamDetails.name || "this stream"} and discover comprehensive courses and resources designed to enhance your knowledge and skills.`}
                                         </p>
+                                        
                                         
                                         {/* Explore button */}
                                         <div className="flex items-center">
@@ -236,37 +210,35 @@ const TrendingStreams = () => {
 
             {/* Pagination */}
             <div className="flex justify-between items-center mt-8">
-            <button
-    onClick={() => setPage((old) => Math.max(old - 1, 1))}
-    disabled={page <= 1}
-    className="bg-red-600 text-white py-2 px-4 rounded-l-lg hover:bg-red-700 disabled:opacity-50"
->
-    Previous
-</button>
+                <button
+                    onClick={() => setPage((old) => Math.max(old - 1, 1))}
+                    disabled={page <= 1}
+                    className="bg-red-600 text-white py-2 px-4 rounded-l-lg hover:bg-red-700 disabled:opacity-50"
+                >
+                    Previous
+                </button>
 
-<span className="bg-gray-100 text-gray-800 py-2 px-4 font-medium">
-    Page {page} of {data?.data?.totalPages || 1}
-</span>
+                <span className="bg-gray-100 text-gray-800 py-2 px-4 font-medium">
+                    Page {page} of {data?.data?.totalPages || 1}
+                </span>
 
-<button
-    onClick={() => setPage((old) => (old < data?.data?.totalPages ? old + 1 : old))}
-    disabled={!data || page >= data?.data?.totalPages}
-    className="bg-red-600 text-white py-2 px-4 rounded-r-lg hover:bg-red-700 disabled:opacity-50"
->
-    Next
-</button>
+                <button
+                    onClick={() => setPage((old) => (old < data?.data?.totalPages ? old + 1 : old))}
+                    disabled={!data || page >= data?.data?.totalPages}
+                    className="bg-red-600 text-white py-2 px-4 rounded-r-lg hover:bg-red-700 disabled:opacity-50"
+                >
+                    Next
+                </button>
             </div>
         </div>
 
-
         <BlogComponent />
-                <HighRatedCareers />
-           
-
-            <div className="flex gap-4 flex-col sm:flex-row">
-                <Events />
-                <ConsellingBanner />
-            </div>
+        <HighRatedCareers />
+        
+        <div className="flex gap-4 flex-col sm:flex-row">
+            <Events />
+            <ConsellingBanner />
+        </div>
         </>
     );
 };
