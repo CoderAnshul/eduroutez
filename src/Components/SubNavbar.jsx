@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import downArrow from "../assets/Images/downArrow.png";
 import axiosInstance from "../ApiFunctions/axios";
+import { IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
 
 // Import or create the courseIdMap for reference
 // You can either import from the PopularCourses component or recreate it here
@@ -117,25 +119,27 @@ const SubNavbar = ({ categories }) => {
     const fetchLatestNews = async () => {
       try {
         const response = await axiosInstance.get(
-          `${import.meta.env.VITE_BASE_URL}/news/superadmin?sort=${encodeURIComponent(
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/news/superadmin?sort=${encodeURIComponent(
             JSON.stringify({ createdAt: "desc" })
           )}`
         );
         console.log("news", response.data);
         setLatestNews(response.data?.data || []);
-        
+
         // Create slug mappings for news items
         if (response.data?.data) {
           response.data.data.forEach((news) => {
             if (news.title) {
               // Create slug from news title
               const slug = getNewsSlug(news);
-              
+
               // Store mapping
               newsIdMap[slug] = news._id;
             }
           });
-          
+
           // Update global map and localStorage
           updateNewsIdMap();
         }
@@ -144,14 +148,13 @@ const SubNavbar = ({ categories }) => {
       }
     };
 
-
     const updateNewsIdMap = () => {
       // Make the mapping available globally
       window.newsIdMap = {
         ...window.newsIdMap,
         ...newsIdMap,
       };
-      
+
       // Get existing mappings from localStorage and merge
       const existingMap = JSON.parse(localStorage.getItem("newsIdMap") || "{}");
       localStorage.setItem(
@@ -238,7 +241,7 @@ const SubNavbar = ({ categories }) => {
   // Helper function to get the slug for a news item
   const getNewsSlug = (news) => {
     if (!news?.title) return news?._id;
-    
+
     return news.title
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
@@ -517,9 +520,11 @@ const SubNavbar = ({ categories }) => {
     const newsSlug = getNewsSlug(news);
     navigate(`/news/${newsSlug}`);
     setHoveredCategory(null); // Close dropdown on click
-    
+
     // You might want to add this debugging log
-    console.log(`News slug: ${newsSlug}, ID: ${newsIdMap[newsSlug] || news._id}`);
+    console.log(
+      `News slug: ${newsSlug}, ID: ${newsIdMap[newsSlug] || news._id}`
+    );
   };
 
   const handleInstituteClick = (institute) => {
@@ -544,8 +549,8 @@ const SubNavbar = ({ categories }) => {
           {popularCourses?.result?.length || 0} Courses Available
         </span>
       </div>
-      
-      <div className="grid grid-cols-3 gap-x-8 gap-y-4">
+
+      <div className="grid grid-cols-3 gap-x-8 ">
         {popularCourses?.result?.map((course) => (
           <div key={course._id} className="group">
             <a
@@ -553,7 +558,12 @@ const SubNavbar = ({ categories }) => {
               className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-all duration-200"
             >
               <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 text-red-500"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
                   <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
                 </svg>
               </div>
@@ -763,50 +773,77 @@ const SubNavbar = ({ categories }) => {
   const renderMoreContent = () => (
     <div className="bg-pink rounded-lg shadow-lg p-6 min-w-[1200px]">
       <div className="grid grid-cols-3 gap-8">
-          <div className="space-y-4 ">
-            <h3 className="font-semibold text-red-500 border-b pb-2 ">
-              Resources
-            </h3>
-            <ul className="space-y-2 list-none ml-0">
-              <li className="!text-black">
-                <a onClick={() => handleLinkClick("/blogpage?category=Exam")} className="text-sm hover:text-red-500 text-black">
-                  Entrance Exams
-                </a>
-              </li>
-              <li className="!text-black list-none">
-                <a onClick={() => handleLinkClick("/searchpage")} className="text-sm hover:text-red-500 text-black">
-                  Top Colleges
-                </a>
-              </li>
-              <li className="!text-black list-none">
-                <a onClick={() => handleLinkClick("/blogdetailpage/67cab414dd3a58f74a0c6295")} className="text-sm hover:text-red-500 text-black">
-                  Scholarships
-                </a>
-              </li>
-              <li className="!text-black list-none">
-                <a onClick={() => handleLinkClick("/blogdetailpage/67cab637dd3a58f74a0c665f")} className="text-sm hover:text-red-500 text-black">
-                  Study Material
-                </a>
-              </li>
-              <li className="!text-black list-none">
-                <a onClick={() => handleLinkClick("/blogpage")} className="text-sm hover:text-red-500 text-black">
-                  Blogs
-                </a>
-              </li>
-            </ul>
-          </div>
+        <div className="space-y-4 ">
+          <h3 className="font-semibold text-red-500 border-b pb-2 ">
+            Resources
+          </h3>
+          <ul className="space-y-2 list-none ml-0">
+            <li className="!text-black">
+              <a
+                onClick={() => handleLinkClick("/blogpage?category=Exam")}
+                className="text-sm hover:text-red-500 text-black"
+              >
+                Entrance Exams
+              </a>
+            </li>
+            <li className="!text-black list-none">
+              <a
+                onClick={() => handleLinkClick("/searchpage")}
+                className="text-sm hover:text-red-500 text-black"
+              >
+                Top Colleges
+              </a>
+            </li>
+            <li className="!text-black list-none">
+              <a
+                onClick={() =>
+                  handleLinkClick("/blogdetailpage/67cab414dd3a58f74a0c6295")
+                }
+                className="text-sm hover:text-red-500 text-black"
+              >
+                Scholarships
+              </a>
+            </li>
+            <li className="!text-black list-none">
+              <a
+                onClick={() =>
+                  handleLinkClick("/blogdetailpage/67cab637dd3a58f74a0c665f")
+                }
+                className="text-sm hover:text-red-500 text-black"
+              >
+                Study Material
+              </a>
+            </li>
+            <li className="!text-black list-none">
+              <a
+                onClick={() => handleLinkClick("/blogpage")}
+                className="text-sm hover:text-red-500 text-black"
+              >
+                Blogs
+              </a>
+            </li>
+          </ul>
+        </div>
 
         {/* Tools Section */}
         <div className="space-y-4">
           <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
           <ul className="space-y-2 ml-0">
             <li className="list-none">
-              <a onClick={() => handleLinkClick("/blogdetailpage/67cab87fdd3a58f74a0c6b99")} className="text-sm hover:text-red-500 text-black">
+              <a
+                onClick={() =>
+                  handleLinkClick("/blogdetailpage/67cab87fdd3a58f74a0c6b99")
+                }
+                className="text-sm hover:text-red-500 text-black"
+              >
                 Career Assessment
               </a>
             </li>
             <li className="list-none">
-              <a onClick={() => handleLinkClick("/counselor")} className="text-sm hover:text-red-500 text-black">
+              <a
+                onClick={() => handleLinkClick("/counselor")}
+                className="text-sm hover:text-red-500 text-black"
+              >
                 Book Your Counselling
               </a>
             </li>
@@ -820,22 +857,34 @@ const SubNavbar = ({ categories }) => {
           </h3>
           <ul className="space-y-2 ml-0">
             <li className="list-none">
-              <a onClick={() => handleLinkClick("/aboutus")} className="text-sm hover:text-red-500 text-black">
+              <a
+                onClick={() => handleLinkClick("/aboutus")}
+                className="text-sm hover:text-red-500 text-black"
+              >
                 About Us
               </a>
             </li>
             <li className="list-none">
-              <a onClick={() => handleLinkClick("/Contactuspage")} className="text-sm hover:text-red-500 text-black">
+              <a
+                onClick={() => handleLinkClick("/Contactuspage")}
+                className="text-sm hover:text-red-500 text-black"
+              >
                 Contact Us
               </a>
             </li>
             <li className="list-none">
-              <a onClick={() => handleLinkClick("/question-&-answers")} className="text-sm hover:text-red-500 text-black">
+              <a
+                onClick={() => handleLinkClick("/question-&-answers")}
+                className="text-sm hover:text-red-500 text-black"
+              >
                 Q/A
               </a>
             </li>
             <li className="list-none">
-              <a onClick={() => handleLinkClick("login")} className="text-sm hover:text-red-500 text-black">
+              <a
+                onClick={() => handleLinkClick("login")}
+                className="text-sm hover:text-red-500 text-black"
+              >
                 Login
               </a>
             </li>
@@ -844,7 +893,6 @@ const SubNavbar = ({ categories }) => {
       </div>
     </div>
   );
-
 
   const renderStreamInstitutes = (streamName) => {
     const popular = popularInstitutes[streamName]?.result || [];
@@ -906,9 +954,9 @@ const SubNavbar = ({ categories }) => {
           {category?.sidebarItems?.map((item) => (
             <li
               key={item.id}
-              className={`px-2  py-2 group mb-0  text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-red-200 ${
+              className={`px-2 py-2 group mb-0  text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${
                 activeContent[category.label] === item.id
-                  ? "bg-red-400 border-l-2 border-red-500 text-white"
+                  ? "bg-black border-l-2 border-black text-white"
                   : "bg-red-500 text-white"
               }`}
               onMouseEnter={() => {
@@ -933,14 +981,12 @@ const SubNavbar = ({ categories }) => {
             >
               {item.name}
               <span className="text-xs">
-                <img
-                  className={`h-3 transform transition-transform duration-300 ${
+                <IoIosArrowForward
+                  className={`text-lg ${
                     activeContent[category.label] === item.id
-                      ? "-rotate-0"
-                      : "-rotate-90"
-                  }`}
-                  src={downArrow}
-                  alt=""
+                      ? "text-white font-semibold rotate-[90deg]"
+                      : "text-black"
+                  } `}
                 />
               </span>
             </li>
