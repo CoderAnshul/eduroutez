@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 
-const UploadDocument = ({ setFormData, setIsSubmit }) => {
-  const [studentIdImage, setStudentIdImage] = useState(null); // State for Student ID/Marksheets
+const UploadDocument = ({ formData, setFormData, setIsSubmit }) => {
+  const [studentIdImage, setStudentIdImage] = useState(
+    formData?.studentIdImage || null
+  ); // State for Student ID/Marksheets
   const [selfieImage, setSelfieImage] = useState(null); // State for Selfie
-  const [studentIdPreview, setStudentIdPreview] = useState(null); // State for Student ID Preview
-  const [selfiePreview, setSelfiePreview] = useState(null); // State for Selfie Preview
+  const [studentIdPreview, setStudentIdPreview] = useState(
+    formData?.studentIdPreview || null
+  ); // State for Student ID Preview
+  const [selfiePreview, setSelfiePreview] = useState(
+    formData?.selfiePreview || null
+  ); // State for Selfie Preview
 
   const handleImageUpload = (e, type) => {
     const file = e.target.files?.[0];
@@ -14,10 +20,12 @@ const UploadDocument = ({ setFormData, setIsSubmit }) => {
       reader.onloadend = () => {
         if (type === "studentId") {
           setStudentIdImage(file);
-          setStudentIdPreview(reader.result); // Set the preview for studentIdImage
+          setStudentIdPreview(reader.result);
+          // Set the preview for studentIdImage
           setFormData((prevFormData) => ({
             ...prevFormData,
             studentIdImage: file,
+            studentIdPreview: reader.result, // Store preview in formData
           }));
         } else if (type === "selfie") {
           setSelfieImage(file);
@@ -25,6 +33,7 @@ const UploadDocument = ({ setFormData, setIsSubmit }) => {
           setFormData((prevFormData) => ({
             ...prevFormData,
             selfieImage: file,
+            selfiePreview: reader.result, // Store preview in formData
           }));
         }
       };
@@ -54,7 +63,9 @@ const UploadDocument = ({ setFormData, setIsSubmit }) => {
     <div className="flex flex-col items-center h-full">
       <div className="w-full flex flex-col items-center p-6 bg-white rounded-lg h-[480px] overflow-y-scroll scrollbar-thumb-red">
         {/* Title */}
-        <h1 className="text-2xl font-semibold text-gray-800">Upload Documents</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">
+          Upload Documents
+        </h1>
 
         {/* Subtitle */}
         <p className="mt-1 text-sm text-gray-500">
@@ -67,7 +78,7 @@ const UploadDocument = ({ setFormData, setIsSubmit }) => {
           <div className="w-64 h-40 border border-gray-300 rounded-lg bg-gray-100 flex flex-col items-center justify-center relative">
             {studentIdPreview ? (
               <img
-                src={studentIdPreview}
+                src={studentIdPreview || formData?.studentIdPreview}
                 alt="Student ID"
                 className="w-full h-full object-cover rounded-lg"
               />
@@ -102,7 +113,7 @@ const UploadDocument = ({ setFormData, setIsSubmit }) => {
           <div className="w-64 h-40 border border-gray-300 rounded-sm bg-gray-100 flex flex-col items-center justify-center relative">
             {selfiePreview ? (
               <img
-                src={selfiePreview}
+                src={selfiePreview || formData?.selfiePreview}
                 alt="Selfie"
                 className="w-full h-full object-cover rounded-lg"
               />

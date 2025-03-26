@@ -20,10 +20,10 @@ const Blogpage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const itemsPerPage = 8;
-  
+
   // Get the URL location and query parameters
   const location = useLocation();
-  
+
   const baseURL = import.meta.env.VITE_BASE_URL;
 
   // Fetch all blogs at once
@@ -74,38 +74,44 @@ const Blogpage = () => {
       const response = await axios.get(`${baseURL}/blog-category`);
       return response.data;
     },
-    { 
+    {
       enabled: true,
       onSuccess: (data) => {
         // Check for category in URL params after categories have loaded
         const queryParams = new URLSearchParams(location.search);
-        const categoryParam = queryParams.get('category');
-        
+        const categoryParam = queryParams.get("category");
+
         if (categoryParam && data?.data?.result) {
           const categories = data.data.result;
           const matchingCategory = categories.find(
-            cat => cat && cat.name && cat.name.toLowerCase() === categoryParam.toLowerCase()
+            (cat) =>
+              cat &&
+              cat.name &&
+              cat.name.toLowerCase() === categoryParam.toLowerCase()
           );
-          
+
           if (matchingCategory) {
             setSelectedCategories([matchingCategory.name]);
           }
         }
-      }
+      },
     }
   );
 
   // Check for URL query parameters when component mounts or URL changes
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const categoryParam = queryParams.get('category');
-    
+    const categoryParam = queryParams.get("category");
+
     if (categoryParam && categoryData?.data?.result) {
       const categories = categoryData.data.result;
       const matchingCategory = categories.find(
-        cat => cat && cat.name && cat.name.toLowerCase() === categoryParam.toLowerCase()
+        (cat) =>
+          cat &&
+          cat.name &&
+          cat.name.toLowerCase() === categoryParam.toLowerCase()
       );
-      
+
       if (matchingCategory) {
         setSelectedCategories([matchingCategory.name]);
       }
@@ -147,20 +153,22 @@ const Blogpage = () => {
         ? prev.filter((cat) => cat !== category)
         : [...prev, category]
     );
-    
+
     // Update URL when category filter changes
     const queryParams = new URLSearchParams(location.search);
     if (!prev.includes(category)) {
-      queryParams.set('category', category);
+      queryParams.set("category", category);
     } else {
-      queryParams.delete('category');
+      queryParams.delete("category");
     }
-    
+
     // Update the URL without refreshing the page
     window.history.replaceState(
       {},
-      '',
-      `${location.pathname}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
+      "",
+      `${location.pathname}${
+        queryParams.toString() ? `?${queryParams.toString()}` : ""
+      }`
     );
   };
 
@@ -220,9 +228,28 @@ const Blogpage = () => {
                 to={`/blogdetailpage/${blog.slug}`}
                 className=" flex flex-col  justify-between "
               >
-                <div className="h-fit overflow-hidden">
+                <div className="relative group h-fit overflow-hidden">
+                  {blog.views !== "0" && (
+                    <div className="absolute h-fit p-1 w-fit px-2 rounded-full bg-white hidden top-2 right-2 group-hover:flex items-center justify-center gap-2 text-gray-600">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="black"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <span className="text-black">{blog.views}</span>
+                    </div>
+                  )}
                   <img
-                    className="w-fit h-40 mx-auto object-cover rounded-t-xl"
+                    className="w-full h-40 mx-auto object-cover rounded-t-xl"
                     src={`${Images}/${blog?.thumbnail}`}
                     alt={blog.title}
                   />
