@@ -462,13 +462,13 @@ const TrendingCourses = () => {
                             </div>
 
                             {/* Course info */}
-                            <div className="grid grid-cols-2 gap-3 pt-2">
+                            <div className="flex w-full justify-between gap-3 pt-2">
+
                               <div className="flex items-center text-sm text-gray-500">
-                                <ThumbsUp
-                                  size={16}
-                                  className="mr-2 text-gray-500"
-                                />
-                                <span>{course.likes?.length}</span>
+                                
+                                {course.likes?.length > 0 && (
+                                                         <><ThumbsUp size={16} className="mr-2 text-gray-500" /><span>{course.likes?.length}</span></>
+                                                         )}
                               </div>
 
                               <div className="flex items-center text-sm text-gray-500">

@@ -153,7 +153,7 @@ const HighRatedCareers = () => {
                   }}
                 ></p>
                 <div className="flex items-center justify-between px-4 w-full mt-2">
-                  {box.views && (
+                  {box.views > 0 && (
                     <div className="flex items-center gap-2 text-gray-600">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
