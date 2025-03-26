@@ -344,7 +344,7 @@ const Careerspage = () => {
                 >
                   <div>
                     <div className="relative group h-48">
-                      {career.views && (
+                      {career.views !=='0' && (
                         <div className="absolute h-fit p-1 w-fit px-2 rounded-full bg-white hidden top-2 right-2 group-hover:flex items-center justify-center gap-2 text-gray-600">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
