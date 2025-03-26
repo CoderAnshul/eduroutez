@@ -138,62 +138,66 @@ const BlogComponent = () => {
                       __html: blog.description.slice(0, 100),
                     }}
                   ></p>
-                  <div className="mt-4">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      {blog.views && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="22"
-                            height="22"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                          </svg>
-                          <span className="text-gray-500">{blog.views}</span>
-                        </div>
-                      )}
-                      {blog.likes && blog.likes.length > 0 && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="22"
-                            height="22"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
-                            <path d="M9 22V12"></path>
-                          </svg>
-                          <span className="">
-                            {blog.likes.length > 0 && blog.likes.length}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <div className="mt-4"></div>
                   <div className="mt-4">
                     <div className="flex justify-between items-center text-gray-600">
                       <button className="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
                         Read More
                       </button>
-                      {/* Social Share component */}
-                      <div onClick={(e) => handleShareClick(e, blog)}>
-                        <SocialShare
-                          title={blog.title}
-                          url={`${window.location.origin}/blogdetailpage/${blog.slug}`}
-                          contentType="blog"
-                        />
+
+                      <div className="flex gap-4">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          {blog.views && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="22"
+                                height="22"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                              </svg>
+                              <span className="text-gray-500">
+                                {blog.views}
+                              </span>
+                            </div>
+                          )}
+                          {blog.likes && blog.likes.length > 0 && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="22"
+                                height="22"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
+                                <path d="M9 22V12"></path>
+                              </svg>
+                              <span className="">
+                                {blog.likes.length > 0 && blog.likes.length}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        {/* Social Share component */}
+                        <div onClick={(e) => handleShareClick(e, blog)}>
+                          <SocialShare
+                            title={blog.title}
+                            url={`${window.location.origin}/blogdetailpage/${blog.slug}`}
+                            contentType="blog"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
