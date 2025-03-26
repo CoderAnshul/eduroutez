@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
 const formSections = [
   {
@@ -104,11 +104,19 @@ const formSections = [
   },
 ];
 
-const Feedback = ({ setFormData, setIsSubmit }) => {
+const Feedback = ({ formData, setFormData, setIsSubmit }) => {
   const [formState, setFormState] = useState({});
 
   const handleChange = (sectionTitle, option) => {
     setFormState((prevState) => ({
+      ...prevState,
+      [sectionTitle]: {
+        ...prevState[sectionTitle],
+        [option]: !prevState[sectionTitle]?.[option], // Toggle option
+      },
+    }));
+
+    setFormData((prevState) => ({
       ...prevState,
       [sectionTitle]: {
         ...prevState[sectionTitle],
@@ -120,10 +128,10 @@ const Feedback = ({ setFormData, setIsSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // setFormData({ ...formState });
-    console.log('done1');
+    console.log("done1");
     setIsSubmit(true);
-    console.log('done');
-    console.log('Form Data Submitted:', formState);
+    console.log("done");
+    console.log("Form Data Submitted:", formState);
   };
 
   return (
@@ -131,24 +139,29 @@ const Feedback = ({ setFormData, setIsSubmit }) => {
       <div className="w-full flex flex-col max-w-4xl items-center md:block p-6 bg-white rounded-lg h-[480px] overflow-y-scroll scrollbar-thumb-red">
         {/* Title */}
         <h1 className="text-2xl font-semibold text-center text-gray-800">
-          Social Links
+          Your Experience Survey
         </h1>
         <p className="mt-1 text-sm text-center text-gray-500">
           Check twice before you paste your social handle's link
         </p>
 
         {/* Form */}
-        <form className="mt-14 space-y-8 mx-auto md:px-10 mb-10" onSubmit={handleSubmit}>
+        <form
+          className="mt-14 space-y-8 mx-auto md:px-10 mb-10"
+          onSubmit={handleSubmit}
+        >
           {formSections.map((section, index) => (
             <div key={index}>
-              <h2 className="text-lg font-medium text-gray-700">{section.title}</h2>
+              <h2 className="text-lg font-medium text-gray-700">
+                {section.title}
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                 {section.options.map((option, i) => (
                   <label key={i} className="flex items-center">
                     <input
                       type="checkbox"
                       className="mr-2 border-gray-300 focus:ring-blue-500"
-                      checked={formState[section.title]?.[option] || false}
+                      checked={formData[section.title]?.[option] || false}
                       onChange={() => handleChange(section.title, option)}
                     />
                     {option}

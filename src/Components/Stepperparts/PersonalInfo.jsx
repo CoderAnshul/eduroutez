@@ -6,7 +6,7 @@ import { setAllFieldsTrue, setAllFieldsFalse } from "../../config/inputSlice";
 import axiosInstance from "../../ApiFunctions/axios";
 import Promotions from "../../Pages/CoursePromotions";
 
-const SearchableDropdown = ({ options, onChange }) => {
+const SearchableDropdown = ({ options, onChange, selected }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchChange = (e) => {
@@ -33,7 +33,11 @@ const SearchableDropdown = ({ options, onChange }) => {
       >
         <option value="">Select</option>
         {filteredOptions.map((item, index) => (
-          <option key={index} value={item._id}>
+          <option
+            selected={selected === item?._id}
+            key={index}
+            value={item._id}
+          >
             {item.instituteName}
           </option>
         ))}
@@ -42,7 +46,7 @@ const SearchableDropdown = ({ options, onChange }) => {
   );
 };
 
-const PersonalInfo = ({ setFormData, setIsSubmit }) => {
+const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
   const [colleges, setColleges] = useState([]);
   const [countries, setCountries] = useState([]);
   const [email, setEmail] = useState("");
@@ -177,7 +181,7 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               htmlFor="email"
               className="block text-sm font-medium text-gray-500"
             >
-              Email ID
+              Email ID <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -193,7 +197,7 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               htmlFor="fullName"
               className="block text-sm font-medium text-gray-500"
             >
-              Full Name
+              Full Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -209,7 +213,7 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               htmlFor="contactNumber"
               className="block text-sm font-medium text-gray-500"
             >
-              Mobile Number
+              Mobile Number <span className="text-red-500">*</span>
             </label>
             <input
               type="tel"
@@ -225,7 +229,7 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               htmlFor="gender"
               className="block text-sm font-medium text-gray-500"
             >
-              Gender
+              Gender <span className="text-red-500">*</span>
             </label>
             <select
               id="gender"
@@ -233,9 +237,9 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               onChange={handleInputChange}
             >
               <option>Select Gender</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Other</option>
+              <option selected={formData?.gender === "Male"}>Male</option>
+              <option selected={formData?.gender === "Female"}>Female</option>
+              <option selected={formData?.gender === "Other"}>Other</option>
             </select>
           </div>
           <div>
@@ -243,7 +247,7 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               htmlFor="country"
               className="block text-sm font-medium text-gray-500"
             >
-              Select Country
+              Select Country <span className="text-red-500">*</span>
             </label>
             <select
               id="country"
@@ -254,6 +258,7 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               {countries.map((country, index) => (
                 <option
                   key={index}
+                  selected={formData?.country?.name === country?.name}
                   value={country._id || country.id || country.name}
                 >
                   {country.name}
@@ -266,10 +271,11 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               htmlFor="institute"
               className="block text-sm font-medium text-gray-500"
             >
-              College You Are Reviewing
+              College You Are Reviewing <span className="text-red-500">*</span>
             </label>
             <SearchableDropdown
               options={colleges}
+              selected={formData?.institute}
               onChange={handleInputChange}
             />
           </div>
@@ -278,11 +284,12 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               htmlFor="address"
               className="block text-sm font-medium text-gray-500"
             >
-              Location
+              Location <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               id="address"
+              value={formData?.address || ""}
               placeholder="Enter location"
               className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
               onChange={handleInputChange}
@@ -293,12 +300,13 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
               htmlFor="yearOfGraduation"
               className="block text-sm font-medium text-gray-500"
             >
-              Year of Pass-out
+              Year of Pass-out <span className="text-red-500">*</span>
             </label>
             <select
               id="year"
               className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
               onChange={handleInputChange}
+              value={formData?.year}
             >
               <option>Select Year</option>
               <option>2020</option>

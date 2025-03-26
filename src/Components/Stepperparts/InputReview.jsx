@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Rating from "@mui/material/Rating";
 
-const InputReview = ({ setFormData, setIsSubmit }) => {
+const InputReview = ({ formData, setFormData, setIsSubmit }) => {
   const [ratings, setRatings] = useState({
     placementStars: 0,
     facultyStars: 0,
@@ -21,7 +21,7 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
       const updatedRatings = { ...prev, [category]: newValue };
       setFormData((prevFormData) => ({
         ...prevFormData,
-        ratings: updatedRatings,
+        ratings: { ...(prevFormData.ratings || {}), [category]: newValue },
       }));
       return updatedRatings;
     });
@@ -55,6 +55,17 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
     }));
   };
 
+  useEffect(() => {
+    if (formData.ratings) {
+      setRatings({
+        placementStars: formData.ratings.placementStars || 0,
+        facultyStars: formData.ratings.facultyStars || 0,
+        campusLifeStars: formData.ratings.campusLifeStars || 0,
+        suggestionsStars: formData.ratings.suggestionsStars || 0,
+      });
+    }
+  }, [formData.ratings]);
+
   return (
     <div className="flex flex-col items-center h-full">
       <div className="w-full max-w-4xl p-6 bg-white rounded-lg h-[480px] overflow-y-scroll scrollbar-thumb-red">
@@ -75,11 +86,12 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               htmlFor="reviewTitle"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Give Your Review A Title
+              Give Your Review A Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               id="reviewTitle"
+              value={formData.reviewTitle}
               onChange={handleInputChange}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
               placeholder="Enter your review title"
@@ -92,10 +104,10 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               htmlFor="placements"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Placements
+              Placements <span className="text-red-500">*</span>
             </label>
             <Rating
-              value={ratings.placements}
+              value={ratings.placementStars}
               onChange={(event, newValue) =>
                 handleRatingChange("placementStars", newValue)
               }
@@ -104,6 +116,7 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               id="placementDescription"
               onChange={handleInputChange}
               rows="4"
+              value={formData.placementDescription || ""}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your review on placements..."
             ></textarea>
@@ -120,10 +133,10 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               htmlFor="facultyStars"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Faculty / Course Content
+              Faculty / Course Content <span className="text-red-500">*</span>
             </label>
             <Rating
-              value={ratings.faculty}
+              value={ratings.facultyStars}
               onChange={(event, newValue) =>
                 handleRatingChange("facultyStars", newValue)
               }
@@ -132,6 +145,7 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               id="facultyDescription"
               onChange={handleInputChange}
               rows="4"
+              value={formData.facultyDescription || ""}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your review on faculty or course content..."
             ></textarea>
@@ -148,10 +162,10 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               htmlFor="campusLifeStars"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Campus / Hostel
+              Campus / Hostel <span className="text-red-500">*</span>
             </label>
             <Rating
-              value={ratings.campus}
+              value={ratings.campusLifeStars}
               onChange={(event, newValue) =>
                 handleRatingChange("campusLifeStars", newValue)
               }
@@ -160,6 +174,7 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               id="campusLifeDescription"
               onChange={handleInputChange}
               rows="4"
+              value={formData.campusLifeDescription || ""}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your review on campus or hostel..."
             ></textarea>
@@ -176,10 +191,10 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               htmlFor="suggestions"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Suggestions
+              Suggestions <span className="text-red-500">*</span>
             </label>
             <Rating
-              value={ratings.suggestions}
+              value={ratings.suggestionsStars}
               onChange={(event, newValue) =>
                 handleRatingChange("suggestionsStars", newValue)
               }
@@ -188,6 +203,7 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
               id="suggestionDescription"
               onChange={handleInputChange}
               rows="4"
+              value={formData.suggestionDescription || ""}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none mt-2"
               placeholder="Write your suggestions..."
             ></textarea>
@@ -201,7 +217,8 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
           {/* Recommendation */}
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">
-              Would you recommend others to take admission in your college?
+              Would you recommend others to take admission in your college?{" "}
+              <span className="text-red-500">*</span>
             </p>
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-2">
@@ -209,6 +226,7 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
                   type="radio"
                   name="recommendation"
                   value={true}
+                  checked={formData.recommendation === "true" ? true : false}
                   onChange={handleRadioChange}
                   className="w-4 h-4 border-gray-300 focus:ring focus:ring-indigo-300"
                 />
@@ -219,6 +237,7 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
                   type="radio"
                   name="recommendation"
                   value={false}
+                  checked={formData.recommendation === "false" ? true : false}
                   onChange={handleRadioChange}
                   className="w-4 h-4 border-gray-300 focus:ring focus:ring-indigo-300"
                 />

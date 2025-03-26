@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-const SocialLinks = ({ setFormData, setIsSubmit }) => {
-  const [links, setLinks] = useState([""]); // Initialize with one empty input field
+const SocialLinks = ({ formData, setFormData, setIsSubmit }) => {
+  const [links, setLinks] = useState(formData?.socialLinks || [""]); // Initialize with one empty input field
 
   // Update the parent form data whenever links change
   useEffect(() => {
@@ -33,7 +33,9 @@ const SocialLinks = ({ setFormData, setIsSubmit }) => {
     <div className="flex flex-col items-center h-full">
       <div className="w-full flex flex-col items-center p-6 bg-white rounded-lg h-[480px] overflow-y-scroll scrollbar-thumb-red">
         {/* Title */}
-        <h1 className="text-2xl font-semibold text-gray-800 text-center">Social Links</h1>
+        <h1 className="text-2xl font-semibold text-gray-800 text-center">
+          Social Links
+        </h1>
 
         {/* Subtitle */}
         <p className="mt-1 text-sm text-gray-500 text-center">

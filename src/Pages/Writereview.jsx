@@ -20,6 +20,8 @@ const Writereview = () => {
   const [formData, setFormData] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
 
+  console.log("Form Data:");
+  console.log(formData);
   const submit = useSelector((store) => store.input.allFields);
 
   const steps = [
@@ -96,19 +98,19 @@ const Writereview = () => {
           ? "Recommendation is required"
           : "",
       };
-  
+
       return newErrors;
     };
-  
+
     const errors = validateForm();
     const hasErrors = Object.values(errors).some((error) => error !== "");
-  
+
     if (hasErrors) {
       toast.error("Please fill in all required fields correctly.");
       console.error("Validation Errors:", errors);
       return errors;
     }
-  
+
     setFormData(newFormData);
     setIsSubmit(false);
     return null;
@@ -122,22 +124,44 @@ const Writereview = () => {
     switch (currentStep) {
       case 1:
         return (
-          <PersonalInfo setFormData={setFormData} setIsSubmit={setIsSubmit} />
+          <PersonalInfo
+            formData={formData}
+            setFormData={setFormData}
+            setIsSubmit={setIsSubmit}
+          />
         );
       case 2:
         return (
-          <InputReview setFormData={setFormData} setIsSubmit={setIsSubmit} />
+          <InputReview
+            formData={formData}
+            setFormData={setFormData}
+            setIsSubmit={setIsSubmit}
+          />
         );
       case 3:
         return (
-          <UploadDocument setFormData={setFormData} setIsSubmit={setIsSubmit} />
+          <UploadDocument
+            formData={formData}
+            setFormData={setFormData}
+            setIsSubmit={setIsSubmit}
+          />
         );
       case 4:
         return (
-          <SocialLinks setFormData={setFormData} setIsSubmit={setIsSubmit} />
+          <SocialLinks
+            formData={formData}
+            setFormData={setFormData}
+            setIsSubmit={setIsSubmit}
+          />
         );
       case 5:
-        return <Feedback setFormData={setFormData} setIsSubmit={setIsSubmit} />;
+        return (
+          <Feedback
+            formData={formData}
+            setFormData={setFormData}
+            setIsSubmit={setIsSubmit}
+          />
+        );
       default:
         return null;
     }
