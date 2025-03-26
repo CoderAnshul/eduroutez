@@ -78,7 +78,7 @@ const CourseCard = ({ course }) => {
           </div>
           <div className="border-b-2 p-1 mb-2">
             <h4 className="text-sm font-bold mb-2 text-gray-700">Cut Off</h4>
-            <p className="text-xs font-medium opacity-70">{course.cutOff ? `${course.cutOff}%` : "N/A"}</p>
+            <p className="text-xs font-medium opacity-70">{course.cutOff ? `${course.cutOff}` : "N/A"}</p>
           </div>
         </div>
 
