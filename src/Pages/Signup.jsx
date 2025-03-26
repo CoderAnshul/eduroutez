@@ -16,7 +16,7 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const roleTypes = [
-    { value: 'institute', label: 'University/College Institute' },
+    { value: 'institute', label: 'University/College/Institute' },
     { value: 'counsellor', label: 'Counsellor' },
     { value: 'student', label: 'Student' },
   ];
