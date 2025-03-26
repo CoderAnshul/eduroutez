@@ -539,7 +539,7 @@ const SubNavbar = ({ categories }) => {
   };
 
   const renderCoursesContent = () => (
-    <div className="p-8 bg-white min-w-[1200px] max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    <div className="p-8 bg-white min-w-[1500px] max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-bold text-xl text-gray-800 flex items-center">
           <span className="w-1.5 h-6 bg-[#b82025] rounded-full mr-3"></span>
@@ -578,7 +578,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderCareersContent = () => (
-    <div className="p-6 bg-white min-w-[1200px]">
+    <div className="p-6 bg-white min-w-[1500px]">
       <div className="space-y-8">
         <h3 className="font-semibold text-red-500">Latest Careers</h3>
         <div className="space-y-6">
@@ -607,7 +607,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderTopCollegesContent = () => (
-    <div className="p-6 bg-white min-w-[1200px]">
+    <div className="p-6 bg-white min-w-[1500px]">
       <div className="grid grid-cols-3 gap-6">
         {/* Popular Colleges (sorted by views) */}
         <div className="space-y-6">
@@ -701,7 +701,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="bg-white rounded-xl min-w-[1200px] shadow-lg">
+    <div className="bg-white rounded-xl min-w-[1500px] shadow-lg">
       <div className="p-4 border-b ">
         <h3 className="text-lg font-bold text-black">Latest Updates</h3>
       </div>
@@ -771,7 +771,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderMoreContent = () => (
-    <div className="bg-pink rounded-lg shadow-lg p-6 min-w-[1200px]">
+    <div className="bg-pink rounded-lg shadow-lg p-6 min-w-[1500px]">
       <div className="grid grid-cols-3 gap-8">
         <div className="space-y-4 ">
           <h3 className="font-semibold text-red-500 border-b pb-2 ">
@@ -948,7 +948,7 @@ const SubNavbar = ({ categories }) => {
   };
 
   const renderRegularContent = (category) => (
-    <div className="flex min-w-[1200px]">
+    <div className="flex min-w-[1500px]">
       <div className="w-[440px]  overflow-y-auto">
         <ul className="min-w-40 whitespace-nowrap md:w-fit ml-0 mb-0 pb-0 space-y-0">
           {category?.sidebarItems?.map((item) => (
