@@ -111,7 +111,7 @@ const StreamLevelPage = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Featured Image */}
-         {console.log('dfghjkl;',pageData?.image) }
+         {/* {console.log('dfghjkl;',pageData?.image) }
           <div className="h-64 w-full overflow-hidden">
             <img
               src={ `${import.meta.env.VITE_IMAGE_BASE_URL}/${pageData.image}`  || cardPhoto}
@@ -122,7 +122,7 @@ const StreamLevelPage = () => {
                 e.target.onerror = null;
               }}
             />
-          </div>
+          </div> */}
 
           {/* Page Content */}
           <div className="p-8">

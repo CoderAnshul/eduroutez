@@ -392,10 +392,12 @@ const TrendingCourses = () => {
                               <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md">
                                 {course.courseTitle}
                               </h3>
-                              {/* <div className="flex items-center mt-2 text-white text-opacity-90 text-sm drop-shadow-md">
+                              <div className="flex items-center mt-2 text-white text-opacity-90 text-sm drop-shadow-md">
                                 <Clock size={14} className="mr-1" />
-                                {course.courseDurationMonths ? `${course.courseDurationMonths} months` : 'Self-paced'}
-                              </div> */}
+
+                          {course.courseDurationYears > 0 ? `${course.courseDurationYears} Years ` : ''}
+
+                          {course.courseDurationMonths > 0 ? `${course.courseDurationMonths} months` : ''}                              </div>
                             </div>
                           </div>
                         </div>
