@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import PersonalInfo from "../Components/Stepperparts/PersonalInfo";
 // import VerifyDetails from "../Components/Stepperparts/VerifyDetails";
 import InputReview from "../Components/Stepperparts/InputReview";
@@ -10,7 +12,7 @@ import { createReview } from "../ApiFunctions/api";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import Promotions from "./CoursePromotions";
-// import { useMutation, useQuery } from '@tanstack/react-query';
+import successImage from "../assets/Images/check.png";
 
 const Writereview = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -19,9 +21,7 @@ const Writereview = () => {
   const [isSubmit, setIsSubmit] = useState(false);
 
   const submit = useSelector((store) => store.input.allFields);
-  // console.log("submit" + submit)
 
-  // Total Steps
   const steps = [
     "Personal Info",
     "Verify Details",
@@ -31,17 +31,18 @@ const Writereview = () => {
     "Feedback",
   ];
 
-  // Move to the next step
   const nextStep = () => {
-    if (currentStep < steps.length -1) {
+    if (currentStep < steps.length - 1) {
       if (!submit) {
-        alert("All fields are required");
+        toast.error("All fields are required");
       } else {
         setCurrentStep(currentStep + 1);
       }
-    } else {
-      handleSubmit(formData);
-      setIsModalOpen(true); // Open modal when "Submit" is clicked
+    } else if (currentStep === steps.length - 1) {
+      const errors = handleSubmit(formData);
+      if (!errors) {
+        setIsModalOpen(true); // Open the modal only after successful submission
+      }
     }
   };
 
@@ -49,51 +50,80 @@ const Writereview = () => {
     ["review", formData],
     () => createReview(formData),
     {
-      enabled: !!formData && isSubmit, // Only run the query when formData is set and submitting
+      enabled: !!formData && isSubmit,
       onSuccess: () => {
-        // Reset formData after success
+        toast.success("Review created successfully!");
         setFormData(null);
+        setIsModalOpen(true);
+
         setIsSubmit(false);
       },
       onError: () => {
+        toast.error("Error creating review");
         setIsSubmit(false);
       },
     }
   );
 
-  // Handle submit
   const handleSubmit = (newFormData) => {
-    setFormData(newFormData); // Set the form data for query to trigger
-    setIsSubmit(true); // Start submitting
+    console.log("Submitting form data:", newFormData);
+    const validateForm = () => {
+      const newErrors = {
+        reviewTitle: !newFormData.reviewTitle?.trim()
+          ? "Review title is required"
+          : "",
+        placementDescription: !newFormData.placementDescription?.trim()
+          ? "Placement description is required"
+          : newFormData.placementDescription?.length < 100
+          ? "Placement description must be at least 100 characters"
+          : "",
+        facultyDescription: !newFormData.facultyDescription?.trim()
+          ? "Faculty description is required"
+          : newFormData.facultyDescription?.length < 100
+          ? "Faculty description must be at least 100 characters"
+          : "",
+        campusLifeDescription: !newFormData.campusLifeDescription?.trim()
+          ? "Campus description is required"
+          : newFormData.campusLifeDescription?.length < 100
+          ? "Campus description must be at least 100 characters"
+          : "",
+        suggestionDescription: !newFormData.suggestionDescription?.trim()
+          ? "Suggestions are required"
+          : newFormData.suggestionDescription?.length < 100
+          ? "Suggestions must be at least 100 characters"
+          : "",
+        recommendation: !newFormData.recommendation
+          ? "Recommendation is required"
+          : "",
+      };
+  
+      return newErrors;
+    };
+  
+    const errors = validateForm();
+    const hasErrors = Object.values(errors).some((error) => error !== "");
+  
+    if (hasErrors) {
+      toast.error("Please fill in all required fields correctly.");
+      console.error("Validation Errors:", errors);
+      return errors;
+    }
+  
+    setFormData(newFormData);
+    setIsSubmit(false);
+    return null;
   };
 
-  // You can handle states like loading, error, success here
-  if (isLoading) {
-    console.log("Loading review creation...");
-  }
-
-  if (isError) {
-    console.error("Error creating review:", error);
-  }
-
-  if (data) {
-    console.log("Review created successfully:", data);
-  }
-
-  // Move to the previous step
   const prevStep = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  // Render Step Components
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return (
           <PersonalInfo setFormData={setFormData} setIsSubmit={setIsSubmit} />
         );
-      // case 2:
-      //   return <VerifyDetails />;
       case 2:
         return (
           <InputReview setFormData={setFormData} setIsSubmit={setIsSubmit} />
@@ -113,9 +143,6 @@ const Writereview = () => {
     }
   };
 
-  console.log(formData);
-  console.log(isSubmit);
-
   useEffect(() => {
     if (isSubmit) {
       console.log(formData);
@@ -124,19 +151,16 @@ const Writereview = () => {
 
   return (
     <>
-      <div className="w-full items-center max-w-4xl h-24 mx-auto">
+      <ToastContainer />
+      <div className="w-full items-center max-w-4xl h-[90px] overflow-hidden mx-auto">
         <Promotions location="REVIEW_PAGE" className="h-[90px]" />
       </div>
-      <div className="p-3 h-[600px] pb-14 bg-white relative flex flex-col">
-        {/* Step Content */}
-
-        <div className=" p-2 md:p-6 rounded h-[300px] relative overflow-hidden shadow flex-1">
+      <div className="p-3 h-fit pb-14 bg-white relative flex flex-col">
+        <div className=" p-2 md:p-6 rounded h-full relative  shadow flex-1">
           {renderStepContent()}
         </div>
 
-        {/* Stepper Bar and Navigation Buttons */}
         <div className="absolute bottom-0 left-0 w-full bg-white border-t shadow-md">
-          {/* Progress Bar */}
           <div className="w-full h-2 bg-gray-300 relative">
             <div
               className="h-2 bg-red-500 transition-all duration-500 ease-in-out"
@@ -146,13 +170,12 @@ const Writereview = () => {
             ></div>
           </div>
 
-          {/* Navigation Buttons */}
           <div className="flex justify-between px-6 py-4">
             <button
               onClick={prevStep}
-              disabled={currentStep === 1}
+              disabled={currentStep == 1}
               className={`px-4 py-2 ${
-                currentStep === 1 ? "bg-gray-300" : "bg-gray-500"
+                currentStep == 1 ? "bg-gray-300" : "bg-gray-500"
               } text-white rounded`}
             >
               Previous
@@ -160,28 +183,26 @@ const Writereview = () => {
             <button
               onClick={nextStep}
               className={`px-4 py-2 ${
-                currentStep === steps.length - 1
+                currentStep == steps.length - 1
                   ? "px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
                   : "px-4 py-2 bg-red-500 text-white rounded"
               }`}
             >
-              {currentStep === steps.length - 1 ? "Submit" : "Next"}
+              {currentStep == steps.length - 1 ? "Submit" : "Next"}
             </button>
           </div>
         </div>
 
-        {/* Modal for Submission */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-              <h2 className="text-xl font-bold text-gray-800">
-                Review Submitted!
-              </h2>
-              <p className="mt-2 text-gray-600">
+            <div className="bg-white flex flex-col items-center  pt-10 rounded-lg shadow-lg p-6 w-96">
+              <img className="h-20 w-20 mb-4" src={successImage} />
+              <h2 className="text-2xl font-bold text-gray-800">Thank you!</h2>
+              <p className="mt-2 text-center  text-gray-600">
                 Thank you for submitting your review. We appreciate your
                 feedback!
               </p>
-              <div className="flex justify-center">
+              <div className="flex mt-4 justify-center">
                 <Link to="/">
                   <button
                     onClick={() => setIsModalOpen(false)}

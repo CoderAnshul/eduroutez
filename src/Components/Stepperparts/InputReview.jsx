@@ -114,7 +114,7 @@ const InputReview = ({ setFormData, setIsSubmit }) => {
             )}
           </div>
 
-          {/* Faculty / Course Content */}
+          {/* se / Course Content */}
           <div>
             <label
               htmlFor="facultyStars"

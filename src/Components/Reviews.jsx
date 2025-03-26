@@ -287,7 +287,7 @@ const Reviews = () => {
     <div className="w-full min-h-44 p-4 md:p-8 bg-gray-50">
       <div className="w-full mx-auto min-h-44 max-w-7xl">
         <div className="flex items-center justify-between mb-8">
-          <h3 className="text-2xl font-bold">What People Say About Us</h3>
+          <h3 className="text-xl font-bold">What People Say About Us</h3>
         </div>
 
         <div className="relative">

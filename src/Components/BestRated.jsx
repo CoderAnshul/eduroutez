@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
 import { Link } from "react-router-dom";
@@ -12,22 +12,24 @@ import { bestRatedInstitute } from "../ApiFunctions/api";
 const BestRated = () => {
   const [content, setContent] = useState([]);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
-  
+
   const navigate = useNavigate();
 
   const handleViewMore = () => {
-    console.log('Navigating to institutes');
-    navigate('/institute');
+    console.log("Navigating to institutes");
+    navigate("/institute");
   };
 
   // Initialize window.instituteIdMap from localStorage on component mount
   useEffect(() => {
     if (!window.instituteIdMap) {
       try {
-        const storedInstituteIdMap = JSON.parse(localStorage.getItem('instituteIdMap') || '{}');
+        const storedInstituteIdMap = JSON.parse(
+          localStorage.getItem("instituteIdMap") || "{}"
+        );
         window.instituteIdMap = storedInstituteIdMap;
       } catch (error) {
-        console.error('Error loading instituteIdMap from localStorage:', error);
+        console.error("Error loading instituteIdMap from localStorage:", error);
         window.instituteIdMap = {};
       }
     }
@@ -36,24 +38,31 @@ const BestRated = () => {
   // Batch update the ID mapping when data arrives
   const updateIdMapping = (institutes) => {
     let hasChanges = false;
-    
-    institutes.forEach(institute => {
-      if (institute.slug && institute._id && !window.instituteIdMap[institute.slug]) {
+
+    institutes.forEach((institute) => {
+      if (
+        institute.slug &&
+        institute._id &&
+        !window.instituteIdMap[institute.slug]
+      ) {
         window.instituteIdMap[institute.slug] = institute._id;
         hasChanges = true;
       }
     });
-    
+
     // Only update localStorage if there are actual changes
     if (hasChanges) {
-      localStorage.setItem('instituteIdMap', JSON.stringify(window.instituteIdMap));
+      localStorage.setItem(
+        "instituteIdMap",
+        JSON.stringify(window.instituteIdMap)
+      );
     }
   };
 
   // Helper function to get URL for display - consistent with other components
   const getInstituteUrl = (institute) => {
     // Prefer slugs for SEO, fall back to IDs
-    return institute?.slug 
+    return institute?.slug
       ? `/institute/${institute.slug}`
       : `/institute/${institute?._id}`;
   };
@@ -67,7 +76,7 @@ const BestRated = () => {
       onSuccess: (data) => {
         const institutes = data.data || [];
         setContent(institutes);
-        
+
         // Update ID mapping
         if (institutes.length > 0) {
           updateIdMapping(institutes);
@@ -100,19 +109,18 @@ const BestRated = () => {
     );
   }
 
-
   return (
     <div className="w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
       <div className="flex items-center justify-between mb-10">
         <h3 className="text-xl font-bold">Best Rated Institutes</h3>
-        <button 
-        onClick={handleViewMore} 
-        className="bg-red-500 text-white py-2 px-4 rounded"
-      >
-        View more
-      </button>
+        <button
+          onClick={handleViewMore}
+          className="bg-red-500 text-white py-2 px-4 rounded"
+        >
+          View more
+        </button>
       </div>
-      
+
       <div className="boxWrapper w-full flex flex-col md:flex-row flex-wrap items-center gap-6">
         {content.length > 0 ? (
           content.slice(0, 3).map((institute, index) => {
@@ -127,17 +135,17 @@ const BestRated = () => {
                     className="h-full w-full object-cover"
                     src={
                       institute.thumbnailImage
-                      ? `${Images}/${institute.thumbnailImage}`
-                      : cardPhoto
+                        ? `${Images}/${institute.thumbnailImage}`
+                        : cardPhoto
                     }
                     alt="Institute"
                   />
                 </div>
                 <div className="textContainer p-4">
-                  <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]">
+                  <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
                     {institute.instituteName || "Institute Name Not Available"}
                   </h3>
-                  
+
                   <p className="text-sm mt-2">
                     {institute.about ? (
                       <span

@@ -51,13 +51,15 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
   const dispatch = useDispatch();
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
   const apiUrl = import.meta.env.VITE_BASE_URL; // Using the same base URL for consistency
-  
+
   // Fetch student data
   const { data: studentData } = useQuery(
     ["student"],
     async () => {
-      const id = localStorage.getItem('userId')
-      const response = await axiosInstance.get(`${VITE_BASE_URL}/student/${id}`);
+      const id = localStorage.getItem("userId");
+      const response = await axiosInstance.get(
+        `${VITE_BASE_URL}/student/${id}`
+      );
       return response.data;
     },
     {
@@ -66,16 +68,16 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
           setEmail(data.data.email || "");
           setName(data.data.name || "");
           setMobile(data.data.phone || "");
-          
+
           // Update form data with fetched values
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             email: data.data.email,
             fullName: data.data.name,
-            mobileNumber: data.data.phoneNo
+            mobileNumber: data.data.phoneNo,
           }));
         }
-      }
+      },
     }
   );
 
@@ -118,11 +120,9 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
     }
   }, [email, name, mobile, dispatch]);
 
-
-
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    
+
     // Update specific state variables
     switch (id) {
       case "email":
@@ -136,22 +136,25 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
         break;
       case "country":
         // Find the selected country object
-        const selectedCountry = countries.find(country => 
-          (country._id || country.id || '').toString() === value.toString()
+        const selectedCountry = countries.find(
+          (country) =>
+            (country._id || country.id || "").toString() === value.toString()
         );
-        
+
         // Update form data with structured country object
-        setFormData(prevData => ({
+        setFormData((prevData) => ({
           ...prevData,
           country: value,
-          country: selectedCountry ? {
-            name: selectedCountry.name,
-            iso2: selectedCountry.iso2
-          } : null
+          country: selectedCountry
+            ? {
+                name: selectedCountry.name,
+                iso2: selectedCountry.iso2,
+              }
+            : null,
         }));
         return; // Skip the general formData update at the end
     }
-  
+
     // Update form data for other fields
     setFormData((prevData) => ({
       ...prevData,
@@ -159,11 +162,9 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
     }));
   };
 
-
   return (
-    <div className="flex flex-col items-center h-full">
-      
-      <div className="w-full max-w-4xl p-6 bg-white rounded-lg h-[480px] overflow-y-scroll">
+    <div className="flex flex-col items-center h-fit mb-4">
+      <div className="w-full max-w-4xl p-6 bg-white rounded-lg h-fit">
         <h1 className="text-2xl font-semibold text-center">
           Personal Information
         </h1>
@@ -251,7 +252,10 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
             >
               <option value="">Select Country</option>
               {countries.map((country, index) => (
-                <option key={index} value={country._id || country.id || country.name}>
+                <option
+                  key={index}
+                  value={country._id || country.id || country.name}
+                >
                   {country.name}
                 </option>
               ))}
@@ -264,8 +268,8 @@ const PersonalInfo = ({ setFormData, setIsSubmit }) => {
             >
               College You Are Reviewing
             </label>
-            <SearchableDropdown 
-              options={colleges} 
+            <SearchableDropdown
+              options={colleges}
               onChange={handleInputChange}
             />
           </div>

@@ -156,7 +156,7 @@ const SearchResultBox = ({ institute, url , className="" }) => {
         {/* Right Section - Details */}
         <div className="w-full md:w-3/4 flex flex-col">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">{institute.instituteName}</h3>
+            <h3 className="text-xl font-medium">{institute.instituteName}</h3>
           </div>
 
           <div className="flex items-center space-x-3 text-sm text-gray-600">
