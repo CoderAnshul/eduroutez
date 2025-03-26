@@ -99,10 +99,10 @@ const BlogDetailPage = () => {
         }
   
         // Get blog image
-        if (response.data.thumbnail || response.data.image) {
+        if (response.data.thumbnail || response.data.image || response.data.coverImage) {
           try {
             const imageResponse = await fetch(
-              `${Images}/${response.data.cover || response.data.thumbnail}`
+              `${Images}/${response.data?.image}`
             );
             const imageBlob = await imageResponse.blob();
             const imageObjectURL = URL.createObjectURL(imageBlob);
