@@ -15,6 +15,8 @@ const CounselorListPage = () => {
   const [limit] = useState(6);
 
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
+  const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+
 
   useEffect(() => {
     fetchCounselors();
@@ -106,7 +108,10 @@ const CounselorListPage = () => {
                   {/* Profile Image */}
                   {counselor.profilePhoto ? (
                     <img
-                      src={counselor.profilePhoto}
+                    src={`${Images}/${counselor.profilePhoto.replace(
+                      "uploads/",
+                      ""
+                    )}`}
                       alt={counselor.firstname}
                       className="h-24 w-24 rounded-lg object-cover"
                     />
