@@ -150,7 +150,7 @@ const SearchPage = () => {
   const { data: streamsData } = useQuery(
     ["streams"],
     async () => {
-      const response = await axios.get(`${baseURL}/streams&sort={"createdAt":"asc"}`);
+      const response = await axios.get(`${baseURL}/streams?&sort={"createdAt":"asc"}`);
       return response.data;
     },
     {
