@@ -37,7 +37,8 @@ const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
       if (!response.data) {
         throw new Error('Failed to submit review');
       }
-
+      setRating(0);
+      setComment('');
       onClose();
     } catch (err) {
       setError(err.message);
