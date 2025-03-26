@@ -90,7 +90,7 @@ a {
   background-position: bottom;
 }
 .viewmorebtn {
-  background-color: red;
+  /* background-color: red; */
   color: white;
   padding: 0.6vw 2vw;
   border-radius: 8px;
