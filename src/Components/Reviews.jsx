@@ -214,7 +214,7 @@ const Reviews = () => {
       type: "Counselor",
       company: "",
       text: "Being a career counselor, I appreciate how Eduroutez connects students with the right mentors. It's a great opportunity for professionals to make an impact.",
-      userImage: imageMap.counselor[3],
+      userImage: imageMap.counselor[4],
       rating: 5,
     },
     {
@@ -223,7 +223,7 @@ const Reviews = () => {
       type: "Counselor",
       company: "",
       text: "I've had a great experience counseling students on Eduroutez. The platform ensures that students get authentic and expert advice for their future.",
-      userImage: imageMap.counselor[4],
+      userImage: imageMap.counselor[3],
       rating: 5,
     }
   ];

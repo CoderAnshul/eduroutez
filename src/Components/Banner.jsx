@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setInput } from '../config/inputSlice';
-import axios from 'axios';
-import Promotions from '../Pages/CoursePromotions'; // Import the Promotions component
+import { setInput } from "../config/inputSlice";
+import axios from "axios";
+import Promotions from "../Pages/CoursePromotions"; // Import the Promotions component
 
 const Banner = () => {
   const [inputField, setInputField] = useState("");
@@ -18,7 +18,7 @@ const Banner = () => {
   // Fetch suggestions based on input
   useEffect(() => {
     let isMounted = true;
-    
+
     const fetchSuggestions = async () => {
       if (inputField.length < 2) {
         setSuggestions([]);
@@ -28,53 +28,59 @@ const Banner = () => {
 
       setIsLoading(true);
       try {
-        const endpoint = searchType === 'counsellor' ? 'counselors' : 'institutes';
-        console.log('Fetching from:', `${baseURL}/${endpoint}`);
-        
+        const endpoint =
+          searchType === "counsellor" ? "counselors" : "institutes";
+        console.log("Fetching from:", `${baseURL}/${endpoint}`);
+
         const response = await axios.get(`${baseURL}/${endpoint}`);
-        console.log('API Response:', response.data);
-        
+        console.log("API Response:", response.data);
+
         if (!isMounted) return;
 
         if (response.data?.data?.result) {
-          const searchRegex = new RegExp(inputField, 'i');
+          const searchRegex = new RegExp(inputField, "i");
           let filteredResults = [];
 
-          if (searchType === 'counsellor') {
-            filteredResults = response.data.data.result.filter(counselor => 
-              searchRegex.test(counselor.firstname) || 
-              searchRegex.test(counselor.lastname) || 
-              (counselor.specialization && searchRegex.test(counselor.specialization))
+          if (searchType === "counsellor") {
+            filteredResults = response.data.data.result.filter(
+              (counselor) =>
+                searchRegex.test(counselor.firstname) ||
+                searchRegex.test(counselor.lastname) ||
+                (counselor.specialization &&
+                  searchRegex.test(counselor.specialization))
             );
-          } else if (searchType === 'course') {
+          } else if (searchType === "course") {
             // Extract all courses from institutes and flatten them into a single array
-            filteredResults = response.data.data.result.reduce((courses, institute) => {
-              if (institute.courses) {
-                const matchingCourses = institute.courses
-                  .filter(course => searchRegex.test(course.courseTitle))
-                  .map(course => ({
-                    courseTitle: course.courseTitle,
-                    instituteName: institute.instituteName,
-                    city: institute.city,
-                    instituteId: institute._id
-                  }));
-                return [...courses, ...matchingCourses];
-              }
-              return courses;
-            }, []);
+            filteredResults = response.data.data.result.reduce(
+              (courses, institute) => {
+                if (institute.courses) {
+                  const matchingCourses = institute.courses
+                    .filter((course) => searchRegex.test(course.courseTitle))
+                    .map((course) => ({
+                      courseTitle: course.courseTitle,
+                      instituteName: institute.instituteName,
+                      city: institute.city,
+                      instituteId: institute._id,
+                    }));
+                  return [...courses, ...matchingCourses];
+                }
+                return courses;
+              },
+              []
+            );
           } else {
-            filteredResults = response.data.data.result.filter(institute => 
+            filteredResults = response.data.data.result.filter((institute) =>
               searchRegex.test(institute.instituteName)
             );
           }
 
-          console.log('Filtered Results:', filteredResults);
+          console.log("Filtered Results:", filteredResults);
 
           setSuggestions(filteredResults);
           setShowSuggestions(filteredResults.length > 0);
         }
       } catch (error) {
-        console.error('Error fetching suggestions:', error);
+        console.error("Error fetching suggestions:", error);
         if (isMounted) {
           setSuggestions([]);
           setShowSuggestions(false);
@@ -87,7 +93,7 @@ const Banner = () => {
     };
 
     const debounceTimer = setTimeout(fetchSuggestions, 300);
-    
+
     return () => {
       isMounted = false;
       clearTimeout(debounceTimer);
@@ -105,20 +111,24 @@ const Banner = () => {
   };
 
   const handleSuggestionClick = (suggestion) => {
-    if (searchType === 'course') {
+    if (searchType === "course") {
       setInputField(suggestion.courseTitle);
       dispatch(setInput(suggestion.courseTitle));
-    } else if (searchType === 'counsellor') {
-      setInputField(suggestion.firstname + ' ' + suggestion.lastname);
+    } else if (searchType === "counsellor") {
+      setInputField(suggestion.firstname + " " + suggestion.lastname);
     } else {
       setInputField(suggestion.instituteName);
       dispatch(setInput(suggestion.instituteName));
     }
-    
+
     setShowSuggestions(false);
-    
-    if (searchType === 'counsellor') {
-      navigate(`/counselor?name=${encodeURIComponent(suggestion.firstname + ' ' + suggestion.lastname)}`);
+
+    if (searchType === "counsellor") {
+      navigate(
+        `/counselor?name=${encodeURIComponent(
+          suggestion.firstname + " " + suggestion.lastname
+        )}`
+      );
     } else {
       navigate("/searchpage");
     }
@@ -130,7 +140,7 @@ const Banner = () => {
       return;
     }
 
-    if (searchType === 'counsellor') {
+    if (searchType === "counsellor") {
       navigate(`/counselor?name=${encodeURIComponent(inputField)}`);
     } else {
       dispatch(setInput(inputField));
@@ -142,56 +152,56 @@ const Banner = () => {
     // <div className="h-[480px] w-full relative">
     <div className="h-fit min-h-56 max-h-96 w-full relative mb-8">
       {/* Dynamic Promotions component instead of static banners */}
-        <Promotions location="HOME_MAIN_PAGE" />
+      <Promotions location="HOME_MAIN_PAGE" />
 
-      <div className="h-full w-full bg-[#00000049] p-2 absolute top-0 overflow-hidden z-10 flex flex-col items-center justify-center">
+      <div className="h-full w-full bg-[#00000049] p-2 absolute top-0  z-10 flex flex-col items-center justify-center">
         <h1 className="text-4xl text-white text-center font-semibold mb-5">
-          {searchType === 'counsellor' 
-            ? 'Find Expert Education Counsellors' 
-            : 'Find Over 5000+ Colleges in India'}
+          {searchType === "counsellor"
+            ? "Find Expert Education Counsellors"
+            : "Find Over 5000+ Colleges in India"}
         </h1>
-        
+
         <div className="relative max-w-[800px] w-full">
           <div className="search ml-5 max-sm:ml-0 mr-5 h-12 bg-white border-[1.5px] relative border-gray-500 rounded-lg items-center gap-2 w-full overflow-hidden flex">
-            <select 
-              className="h-full max-sm:w-20 bg-gray-100 border-r border-gray-300 px-2 text-sm outline-none cursor-pointer" 
-              value={searchType} 
+            <select
+              className="h-full max-sm:w-20 bg-gray-100 border-r border-gray-300 px-2 text-sm outline-none cursor-pointer"
+              value={searchType}
               onChange={(e) => setSearchType(e.target.value)}
             >
               <option value="institute">Institute</option>
               <option value="course">Course</option>
               <option value="counsellor">Counsellor</option>
             </select>
-            
+
             <div className="flex items-center w-4/5 pl-4 max-sm:pl-1 py-2 gap-3">
-              <svg 
-                className="w-5 h-5 text-gray-500" 
-                fill="none" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth="2" 
-                viewBox="0 0 24 24" 
+              <svg
+                className="w-5 h-5 text-gray-500"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
               >
                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <input 
-                className="text-sm w-1/2 outline-none" 
-                type="text" 
-                value={inputField} 
+              <input
+                className="text-sm w-1/2 outline-none"
+                type="text"
+                value={inputField}
                 onChange={handleInputChange}
                 placeholder={
-                  searchType === 'counsellor' 
-                    ? 'Search for counsellor names...' 
-                    : searchType === 'course'
-                    ? 'Search for courses...'
-                    : 'Search for institutes...'
+                  searchType === "counsellor"
+                    ? "Search for counsellor names..."
+                    : searchType === "course"
+                    ? "Search for courses..."
+                    : "Search for institutes..."
                 }
               />
             </div>
-            
-            <button 
-              className="!h-full right-0 !rounded-sm w-1/5 max-sm:w-1/6 absolute top-0 bg-red-500 min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white" 
+
+            <button
+              className="!h-full right-0 !rounded-sm w-1/5 max-sm:w-1/6 absolute top-0 bg-red-500 min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white"
               onClick={handleBtnClick}
             >
               Search
@@ -211,22 +221,27 @@ const Banner = () => {
                     onClick={() => handleSuggestionClick(suggestion)}
                   >
                     <div className="font-medium">
-                      {searchType === 'course' 
-                        ? suggestion.courseTitle 
-                        : searchType === 'counsellor'
-                        ? suggestion.firstname + ' ' + suggestion.lastname
+                      {searchType === "course"
+                        ? suggestion.courseTitle
+                        : searchType === "counsellor"
+                        ? suggestion.firstname + " " + suggestion.lastname
                         : suggestion.instituteName}
                     </div>
-                    {searchType === 'course' && (
+                    {searchType === "course" && (
                       <div className="text-sm text-gray-600">
                         {suggestion.instituteName} - {suggestion.cityName}
                       </div>
                     )}
-                    {searchType === 'counsellor' && suggestion.specialization && (
-                      <div className="text-sm text-gray-600">{suggestion.specialization}</div>
-                    )}
-                    {searchType === 'institute' && suggestion.cityName && (
-                      <div className="text-sm text-gray-600">{suggestion.cityName}</div>
+                    {searchType === "counsellor" &&
+                      suggestion.specialization && (
+                        <div className="text-sm text-gray-600">
+                          {suggestion.specialization}
+                        </div>
+                      )}
+                    {searchType === "institute" && suggestion.cityName && (
+                      <div className="text-sm text-gray-600">
+                        {suggestion.cityName}
+                      </div>
                     )}
                   </div>
                 ))
