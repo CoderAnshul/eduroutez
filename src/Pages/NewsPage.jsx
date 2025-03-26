@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Loader2, Search } from 'lucide-react';
-import axiosInstance from '../ApiFunctions/axios';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Loader2, Search } from "lucide-react";
+import axiosInstance from "../ApiFunctions/axios";
+import { Link } from "react-router-dom";
 
 export default function NewsPage() {
   const [latestNews, setLatestNews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState('latest');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState("latest");
+  const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 6;
 
   const fetchLatestNews = async () => {
@@ -21,8 +21,8 @@ export default function NewsPage() {
       );
       setLatestNews(response.data?.data || []);
     } catch (error) {
-      console.error('Error fetching latest news:', error.message);
-      setError('Failed to load news. Please try again later.');
+      console.error("Error fetching latest news:", error.message);
+      setError("Failed to load news. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -34,7 +34,7 @@ export default function NewsPage() {
 
   // Filter and sort news based on search query and selected order
   const filteredAndSortedNews = [...latestNews]
-    .filter(news => {
+    .filter((news) => {
       const searchLower = searchQuery.toLowerCase();
       return (
         news.title.toLowerCase().includes(searchLower) ||
@@ -45,7 +45,7 @@ export default function NewsPage() {
     .sort((a, b) => {
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
-      return sortOrder === 'latest' ? dateB - dateA : dateA - dateB;
+      return sortOrder === "latest" ? dateB - dateA : dateA - dateB;
     });
 
   // Calculate pagination
@@ -76,9 +76,9 @@ export default function NewsPage() {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
         <p className="text-red-500">{error}</p>
-        <button 
+        <button
           onClick={fetchLatestNews}
-          className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          className="rounded-lg bg-[#b82025] px-4 py-2 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
         >
           Try Again
         </button>
@@ -111,16 +111,21 @@ export default function NewsPage() {
           </select>
         </div>
       </div>
-      
+
       {filteredAndSortedNews.length === 0 ? (
         <div className="text-center text-gray-500">
-          {searchQuery ? 'No results found for your search.' : 'No news articles available.'}
+          {searchQuery
+            ? "No results found for your search."
+            : "No news articles available."}
         </div>
       ) : (
         <>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {currentNews.map((news, index) => (
-              <div key={news.id || index} className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+              <div
+                key={news.id || index}
+                className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+              >
                 {news.image && (
                   <img
                     src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${news.image}`}
@@ -154,9 +159,11 @@ export default function NewsPage() {
             <div className="mt-8 flex justify-center space-x-2">
               <button
                 className={`rounded-lg border px-4 py-2 text-sm transition-colors
-                  ${page === 1 
-                    ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400' 
-                    : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                  ${
+                    page === 1
+                      ? "cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400"
+                      : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                  }`}
                 disabled={page === 1}
                 onClick={() => setPage(page - 1)}
               >
@@ -167,18 +174,22 @@ export default function NewsPage() {
                   key={index}
                   onClick={() => setPage(index + 1)}
                   className={`rounded-lg px-4 py-2 text-sm transition-colors
-                    ${page === index + 1
-                      ? 'bg-red-600 text-white'
-                      : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                    ${
+                      page === index + 1
+                        ? "bg-[#b82025] text-white"
+                        : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   {index + 1}
                 </button>
               ))}
               <button
                 className={`rounded-lg border px-4 py-2 text-sm transition-colors
-                  ${page === totalPages 
-                    ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400' 
-                    : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                  ${
+                    page === totalPages
+                      ? "cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400"
+                      : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                  }`}
                 disabled={page === totalPages}
                 onClick={() => setPage(page + 1)}
               >

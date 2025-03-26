@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
-import axiosInstance from '../ApiFunctions/axios';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
+import axiosInstance from "../ApiFunctions/axios";
 
-const Faqs = ({instituteData}) => {
-  console.log('d gfhgjkl faqf',instituteData.data?._id);
+const Faqs = ({ instituteData }) => {
+  console.log("d gfhgjkl faqf", instituteData.data?._id);
   const [faqs, setFaqs] = useState([]);
   const [showMore, setShowMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -17,8 +17,10 @@ const Faqs = ({instituteData}) => {
     const fetchFaqs = async () => {
       try {
         setIsLoading(true);
-        const response = await axiosInstance.get(`${apiUrl}/faq-by-institute/${instituteData?.data?._id}`);
-        console.log('faq data ghj',response);
+        const response = await axiosInstance.get(
+          `${apiUrl}/faq-by-institute/${instituteData?.data?._id}`
+        );
+        console.log("faq data ghj", response);
         const faqData = response?.data?.data || [];
         setFaqs(Array.isArray(faqData) ? faqData : []);
         setIsLoading(false);
@@ -42,24 +44,30 @@ const Faqs = ({instituteData}) => {
       <>
         <div
           className="border-2 rounded-xl p-3 overflow-hidden transition-all"
-          style={{ maxHeight: showMore ? '1000px' : 'calc(8 * 60px)' }}
+          style={{ maxHeight: showMore ? "1000px" : "calc(8 * 60px)" }}
         >
           {faqs.slice(0, showMore ? faqs.length : 8).map((faq, index) => (
             <div key={index} className="border-b last:border-b-0 py-2">
               <div
                 className="flex justify-between items-center cursor-pointer"
                 onClick={() => {
-                  const details = document.getElementById(`faq-details-${index}`);
-                  details?.classList.toggle('hidden');
+                  const details = document.getElementById(
+                    `faq-details-${index}`
+                  );
+                  details?.classList.toggle("hidden");
                 }}
               >
-                <h4 className="text-md font-semibold">{faq?.question || 'Untitled Question'}</h4>
+                <h4 className="text-md font-semibold">
+                  {faq?.question || "Untitled Question"}
+                </h4>
                 <ChevronDown className="text-gray-500" />
               </div>
               <div
                 id={`faq-details-${index}`}
                 className="hidden mt-2 text-gray-600"
-                dangerouslySetInnerHTML={{ __html: faq?.answer || 'No answer available' }}
+                dangerouslySetInnerHTML={{
+                  __html: faq?.answer || "No answer available",
+                }}
               />
             </div>
           ))}
@@ -70,7 +78,7 @@ const Faqs = ({instituteData}) => {
             onClick={() => setShowMore(!showMore)}
             className="text-blue-600 mt-2"
           >
-            {showMore ? 'Show Less' : 'Show More'}
+            {showMore ? "Show Less" : "Show More"}
           </button>
         )}
       </>
@@ -84,7 +92,7 @@ const Faqs = ({instituteData}) => {
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4">
-      <div className='mb-8 flex items-center justify-between'>
+      <div className="mb-8 flex items-center justify-between">
         <div>
           <h3 className="text-xl font-bold">Questions & Answers</h3>
           <h4 className="font-semibold opacity-75">
@@ -92,8 +100,10 @@ const Faqs = ({instituteData}) => {
           </h4>
         </div>
         <button
-          className="bg-red-500 text-sm font-medium px-4 py-3 rounded-lg text-white"
-          onClick={() => window.location.href = `/questionandAnswer/${instituteData?.data?.email}`}
+          className="bg-[#b82025] text-sm font-medium px-4 py-3 rounded-lg text-white"
+          onClick={() =>
+            (window.location.href = `/questionandAnswer/${instituteData?.data?.email}`)
+          }
         >
           Ask our experts
         </button>

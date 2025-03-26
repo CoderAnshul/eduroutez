@@ -97,7 +97,7 @@ const BlogComponent = () => {
       <div className="flex items-center justify-between mb-10">
         <h3 className="text-xl font-bold">Latest Blogs</h3>
         <Link to="/blogpage">
-          <button className="bg-red-500 text-white py-2 px-4 rounded">
+          <button className="bg-[#b82025] text-white py-2 px-4 rounded">
             View more
           </button>
         </Link>
@@ -127,13 +127,13 @@ const BlogComponent = () => {
 
                 {/* Card Content */}
                 <div className="p-6">
-                  <h3 className="text-xl md:text-xl lg:text-xl font-bold text-gray-800">
+                  <h3 className="text-xl min-h-[3em]  md:text-xl lg:text-xl font-bold text-gray-800">
                     {blog.title.length > 30
                       ? `${blog.title.slice(0, 35)}...`
                       : blog.title}
                   </h3>
                   <p
-                    className="text-sm  text-gray-600 mt-3 line-clamp-3"
+                    className="text-sm min-h-[3em]  text-gray-600 mt-3 line-clamp-3"
                     dangerouslySetInnerHTML={{
                       __html: blog.description.slice(0, 100),
                     }}
@@ -141,7 +141,7 @@ const BlogComponent = () => {
                   <div className="mt-4"></div>
                   <div className="mt-4">
                     <div className="flex justify-between items-center text-gray-600">
-                      <button className="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
+                      <button className="bg-[#b82025] text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
                         Read More
                       </button>
 

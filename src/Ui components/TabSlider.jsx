@@ -1,139 +1,143 @@
 import React, { useRef, useState, useEffect } from "react";
 
 const TabSlider = ({ tabs, sectionRefs, className }) => {
-    const sliderRef = useRef();
-    const tabContainerRef = useRef();
-    const [isOverflowing, setIsOverflowing] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [isFixed, setIsFixed] = useState(false);
-    const [containerTop, setContainerTop] = useState(0);
-    const [containerWidth, setContainerWidth] = useState(0);
+  const sliderRef = useRef();
+  const tabContainerRef = useRef();
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isFixed, setIsFixed] = useState(false);
+  const [containerTop, setContainerTop] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
 
-    const checkOverflow = () => {
-        const slider = sliderRef.current;
-        if (slider) {
-            setIsOverflowing(slider.scrollWidth > slider.clientWidth);
-        }
+  const checkOverflow = () => {
+    const slider = sliderRef.current;
+    if (slider) {
+      setIsOverflowing(slider.scrollWidth > slider.clientWidth);
+    }
+  };
+
+  useEffect(() => {
+    checkOverflow();
+
+    // Store the original position and width of the container
+    if (tabContainerRef.current) {
+      const rect = tabContainerRef.current.getBoundingClientRect();
+      setContainerTop(rect.top + window.scrollY);
+      setContainerWidth(rect.width);
+    }
+
+    const handleScroll = () => {
+      if (tabContainerRef.current) {
+        const scrollPosition = window.scrollY;
+        const shouldBeFixed = scrollPosition > containerTop - 64; // 64px is equivalent to top-16
+        setIsFixed(shouldBeFixed);
+      }
     };
 
-    useEffect(() => {
-        checkOverflow();
-        
-        // Store the original position and width of the container
-        if (tabContainerRef.current) {
-            const rect = tabContainerRef.current.getBoundingClientRect();
-            setContainerTop(rect.top + window.scrollY);
-            setContainerWidth(rect.width);
-        }
-
-        const handleScroll = () => {
-            if (tabContainerRef.current) {
-                const scrollPosition = window.scrollY;
-                const shouldBeFixed = scrollPosition > containerTop - 64; // 64px is equivalent to top-16
-                setIsFixed(shouldBeFixed);
-            }
-        };
-
-        const handleResize = () => {
-            checkOverflow();
-            if (tabContainerRef.current) {
-                setContainerWidth(tabContainerRef.current.offsetWidth);
-                const rect = tabContainerRef.current.getBoundingClientRect();
-                setContainerTop(rect.top + window.scrollY);
-            }
-        };
-
-        window.addEventListener("scroll", handleScroll);
-        window.addEventListener("resize", handleResize);
-
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            window.removeEventListener("resize", handleResize);
-        };
-    }, [containerTop]);
-
-    const handleTabClick = (index) => {
-        setActiveIndex(index);
-    
-        const section = sectionRefs[index].current;
-        if (section) {
-            const topOffset = 100;
-            const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-            const scrollToPosition = sectionTop - topOffset;
-    
-            window.scrollTo({
-                top: scrollToPosition,
-                behavior: "smooth",
-            });
-        }
+    const handleResize = () => {
+      checkOverflow();
+      if (tabContainerRef.current) {
+        setContainerWidth(tabContainerRef.current.offsetWidth);
+        const rect = tabContainerRef.current.getBoundingClientRect();
+        setContainerTop(rect.top + window.scrollY);
+      }
     };
 
-    const scroll = (direction) => {
-        const slider = sliderRef.current;
-        const scrollAmount = direction === "left" ? -200 : 200;
-        slider.scrollBy({
-            left: scrollAmount,
-            behavior: "smooth",
-        });
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
     };
+  }, [containerTop]);
 
-    return (
-        <>
-            {/* Placeholder div to maintain layout when tab bar becomes fixed */}
-            {isFixed && <div style={{ height: "56px" }}></div>}
-            
-            <div 
-                ref={tabContainerRef}
-                className={`${className}`}
-                style={{
-                    position: isFixed ? 'fixed' : 'relative',
-                    top: isFixed ? '64px' : 'auto', // Equivalent to top-16
-                    width: isFixed ? containerWidth : '100%',
-                    zIndex: 998,
-                    backgroundColor: 'white',
-                    boxShadow: isFixed ? '0 2px 4px rgba(0,0,0,0.1)' : 'none',
-                }}
-            >
-                <div
-                    className="tabsScroll bg-white border-[1.5px] solid border-black border-opacity-35 rounded-md overflow-x-auto scrollbar-hide"
-                    ref={sliderRef}
-                >
-                    <ul className="flex border-b justify-between py-1 list-none m-0 p-0">
-                        {tabs.map((tab, index) => (
-                            <li
-                                key={index}
-                                className={`px-4 mb-0 py-2 border-r-[1.5px] border-l-[1.5px] border-opacity-65 flex-1 whitespace-nowrap min-w-32 cursor-pointer text-center text-xs font-medium transition-all duration-300
-                                ${activeIndex === index ? "bg-red-500 text-white rounded-md border-none mx-1" : "hover:bg-gray-200 border-gray-400"}`}
-                                onClick={() => handleTabClick(index)}
-                            >
-                                {tab}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+  const handleTabClick = (index) => {
+    setActiveIndex(index);
 
-                {isOverflowing && (
-                    <button
-                        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[#F0FDF4] transition-transform active:scale-95 p-1 pb-2 px-3 shadow-md rounded-full z-20"
-                        onClick={() => scroll("left")}
-                        style={{ marginLeft: "-10px" }}
-                    >
-                        &#8592;
-                    </button>
-                )}
+    const section = sectionRefs[index].current;
+    if (section) {
+      const topOffset = 100;
+      const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+      const scrollToPosition = sectionTop - topOffset;
 
-                {isOverflowing && (
-                    <button
-                        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[#ffaf80] transition-transform active:scale-95 p-1 pb-2 px-3 shadow-md rounded-full z-20"
-                        onClick={() => scroll("right")}
-                        style={{ marginRight: "-10px" }}
-                    >
-                        &#8594;
-                    </button>
-                )}
-            </div>
-        </>
-    );
+      window.scrollTo({
+        top: scrollToPosition,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const scroll = (direction) => {
+    const slider = sliderRef.current;
+    const scrollAmount = direction === "left" ? -200 : 200;
+    slider.scrollBy({
+      left: scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <>
+      {/* Placeholder div to maintain layout when tab bar becomes fixed */}
+      {isFixed && <div style={{ height: "56px" }}></div>}
+
+      <div
+        ref={tabContainerRef}
+        className={`${className}`}
+        style={{
+          position: isFixed ? "fixed" : "relative",
+          top: isFixed ? "64px" : "auto", // Equivalent to top-16
+          width: isFixed ? containerWidth : "100%",
+          zIndex: 998,
+          backgroundColor: "white",
+          boxShadow: isFixed ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
+        }}
+      >
+        <div
+          className="tabsScroll bg-white border-[1.5px] solid border-black border-opacity-35 rounded-md overflow-x-auto scrollbar-hide"
+          ref={sliderRef}
+        >
+          <ul className="flex border-b justify-between py-1 list-none m-0 p-0">
+            {tabs.map((tab, index) => (
+              <li
+                key={index}
+                className={`px-4 mb-0 py-2 border-r-[1.5px] border-l-[1.5px] border-opacity-65 flex-1 whitespace-nowrap min-w-32 cursor-pointer text-center text-xs font-medium transition-all duration-300
+                                ${
+                                  activeIndex === index
+                                    ? "bg-[#b82025] text-white rounded-md border-none mx-1"
+                                    : "hover:bg-gray-200 border-gray-400"
+                                }`}
+                onClick={() => handleTabClick(index)}
+              >
+                {tab}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {isOverflowing && (
+          <button
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[#F0FDF4] transition-transform active:scale-95 p-1 pb-2 px-3 shadow-md rounded-full z-20"
+            onClick={() => scroll("left")}
+            style={{ marginLeft: "-10px" }}
+          >
+            &#8592;
+          </button>
+        )}
+
+        {isOverflowing && (
+          <button
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[#ffaf80] transition-transform active:scale-95 p-1 pb-2 px-3 shadow-md rounded-full z-20"
+            onClick={() => scroll("right")}
+            style={{ marginRight: "-10px" }}
+          >
+            &#8594;
+          </button>
+        )}
+      </div>
+    </>
+  );
 };
 
 export default TabSlider;

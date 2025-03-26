@@ -118,7 +118,7 @@ const HighRatedCareers = () => {
       <div className="flex items-center justify-between mb-10">
         <h3 className="text-xl font-bold">High Rated careers</h3>
         <Link to="/careerspage">
-          <button className="bg-red-500 text-white py-2 px-4 rounded">
+          <button className="bg-[#b82025] text-white py-2 px-4 rounded">
             View more
           </button>
         </Link>

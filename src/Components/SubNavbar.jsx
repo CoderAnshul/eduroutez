@@ -542,7 +542,7 @@ const SubNavbar = ({ categories }) => {
     <div className="p-8 bg-white min-w-[1200px] max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-bold text-xl text-gray-800 flex items-center">
-          <span className="w-1.5 h-6 bg-red-500 rounded-full mr-3"></span>
+          <span className="w-1.5 h-6 bg-[#b82025] rounded-full mr-3"></span>
           Popular Courses
         </h3>
         <span className="text-xs px-3 py-1 bg-red-50 text-red-500 rounded-full font-medium">
@@ -957,7 +957,7 @@ const SubNavbar = ({ categories }) => {
               className={`px-2 py-2 group mb-0  text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${
                 activeContent[category.label] === item.id
                   ? "bg-black border-l-2 border-black text-white"
-                  : "bg-red-500 text-white"
+                  : "bg-[#b82025] text-white"
               }`}
               onMouseEnter={() => {
                 setActiveContent((prev) => ({

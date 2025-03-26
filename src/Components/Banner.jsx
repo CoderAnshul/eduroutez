@@ -201,7 +201,7 @@ const Banner = () => {
             </div>
 
             <button
-              className="!h-full right-0 !rounded-sm w-1/5 max-sm:w-1/6 absolute top-0 bg-red-500 min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white"
+              className="!h-full right-0 !rounded-sm w-1/5 max-sm:w-1/6 absolute top-0 bg-[#b82025] min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white"
               onClick={handleBtnClick}
             >
               Search

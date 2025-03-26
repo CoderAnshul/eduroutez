@@ -1,13 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { useQuery } from 'react-query';
-import { TrendingUp, Clock, Users, BookOpen, ArrowRight, Star, Eye, ChevronLeft, ChevronRight, Filter, ThumbsUp } from 'lucide-react';
-import HighRatedCareers from '../Components/HighRatedCareers';
-import BlogComponent from '../Components/BlogComponent';
-import BestRated from '../Components/BestRated';
-import Events from '../Components/Events';
-import ConsellingBanner from '../Components/ConsellingBanner';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { useQuery } from "react-query";
+import {
+  TrendingUp,
+  Clock,
+  Users,
+  BookOpen,
+  ArrowRight,
+  Star,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  ThumbsUp,
+} from "lucide-react";
+import HighRatedCareers from "../Components/HighRatedCareers";
+import BlogComponent from "../Components/BlogComponent";
+import BestRated from "../Components/BestRated";
+import Events from "../Components/Events";
+import ConsellingBanner from "../Components/ConsellingBanner";
 
 // Function to fetch trending courses
 const baseURL = import.meta.env.VITE_BASE_URL;
@@ -17,15 +29,19 @@ const fetchTrendingCourses = async (categoryIds = []) => {
   try {
     // If we have selected categories, use them in the filter
     if (categoryIds.length > 0) {
-      const response = await axios.get(`${baseURL}/courses?filters={"category":${JSON.stringify(categoryIds)}}`);
+      const response = await axios.get(
+        `${baseURL}/courses?filters={"category":${JSON.stringify(categoryIds)}}`
+      );
       return response.data;
     } else {
       // Otherwise fetch trending courses
-      const response = await axios.get(`${baseURL}/courses?filters={"isCourseTrending":true}`);
+      const response = await axios.get(
+        `${baseURL}/courses?filters={"isCourseTrending":true}`
+      );
       return response.data;
     }
   } catch (error) {
-    throw new Error('Failed to fetch courses');
+    throw new Error("Failed to fetch courses");
   }
 };
 
@@ -34,12 +50,12 @@ const fetchCategories = async () => {
   try {
     const response = await axios.get(`${baseURL}/course-categories`, {
       params: {
-        page: 0
-      }
+        page: 0,
+      },
     });
     return response.data;
   } catch (error) {
-    throw new Error('Failed to fetch course categories');
+    throw new Error("Failed to fetch course categories");
   }
 };
 
@@ -49,7 +65,7 @@ const TrendingCourses = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
-  
+
   // Filter states
   const [categories, setCategories] = useState([]);
   const [categoryMap, setCategoryMap] = useState({}); // Map to store title-to-id mapping
@@ -74,7 +90,7 @@ const TrendingCourses = () => {
       try {
         const response = await fetchCategories();
         const categoriesData = response.data.result;
-        
+
         // Create a mapping of category titles to IDs
         const titleToIdMap = {};
         const extractedCategories = categoriesData.map((category) => {
@@ -85,7 +101,7 @@ const TrendingCourses = () => {
           }
           return category;
         });
-        
+
         setCategories(extractedCategories);
         setCategoryMap(titleToIdMap);
       } catch (error) {
@@ -98,7 +114,9 @@ const TrendingCourses = () => {
 
   // Update category IDs when selected categories change
   useEffect(() => {
-    const categoryIds = selectedCategories.map(title => categoryMap[title]).filter(id => id);
+    const categoryIds = selectedCategories
+      .map((title) => categoryMap[title])
+      .filter((id) => id);
     setSelectedCategoryIds(categoryIds);
     setCurrentPage(1); // Reset to first page when changing filters
   }, [selectedCategories, categoryMap]);
@@ -106,44 +124,44 @@ const TrendingCourses = () => {
   // Format date to readable format
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   // Get course level badge design
   const getLevelBadge = (level) => {
     switch (level?.toLowerCase()) {
-      case 'beginner':
+      case "beginner":
         return {
-          color: 'bg-emerald-100 text-emerald-700',
-          label: 'Beginner'
+          color: "bg-emerald-100 text-emerald-700",
+          label: "Beginner",
         };
-      case 'intermediate':
+      case "intermediate":
         return {
-          color: 'bg-amber-100 text-amber-700',
-          label: 'Intermediate'
+          color: "bg-amber-100 text-amber-700",
+          label: "Intermediate",
         };
-      case 'advanced':
+      case "advanced":
         return {
-          color: 'bg-red-100 text-red-700',
-          label: 'Advanced'
+          color: "bg-red-100 text-red-700",
+          label: "Advanced",
         };
       default:
         return {
-          color: 'bg-gray-100 text-gray-700',
-          label: 'All Levels'
+          color: "bg-gray-100 text-gray-700",
+          label: "All Levels",
         };
     }
   };
 
   // Clean HTML content
   const stripHtml = (html) => {
-    const temp = document.createElement('div');
+    const temp = document.createElement("div");
     temp.innerHTML = html;
-    return temp.textContent || temp.innerText || '';
+    return temp.textContent || temp.innerText || "";
   };
 
   // Handle category selection
@@ -167,10 +185,13 @@ const TrendingCourses = () => {
           <h2 className="text-2xl font-bold">Trending Courses</h2>
           <div className="w-24 h-8 bg-gray-200 animate-pulse rounded"></div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div
+              key={item}
+              className="bg-white rounded-xl shadow-md overflow-hidden"
+            >
               <div className="h-48 bg-gray-200 animate-pulse"></div>
               <div className="p-6 space-y-4">
                 <div className="h-4 bg-gray-200 rounded animate-pulse w-1/4"></div>
@@ -190,14 +211,27 @@ const TrendingCourses = () => {
       <div className="w-full max-w-7xl mx-auto p-6">
         <div className="bg-red-50 border border-red-200 text-red-600 p-8 rounded-xl text-center">
           <div className="mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 mx-auto text-red-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
             </svg>
           </div>
           <h3 className="text-lg font-semibold mb-2">Unable to Load Courses</h3>
-          <p className="mb-4">We couldn't retrieve the courses. Please try again later.</p>
-          <button 
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          <p className="mb-4">
+            We couldn't retrieve the courses. Please try again later.
+          </p>
+          <button
+            className="px-4 py-2 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors"
             onClick={() => refetch()}
           >
             Retry
@@ -208,29 +242,38 @@ const TrendingCourses = () => {
   }
 
   const allCourses = data?.data?.result || [];
-  
+
   // Filter courses based on search term only (category filtering is handled by API)
   const filteredCourses = allCourses.filter((course) => {
-    return course.courseTitle.toLowerCase().includes(searchTerm.toLowerCase()) || 
-           (course.shortDescription && course.shortDescription.toLowerCase().includes(searchTerm.toLowerCase()));
+    return (
+      course.courseTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (course.shortDescription &&
+        course.shortDescription
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()))
+    );
   });
 
   const totalCourses = filteredCourses.length;
   const totalPages = Math.ceil(totalCourses / itemsPerPage);
-  
+
   // Get current page items
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentCourses = filteredCourses.slice(indexOfFirstItem, indexOfLastItem);
+  const currentCourses = filteredCourses.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
-  const goToPrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+  const goToNextPage = () =>
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const goToPrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
   // Clear all filters
   const clearFilters = () => {
-    setSearchTerm('');
+    setSearchTerm("");
     setSelectedCategories([]);
     setSelectedCategoryIds([]);
   };
@@ -241,20 +284,19 @@ const TrendingCourses = () => {
       <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
         <h1 className="text-4xl font-bold mb-4">Trending Courses</h1>
         <p className="text-xl">
-          Discover trending Courses that can transform your
-          academic journey
+          Discover trending Courses that can transform your academic journey
         </p>
       </div>
-      
+
       {/* Mobile Filter Button */}
       <button
-        className="mb-6 bg-red-600 text-white rounded-lg px-4 py-2 shadow-lg md:hidden flex items-center"
+        className="mb-6 bg-[#b82025] text-white rounded-lg px-4 py-2 shadow-lg md:hidden flex items-center"
         onClick={() => setIsFilterOpen(true)}
       >
         <Filter size={16} className="mr-2" />
         Filters
       </button>
-      
+
       {/* Mobile Filter Overlay */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 z-[1000] flex transition-opacity duration-300 ${
@@ -305,7 +347,7 @@ const TrendingCourses = () => {
           onClick={() => setIsFilterOpen(false)}
         ></div>
       </div>
-      
+
       {/* Desktop Layout with Filters */}
       <div className="flex flex-col md:flex-row gap-8 mb-8">
         {/* Desktop Sidebar Filter */}
@@ -343,7 +385,7 @@ const TrendingCourses = () => {
             )}
           </div>
           {(selectedCategories.length > 0 || searchTerm) && (
-            <button 
+            <button
               onClick={clearFilters}
               className="mt-4 text-sm text-red-600 hover:text-red-800"
             >
@@ -351,7 +393,7 @@ const TrendingCourses = () => {
             </button>
           )}
         </div>
-        
+
         {/* Course Grid */}
         <div className="w-full md:w-3/4">
           {currentCourses.length > 0 ? (
@@ -359,24 +401,30 @@ const TrendingCourses = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {currentCourses.map((course) => {
                   const levelBadge = getLevelBadge(course.courseLevel);
-                  
+
                   return (
-                    <Link key={course._id} to={`/coursesinfopage/${course?.slug}`} className="group">
+                    <Link
+                      key={course._id}
+                      to={`/coursesinfopage/${course?.slug}`}
+                      className="group"
+                    >
                       <div className="bg-white rounded-xl shadow-md overflow-hidden h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                         <div className="relative h-48 overflow-hidden">
-                          <img 
+                          <img
                             src={`${Images}/${course.coursePreviewThumbnail}`}
-                            alt={course.courseTitle} 
+                            alt={course.courseTitle}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                           <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-                          
+
                           <div className="absolute inset-0 p-6 flex flex-col justify-between">
                             <div className="flex justify-between items-start">
-                              <div className={`${levelBadge.color} text-xs font-semibold px-3 py-1 rounded-full`}>
+                              <div
+                                className={`${levelBadge.color} text-xs font-semibold px-3 py-1 rounded-full`}
+                              >
                                 {levelBadge.label}
                               </div>
-                              
+
                               {/* {course.isCourseFree === "free" ? (
                                 <div className="bg-white text-green-600 text-xs font-bold px-3 py-1 rounded-full">
                                   Free
@@ -387,42 +435,51 @@ const TrendingCourses = () => {
                                 </div>
                               )} */}
                             </div>
-                            
+
                             <div>
                               <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md">
                                 {course.courseTitle}
                               </h3>
                               <div className="flex items-center mt-2 text-white text-opacity-90 text-sm drop-shadow-md">
                                 <Clock size={14} className="mr-1" />
-
-                          {course.courseDurationYears > 0 ? `${course.courseDurationYears} Years ` : ''}
-
-                          {course.courseDurationMonths > 0 ? `${course.courseDurationMonths} months` : ''}                              </div>
+                                {course.courseDurationYears > 0
+                                  ? `${course.courseDurationYears} Years `
+                                  : ""}
+                                {course.courseDurationMonths > 0
+                                  ? `${course.courseDurationMonths} months`
+                                  : ""}{" "}
+                              </div>
                             </div>
                           </div>
                         </div>
-                        
+
                         {/* Course content */}
                         <div className="p-6">
                           <div className="space-y-4">
                             {/* Short description */}
                             <div className="text-gray-600 line-clamp-3 h-18">
-                              {stripHtml(course.shortDescription || '')}
+                              {stripHtml(course.shortDescription || "")}
                             </div>
-                            
+
                             {/* Course info */}
                             <div className="grid grid-cols-2 gap-3 pt-2">
                               <div className="flex items-center text-sm text-gray-500">
-                                <ThumbsUp size={16} className="mr-2 text-gray-500" />
+                                <ThumbsUp
+                                  size={16}
+                                  className="mr-2 text-gray-500"
+                                />
                                 <span>{course.likes?.length}</span>
                               </div>
-                              
+
                               <div className="flex items-center text-sm text-gray-500">
-                                <Users size={16} className="mr-2 text-gray-500" />
+                                <Users
+                                  size={16}
+                                  className="mr-2 text-gray-500"
+                                />
                                 <span>{course.views || 0} views</span>
                               </div>
                             </div>
-                            
+
                             {/* Application dates if available */}
                             {/* {course.applicationStartDate ? (
                               <div className="border-t border-gray-100 pt-4 mt-4">
@@ -436,16 +493,19 @@ const TrendingCourses = () => {
                             ) : (
                               <div className="border-t border-gray-100 pt-4 mt-4">
                                 {/* Empty space - no text */}
-                                {/* <div className="h-6"></div>
+                            {/* <div className="h-6"></div>
                               </div>
                             )} */}
                           </div>
-                          
+
                           {/* Action button */}
                           <div className="mt-6">
-                            <div className="w-full bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-center font-medium flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors">
+                            <div className="w-full bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-center font-medium flex items-center justify-center group-hover:bg-[#b82025] group-hover:text-white transition-colors">
                               <span>View Course</span>
-                              <ArrowRight size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
+                              <ArrowRight
+                                size={16}
+                                className="ml-2 transition-transform group-hover:translate-x-1"
+                              />
                             </div>
                           </div>
                         </div>
@@ -454,19 +514,23 @@ const TrendingCourses = () => {
                   );
                 })}
               </div>
-              
+
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="mt-12 flex justify-center">
                   <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={goToPrevPage} 
+                    <button
+                      onClick={goToPrevPage}
                       disabled={currentPage === 1}
-                      className={`p-2 rounded-md ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`}
+                      className={`p-2 rounded-md ${
+                        currentPage === 1
+                          ? "text-gray-400 cursor-not-allowed"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
                     >
                       <ChevronLeft size={20} />
                     </button>
-                    
+
                     {/* Page numbers */}
                     <div className="flex space-x-1">
                       {[...Array(totalPages)].map((_, index) => (
@@ -475,29 +539,35 @@ const TrendingCourses = () => {
                           onClick={() => paginate(index + 1)}
                           className={`w-8 h-8 rounded-md text-sm ${
                             currentPage === index + 1
-                              ? 'bg-red-600 text-white'
-                              : 'text-gray-700 hover:bg-gray-100'
+                              ? "bg-[#b82025] text-white"
+                              : "text-gray-700 hover:bg-gray-100"
                           }`}
                         >
                           {index + 1}
                         </button>
                       ))}
                     </div>
-                    
-                    <button 
-                      onClick={goToNextPage} 
+
+                    <button
+                      onClick={goToNextPage}
                       disabled={currentPage === totalPages}
-                      className={`p-2 rounded-md ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`}
+                      className={`p-2 rounded-md ${
+                        currentPage === totalPages
+                          ? "text-gray-400 cursor-not-allowed"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
                     >
                       <ChevronRight size={20} />
                     </button>
                   </div>
                 </div>
               )}
-              
+
               {/* Pagination info */}
               <div className="mt-4 text-center text-sm text-gray-500">
-                {totalPages > 0 ? `Page ${currentPage} of ${totalPages} (${totalCourses} courses)` : `${totalCourses} courses`}
+                {totalPages > 0
+                  ? `Page ${currentPage} of ${totalPages} (${totalCourses} courses)`
+                  : `${totalCourses} courses`}
               </div>
             </>
           ) : (
@@ -506,8 +576,10 @@ const TrendingCourses = () => {
                 <BookOpen size={24} className="text-gray-500" />
               </div>
               <h3 className="text-xl font-semibold mb-2">No Courses Found</h3>
-              <p className="text-gray-600 mb-6">We couldn't find any courses matching your filters.</p>
-              <button 
+              <p className="text-gray-600 mb-6">
+                We couldn't find any courses matching your filters.
+              </p>
+              <button
                 className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
                 onClick={clearFilters}
               >
@@ -517,10 +589,10 @@ const TrendingCourses = () => {
           )}
         </div>
       </div>
-            
- <HighRatedCareers />
-        <BlogComponent />
-        <BestRated />
+
+      <HighRatedCareers />
+      <BlogComponent />
+      <BestRated />
 
       <div className="w-full flex items-start mt-10">
         <Events />

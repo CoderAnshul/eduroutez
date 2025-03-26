@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import axiosInstance from '../../ApiFunctions/axios';
+import React, { useState } from "react";
+import axiosInstance from "../../ApiFunctions/axios";
 
 const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
-  console.log('counselor', counselor); // Log the entire counselor object
+  console.log("counselor", counselor); // Log the entire counselor object
   const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState(''); // Fixed variable name
+  const [comment, setComment] = useState(""); // Fixed variable name
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const apiUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
+  const [error, setError] = useState("");
+  const apiUrl =
+    import.meta.env.VITE_BASE_URL || "http://localhost:4001/api/v1";
 
   if (!isOpen) return null;
 
@@ -18,27 +19,30 @@ const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
-    setError('');
+    setError("");
 
     try {
-      const studentEmail = localStorage.getItem('email');
-      
+      const studentEmail = localStorage.getItem("email");
+
       if (!studentEmail) {
-        throw new Error('Student email not found in localStorage');
+        throw new Error("Student email not found in localStorage");
       }
 
-      const response = await axiosInstance.post(`${apiUrl}/submit-counsellor-review`, {
-        studentEmail,
-        counselorId: counselor?._id, // Use counselor._id directly from props
-        rating,
-        comment
-      });
+      const response = await axiosInstance.post(
+        `${apiUrl}/submit-counsellor-review`,
+        {
+          studentEmail,
+          counselorId: counselor?._id, // Use counselor._id directly from props
+          rating,
+          comment,
+        }
+      );
 
       if (!response.data) {
-        throw new Error('Failed to submit review');
+        throw new Error("Failed to submit review");
       }
       setRating(0);
-      setComment('');
+      setComment("");
       onClose();
     } catch (err) {
       setError(err.message);
@@ -69,7 +73,7 @@ const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
                 <span
                   key={index}
                   className={`cursor-pointer text-2xl ${
-                    index < rating ? 'text-yellow-500' : 'text-gray-300'
+                    index < rating ? "text-yellow-500" : "text-gray-300"
                   }`}
                   onClick={() => handleRating(index)}
                 >
@@ -92,11 +96,7 @@ const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
           </div>
 
           {/* Error Message */}
-          {error && (
-            <div className="mb-4 text-red-500 text-sm">
-              {error}
-            </div>
-          )}
+          {error && <div className="mb-4 text-red-500 text-sm">{error}</div>}
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-3">
@@ -110,10 +110,10 @@ const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+              className="px-4 py-2 bg-[#b82025] text-white rounded hover:bg-red-700 disabled:opacity-50"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         </form>

@@ -56,7 +56,7 @@ const SocialLinks = ({ formData, setFormData, setIsSubmit }) => {
               {links.length > 1 && (
                 <button
                   onClick={() => handleRemoveInput(index)}
-                  className="px-[10px] py-1 text-sm text-white bg-red-500 rounded-full hover:bg-red-600"
+                  className="px-[10px] py-1 text-sm text-white bg-[#b82025] rounded-full hover:bg-[#b82025]"
                 >
                   X
                 </button>

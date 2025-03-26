@@ -205,7 +205,7 @@ const TrendingInstitute = () => {
                     className={`px-4 py-2 rounded ${
                       currentPage === 1
                         ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-red-600 text-white hover:bg-red-700"
+                        : "bg-[#b82025] text-white hover:bg-red-700"
                     }`}
                   >
                     Previous
@@ -217,7 +217,7 @@ const TrendingInstitute = () => {
                       onClick={() => paginate(number + 1)}
                       className={`px-4 py-2 rounded ${
                         currentPage === number + 1
-                          ? "bg-red-600 text-white"
+                          ? "bg-[#b82025] text-white"
                           : "bg-gray-200 hover:bg-gray-300"
                       }`}
                     >
@@ -236,7 +236,7 @@ const TrendingInstitute = () => {
                     className={`px-4 py-2 rounded ${
                       currentPage === totalPages
                         ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-red-600 text-white hover:bg-red-700"
+                        : "bg-[#b82025] text-white hover:bg-red-700"
                     }`}
                   >
                     Next
