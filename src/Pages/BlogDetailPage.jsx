@@ -102,7 +102,7 @@ const BlogDetailPage = () => {
         if (response.data.thumbnail || response.data.image) {
           try {
             const imageResponse = await fetch(
-              `${Images}/${response.data.thumbnail || response.data.image}`
+              `${Images}/${response.data.cover || response.data.thumbnail}`
             );
             const imageBlob = await imageResponse.blob();
             const imageObjectURL = URL.createObjectURL(imageBlob);
