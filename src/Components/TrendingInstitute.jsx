@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import cardPhoto from '../assets/Images/teacher.jpg';
-import rupee from '../assets/Images/rupee.png';
-import { useQuery } from 'react-query';
-import { trendingInstitute } from '../ApiFunctions/api';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import cardPhoto from "../assets/Images/teacher.jpg";
+import rupee from "../assets/Images/rupee.png";
+import { useQuery } from "react-query";
+import { trendingInstitute } from "../ApiFunctions/api";
 
 const TrendingInstitute = () => {
   const [content, setContent] = useState([]);
@@ -13,10 +13,12 @@ const TrendingInstitute = () => {
   useEffect(() => {
     if (!window.instituteIdMap) {
       try {
-        const storedInstituteIdMap = JSON.parse(localStorage.getItem('instituteIdMap') || '{}');
+        const storedInstituteIdMap = JSON.parse(
+          localStorage.getItem("instituteIdMap") || "{}"
+        );
         window.instituteIdMap = storedInstituteIdMap;
       } catch (error) {
-        console.error('Error loading instituteIdMap from localStorage:', error);
+        console.error("Error loading instituteIdMap from localStorage:", error);
         window.instituteIdMap = {};
       }
     }
@@ -25,22 +27,29 @@ const TrendingInstitute = () => {
   // Batch update the ID mapping when data arrives
   const updateIdMapping = (institutes) => {
     let hasChanges = false;
-    
-    institutes.forEach(institute => {
-      if (institute.slug && institute._id && !window.instituteIdMap[institute.slug]) {
+
+    institutes.forEach((institute) => {
+      if (
+        institute.slug &&
+        institute._id &&
+        !window.instituteIdMap[institute.slug]
+      ) {
         window.instituteIdMap[institute.slug] = institute._id;
         hasChanges = true;
       }
     });
-    
+
     // Only update localStorage if there are actual changes
     if (hasChanges) {
-      localStorage.setItem('instituteIdMap', JSON.stringify(window.instituteIdMap));
+      localStorage.setItem(
+        "instituteIdMap",
+        JSON.stringify(window.instituteIdMap)
+      );
     }
   };
 
   const { data, isLoading, isError } = useQuery(
-    ['institutes'],
+    ["institutes"],
     () => trendingInstitute(),
     {
       enabled: true,
@@ -48,10 +57,10 @@ const TrendingInstitute = () => {
       cacheTime: 3600000, // 1 hour
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
-        console.log('Trending Institutes:', data);
+        console.log("Trending Institutes:", data);
         const institutes = data.data?.result || [];
         setContent(institutes);
-        
+
         // Update ID mapping
         if (institutes.length > 0) {
           updateIdMapping(institutes);
@@ -63,7 +72,7 @@ const TrendingInstitute = () => {
   // Helper function to get URL for display - consistent with other components
   const getInstituteUrl = (institute) => {
     // Prefer slugs for SEO, fall back to IDs
-    return institute?.slug 
+    return institute?.slug
       ? `/institute/${institute.slug}`
       : `/institute/${institute?._id}`;
   };
@@ -102,40 +111,48 @@ const TrendingInstitute = () => {
           </button>
         </Link>
       </div>
-      
+
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
-        {(content?.length > 0) ? content.slice(0, 3).map((institute, index) => {
-          return (
-            <Link
-              to={getInstituteUrl(institute)}
-              key={institute._id || index}
-              className="box lg:max-w-[500px] shadow-lg"
-            >
-              <div className="imageContainer">
-                <img
-                  className="h-full w-full object-cover"
-                  src={
-                    institute.thumbnailImage
-                    ? `${Images}/${institute.thumbnailImage}`
-                    : cardPhoto
-                  }
-                  alt="Institute"
-                />
-              </div>
-              <div className="textContainer p-4">
-                <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]">
-                  {institute.instituteName || 'Institute Name Not Available'}
-                </h3>
-                
-                <p className="text-sm mt-2">
-                  {institute.about
-                    ? <span dangerouslySetInnerHTML={{ __html: institute.about.slice(0, 100) + '...' }} />
-                    : 'No description available'}
-                </p>
-              </div>
-            </Link>
-          );
-        }) : (
+        {content?.length > 0 ? (
+          content.slice(0, 3).map((institute, index) => {
+            return (
+              <Link
+                to={getInstituteUrl(institute)}
+                key={institute._id || index}
+                className="box lg:max-w-[500px] shadow-lg"
+              >
+                <div className="imageContainer">
+                  <img
+                    className="h-full w-full object-cover"
+                    src={
+                      institute.thumbnailImage
+                        ? `${Images}/${institute.thumbnailImage}`
+                        : cardPhoto
+                    }
+                    alt="Institute"
+                  />
+                </div>
+                <div className="textContainer p-4">
+                  <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
+                    {institute.instituteName || "Institute Name Not Available"}
+                  </h3>
+
+                  <p className="text-sm mt-2">
+                    {institute.about ? (
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: institute.about.slice(0, 100) + "...",
+                        }}
+                      />
+                    ) : (
+                      "No description available"
+                    )}
+                  </p>
+                </div>
+              </Link>
+            );
+          })
+        ) : (
           <p>No trending institutes available</p>
         )}
       </div>
