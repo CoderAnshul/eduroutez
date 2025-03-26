@@ -176,9 +176,12 @@ const Writereview = () => {
   return (
     <>
       <ToastContainer />
-      <div className="w-full items-center max-w-4xl h-[90px] overflow-hidden mx-auto">
+      <div className="w-full  max-w-4xl  overflow-hidden mx-auto">
         <Promotions location="REVIEW_PAGE" className="h-[90px]" />
       </div>
+      <h2 className=" font-bold mt-6 text-center w-full text-[#b82025] z-30 text-3xl">
+        Review
+      </h2>
       <div className="p-3 h-fit pb-14 bg-white relative flex flex-col">
         <div className=" p-2 md:p-6 rounded h-full relative  shadow flex-1">
           {renderStepContent()}
