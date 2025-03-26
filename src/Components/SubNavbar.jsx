@@ -707,10 +707,10 @@ const SubNavbar = ({ categories }) => {
       </div>
 
       <div className="p-4">
-        <ul className="grid grid-cols-3 gap-8 ml-0  list-none">
+        <ul className="grid grid-cols-4 gap-8 ml-0  list-none">
           {latestNews
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice(0, 3)
+            .slice(0, 4)
             .map((news) => (
               <li
                 key={news._id}
