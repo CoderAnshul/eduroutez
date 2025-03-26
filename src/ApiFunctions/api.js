@@ -433,7 +433,7 @@ export const career = async () => {
 };
 export const category = async () => {
   try {
-    const response = await axios.get(`${baseURL}/streams?limit=8`);
+    const response = await axios.get(`${baseURL}/streams?limit=8&sort={"createdAt":"asc"}`);
     console.log("response", response);
     return response.data;
 
