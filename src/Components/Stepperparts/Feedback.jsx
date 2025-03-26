@@ -141,9 +141,9 @@ const Feedback = ({ formData, setFormData, setIsSubmit }) => {
         <h1 className="text-2xl font-semibold text-center text-gray-800">
           Your Experience Survey
         </h1>
-        <p className="mt-1 text-sm text-center text-gray-500">
+        {/* <p className="mt-1 text-sm text-center text-gray-500">
           Check twice before you paste your social handle's link
-        </p>
+        </p> */}
 
         {/* Form */}
         <form
