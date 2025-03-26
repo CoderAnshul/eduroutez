@@ -1,22 +1,10 @@
 import React, { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import { createQuery } from "../ApiFunctions/api";
 
 const QueryForm = ({ instituteData }) => {
   const [errors, setErrors] = useState({});
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState("error"); // "error" or "success"
-
-  const displayToast = (message, type = "error") => {
-    setToastMessage(message);
-    setToastType(type);
-    setShowToast(true);
-    
-    // Auto-hide toast after 3 seconds
-    setTimeout(() => {
-      setShowToast(false);
-    }, 3000);
-  };
 
   const validateForm = (formData) => {
     const newErrors = {};
@@ -52,7 +40,7 @@ const QueryForm = ({ instituteData }) => {
     
     // Validate the form
     if (!validateForm(formData)) {
-      displayToast("Please fill all required fields correctly");
+      toast.error("Please fill all required fields correctly");
       return;
     }
 
@@ -71,24 +59,28 @@ const QueryForm = ({ instituteData }) => {
     createQuery(data)
       .then((response) => {
         console.log("Query submitted successfully:", response);
-        alert('Query Created Sucessfully');
-                e.target.reset(); // Reset the form fields after submission
+        toast.success("Query Submitted Successfully");
+        e.target.reset(); // Reset the form fields after submission
       })
       .catch((error) => {
         console.error("Error submitting query:", error);
-        displayToast("An error occurred while submitting your query");
+        toast.error("An error occurred while submitting your query");
       });
   };
 
   return (
     <div className="hidden lg:block items-center pt-4 min-w-[400px] justify-center min-h-44 w-1/5">
-      {showToast && (
-        <div className={`fixed top-4 right-4 px-4 py-2 rounded-md shadow-md ${
-          toastType === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-        }`}>
-          {toastMessage}
-        </div>
-      )}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       
       <form
         className="w-full max-w-sm p-2 bg-[#F0FDF4] rounded-lg shadow-md"
