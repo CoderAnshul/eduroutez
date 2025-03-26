@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import downArrow from '../assets/Images/downArrow.png';
+import downArrow from "../assets/Images/downArrow.png";
 
 const MobileNavbar = ({ categories }) => {
-  console.log('dfghjk',categories);
+  console.log("dfghjk", categories);
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeItem, setActiveItem] = useState(null);
 
@@ -22,8 +22,9 @@ const MobileNavbar = ({ categories }) => {
           <li key={index}>
             <div
               className={`flex justify-between items-center p-3 transition-all rounded cursor-pointer ${
-                activeCategory === category.label? "bg-red-500 text-white": "bg-gray-200"
-                 
+                activeCategory === category.label
+                  ? "bg-[#b82025] text-white"
+                  : "bg-gray-200"
               }`}
               onClick={() => toggleCategory(category.label)}
             >
@@ -33,11 +34,7 @@ const MobileNavbar = ({ categories }) => {
                   activeCategory === category.label ? "rotate-180" : "rotate-0"
                 }`}
               >
-                <img
-                  className="h-3 transition-all"
-                  src={downArrow}
-                  alt=""
-                />
+                <img className="h-3 transition-all" src={downArrow} alt="" />
               </span>
             </div>
             {activeCategory === category.label && (

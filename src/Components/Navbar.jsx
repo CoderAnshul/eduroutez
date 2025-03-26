@@ -103,7 +103,6 @@ const Navbar = () => {
               <img className="h-6" src={menubar} alt="open menu" />
             </button>
             <Link to="/">
-
               <img className="h-8 md:h-10" src={logo} alt="mainLogo" />
             </Link>
           </div>
@@ -112,7 +111,7 @@ const Navbar = () => {
             <div className="">
               <button
                 onClick={handleQuestion}
-                className="md:flex hidden items-center text-xs font-medium gap-2 px-4 hover:scale-95 py-2 bg-red-600 uppercase text-white  hover:bg-red-500 transition-colors"
+                className="md:flex hidden items-center text-xs font-medium gap-2 px-4 hover:scale-95 py-2 bg-[#b82025] uppercase text-white  hover:bg-[#b82025] transition-colors"
               >
                 Ask
                 <ArrowRight className="h-4 w-4 hidden md:flex" />
@@ -147,7 +146,7 @@ const Navbar = () => {
             {!accessToken && (
               <Link
                 to="/login"
-                className="CustomFlex gap-1 bg-red-500 px-4 py-2 rounded-md text-white text-xs  hover:scale-95 group transform transition-all font-medium cursor-pointer"
+                className="CustomFlex gap-1 bg-[#b82025] px-4 py-2 rounded-md text-white text-xs  hover:scale-95 group transform transition-all font-medium cursor-pointer"
               >
                 <span>LOGIN</span>
               </Link>
@@ -236,7 +235,7 @@ const Navbar = () => {
 
           <button
             onClick={toggleMenu}
-            className="text-white font-semibold hover:font-semibold text-md px-2 rounded-full hover:bg-red-200 transition-all bg-red-500 hover:text-red-800"
+            className="text-white font-semibold hover:font-semibold text-md px-2 rounded-full hover:bg-red-200 transition-all bg-[#b82025] hover:text-red-800"
           >
             X
           </button>
@@ -254,7 +253,11 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link className="text-black" to="/writereview" onClick={handleReviewClick}>
+            <Link
+              className="text-black"
+              to="/writereview"
+              onClick={handleReviewClick}
+            >
               Write a Review
             </Link>
           </li>
@@ -281,7 +284,7 @@ const Navbar = () => {
               <Link
                 to="/login"
                 onClick={handleLoginPopupClose}
-                className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+                className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
               >
                 Log In
               </Link>

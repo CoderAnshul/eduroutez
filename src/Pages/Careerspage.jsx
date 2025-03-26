@@ -66,11 +66,11 @@ const Careerspage = () => {
   useEffect(() => {
     if (initialCareerData && initialCareerData.data.totalPages > 0) {
       setTotalPages(initialCareerData.data.totalPages);
-      
+
       // Add first page data to allCareerData
       const firstPageData = initialCareerData.data.result || [];
       setAllCareerData(firstPageData);
-      
+
       // Update careerIdMap with first page data
       const updatedCareerIdMap = { ...careerIdMap };
       firstPageData.forEach((career) => {
@@ -80,7 +80,7 @@ const Careerspage = () => {
       });
       setCareerIdMap(updatedCareerIdMap);
       localStorage.setItem("careerIdMap", JSON.stringify(updatedCareerIdMap));
-      
+
       // If there are more pages, fetch them all
       if (initialCareerData.data.totalPages > 1) {
         fetchAllPages(initialCareerData.data.totalPages);
@@ -91,19 +91,21 @@ const Careerspage = () => {
   // Function to fetch all pages of career data
   const fetchAllPages = async (totalPageCount) => {
     setIsLoadingAllData(true);
-    
+
     try {
       // Start from page 2 since we already have page 1
       const pagePromises = [];
       for (let pageNum = 2; pageNum <= totalPageCount; pageNum++) {
         pagePromises.push(careers(pageNum));
       }
-      
+
       const responses = await Promise.all(pagePromises);
-      
+
       // Extract data and update state
-      const newData = responses.flatMap(response => response.data.result || []);
-      
+      const newData = responses.flatMap(
+        (response) => response.data.result || []
+      );
+
       // Update careerIdMap with all new data
       const updatedCareerIdMap = { ...careerIdMap };
       newData.forEach((career) => {
@@ -111,13 +113,13 @@ const Careerspage = () => {
           updatedCareerIdMap[career.slug] = career._id;
         }
       });
-      
+
       // Save updated map to state and localStorage
       setCareerIdMap(updatedCareerIdMap);
       localStorage.setItem("careerIdMap", JSON.stringify(updatedCareerIdMap));
-      
+
       // Update career data (append new data to existing first page data)
-      setAllCareerData(prevData => [...prevData, ...newData]);
+      setAllCareerData((prevData) => [...prevData, ...newData]);
     } catch (error) {
       console.error("Error fetching all career data:", error);
     } finally {
@@ -168,7 +170,7 @@ const Careerspage = () => {
       if (filteredData) {
         // Only load images for currently displayed items to improve performance
         const visibleItems = filteredData.slice(0, displayedItems);
-        
+
         const imagePromises = visibleItems.map(async (career) => {
           if (!imageUrls[career.thumbnail]) {
             const url = await fetchImage(career.thumbnail);
@@ -212,14 +214,18 @@ const Careerspage = () => {
   };
 
   const loadMore = () => {
-    setDisplayedItems(prev => prev + itemsPerPage);
+    setDisplayedItems((prev) => prev + itemsPerPage);
   };
 
-  if ((isLoadingInitial && !allCareerData.length) || (isLoadingAllData && !allCareerData.length)) {
+  if (
+    (isLoadingInitial && !allCareerData.length) ||
+    (isLoadingAllData && !allCareerData.length)
+  ) {
     return <p className="text-center py-16">Loading careers...</p>;
   }
-  
-  if (isError) return <p className="text-center py-16">Error: {error.message}</p>;
+
+  if (isError)
+    return <p className="text-center py-16">Error: {error.message}</p>;
 
   const filteredData = getFilteredData();
   const visibleData = filteredData.slice(0, displayedItems);
@@ -332,7 +338,9 @@ const Careerspage = () => {
           {isLoadingAllData && !visibleData.length ? (
             <p className="text-center py-8">Loading all career data...</p>
           ) : visibleData.length === 0 ? (
-            <p className="text-center py-8">No careers found matching your criteria.</p>
+            <p className="text-center py-8">
+              No careers found matching your criteria.
+            </p>
           ) : (
             <div className="flex flex-wrap justify-start gap-6">
               {visibleData.map((career) => (
@@ -344,7 +352,7 @@ const Careerspage = () => {
                 >
                   <div>
                     <div className="relative group h-48">
-                      {career.views !=='0' && (
+                      {career.views !== "0" && (
                         <div className="absolute h-fit p-1 w-fit px-2 rounded-full bg-white hidden top-2 right-2 group-hover:flex items-center justify-center gap-2 text-gray-600">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -384,7 +392,10 @@ const Careerspage = () => {
                         className="text-sm text-gray-600 mt-2"
                         dangerouslySetInnerHTML={{
                           __html:
-                            career.description.split(" ").slice(0, 25).join(" ") +
+                            career.description
+                              .split(" ")
+                              .slice(0, 25)
+                              .join(" ") +
                             (career.description.split(" ").length > 25
                               ? "..."
                               : ""),
@@ -392,10 +403,8 @@ const Careerspage = () => {
                       />
                     </div>
                   </div>
-               
-                  <div className="flex justify-between p-4">
-                    
 
+                  <div className="flex justify-between p-4">
                     <div className="inline-block">
                       <CustomButton
                         text="View More"
@@ -419,7 +428,7 @@ const Careerspage = () => {
           <div className="flex mt-10 justify-center">
             {page < totalPages && filteredData.length > 0 && (
               <button
-                className="bg-red-600 text-white rounded-lg px-4 py-2 shadow-lg"
+                className="bg-[#b82025] text-white rounded-lg px-4 py-2 shadow-lg"
                 onClick={loadMore}
               >
                 Load More

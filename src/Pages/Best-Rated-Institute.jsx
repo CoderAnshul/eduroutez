@@ -179,7 +179,7 @@ const BestRatedInstitute = () => {
               <CustomButton
                 text="Load More Institutes"
                 onClick={handleLoadMore}
-                className="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-all"
+                className="bg-[#b82025] text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-all"
               />
             </div>
           )}

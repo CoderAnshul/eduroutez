@@ -1,48 +1,48 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import logo from '../../assets/Images/logo.png';
-import favicon from '../../assets/Images/favicon.png';
-import axiosInstance from '../../ApiFunctions/axios';
+import React from "react";
+import { Link, NavLink } from "react-router-dom";
+import logo from "../../assets/Images/logo.png";
+import favicon from "../../assets/Images/favicon.png";
+import axiosInstance from "../../ApiFunctions/axios";
 const Sidebar = () => {
   const menuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: '🏠' },
-    { name: 'My Profile', path: '/dashboard/profile-page', icon: '👤' },
-    { name: 'Wishlist', path: '/dashboard/wishlist', icon: '🏫' },
-    { name: 'My Documents', path: '/dashboard/documents', icon: '📄' },
-    { name: 'Talk to Counselor', path: '/dashboard/counselor', icon: '👤' },
-    {name: 'My Reviews',path:'/dashboard/reviews',icon:'📝'},
-    {name: 'Scheduled Slots', path: '/dashboard/slots', icon: '📅'},
-        {name:'Payout', path:'/dashboard/payout',icon:'💰'},
-    {name:'Refer & Earn',path:'/dashboard/refer&earn',icon:'🏫'},
-    {name: 'Redeem', path: '/dashboard/redeem', icon: '🎁'},
-        { name: 'Settings', path: '/dashboard/settings', icon: '⚙️' },
-    { name: 'Logout', path: '/dashboard/logout', icon: '🚪' },
+    { name: "Dashboard", path: "/dashboard", icon: "🏠" },
+    { name: "My Profile", path: "/dashboard/profile-page", icon: "👤" },
+    { name: "Wishlist", path: "/dashboard/wishlist", icon: "🏫" },
+    { name: "My Documents", path: "/dashboard/documents", icon: "📄" },
+    { name: "Talk to Counselor", path: "/dashboard/counselor", icon: "👤" },
+    { name: "My Reviews", path: "/dashboard/reviews", icon: "📝" },
+    { name: "Scheduled Slots", path: "/dashboard/slots", icon: "📅" },
+    { name: "Payout", path: "/dashboard/payout", icon: "💰" },
+    { name: "Refer & Earn", path: "/dashboard/refer&earn", icon: "🏫" },
+    { name: "Redeem", path: "/dashboard/redeem", icon: "🎁" },
+    { name: "Settings", path: "/dashboard/settings", icon: "⚙️" },
+    { name: "Logout", path: "/dashboard/logout", icon: "🚪" },
   ];
 
-
   const handleLogout = async () => {
-    if(name === "Logout"){
+    if (name === "Logout") {
+      try {
+        const response = await axiosInstance(
+          `${import.meta.env.VITE_BASE_URL}/logout`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-access-token": localStorage.getItem("accessToken"),
+              "x-refresh-token": localStorage.getItem("refreshToken"),
+            },
+            credentials: "true",
+          }
+        );
 
-    try {
-
-      const response = await axiosInstance(`${import.meta.env.VITE_BASE_URL}/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken')
-        },
-        credentials: 'true',
-      });
-
-if(response)    {  
-  localStorage.clear();
-      window.location.reload();
-}
-    } catch (error) {
-      console.error('Error during logout:', error);
+        if (response) {
+          localStorage.clear();
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error("Error during logout:", error);
+      }
     }
-  }
   };
 
   return (
@@ -60,13 +60,13 @@ if(response)    {
               <li key={index} className="mb-2">
                 <NavLink
                   to={item.path}
-                  end={item.path === '/dashboard'} // Add 'end' only for the Dashboard route
+                  end={item.path === "/dashboard"} // Add 'end' only for the Dashboard route
                   className={({ isActive }) =>
                     `flex items-center gap-3 p-2 rounded-md ${
-                      isActive ? 'bg-red-500 text-white' : 'hover:bg-gray-200'
+                      isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
                     }`
                   }
-                  onClick={()=>handleLogout(item.name)}
+                  onClick={() => handleLogout(item.name)}
                 >
                   <span>{item.icon}</span>
                   {item.name}
@@ -88,10 +88,10 @@ if(response)    {
             <li key={index}>
               <NavLink
                 to={item.path}
-                end={item.path === '/dashboard'} // Add 'end' only for the Dashboard route
+                end={item.path === "/dashboard"} // Add 'end' only for the Dashboard route
                 className={({ isActive }) =>
                   `flex items-center gap-2 p-2 rounded-md ${
-                    isActive ? 'bg-red-500 text-white' : 'hover:bg-gray-200'
+                    isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
                   }`
                 }
               >

@@ -190,7 +190,7 @@ const Writereview = () => {
         <div className="absolute bottom-0 left-0 w-full bg-white border-t shadow-md">
           <div className="w-full h-2 bg-gray-300 relative">
             <div
-              className="h-2 bg-red-500 transition-all duration-500 ease-in-out"
+              className="h-2 bg-[#b82025] transition-all duration-500 ease-in-out"
               style={{
                 width: `${(currentStep / steps.length) * 100}%`,
               }}
@@ -212,7 +212,7 @@ const Writereview = () => {
               className={`px-4 py-2 ${
                 currentStep == steps.length - 1
                   ? "px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
-                  : "px-4 py-2 bg-red-500 text-white rounded"
+                  : "px-4 py-2 bg-[#b82025] text-white rounded"
               }`}
             >
               {currentStep == steps.length - 1 ? "Submit" : "Next"}
@@ -233,7 +233,7 @@ const Writereview = () => {
                 <Link to="/">
                   <button
                     onClick={() => setIsModalOpen(false)}
-                    className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+                    className="mt-4 px-4 py-2 bg-[#b82025] text-white rounded"
                   >
                     Go Home
                   </button>

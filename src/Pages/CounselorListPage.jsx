@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ScheduleCallPopup from '../Components/DashboardComponent/ScheduleCallPopup';
-import ReviewFeedbackPopup from '../Components/DashboardComponent/ReviewFeedbackPopup';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import ScheduleCallPopup from "../Components/DashboardComponent/ScheduleCallPopup";
+import ReviewFeedbackPopup from "../Components/DashboardComponent/ReviewFeedbackPopup";
 
 const CounselorListPage = () => {
   const [isCallPopupOpen, setIsCallPopupOpen] = useState(false);
@@ -16,7 +16,6 @@ const CounselorListPage = () => {
 
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
-
 
   useEffect(() => {
     fetchCounselors();
@@ -37,23 +36,23 @@ const CounselorListPage = () => {
           limit,
           filters,
           searchFields,
-          sort
-        }
+          sort,
+        },
       });
 
       const newCounselors = response.data.data.result || [];
-      
+
       if (newCounselors.length < limit) {
         setHasMore(false);
       }
 
       if (isLoadMore) {
-        setCounselors(prev => [...prev, ...newCounselors]);
+        setCounselors((prev) => [...prev, ...newCounselors]);
       } else {
         setCounselors(newCounselors);
       }
     } catch (error) {
-      console.error('Error fetching counselors:', error);
+      console.error("Error fetching counselors:", error);
     } finally {
       const loadingState = isLoadMore ? setLoadingMore : setLoading;
       loadingState(false);
@@ -61,7 +60,7 @@ const CounselorListPage = () => {
   };
 
   const handleLoadMore = () => {
-    setPage(prev => prev + 1);
+    setPage((prev) => prev + 1);
     fetchCounselors(true);
   };
 
@@ -82,7 +81,7 @@ const CounselorListPage = () => {
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Talk To Our Expert Counselors
         </h1>
-        <button 
+        <button
           className="flex items-center text-red-600 font-medium"
           onClick={() => setIsCallPopupOpen(true)}
         >
@@ -108,10 +107,10 @@ const CounselorListPage = () => {
                   {/* Profile Image */}
                   {counselor.profilePhoto ? (
                     <img
-                    src={`${Images}/${counselor.profilePhoto.replace(
-                      "uploads/",
-                      ""
-                    )}`}
+                      src={`${Images}/${counselor.profilePhoto.replace(
+                        "uploads/",
+                        ""
+                      )}`}
                       alt={counselor.firstname}
                       className="h-24 w-24 rounded-lg object-cover"
                     />
@@ -129,7 +128,8 @@ const CounselorListPage = () => {
                     <div className="flex items-center mt-1">
                       <i className="fa fa-star text-yellow-500 mr-1"></i>
                       <span className="text-sm text-gray-600">
-                        {counselor.rating || 0} ({counselor.rating ? '1' : '0'} Rating)
+                        {counselor.rating || 0} ({counselor.rating ? "1" : "0"}{" "}
+                        Rating)
                       </span>
                     </div>
                     {counselor.level && (
@@ -179,7 +179,7 @@ const CounselorListPage = () => {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-red-300 flex items-center space-x-2"
+                className="px-6 py-2 bg-[#b82025] text-white rounded-md hover:bg-red-700 disabled:bg-red-300 flex items-center space-x-2"
               >
                 {loadingMore ? (
                   <>

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Heart, Plus } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Heart, Plus } from "lucide-react";
 import searchBoximg from "../assets/Images/serachBoximg.jpg";
 
 const Wishlist = () => {
@@ -15,19 +15,18 @@ const Wishlist = () => {
   useEffect(() => {
     const fetchWishlists = async () => {
       try {
-        const response = await axios.get(`${VITE_BASE_URL}/wishlists`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': localStorage.getItem('accessToken'),
-              'x-refresh-token': localStorage.getItem('refreshToken')  }
-            }
-        );
+        const response = await axios.get(`${VITE_BASE_URL}/wishlists`, {
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
+        });
         if (response.data.success) {
           setWishlists(response.data.data.college_wishlist || []);
         }
       } catch (error) {
-        console.error('Error fetching wishlists:', error);
+        console.error("Error fetching wishlists:", error);
         setWishlists([]); // Set empty array on error
       } finally {
         setLoading(false);
@@ -36,7 +35,11 @@ const Wishlist = () => {
     fetchWishlists();
   }, []);
 
-  const displayedItems = wishlists.length ? (showAll ? wishlists : wishlists.slice(0, currentPage * itemsPerPage)) : [];
+  const displayedItems = wishlists.length
+    ? showAll
+      ? wishlists
+      : wishlists.slice(0, currentPage * itemsPerPage)
+    : [];
 
   const handleSeeMore = () => {
     if (!showAll) {
@@ -54,7 +57,7 @@ const Wishlist = () => {
   };
 
   const handleExploreColleges = () => {
-    window.location.href = '/searchpage'; // Or use your routing method
+    window.location.href = "/searchpage"; // Or use your routing method
   };
 
   if (loading) {
@@ -69,7 +72,7 @@ const Wishlist = () => {
     <div className="p-6 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold text-center mb-8 text-gray-800 relative">
         My Wishlist
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-red-500 rounded-full"></div>
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-[#b82025] rounded-full"></div>
       </h1>
 
       {wishlists.length === 0 ? (
@@ -77,13 +80,16 @@ const Wishlist = () => {
           <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center">
             <Heart className="w-12 h-12 text-red-500" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-800">Your wishlist is empty</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Your wishlist is empty
+          </h2>
           <p className="text-gray-600 text-center max-w-md">
-            Start exploring colleges and add them to your wishlist to keep track of your favorite institutions.
+            Start exploring colleges and add them to your wishlist to keep track
+            of your favorite institutions.
           </p>
           <button
             onClick={handleExploreColleges}
-            className="mt-4 flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-md hover:shadow-lg"
+            className="mt-4 flex items-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-full hover:bg-red-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-md hover:shadow-lg"
           >
             <Plus className="w-5 h-5" />
             Explore Colleges
@@ -99,27 +105,37 @@ const Wishlist = () => {
               >
                 <div className="relative">
                   <img
-                    src={college.thumbnailImage
-                      ? `${Image_URL}/${college.thumbnailImage}`
-                      : searchBoximg}
+                    src={
+                      college.thumbnailImage
+                        ? `${Image_URL}/${college.thumbnailImage}`
+                        : searchBoximg
+                    }
                     alt={college.instituteName}
                     className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-                
+
                 <div className="p-5">
                   <h2 className="text-lg font-semibold text-gray-800 mb-2 border-b border-red-200 pb-2">
                     {college.instituteName}
                   </h2>
-                  
+
                   <div className="space-y-2">
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium text-red-600">Established:</span> {college.establishedYear}
+                      <span className="font-medium text-red-600">
+                        Established:
+                      </span>{" "}
+                      {college.establishedYear}
                     </p>
-                    <p className="text-sm text-gray-600 line-clamp-2">{college.collegeInfo}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {college.collegeInfo}
+                    </p>
                     <p className="text-sm text-gray-800">
-                      <span className="font-medium text-red-600">Highest Package:</span> {college.highestPackage}
+                      <span className="font-medium text-red-600">
+                        Highest Package:
+                      </span>{" "}
+                      {college.highestPackage}
                     </p>
                   </div>
                 </div>
@@ -131,7 +147,7 @@ const Wishlist = () => {
             {!showAll && currentPage * itemsPerPage < wishlists.length && (
               <button
                 onClick={handleSeeMore}
-                className="px-8 py-3 bg-red-600 text-white text-sm font-medium rounded-full hover:bg-red-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-md hover:shadow-lg"
+                className="px-8 py-3 bg-[#b82025] text-white text-sm font-medium rounded-full hover:bg-red-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 See More
               </button>
@@ -139,7 +155,7 @@ const Wishlist = () => {
             {currentPage > 1 && (
               <button
                 onClick={handleSeeLess}
-                className="px-8 py-3 bg-red-600 text-white text-sm font-medium rounded-full hover:bg-red-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-md hover:shadow-lg"
+                className="px-8 py-3 bg-[#b82025] text-white text-sm font-medium rounded-full hover:bg-red-700 transform hover:-translate-y-0.5 transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 See Less
               </button>

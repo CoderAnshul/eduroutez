@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Crown, Award, Medal, Star, MessageCircle, Share2, UserPlus, MessageSquare, HelpCircle } from "lucide-react";
+import {
+  Crown,
+  Award,
+  Medal,
+  Star,
+  MessageCircle,
+  Share2,
+  UserPlus,
+  MessageSquare,
+  HelpCircle,
+} from "lucide-react";
 import axios from "axios";
 
 const WelcomeBanner = () => {
@@ -8,18 +18,19 @@ const WelcomeBanner = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const VITE_BASE_URL=import.meta.env.VITE_BASE_URL;
+  const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(`${VITE_BASE_URL}/user`, {
           headers: {
-            'Content-Type': 'application/json',
-            
-            'x-access-token': localStorage.getItem('accessToken'),
-            'x-refresh-token': localStorage.getItem('refreshToken')
-          }        });
+            "Content-Type": "application/json",
+
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
+        });
         if (response.data.success) {
           setUser(response.data.data);
         } else {
@@ -45,7 +56,7 @@ const WelcomeBanner = () => {
         textColor: "text-slate-900",
         progress: 100,
         currentRange: "5001+",
-        description: "Elite Level Achievement"
+        description: "Elite Level Achievement",
       },
       {
         threshold: 1001,
@@ -55,7 +66,7 @@ const WelcomeBanner = () => {
         textColor: "text-yellow-900",
         progress: 80,
         currentRange: "1001-5000",
-        description: "Advanced Expert Status"
+        description: "Advanced Expert Status",
       },
       {
         threshold: 501,
@@ -65,7 +76,7 @@ const WelcomeBanner = () => {
         textColor: "text-gray-900",
         progress: 60,
         currentRange: "501-1000",
-        description: "Intermediate Level"
+        description: "Intermediate Level",
       },
       {
         threshold: 11,
@@ -75,7 +86,7 @@ const WelcomeBanner = () => {
         textColor: "text-orange-100",
         progress: 40,
         currentRange: "11-500",
-        description: "Getting Started"
+        description: "Getting Started",
       },
       {
         threshold: 0,
@@ -85,17 +96,25 @@ const WelcomeBanner = () => {
         textColor: "text-blue-900",
         progress: 20,
         currentRange: "0-10",
-        description: "New Member"
-      }
+        description: "New Member",
+      },
     ];
 
-    return levels.find(level => points >= level.threshold) || levels[levels.length - 1];
+    return (
+      levels.find((level) => points >= level.threshold) ||
+      levels[levels.length - 1]
+    );
   };
 
   const ActionCard = ({ icon: Icon, title, onClick, color }) => (
-    <div className="bg-white rounded-lg shadow-md group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1" onClick={onClick}>
+    <div
+      className="bg-white rounded-lg shadow-md group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+      onClick={onClick}
+    >
       <div className="p-6 flex flex-col items-center text-center space-y-2">
-        <div className={`p-3 rounded-full ${color} group-hover:scale-110 transition-transform duration-300`}>
+        <div
+          className={`p-3 rounded-full ${color} group-hover:scale-110 transition-transform duration-300`}
+        >
           <Icon className="h-6 w-6 text-white" />
         </div>
         <h3 className="font-semibold">{title}</h3>
@@ -123,7 +142,9 @@ const WelcomeBanner = () => {
   if (!user) {
     return (
       <div className="w-full p-6 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-600">Error loading user data. Please try again later.</p>
+        <p className="text-red-600">
+          Error loading user data. Please try again later.
+        </p>
       </div>
     );
   }
@@ -132,11 +153,36 @@ const WelcomeBanner = () => {
   const LevelIcon = levelDetails.icon;
 
   const actions = [
-    { icon: MessageCircle, title: "Ask a Question", color: "bg-blue-500", route: "/question-&-answers" },
-    { icon: Share2, title: "Refer Friends", color: "bg-purple-500", route: "/dashboard/refer&earn" },
-    { icon: UserPlus, title: "Become Counselor", color: "bg-red-500", route: "/become-couseller" },
-    { icon: MessageSquare, title: "Feedback", color: "bg-indigo-500", route: "/dashboard/reviews" },
-    { icon: HelpCircle, title: "Talk to Expert", color: "bg-pink-500", route: "/dashboard/counselor" },
+    {
+      icon: MessageCircle,
+      title: "Ask a Question",
+      color: "bg-blue-500",
+      route: "/question-&-answers",
+    },
+    {
+      icon: Share2,
+      title: "Refer Friends",
+      color: "bg-purple-500",
+      route: "/dashboard/refer&earn",
+    },
+    {
+      icon: UserPlus,
+      title: "Become Counselor",
+      color: "bg-[#b82025]",
+      route: "/become-couseller",
+    },
+    {
+      icon: MessageSquare,
+      title: "Feedback",
+      color: "bg-indigo-500",
+      route: "/dashboard/reviews",
+    },
+    {
+      icon: HelpCircle,
+      title: "Talk to Expert",
+      color: "bg-pink-500",
+      route: "/dashboard/counselor",
+    },
   ];
 
   const handleActionClick = (route) => {
@@ -159,9 +205,11 @@ const WelcomeBanner = () => {
             <LevelIcon className="h-16 w-16 text-white opacity-90" />
           </div>
         </div>
-        
+
         <div className="py-5 px-2 sm:py-6 sm:px-6 space-y-6">
-          <div className={`bg-gradient-to-r ${levelDetails.color} rounded-lg shadow-md`}>
+          <div
+            className={`bg-gradient-to-r ${levelDetails.color} rounded-lg shadow-md`}
+          >
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="space-y-1">
@@ -176,8 +224,12 @@ const WelcomeBanner = () => {
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className={`${levelDetails.textColor}`}>Current Range: {levelDetails.currentRange} points</span>
-                  <span className={`${levelDetails.textColor} font-medium`}>{levelDetails.progress}%</span>
+                  <span className={`${levelDetails.textColor}`}>
+                    Current Range: {levelDetails.currentRange} points
+                  </span>
+                  <span className={`${levelDetails.textColor} font-medium`}>
+                    {levelDetails.progress}%
+                  </span>
                 </div>
                 <div className="w-full bg-black bg-opacity-10 rounded-full h-2">
                   <div

@@ -5,29 +5,30 @@ import rupee from "../assets/Images/rupee.png";
 import badge from "../assets/Images/badge.png";
 import cashhand from "../assets/Images/cashhand.png";
 import checklist from "../assets/Images/checklist.png";
-import { addToWishlist } from '../ApiFunctions/api';
+import { addToWishlist } from "../ApiFunctions/api";
 import axiosInstance from "../ApiFunctions/axios";
-import { MapPin, Building } from 'lucide-react';
+import { MapPin, Building } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
-const SearchResultBox = ({ institute, url , className="" }) => {
-  console.log('Institute:', institute);
-  const userId = localStorage.getItem('userId');
+const SearchResultBox = ({ institute, url, className = "" }) => {
+  console.log("Institute:", institute);
+  const userId = localStorage.getItem("userId");
 
   const [isWishlisted, setIsWishlisted] = useState(
     institute.wishlist && institute.wishlist.includes(userId)
-  );  const baseURL = import.meta.env.VITE_BASE_URL;
+  );
+  const baseURL = import.meta.env.VITE_BASE_URL;
   const Image = import.meta.env.VITE_IMAGE_BASE_URL;
 
   // Get the correct URL for the institute (using slug if available)
   const getInstituteUrl = () => {
     // If a URL is provided from parent component, use it
     if (url) return url;
-    
+
     // Otherwise, fall back to slug-based URL if available, or ID-based URL as last resort
-    return institute?.slug 
+    return institute?.slug
       ? `/institute/${institute.slug}`
       : `/institute/${institute?._id}`;
   };
@@ -36,33 +37,41 @@ const SearchResultBox = ({ institute, url , className="" }) => {
 
   const handleAddToWishlist = async () => {
     try {
-      const userId = localStorage.getItem('userId');
+      const userId = localStorage.getItem("userId");
       const response = await addToWishlist(userId, institute._id, null, {
         headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken')
-        }
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("accessToken"),
+          "x-refresh-token": localStorage.getItem("refreshToken"),
+        },
       }); // Assuming courseId is null for now
-      if (response.message.includes('removed')) {
+      if (response.message.includes("removed")) {
         setIsWishlisted(false);
-      } else if (response.message.includes('added')) {
+      } else if (response.message.includes("added")) {
         setIsWishlisted(true);
       }
     } catch (error) {
-      console.error('Error adding to wishlist:', error);
+      console.error("Error adding to wishlist:", error);
     }
   };
 
-  const hasWishlistFeature = institute.plan?.features?.some(feature => feature.key === 'WishList' && feature.value === 'Yes');
+  const hasWishlistFeature = institute.plan?.features?.some(
+    (feature) => feature.key === "WishList" && feature.value === "Yes"
+  );
 
-  const overallRating = institute.reviews.length > 0 
-    ? institute?.reviews.reduce((sum, review) => sum + (review.placementStars || 0) + 
-      (review.campusLifeStars || 0) + 
-      (review.facultyStars || 0) + 
-      (review.suggestionsStars || 0), 0) / (institute?.reviews.length * 4 || 1)
-    : 0;
-  console.log('h', isNaN(overallRating) ? 3 : overallRating);
+  const overallRating =
+    institute.reviews.length > 0
+      ? institute?.reviews.reduce(
+          (sum, review) =>
+            sum +
+            (review.placementStars || 0) +
+            (review.campusLifeStars || 0) +
+            (review.facultyStars || 0) +
+            (review.suggestionsStars || 0),
+          0
+        ) / (institute?.reviews.length * 4 || 1)
+      : 0;
+  console.log("h", isNaN(overallRating) ? 3 : overallRating);
 
   const handleDownloadBrochure = async () => {
     try {
@@ -76,41 +85,41 @@ const SearchResultBox = ({ institute, url , className="" }) => {
           responseType: "blob",
         }
       );
-  
+
       // Get content type from response
-      const contentType = response.headers['content-type'];
-      
+      const contentType = response.headers["content-type"];
+
       // Set file extension and type based on content type
       let fileExtension;
       let mimeType;
-      
-      if (contentType.includes('pdf')) {
-        fileExtension = 'pdf';
-        mimeType = 'application/pdf';
-      } else if (contentType.includes('jpeg') || contentType.includes('jpg')) {
-        fileExtension = 'jpg';
-        mimeType = 'image/jpeg';
-      } else if (contentType.includes('png')) {
-        fileExtension = 'png';
-        mimeType = 'image/png';
+
+      if (contentType.includes("pdf")) {
+        fileExtension = "pdf";
+        mimeType = "application/pdf";
+      } else if (contentType.includes("jpeg") || contentType.includes("jpg")) {
+        fileExtension = "jpg";
+        mimeType = "image/jpeg";
+      } else if (contentType.includes("png")) {
+        fileExtension = "png";
+        mimeType = "image/png";
       } else {
         // Default to PDF if content type is not recognized
-        fileExtension = 'pdf';
-        mimeType = 'application/pdf';
+        fileExtension = "pdf";
+        mimeType = "application/pdf";
       }
-  
+
       const blob = new Blob([response.data], { type: mimeType });
       const url = window.URL.createObjectURL(blob);
-  
+
       const a = document.createElement("a");
       a.href = url;
       a.download = `brochure.${fileExtension}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-  
+
       window.URL.revokeObjectURL(url);
-      
+
       toast.success("Brochure downloaded successfully");
     } catch (error) {
       console.error("Download error:", error);
@@ -119,20 +128,28 @@ const SearchResultBox = ({ institute, url , className="" }) => {
   };
 
   return (
-    <div className={`border rounded-lg shadow-md p-4 flex flex-col space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2 ${className}`}>
+    <div
+      className={`border rounded-lg shadow-md p-4 flex flex-col space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2 ${className}`}
+    >
       {/* Left Section - Image */}
       <div className="flex justify-between flex-col gap-3"></div>
       <div className="flex justify-between flex-col md:flex-row gap-3">
         <div className="relative w-full md:w-2/6 !ml-0">
           <img
-            src={institute.thumbnailImage ? `${Image}/${institute.thumbnailImage}` : serachBoximg}
+            src={
+              institute.thumbnailImage
+                ? `${Image}/${institute.thumbnailImage}`
+                : serachBoximg
+            }
             alt="Institute Thumbnail"
             className="rounded-lg object-cover w-full h-44"
           />
           {hasWishlistFeature && (
             <button
               className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md"
-              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              aria-label={
+                isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+              }
               onClick={handleAddToWishlist}
             >
               <svg
@@ -162,57 +179,77 @@ const SearchResultBox = ({ institute, url , className="" }) => {
           <div className="flex items-center space-x-3 text-sm text-gray-600">
             {overallRating !== 0 && (
               <span className="flex items-center">
-                <span className="text-yellow-500">★</span>{overallRating}
+                <span className="text-yellow-500">★</span>
+                {overallRating}
               </span>
             )}
             <span>{institute.reviews.length} Reviews</span>
             <span className="flex items-center gap-2 text-gray-600">
-            {institute.state?.name && (
-              <><MapPin size={16} className="text-gray-500" /><span>{institute.state?.name}</span></>
-            )}
-            {institute.organisationType && (
-              <><Building size={16} className="text-gray-500" /><span>{institute.organisationType}</span></>
-            )}
+              {institute.state?.name && (
+                <>
+                  <MapPin size={16} className="text-gray-500" />
+                  <span>{institute.state?.name}</span>
+                </>
+              )}
+              {institute.organisationType && (
+                <>
+                  <Building size={16} className="text-gray-500" />
+                  <span>{institute.organisationType}</span>
+                </>
+              )}
             </span>
           </div>
 
           <div className="flex items-center space-x-4 mt-5 mb-2">
             {institute.minFees && institute.maxFees && (
               <span className="text-gray-700 font-medium md:text-xl text-xs sm:text-sm flex items-center gap-1">
-                <img src={rupee} className="h-4 opacity-75 mt-1" alt="rupee" />{institute.minFees}-{institute.maxFees}
+                <img src={rupee} className="h-4 opacity-75 mt-1" alt="rupee" />
+                {institute.minFees}-{institute.maxFees}
               </span>
             )}
             <span className="flex items-center font-medium md:text-xl text-xs sm:text-sm space-x-1">
               <img src={badge} alt="AICTE" className="h-4 opacity-75 mt-1" />
-              <span>{institute.affiliation || 'AICTE'}</span>
+              <span>{institute.affiliation || "AICTE"}</span>
             </span>
             {institute.highestPackage && (
               <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl">
-                <img src={cashhand} alt="cash" className="h-4 opacity-75 mt-1" />{institute.highestPackage}
+                <img
+                  src={cashhand}
+                  alt="cash"
+                  className="h-4 opacity-75 mt-1"
+                />
+                {institute.highestPackage}
               </span>
             )}
             {institute.examAccepted && (
               <span className="text-gray-700 flex items-center gap-1 font-medium text-xs sm:text-sm md:text-xl relative group">
-                <img src={checklist} alt="checklist" className="h-4 opacity-75 mt-1" />
+                <img
+                  src={checklist}
+                  alt="checklist"
+                  className="h-4 opacity-75 mt-1"
+                />
                 <span>
-                  {institute.examAccepted.split(',')[0]}
-                  {institute.examAccepted.split(',').length > 1 && (
+                  {institute.examAccepted.split(",")[0]}
+                  {institute.examAccepted.split(",").length > 1 && (
                     <span className="text-blue-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer ml-1">
-                      + {institute.examAccepted.split(',').length - 1} more
+                      + {institute.examAccepted.split(",").length - 1} more
                     </span>
                   )}
                 </span>
-                {institute.examAccepted.split(',').length > 1 && (
+                {institute.examAccepted.split(",").length > 1 && (
                   <span className="absolute left-0 top-full mt-2 hidden group-hover:block bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50 min-w-[200px]">
                     <div className="max-h-[200px] overflow-y-auto">
-                      {institute.examAccepted.split(',').slice(1).map((exam, index) => (
-                        <div
-                          key={index}
-                          className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                        >
-                          {exam.trim()}
-                        </div>
-                      ))}
+                      {institute.examAccepted
+                        .split(",")
+                        .slice(1)
+                        .map((exam, index) => (
+                          <div
+                            key={index}
+                            className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                          >
+                            {exam.trim()}
+                          </div>
+                        ))}
                     </div>
                   </span>
                 )}
@@ -220,7 +257,10 @@ const SearchResultBox = ({ institute, url , className="" }) => {
             )}
           </div>
 
-          <p className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{ __html: institute.about }} />
+          <p
+            className="text-sm text-gray-600 line-clamp-3"
+            dangerouslySetInnerHTML={{ __html: institute.about }}
+          />
           <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">
             <div className="space-x-4">
               {/* Links updated below to use slug URLs */}
@@ -231,16 +271,29 @@ const SearchResultBox = ({ institute, url , className="" }) => {
       <div className="flex space-x-4 justify-center md:justify-between gap-4 items-center flex-wrap">
         <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
           <div className="space-x-4">
-            <Link to={`${instituteUrl}`} className="hover:underline">Fees and Courses</Link>
-            <Link to={`${instituteUrl}`} className="hover:underline">Admission</Link>
-            <Link to={`${instituteUrl}`} className="hover:underline">Placement</Link>
+            <Link to={`${instituteUrl}`} className="hover:underline">
+              Fees and Courses
+            </Link>
+            <Link to={`${instituteUrl}`} className="hover:underline">
+              Admission
+            </Link>
+            <Link to={`${instituteUrl}`} className="hover:underline">
+              Placement
+            </Link>
           </div>
         </div>
         <div className="flex items-center flex-wrap gap-4 !ml-0">
-          <button className="bg-red-600 text-white px-4 py-2 rounded-lg" onClick={handleDownloadBrochure}>
+          <button
+            className="bg-[#b82025] text-white px-4 py-2 rounded-lg"
+            onClick={handleDownloadBrochure}
+          >
             Download Brochure
           </button>
-          <CustomButton to={instituteUrl} className='!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md ' text='View more'>
+          <CustomButton
+            to={instituteUrl}
+            className="!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md "
+            text="View more"
+          >
             View more
           </CustomButton>
         </div>

@@ -6,7 +6,7 @@ import counsellor3 from "../assets/Images/Counsellor3.jpg";
 import counsellor4 from "../assets/Images/Counsellor4.jpg";
 import counsellor5 from "../assets/Images/Counsellor5.jpg";
 import aditi from "../assets/Images/AditiJoshi.png";
-import  DurviKaskar from "../assets/Images/DurviKaskar.png";
+import DurviKaskar from "../assets/Images/DurviKaskar.png";
 import RohanPatil from "../assets/Images/RohanPatil.png";
 import PrinceMishra from "../assets/Images/PrinceMishra.jpeg";
 import Natasha from "../assets/Images/NatashaSawant.jpeg";
@@ -69,9 +69,9 @@ const ReviewBox = ({ review, onReadMore }) => {
       <div className="flex items-center mb-4">
         {/* Add the image here */}
         <div className="mr-4">
-          <img 
-            src={review.userImage} 
-            alt={`${review.name}`} 
+          <img
+            src={review.userImage}
+            alt={`${review.name}`}
             className="w-12 h-12 rounded-full object-cover"
           />
         </div>
@@ -94,20 +94,22 @@ const ReviewModal = ({ review, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full">
         <div className="flex items-center mb-4">
-          <img 
-            src={review.userImage} 
-            alt={`${review.name}`} 
+          <img
+            src={review.userImage}
+            alt={`${review.name}`}
             className="w-16 h-16 rounded-full object-cover mr-4"
           />
           <div>
             <h4 className="font-bold text-lg mb-2">{review.name}</h4>
             <p className="text-sm text-gray-600 mb-1">{review.type}</p>
-            {review.company && <p className="text-xs text-gray-500 mb-2">{review.company}</p>}
+            {review.company && (
+              <p className="text-xs text-gray-500 mb-2">{review.company}</p>
+            )}
           </div>
         </div>
         <p className="text-gray-700">{review.text}</p>
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
         >
           Close
@@ -127,8 +129,14 @@ const Reviews = () => {
 
   // Map of images to use for different review types
   const imageMap = {
-    student: [aditi, RohanPatil, PrinceMishra, DurviKaskar,Natasha],
-    counselor: [ counsellor1, counsellor2,counsellor3, counsellor4, counsellor5]
+    student: [aditi, RohanPatil, PrinceMishra, DurviKaskar, Natasha],
+    counselor: [
+      counsellor1,
+      counsellor2,
+      counsellor3,
+      counsellor4,
+      counsellor5,
+    ],
   };
 
   // Combined review data from all sources
@@ -225,7 +233,7 @@ const Reviews = () => {
       text: "I've had a great experience counseling students on Eduroutez. The platform ensures that students get authentic and expert advice for their future.",
       userImage: imageMap.counselor[3],
       rating: 5,
-    }
+    },
   ];
 
   // Determine how many reviews to show based on screen size
@@ -328,7 +336,7 @@ const Reviews = () => {
               key={index}
               onClick={() => setCurrentIndex(index)}
               className={`h-2 w-2 rounded-full transition-all ${
-                index === currentIndex ? "bg-red-600 w-4" : "bg-gray-300"
+                index === currentIndex ? "bg-[#b82025] w-4" : "bg-gray-300"
               }`}
               aria-label={`Go to review ${index + 1}`}
             />

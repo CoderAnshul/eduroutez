@@ -1,11 +1,11 @@
-'use client';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Rating from '@mui/material/Rating';
-import InstituteReviewBox from '../Ui components/InstituteReviewBox';
+"use client";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Link } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Rating from "@mui/material/Rating";
+import InstituteReviewBox from "../Ui components/InstituteReviewBox";
 import CustomButton from "../Ui components/CustomButton";
-import axios from 'axios';
+import axios from "axios";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -22,12 +22,14 @@ const ReviewandRating = ({ instituteData }) => {
     const fetchReviewsAndRatings = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`${baseURL}/review-by-institute/${instituteData?.data?._id}`);
+        const response = await axios.get(
+          `${baseURL}/review-by-institute/${instituteData?.data?._id}`
+        );
         setRatings(response.data.ratings || []);
         setReviews(response.data.data.result || []);
       } catch (err) {
-        console.error('Error fetching reviews:', err);
-        setError('Failed to load reviews. Please try again later.');
+        console.error("Error fetching reviews:", err);
+        setError("Failed to load reviews. Please try again later.");
       } finally {
         setIsLoading(false);
       }
@@ -41,7 +43,7 @@ const ReviewandRating = ({ instituteData }) => {
     if (!accessToken) {
       setShowLoginPopup(true);
     } else {
-      window.location.href = '/writereview'; // Navigate to write review if logged in
+      window.location.href = "/writereview"; // Navigate to write review if logged in
     }
   };
 
@@ -51,11 +53,16 @@ const ReviewandRating = ({ instituteData }) => {
 
   const averageRating = useMemo(() => {
     if (reviews?.result?.length === 0) return 0;
-    return reviews?.result?.slice(0, 6).reduce((total, review) => total + review.rating, 0) / Math.min(reviews.length, 6);
+    return (
+      reviews?.result
+        ?.slice(0, 6)
+        .reduce((total, review) => total + review.rating, 0) /
+      Math.min(reviews.length, 6)
+    );
   }, [reviews]);
 
   const toggleModal = useCallback(() => {
-    setIsModalOpen(prev => !prev);
+    setIsModalOpen((prev) => !prev);
   }, []);
 
   if (isLoading) {
@@ -79,15 +86,17 @@ const ReviewandRating = ({ instituteData }) => {
       <div className="min-h-28 w-full flex flex-col items-center justify-center">
         <p>No reviews available for this institute.</p>
         <CustomButton
-          text='Be the First to Write a Review'
-          className="!bg-red-500 !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg mt-4"
+          text="Be the First to Write a Review"
+          className="!bg-[#b82025] !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg mt-4"
           onClick={handleReviewClick}
         />
         {showLoginPopup && (
           <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
             <div className="popup bg-white p-12 rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
               <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
-                Hey there! We'd love to hear your thoughts. Please log in to share your review with us and help others make informed decisions.
+                Hey there! We'd love to hear your thoughts. Please log in to
+                share your review with us and help others make informed
+                decisions.
               </h3>
               <div className="flex justify-center space-x-6">
                 <button
@@ -99,7 +108,7 @@ const ReviewandRating = ({ instituteData }) => {
                 <Link
                   to="/login"
                   onClick={handleLoginPopupClose}
-                  className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+                  className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
                 >
                   Log In
                 </Link>
@@ -111,12 +120,27 @@ const ReviewandRating = ({ instituteData }) => {
     );
   }
 
-  const overallRating = reviews.length > 0 
-    ? reviews.reduce((sum, review) => sum + ((typeof review?.placementStars === 'number' ? review.placementStars : 0) + 
-      (typeof review?.campusLifeStars === 'number' ? review.campusLifeStars : 0) + 
-      (typeof review?.facultyStars === 'number' ? review.facultyStars : 0) + 
-      (typeof review?.suggestionsStars === 'number' ? review.suggestionsStars : 0))/4, 0) / reviews.length 
-    : 0;
+  const overallRating =
+    reviews.length > 0
+      ? reviews.reduce(
+          (sum, review) =>
+            sum +
+            ((typeof review?.placementStars === "number"
+              ? review.placementStars
+              : 0) +
+              (typeof review?.campusLifeStars === "number"
+                ? review.campusLifeStars
+                : 0) +
+              (typeof review?.facultyStars === "number"
+                ? review.facultyStars
+                : 0) +
+              (typeof review?.suggestionsStars === "number"
+                ? review.suggestionsStars
+                : 0)) /
+              4,
+          0
+        ) / reviews.length
+      : 0;
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between rounded-xl sm:p-4">
@@ -124,17 +148,24 @@ const ReviewandRating = ({ instituteData }) => {
         <h3 className="text-xl font-bold">Overall Rating & Reviews</h3>
 
         <div className="flex gap-5">
-          <Box sx={{ '& > legend': { mt: 2 } }} className="flex items-center gap-2">
-            <Rating 
-              className="!text-lg" 
-              name="read-only" 
-              value={overallRating} 
+          <Box
+            sx={{ "& > legend": { mt: 2 } }}
+            className="flex items-center gap-2"
+          >
+            <Rating
+              className="!text-lg"
+              name="read-only"
+              value={overallRating}
               precision={0.1}
-              readOnly 
+              readOnly
             />
-            <h4 className="font-semibold opacity-75">{overallRating.toFixed(1)}</h4>
+            <h4 className="font-semibold opacity-75">
+              {overallRating.toFixed(1)}
+            </h4>
           </Box>
-          <h4 className="font-semibold opacity-75">({reviews.length} reviews)</h4>
+          <h4 className="font-semibold opacity-75">
+            ({reviews.length} reviews)
+          </h4>
         </div>
 
         <div className="flex gap-[2vw] flex-wrap justify-between sm:justify-normal mt-10">
@@ -149,7 +180,9 @@ const ReviewandRating = ({ instituteData }) => {
                   precision={0.1}
                   readOnly
                 />
-                <span className="text-sm font-medium text-gray-600">{item.rating.toFixed(1)}</span>
+                <span className="text-sm font-medium text-gray-600">
+                  {item.rating.toFixed(1)}
+                </span>
               </div>
             </div>
           ))}
@@ -157,8 +190,15 @@ const ReviewandRating = ({ instituteData }) => {
 
         <div className="flex gap-2 items-center mt-4">
           <h5 className="font-semibold">Average Rating of Initial 6 Reviews</h5>
-          <Rating className="!text-sm" name="read-only-avg" value={overallRating} readOnly />
-          <span className="text-sm font-medium text-gray-600">{overallRating.toFixed(1)}</span>
+          <Rating
+            className="!text-sm"
+            name="read-only-avg"
+            value={overallRating}
+            readOnly
+          />
+          <span className="text-sm font-medium text-gray-600">
+            {overallRating.toFixed(1)}
+          </span>
         </div>
 
         <div className="w-full h-auto bg-white mt-8 border-2 rounded-xl flex flex-wrap p-3 gap-2">
@@ -175,14 +215,25 @@ const ReviewandRating = ({ instituteData }) => {
               placementDescription={review?.placementDescription}
               facultyStars={review?.facultyStars}
               suggestionsStars={review?.suggestionsStars}
-              rating={(review.placementStars + review.facultyStars + review.campusLifeStars + review.suggestionsStars) / 4}
+              rating={
+                (review.placementStars +
+                  review.facultyStars +
+                  review.campusLifeStars +
+                  review.suggestionsStars) /
+                4
+              }
               review={review.reviewTitle}
-              courseRatings={[review.placementStars, review.facultyStars, review.campusLifeStars, review.suggestionsStars]}
+              courseRatings={[
+                review.placementStars,
+                review.facultyStars,
+                review.campusLifeStars,
+                review.suggestionsStars,
+              ]}
             />
           ))}
         </div>
 
-        <div className='flex justify-between items-center mt-4'>
+        <div className="flex justify-between items-center mt-4">
           <button
             className="text-blue-600 text-sm font-medium hover:underline"
             onClick={toggleModal}
@@ -191,8 +242,8 @@ const ReviewandRating = ({ instituteData }) => {
           </button>
 
           <CustomButton
-            text='Write a Review'
-            className="!bg-red-500 !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg"
+            text="Write a Review"
+            className="!bg-[#b82025] !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg"
             onClick={handleReviewClick}
           />
         </div>
@@ -202,7 +253,8 @@ const ReviewandRating = ({ instituteData }) => {
         <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
           <div className="popup bg-white p-12 rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
             <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
-              Hey there! We'd love to hear your thoughts. Please log in to share your review with us and help others make informed decisions.
+              Hey there! We'd love to hear your thoughts. Please log in to share
+              your review with us and help others make informed decisions.
             </h3>
             <div className="flex justify-center space-x-6">
               <button
@@ -214,7 +266,7 @@ const ReviewandRating = ({ instituteData }) => {
               <Link
                 to="/login"
                 onClick={handleLoginPopupClose}
-                className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+                className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
               >
                 Log In
               </Link>
@@ -236,23 +288,32 @@ const ReviewandRating = ({ instituteData }) => {
             <h3 className="text-xl font-bold mb-4">Overall Rating & Reviews</h3>
 
             <div className="flex gap-5 mb-6">
-              <Box sx={{ '& > legend': { mt: 2 } }} className="flex items-center gap-2">
-                <Rating 
-                  className="!text-lg" 
-                  name="read-only" 
-                  value={overallRating} 
+              <Box
+                sx={{ "& > legend": { mt: 2 } }}
+                className="flex items-center gap-2"
+              >
+                <Rating
+                  className="!text-lg"
+                  name="read-only"
+                  value={overallRating}
                   precision={0.1}
-                  readOnly 
+                  readOnly
                 />
-                <h4 className="font-semibold opacity-75">{overallRating.toFixed(1)}</h4>
+                <h4 className="font-semibold opacity-75">
+                  {overallRating.toFixed(1)}
+                </h4>
               </Box>
-              <h4 className="font-semibold opacity-75">({reviews.length} reviews)</h4>
+              <h4 className="font-semibold opacity-75">
+                ({reviews.length} reviews)
+              </h4>
             </div>
 
             <div className="flex gap-[2vw] mb-6 flex-wrap justify-between sm:justify-normal">
               {ratings.map((item, index) => (
                 <div key={index} className="flex flex-col items-center">
-                  <h5 className="font-semibold text-gray-700">{item.category}</h5>
+                  <h5 className="font-semibold text-gray-700">
+                    {item.category}
+                  </h5>
                   <div className="flex items-center gap-2">
                     <Rating
                       className="!text-sm"
@@ -283,9 +344,20 @@ const ReviewandRating = ({ instituteData }) => {
                   placementDescription={review?.placementDescription}
                   facultyStars={review?.facultyStars}
                   suggestionsStars={review?.suggestionsStars}
-                  rating={(review.placementStars + review.facultyStars + review.campusLifeStars + review.suggestionsStars) / 4}
+                  rating={
+                    (review.placementStars +
+                      review.facultyStars +
+                      review.campusLifeStars +
+                      review.suggestionsStars) /
+                    4
+                  }
                   review={review.reviewTitle}
-                  courseRatings={[review.placementStars, review.facultyStars, review.campusLifeStars, review.suggestionsStars]}
+                  courseRatings={[
+                    review.placementStars,
+                    review.facultyStars,
+                    review.campusLifeStars,
+                    review.suggestionsStars,
+                  ]}
                 />
               ))}
             </div>

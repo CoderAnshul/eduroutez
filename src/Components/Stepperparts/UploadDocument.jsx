@@ -95,7 +95,7 @@ const UploadDocument = ({ formData, setFormData, setIsSubmit }) => {
             ) : (
               <button
                 onClick={() => handleRemoveImage("studentId")}
-                className="absolute bottom-2 px-3 py-1 text-sm rounded-sm bg-red-500 text-white cursor-pointer"
+                className="absolute bottom-2 px-3 py-1 text-sm rounded-sm bg-[#b82025] text-white cursor-pointer"
               >
                 Remove
               </button>
@@ -130,7 +130,7 @@ const UploadDocument = ({ formData, setFormData, setIsSubmit }) => {
             ) : (
               <button
                 onClick={() => handleRemoveImage("selfie")}
-                className="absolute bottom-2 px-3 py-1 text-sm rounded-sm bg-red-500 text-white cursor-pointer"
+                className="absolute bottom-2 px-3 py-1 text-sm rounded-sm bg-[#b82025] text-white cursor-pointer"
               >
                 Remove
               </button>

@@ -116,7 +116,9 @@ const CounselorListPage = () => {
   useEffect(() => {
     const fetchStreams = async () => {
       try {
-        const response = await axios.get(`${VITE_BASE_URL}/streams?&page=0&sort={"createdAt":"asc"}`);
+        const response = await axios.get(
+          `${VITE_BASE_URL}/streams?&page=0&sort={"createdAt":"asc"}`
+        );
         setStreams(response.data.data.result || []);
       } catch (error) {
         console.error("Error fetching streams:", error.message);
@@ -238,11 +240,11 @@ const CounselorListPage = () => {
                   </label>
                 ))}
               </div>
-          </div>
-              <Promotions
-                location="COUNSELING_PAGE_SIDEBAR"
-                className="h-[250px] w-fit "
-              />
+            </div>
+            <Promotions
+              location="COUNSELING_PAGE_SIDEBAR"
+              className="h-[250px] w-fit "
+            />
           </div>
 
           <div className="w-full md:w-3/4 md:pl-6">
@@ -291,7 +293,8 @@ const CounselorListPage = () => {
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-2">
                                 <h2 className="text-lg font-semibold text-gray-900">
-                                  {counselor.firstname +" " }{counselor.lastname}
+                                  {counselor.firstname + " "}
+                                  {counselor.lastname}
                                 </h2>
                                 <div className="flex items-center gap-1.5">
                                   <div className="flex">
@@ -321,7 +324,9 @@ const CounselorListPage = () => {
                                 </div>
                               </div>
 
-                              <span className="text-gray-600 mb-4">{counselor?.about}</span>
+                              <span className="text-gray-600 mb-4">
+                                {counselor?.about}
+                              </span>
 
                               <div className="space-y-2.5 mt-4">
                                 {counselor?.language && (
@@ -401,9 +406,6 @@ const CounselorListPage = () => {
                                   </button>
                                 </div>
 
-                           
-
-
                                 {counselor.ExperienceYear && (
                                   <div className="flex items-center gap-4 font-bold text-sm text-gray-600">
                                     <div className="flex items-center">
@@ -481,7 +483,7 @@ const CounselorListPage = () => {
                               <div className="flex gap-3 mt-6">
                                 <button
                                   onClick={() => handleScheduleCall(counselor)}
-                                  className="flex-1 inline-flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                                  className="flex-1 inline-flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-[#b82025] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                                 >
                                   <svg
                                     className="w-4 h-4 mr-2"
@@ -528,7 +530,9 @@ const CounselorListPage = () => {
                   </div>
                 ) : (
                   <div className=" w-full flex flex-col   justify-center gap-2 items-center h-80">
-                    <h2 className="text-xl font-semibold text-red-600">No Counselor Found</h2>
+                    <h2 className="text-xl font-semibold text-red-600">
+                      No Counselor Found
+                    </h2>
                     <h2 className="w-[50%] max-sm:w-full text-center">
                       The requested counselor could not be found. Please check
                       counselor name and try again.
@@ -541,7 +545,7 @@ const CounselorListPage = () => {
                     <button
                       onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                       disabled={page === 1}
-                      className="mx-2 px-4 py-2 rounded-md bg-red-600 text-white disabled:opacity-50"
+                      className="mx-2 px-4 py-2 rounded-md bg-[#b82025] text-white disabled:opacity-50"
                     >
                       Previous
                     </button>
@@ -549,7 +553,7 @@ const CounselorListPage = () => {
                     <button
                       onClick={() => setPage((prev) => prev + 1)}
                       disabled={displayedCounselors.length < itemsPerPage}
-                      className="mx-2 px-4 py-2 rounded-md bg-red-600 text-white disabled:opacity-50"
+                      className="mx-2 px-4 py-2 rounded-md bg-[#b82025] text-white disabled:opacity-50"
                     >
                       Next
                     </button>
@@ -579,7 +583,7 @@ const CounselorListPage = () => {
               <Link
                 to="/login"
                 onClick={handleLoginPopupClose}
-                className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+                className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
               >
                 Log In
               </Link>

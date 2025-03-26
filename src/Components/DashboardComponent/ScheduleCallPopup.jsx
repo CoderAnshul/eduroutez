@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
   const [formData, setFormData] = useState({
@@ -19,25 +19,30 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
 
   useEffect(() => {
     const loadRazorpayScript = () => {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-        script.async = true;
-        script.onload = () => console.log("Razorpay script loaded");
-        script.onerror = () => console.error("Failed to load Razorpay script");
-        document.body.appendChild(script);
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = () => console.log("Razorpay script loaded");
+      script.onerror = () => console.error("Failed to load Razorpay script");
+      document.body.appendChild(script);
     };
 
     loadRazorpayScript();
 
     const fetchCounselorSchedule = async () => {
       try {
-        const response = await fetch(`${apiUrl}/counselorslots/${counselor?.email ?? ""}`);
+        const response = await fetch(
+          `${apiUrl}/counselorslots/${counselor?.email ?? ""}`
+        );
         const data = await response.json();
         if (data?.data) {
           setCounselorSchedule(data.data);
-          
+
           // Extract booked slots from the response
-          if (data.data.scheduledSlots && Array.isArray(data.data.scheduledSlots)) {
+          if (
+            data.data.scheduledSlots &&
+            Array.isArray(data.data.scheduledSlots)
+          ) {
             setBookedSlots(data.data.scheduledSlots);
           }
         }
@@ -58,7 +63,15 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
     const generateTimeSlots = () => {
       const date = new Date(formData.date);
       const dayOfWeek = date.getDay();
-      const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+      const days = [
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+      ];
       const currentDay = days[dayOfWeek];
 
       const startTime = counselorSchedule?.[`${currentDay}Start`] ?? "";
@@ -91,7 +104,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -117,11 +130,11 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
         handler: async (response) => {
           try {
             const bookingResponse = await fetch(`${apiUrl}/bookslot`, {
-              method: 'POST',
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json',
-                'x-access-token': localStorage.getItem("accessToken"),
-                'x-refresh-token': localStorage.getItem("refreshToken"),
+                "Content-Type": "application/json",
+                "x-access-token": localStorage.getItem("accessToken"),
+                "x-refresh-token": localStorage.getItem("refreshToken"),
               },
               body: JSON.stringify({
                 date: formData.date,
@@ -133,22 +146,24 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
             });
 
             const bookingData = await bookingResponse.json();
-            
+
             if (bookingResponse.ok) {
-              console.log('Booking successful:', bookingData);
+              console.log("Booking successful:", bookingData);
               // Add newly booked slot to local state
               const newBookedSlot = {
                 date: formData.date,
-                slot: formData.timeSlot
+                slot: formData.timeSlot,
               };
-              setBookedSlots(prev => [...prev, newBookedSlot]);
-              
+              setBookedSlots((prev) => [...prev, newBookedSlot]);
+
               // Ensure toast is shown
               toast.success("Slot booked successfully!");
               setTimeout(() => onClose(), 2000); // Close after showing toast
             } else {
               console.error("Booking failed:", bookingData);
-              toast.error(bookingData.message || "Failed to book slot after payment.");
+              toast.error(
+                bookingData.message || "Failed to book slot after payment."
+              );
             }
           } catch (error) {
             console.error("Error booking slot:", error);
@@ -163,7 +178,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
           color: "#3399cc",
         },
         modal: {
-          ondismiss: function() {
+          ondismiss: function () {
             toast.info("Payment cancelled");
           },
         },
@@ -172,7 +187,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
-      console.log('error', error.message);
+      console.log("error", error.message);
       toast.error("Payment initialization failed. Please try again.");
     }
   };
@@ -180,13 +195,13 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
   // Check if a slot is already booked
   const isSlotBooked = (slot, date) => {
     if (!date || !bookedSlots.length) return false;
-    
-    const formattedDate = new Date(date).toISOString().split('T')[0];
-    
+
+    const formattedDate = new Date(date).toISOString().split("T")[0];
+
     return bookedSlots.some(
-      bookedSlot => 
-        bookedSlot.slot === slot && 
-        new Date(bookedSlot.date).toISOString().split('T')[0] === formattedDate
+      (bookedSlot) =>
+        bookedSlot.slot === slot &&
+        new Date(bookedSlot.date).toISOString().split("T")[0] === formattedDate
     );
   };
 
@@ -199,14 +214,26 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
         <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Schedule Call</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Schedule Call
+            </h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-500 focus:outline-none"
             >
               <span className="sr-only">Close</span>
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -236,9 +263,11 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
                   {availableSlots.map((time) => {
                     const slotBooked = isSlotBooked(time, formData.date);
                     return (
-                      <label 
-                        key={time} 
-                        className={`flex items-center space-x-2 ${slotBooked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      <label
+                        key={time}
+                        className={`flex items-center space-x-2 ${
+                          slotBooked ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                       >
                         <input
                           type="radio"
@@ -250,9 +279,13 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
                           className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500 disabled:opacity-50"
                           required
                         />
-                        <span className={`text-sm ${slotBooked ? 'text-gray-400 ' : 'text-gray-900'}`}>
+                        <span
+                          className={`text-sm ${
+                            slotBooked ? "text-gray-400 " : "text-gray-900"
+                          }`}
+                        >
                           {time}
-                          {slotBooked && ' (Booked)'}
+                          {slotBooked && " (Booked)"}
                         </span>
                       </label>
                     );
@@ -260,8 +293,8 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
                 </div>
               ) : (
                 <p className="mt-2 text-sm text-gray-500">
-                  {formData.date 
-                    ? "No slots available for selected date" 
+                  {formData.date
+                    ? "No slots available for selected date"
                     : "Please select a date to view available slots"}
                 </p>
               )}
@@ -278,7 +311,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
               <button
                 type="submit"
                 disabled={!formData.date || !formData.timeSlot}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm font-medium text-white bg-[#b82025] rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Book Slot
               </button>
@@ -291,9 +324,11 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
         <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-12 rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
             <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
-              Hey there! You'll need to log in first to book a session with our counselor. This helps us provide you with the best possible experience.
+              Hey there! You'll need to log in first to book a session with our
+              counselor. This helps us provide you with the best possible
+              experience.
             </h3>
-            
+
             <div className="flex justify-center space-x-6">
               <button
                 type="button"
@@ -305,7 +340,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
               <Link
                 to="/login"
                 onClick={() => setShowLoginDialog(false)}
-                className="bg-red-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+                className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
               >
                 Log In
               </Link>

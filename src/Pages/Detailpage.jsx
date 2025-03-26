@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 import { CarrerDetail } from "../ApiFunctions/api";
 import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
@@ -12,7 +12,7 @@ const DetailPage = () => {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
-  const { id } = useParams();  // This can be either ID or slug
+  const { id } = useParams(); // This can be either ID or slug
   const navigate = useNavigate();
 
   const tabConfig = [
@@ -20,17 +20,19 @@ const DetailPage = () => {
     { id: "eligibility", name: "Eligibility", titleRef: useRef(null) },
     { id: "jobRoles", name: "Jobs Roles", titleRef: useRef(null) },
     { id: "opportunity", name: "Career Opportunity", titleRef: useRef(null) },
-    { id: "topColleges", name: "Top Colleges", titleRef: useRef(null) }
+    { id: "topColleges", name: "Top Colleges", titleRef: useRef(null) },
   ];
 
   // Initialize careerIdMap from localStorage
   useEffect(() => {
     if (!window.careerIdMap) {
       try {
-        const storedCareerIdMap = JSON.parse(localStorage.getItem('careerIdMap') || '{}');
+        const storedCareerIdMap = JSON.parse(
+          localStorage.getItem("careerIdMap") || "{}"
+        );
         window.careerIdMap = storedCareerIdMap;
       } catch (error) {
-        console.error('Error initializing careerIdMap:', error);
+        console.error("Error initializing careerIdMap:", error);
         window.careerIdMap = {};
       }
     }
@@ -40,16 +42,16 @@ const DetailPage = () => {
     const fetchCareer = async () => {
       try {
         // Determine if we're dealing with an ID or a slug
-        const isSlug = isNaN(parseInt(id)) || id.includes('-');
-        
+        const isSlug = isNaN(parseInt(id)) || id.includes("-");
+
         // Initialize variables for API response and career ID
         let response;
         let careerId = id;
-        
+
         if (isSlug) {
           // Try to get the ID from careerIdMap
           const mappedId = window.careerIdMap?.[id];
-          
+
           if (mappedId) {
             // We found the ID in the map, use it
             careerId = mappedId;
@@ -57,20 +59,25 @@ const DetailPage = () => {
           } else {
             // If careerIdMap doesn't have the slug, get the career by slug through a custom API call
             try {
-  response = await CarrerDetail(careerId);              
+              response = await CarrerDetail(careerId);
               // If we got a response, grab the ID for future use
               if (response && response.data) {
                 careerId = response.data._id;
-                
+
                 // Save this slug -> ID mapping to both window and localStorage
                 window.careerIdMap = window.careerIdMap || {};
                 window.careerIdMap[id] = careerId;
-                localStorage.setItem('careerIdMap', JSON.stringify(window.careerIdMap));
-                console.log(`Saved mapping: ${id} -> ${careerId} in localStorage`);
+                localStorage.setItem(
+                  "careerIdMap",
+                  JSON.stringify(window.careerIdMap)
+                );
+                console.log(
+                  `Saved mapping: ${id} -> ${careerId} in localStorage`
+                );
               }
             } catch (slugError) {
-              console.error('Error fetching career by slug:', slugError);
-              
+              console.error("Error fetching career by slug:", slugError);
+
               // As a final fallback, try using the career ID API
               response = await CarrerDetail(id);
             }
@@ -78,22 +85,27 @@ const DetailPage = () => {
         } else {
           // It's an ID, use it directly
           response = await CarrerDetail(careerId);
-          
+
           // If the career has a slug, we should save that mapping too
           if (response && response.data && response.data.slug) {
             const slug = response.data.slug;
             window.careerIdMap = window.careerIdMap || {};
             window.careerIdMap[slug] = careerId;
-            localStorage.setItem('careerIdMap', JSON.stringify(window.careerIdMap));
-            console.log(`Saved mapping: ${slug} -> ${careerId} in localStorage`);
+            localStorage.setItem(
+              "careerIdMap",
+              JSON.stringify(window.careerIdMap)
+            );
+            console.log(
+              `Saved mapping: ${slug} -> ${careerId} in localStorage`
+            );
           }
         }
 
         if (!response || !response.data) {
-          console.error('No career data found');
+          console.error("No career data found");
           return;
         }
-        
+
         setData(response.data);
       } catch (error) {
         console.error("Error fetching career:", error);
@@ -108,8 +120,9 @@ const DetailPage = () => {
     const yOffset = -170;
     const element = tabItem.titleRef.current;
     if (element) {
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
 
@@ -127,7 +140,7 @@ const DetailPage = () => {
       eligibility: data.eligibility || [],
       jobRoles: data.jobRoles || [],
       opportunity: data.opportunity || [],
-      topColleges: data.topColleges || []
+      topColleges: data.topColleges || [],
     };
     return DOMPurify.sanitize(content[tabId]);
   };
@@ -167,13 +180,15 @@ const DetailPage = () => {
             <img
               className="h-full w-full object-cover"
               src={`${Images}/${data.image}`}
-            alt={data.title || "Career banner"}
-          />
+              alt={data.title || "Career banner"}
+            />
           </div>
 
           {/* Navigation Tabs */}
           <div className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-4 sticky top-0 z-50">
-            <h1 className="text-2xl font-bold mb-6 px-4">{data.title || "Career Details"}</h1>
+            <h1 className="text-2xl font-bold mb-6 px-4">
+              {data.title || "Career Details"}
+            </h1>
             <div className="w-full overflow-x-auto">
               <div className="border rounded-xl border-gray-200">
                 <ul className="flex justify-evenly items-center whitespace-nowrap">
@@ -181,10 +196,11 @@ const DetailPage = () => {
                     <li
                       key={tab.id}
                       className={`cursor-pointer px-8 py-3 text-sm font-medium transition-all duration-200 
-                      ${activeTab === tab.name
-                          ? "bg-red-600 rounded-full mx-2 text-white"
+                      ${
+                        activeTab === tab.name
+                          ? "bg-[#b82025] rounded-full mx-2 text-white"
                           : "text-gray-700 hover:text-black hover:bg-gray-50 rounded-full mx-2"
-                        }`}
+                      }`}
                       onClick={() => scrollToSection(tab)}
                     >
                       {tab.name}
@@ -206,10 +222,7 @@ const DetailPage = () => {
                   key={tab.id}
                   className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-8 scroll-mt-24"
                 >
-                  <h3
-                    ref={tab.titleRef}
-                    className="text-lg font-bold mb-6"
-                  >
+                  <h3 ref={tab.titleRef} className="text-lg font-bold mb-6">
                     {tab.name}
                   </h3>
                   {isArray ? (

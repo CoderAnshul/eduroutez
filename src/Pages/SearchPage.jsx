@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
-import PageBanner from '../Ui components/PageBanner';
-import ExpandedBox from '../Ui components/ExpandedBox';
-import SearchResultBox from '../Ui components/SearchResultBox';
-import Filter from '../Ui components/Filter';
-import BestRated from '../Components/BestRated';
-import Events from '../Components/Events';
-import axios from 'axios';
-import BlogComponent from '../Components/BlogComponent';
-import HighRatedCareers from '../Components/HighRatedCareers';
-import { useQuery } from 'react-query';
-import { getInstitutes } from '../ApiFunctions/api';
-import { useSelector } from 'react-redux';
-import { useSearchParams, useLocation } from 'react-router-dom';
-import Promotions from './CoursePromotions';
+import { useEffect, useState } from "react";
+import PageBanner from "../Ui components/PageBanner";
+import ExpandedBox from "../Ui components/ExpandedBox";
+import SearchResultBox from "../Ui components/SearchResultBox";
+import Filter from "../Ui components/Filter";
+import BestRated from "../Components/BestRated";
+import Events from "../Components/Events";
+import axios from "axios";
+import BlogComponent from "../Components/BlogComponent";
+import HighRatedCareers from "../Components/HighRatedCareers";
+import { useQuery } from "react-query";
+import { getInstitutes } from "../ApiFunctions/api";
+import { useSelector } from "react-redux";
+import { useSearchParams, useLocation } from "react-router-dom";
+import Promotions from "./CoursePromotions";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -27,29 +27,31 @@ const SearchPage = () => {
   const [streams, setStreams] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set the number of items per page
-  const inputField = useSelector(store => store.input.inputField);
+  const inputField = useSelector((store) => store.input.inputField);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
-  
+
   // Get URL parameters
-  const streamFromUrl = searchParams.get('stream');
-  const stateFromUrl = searchParams.get('state');
-  const cityFromUrl = searchParams.get('city');
-  const examFromUrl = searchParams.get('Exam');
-  const feesFromUrl = searchParams.get('Fees');
-  const ratingsFromUrl = searchParams.get('Ratings');
-  const organizationTypeFromUrl = searchParams.get('organisationType');
-  const specializationFromUrl = searchParams.get('specialization');
+  const streamFromUrl = searchParams.get("stream");
+  const stateFromUrl = searchParams.get("state");
+  const cityFromUrl = searchParams.get("city");
+  const examFromUrl = searchParams.get("Exam");
+  const feesFromUrl = searchParams.get("Fees");
+  const ratingsFromUrl = searchParams.get("Ratings");
+  const organizationTypeFromUrl = searchParams.get("organisationType");
+  const specializationFromUrl = searchParams.get("specialization");
 
   useEffect(() => {
     if (!window.instituteIdMap) {
       try {
-        const storedInstituteIdMap = JSON.parse(localStorage.getItem('instituteIdMap') || '{}');
+        const storedInstituteIdMap = JSON.parse(
+          localStorage.getItem("instituteIdMap") || "{}"
+        );
         window.instituteIdMap = storedInstituteIdMap;
       } catch (error) {
-        console.error('Error loading instituteIdMap from localStorage:', error);
+        console.error("Error loading instituteIdMap from localStorage:", error);
         window.instituteIdMap = {};
       }
     }
@@ -59,42 +61,45 @@ const SearchPage = () => {
   useEffect(() => {
     // Build initial filters from URL parameters
     const initialFilters = {};
-    
+
     if (streamFromUrl) {
-      const streamValues = streamFromUrl.split(',').map(s => s.trim()).filter(Boolean);
+      const streamValues = streamFromUrl
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
       if (streamValues.length > 0) {
         initialFilters.streams = streamValues;
       }
     }
-    
+
     if (stateFromUrl) {
       initialFilters.state = [stateFromUrl];
     }
-    
+
     if (cityFromUrl) {
       initialFilters.city = [cityFromUrl];
     }
-    
+
     if (examFromUrl) {
       initialFilters.Exam = [examFromUrl];
     }
-    
+
     if (feesFromUrl) {
       initialFilters.Fees = [feesFromUrl];
     }
-    
+
     if (ratingsFromUrl) {
       initialFilters.Ratings = [ratingsFromUrl];
     }
-    
+
     if (organizationTypeFromUrl) {
       initialFilters.organisationType = [organizationTypeFromUrl];
     }
-    
+
     if (specializationFromUrl) {
       initialFilters.specialization = [specializationFromUrl];
     }
-    
+
     // Apply URL filters or fetch default data
     if (Object.keys(initialFilters).length > 0) {
       setSelectedFilters(initialFilters);
@@ -105,20 +110,20 @@ const SearchPage = () => {
       setSelectedFilters({});
       setLoading(true);
       getInstitutes(inputField, inputField, inputField, inputField)
-        .then(data => {
+        .then((data) => {
           const { result, totalDocuments } = data.data;
           setContent(result);
           setFilteredContent(result);
           setTotalDocuments(totalDocuments);
-          
+
           if (result && result.length > 0) {
             updateIdMapping(result);
           }
           setLoading(false);
           setInitialLoadComplete(true);
         })
-        .catch(error => {
-          console.error('Error fetching institutes:', error);
+        .catch((error) => {
+          console.error("Error fetching institutes:", error);
           setFetchError(true);
           setLoading(false);
           setInitialLoadComplete(true);
@@ -128,21 +133,28 @@ const SearchPage = () => {
 
   const updateIdMapping = (institutes) => {
     let hasChanges = false;
-    
-    institutes.forEach(institute => {
-      if (institute.slug && institute._id && !window.instituteIdMap[institute.slug]) {
+
+    institutes.forEach((institute) => {
+      if (
+        institute.slug &&
+        institute._id &&
+        !window.instituteIdMap[institute.slug]
+      ) {
         window.instituteIdMap[institute.slug] = institute._id;
         hasChanges = true;
       }
     });
-    
+
     if (hasChanges) {
-      localStorage.setItem('instituteIdMap', JSON.stringify(window.instituteIdMap));
+      localStorage.setItem(
+        "instituteIdMap",
+        JSON.stringify(window.instituteIdMap)
+      );
     }
   };
 
   const getInstituteUrl = (institute) => {
-    return institute?.slug 
+    return institute?.slug
       ? `/institute/${institute.slug}`
       : `/institute/${institute?._id}`;
   };
@@ -150,14 +162,17 @@ const SearchPage = () => {
   const { data: streamsData } = useQuery(
     ["streams"],
     async () => {
-      const response = await axios.get(`${baseURL}/streams?&page=0&sort={"createdAt":"asc"}`);
+      const response = await axios.get(
+        `${baseURL}/streams?&page=0&sort={"createdAt":"asc"}`
+      );
       return response.data;
     },
     {
       onSuccess: (data) => {
-        const streamNames = data.data?.result
-          ?.filter(stream => stream.status)
-          ?.map(stream => stream.name) || [];
+        const streamNames =
+          data.data?.result
+            ?.filter((stream) => stream.status)
+            ?.map((stream) => stream.name) || [];
         setStreams(streamNames);
       },
     }
@@ -200,7 +215,7 @@ const SearchPage = () => {
     "Jammu and Kashmir",
     "Ladakh",
     "Lakshadweep",
-    "Puducherry"
+    "Puducherry",
   ];
 
   const staticCities = [
@@ -306,13 +321,13 @@ const SearchPage = () => {
     "Kozhikode",
     "Kurnool",
     "Rajpur Sonarpur",
-    "Bokaro"
+    "Bokaro",
   ];
 
   const filterSections = [
     {
-      "title": "streams",
-      "items": streams, 
+      title: "streams",
+      items: streams,
     },
     {
       title: "state",
@@ -413,7 +428,7 @@ const SearchPage = () => {
         "Educational Psychology",
         "Physical Education",
         "Social Sciences",
-        "Humanities"
+        "Humanities",
       ],
     },
     {
@@ -457,7 +472,7 @@ const SearchPage = () => {
         "GATE",
         "CSIR NET",
         "UGC NET",
-      ]
+      ],
     },
     {
       title: "organisationType",
@@ -473,10 +488,10 @@ const SearchPage = () => {
   const handleFilterChangeWithoutScroll = (filterCategory, filterValue) => {
     // Save current scroll position
     const scrollPosition = window.scrollY;
-    
+
     // Apply filter change
     handleFilterChange(filterCategory, filterValue);
-    
+
     // Restore scroll position after state update
     setTimeout(() => {
       window.scrollTo(0, scrollPosition);
@@ -499,41 +514,44 @@ const SearchPage = () => {
   const fetchFilteredInstitutes = async (filters, page, limit) => {
     setLoading(true);
     setFetchError(false);
-    
+
     try {
       // Create a deep copy of filters to avoid modifying the original
       const apiFilters = JSON.parse(JSON.stringify(filters));
-      
+
       // Ensure we're using "streams" (plural) for the API
       if (apiFilters.stream && !apiFilters.streams) {
         apiFilters.streams = apiFilters.stream;
         delete apiFilters.stream;
       }
-      
+
       // Make sure all filter arrays are properly formatted
-      Object.keys(apiFilters).forEach(key => {
+      Object.keys(apiFilters).forEach((key) => {
         // If the value is not already an array, convert it to an array
         if (!Array.isArray(apiFilters[key])) {
           apiFilters[key] = [apiFilters[key]];
         }
       });
-      
+
       console.log("Sending filters to API:", apiFilters);
-      
-      const queryString = `filters=${encodeURIComponent(JSON.stringify(apiFilters))}&page=${page}&limit=${limit}`;
+
+      const queryString = `filters=${encodeURIComponent(
+        JSON.stringify(apiFilters)
+      )}&page=${page}&limit=${limit}`;
       const response = await axios.get(`${baseURL}/institutes?${queryString}`);
-      
+
       if (response.data) {
         const institutes = response.data.data.result;
         setContent(institutes);
         setFilteredContent(institutes);
         setTotalDocuments(response.data.data.totalDocuments);
-        
-        if (institutes && institutes.length > 0) {updateIdMapping(institutes);
+
+        if (institutes && institutes.length > 0) {
+          updateIdMapping(institutes);
         }
       }
     } catch (error) {
-      console.error('Error fetching filtered institutes:', error);
+      console.error("Error fetching filtered institutes:", error);
       setFetchError(true);
     } finally {
       setLoading(false);
@@ -542,7 +560,7 @@ const SearchPage = () => {
 
   useEffect(() => {
     if (searchQuery.length > 0) {
-      const filtered = content.filter(item =>
+      const filtered = content.filter((item) =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredContent(filtered);
@@ -576,9 +594,9 @@ const SearchPage = () => {
       <div className="px-[4vw] pb-[2vw] max-sm:overflow-x-hidden flex flex-col items-start">
         <div className="flex gap-4 w-full mt-6">
           <div className="filters w-[25%] hidden lg:block">
-            <Filter 
-              filterSections={filterSections} 
-              handleFilterChange={handleFilterChangeWithoutScroll} 
+            <Filter
+              filterSections={filterSections}
+              handleFilterChange={handleFilterChangeWithoutScroll}
               selectedFilters={selectedFilters}
               onFiltersChanged={handleFiltersChanged}
             />
@@ -588,38 +606,57 @@ const SearchPage = () => {
             {loading ? (
               <div className="text-center py-8">Loading results...</div>
             ) : fetchError ? (
-              <div className="text-center py-8 text-red-500">Error fetching results</div>
+              <div className="text-center py-8 text-red-500">
+                Error fetching results
+              </div>
             ) : filteredContent.length > 0 ? (
               <>
                 <div className="text-sm text-gray-700 mb-2">
-                  <span className="font-semibold text-red-500">{totalDocuments || "0"}</span> Institutes Found
+                  <span className="font-semibold text-red-500">
+                    {totalDocuments || "0"}
+                  </span>{" "}
+                  Institutes Found
                 </div>
                 {/* <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}> */}
-                <div style={{ width: 'fit-content'}}>
-                  <Promotions location="INSTITUTE_PAGE_RECTANGLE" className="h-[90px] w-full max-sm:w-[100%] !p-0"></Promotions>
-                </div>                
+                <div style={{ width: "fit-content" }}>
+                  <Promotions
+                    location="INSTITUTE_PAGE_RECTANGLE"
+                    className="h-[90px] w-full max-sm:w-[100%] !p-0"
+                  ></Promotions>
+                </div>
                 {getPaginatedContent().map((institute, index) => (
-                  <SearchResultBox 
-                    key={index} 
-                    institute={institute} 
-                    url={getInstituteUrl(institute)} 
-                    className='!mt-4'
+                  <SearchResultBox
+                    key={index}
+                    institute={institute}
+                    url={getInstituteUrl(institute)}
+                    className="!mt-4"
                   />
                 ))}
                 <div className="pagination">
-                  {Array.from({ length: Math.ceil(filteredContent.length / itemsPerPage) }, (_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handlePageChange(index + 1)}
-                      className={`px-4 py-2 ${currentPage === index + 1 ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
+                  {Array.from(
+                    {
+                      length: Math.ceil(filteredContent.length / itemsPerPage),
+                    },
+                    (_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handlePageChange(index + 1)}
+                        className={`px-4 py-2 ${
+                          currentPage === index + 1
+                            ? "bg-[#b82025] text-white"
+                            : "bg-gray-200"
+                        }`}
+                      >
+                        {index + 1}
+                      </button>
+                    )
+                  )}
                 </div>
               </>
             ) : (
-              <div className="text-center py-8 text-gray-500">No institutes found.</div>
+              <div className="text-center py-8 text-gray-500">
+                No institutes found.
+              </div>
             )}
           </div>
         </div>

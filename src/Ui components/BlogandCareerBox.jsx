@@ -23,10 +23,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
     e.stopPropagation(); // Stop event from bubbling up
     // Any additional share handling logic can go here
   };
-  const displayedBlogs = blogData?.slice(
-    0,
-    currentPage * itemsPerPage
-  );
+  const displayedBlogs = blogData?.slice(0, currentPage * itemsPerPage);
 
   return (
     <div className="w-full p-6 bg-gray-50">
@@ -59,64 +56,61 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
                   }}
                 ></p>
                 {blog.description &&
-                  blog.description.split(" ").length > 30 && (
-                    <span>....</span>
-                  )}
+                  blog.description.split(" ").length > 30 && <span>....</span>}
                 <p className="text-sm text-gray-600 mt-2 bg-blue-100 p-1 rounded-lg inline-block">
-                  <badge>
-                    {blog.category}
-                    </badge> 
+                  <badge>{blog.category}</badge>
                 </p>
               </div>
 
-              <div className='flex items-center gap-2 text-gray-600'>
-                      {blog.views && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="22"
-                            height="22"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                          </svg>
-                          <span className='text-gray-500'>{blog.views}</span>
-                        </div>
-                      )}
-                      {blog.likes && blog.likes.length>0 && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="22"
-                            height="22"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
-                            <path d="M9 22V12"></path>
-                          </svg>
-                          <span className=''>{blog.likes.length>0 && blog.likes.length}</span>
-                        </div>
-                      )}
-                       <div onClick={handleShareClick}>
-      <SocialShare 
-        title={blog?.title} 
-        url={`${window.location.origin}/blogdetailpage/${blog._id}`}
-        contentType="career"
-      />
-    </div>
-                    </div>
-
+              <div className="flex items-center gap-2 text-gray-600">
+                {blog.views && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span className="text-gray-500">{blog.views}</span>
+                  </div>
+                )}
+                {blog.likes && blog.likes.length > 0 && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
+                      <path d="M9 22V12"></path>
+                    </svg>
+                    <span className="">
+                      {blog.likes.length > 0 && blog.likes.length}
+                    </span>
+                  </div>
+                )}
+                <div onClick={handleShareClick}>
+                  <SocialShare
+                    title={blog?.title}
+                    url={`${window.location.origin}/blogdetailpage/${blog._id}`}
+                    contentType="career"
+                  />
+                </div>
+              </div>
 
               <div className="mt-4">
                 <CustomButton
@@ -132,7 +126,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
       <div className="w-full flex justify-center gap-4 mt-24">
         {displayedBlogs.length < blogData?.data?.length && (
           <button
-            className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+            className="bg-[#b82025] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b82025] transition duration-300"
             onClick={handleSeeMore}
           >
             See More
@@ -140,7 +134,7 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
         )}
         {currentPage > 1 && (
           <button
-            className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+            className="bg-[#b82025] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b82025] transition duration-300"
             onClick={handleSeeLess}
           >
             See Less

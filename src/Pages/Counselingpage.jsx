@@ -92,7 +92,6 @@ const counselors = [
   },
 ];
 
-
 const tabs = [
   "Best Rated Counseling",
   "Highly recommended",
@@ -146,7 +145,7 @@ const Counselingpage = () => {
                 onClick={() => setSelectedTab(index)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg ${
                   selectedTab === index
-                    ? "bg-red-500 text-white shadow-md"
+                    ? "bg-[#b82025] text-white shadow-md"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
@@ -197,7 +196,7 @@ const Counselingpage = () => {
                 <div className="flex justify-end">
                   <button
                     onClick={() => handleConnectClick(counselor?.email)}
-                    className="px-4 py-2 self-end bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600"
+                    className="px-4 py-2 self-end bg-[#b82025] text-white text-sm font-medium rounded-lg hover:bg-[#b82025]"
                   >
                     Connect
                   </button>

@@ -226,7 +226,7 @@ const Blogpage = () => {
               {/* Use Link with slug for navigation */}
               <Link
                 to={`/blogdetailpage/${blog.slug}`}
-                className=" flex flex-col  justify-between "
+                className=" flex flex-col h-fit justify-between "
               >
                 <div className="relative group h-fit overflow-hidden">
                   {blog.views !== "0" && (
@@ -253,37 +253,39 @@ const Blogpage = () => {
                     src={`${Images}/${blog?.thumbnail}`}
                     alt={blog.title}
                   />
+                </div>
 
+                <div className="">
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 line-clamp-2">
+                    <h3 className="text-lg  h-[4rem] font-semibold text-gray-800 line-clamp-2">
                       {blog.title}
                     </h3>
                     <p
-                      className="text-sm text-gray-600 mt-2 h-fit  overflow-hidden  line-clamp-3"
+                      className="text-sm h-[4rem] text-gray-600 mt-2  overflow-hidden  line-clamp-3"
                       dangerouslySetInnerHTML={{ __html: blog.description }}
                     ></p>
                   </div>
-                </div>
-                <div className="px-4 pb-4 mt-2 flex flex-col  gap-4 justify-between items-start h-full ">
-                  {blog.category && (
-                    <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
-                      {blog.category}
-                    </span>
-                  )}
-                  <div className="flex items-center w-full justify-between gap-4">
-                    <button className="bg-red-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-red-700 transition-all">
-                      Read More
-                    </button>
-                    <div
-                      className="z-50 "
-                      onClick={(e) => handleShareClick(e, blog)}
-                    >
-                      <SocialShare
-                        title={blog.title}
-                        url={`${window.location.origin}/blogdetailpage/${blog.slug}`}
-                        contentType="blog"
-                        className="z-50"
-                      />
+                  <div className="px-4 pb-4 mt-2 flex flex-col  gap-4 justify-between items-start h-full ">
+                    {blog.category && (
+                      <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                        {blog.category}
+                      </span>
+                    )}
+                    <div className="flex items-center w-full justify-between gap-4">
+                      <button className="bg-[#b82025] text-white py-2 px-4 rounded-lg text-sm hover:bg-red-700 transition-all">
+                        Read More
+                      </button>
+                      <div
+                        className="z-50 "
+                        onClick={(e) => handleShareClick(e, blog)}
+                      >
+                        <SocialShare
+                          title={blog.title}
+                          url={`${window.location.origin}/blogdetailpage/${blog.slug}`}
+                          contentType="blog"
+                          className="z-50"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -322,7 +324,7 @@ const Blogpage = () => {
           className={`px-3 py-1 rounded-md ${
             page === 1
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-red-600 text-white hover:bg-red-700"
+              : "bg-[#b82025] text-white hover:bg-red-700"
           }`}
         >
           Previous
@@ -345,7 +347,7 @@ const Blogpage = () => {
             key={number}
             onClick={() => handlePageChange(number)}
             className={`px-3 py-1 rounded-md ${
-              page === number ? "bg-red-600 text-white" : "hover:bg-gray-200"
+              page === number ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
             }`}
           >
             {number}
@@ -370,7 +372,7 @@ const Blogpage = () => {
           className={`px-3 py-1 rounded-md ${
             page === totalPages
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-red-600 text-white hover:bg-red-700"
+              : "bg-[#b82025] text-white hover:bg-red-700"
           }`}
         >
           Next
@@ -385,7 +387,7 @@ const Blogpage = () => {
 
       {/* Filter button for mobile */}
       <button
-        className="mx-[20px] mt-[30px] z-[500] bg-red-600 text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
+        className="mx-[20px] mt-[30px] z-[500] bg-[#b82025] text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
         onClick={() => setIsFilterOpen(true)}
       >
         Filters
@@ -484,7 +486,7 @@ const Blogpage = () => {
             {selectedCategories.map((category) => (
               <span
                 key={category}
-                className="inline-block bg-red-500 text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded"
+                className="inline-block bg-[#b82025] text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded"
               >
                 {category}
               </span>

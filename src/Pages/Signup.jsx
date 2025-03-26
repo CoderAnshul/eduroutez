@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
@@ -14,11 +14,11 @@ const Signup = () => {
   const [timer, setTimer] = useState(90); // 90-second countdown
   const [canResend, setCanResend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const roleTypes = [
-    { value: 'institute', label: 'University/College/Institute' },
-    { value: 'counsellor', label: 'Counsellor' },
-    { value: 'student', label: 'Student' },
+    { value: "institute", label: "University/College/Institute" },
+    { value: "counsellor", label: "Counsellor" },
+    { value: "student", label: "Student" },
   ];
 
   const [formData, setFormData] = useState({
@@ -35,7 +35,7 @@ const Signup = () => {
     // Store the name values separately for display purposes
     countryName: "",
     stateName: "",
-    cityName: ""
+    cityName: "",
   });
 
   const [role, setRole] = useState("");
@@ -43,7 +43,8 @@ const Signup = () => {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
+  const apiUrl =
+    import.meta.env.VITE_BASE_URL || "http://localhost:4001/api/v1";
 
   // Fetch all countries on component mount
   useEffect(() => {
@@ -66,13 +67,15 @@ const Signup = () => {
         setStates([]);
         return;
       }
-      
+
       try {
         // Find the selected country to get its ISO code
-        const selectedCountry = countries.find(country => country.id.toString() === formData.country.toString());
+        const selectedCountry = countries.find(
+          (country) => country.id.toString() === formData.country.toString()
+        );
         if (selectedCountry) {
           const res = await axiosInstance.post(`${apiUrl}/states-by-country`, {
-            countryCode: selectedCountry.iso2
+            countryCode: selectedCountry.iso2,
           });
           setStates(res.data?.data || []);
         }
@@ -81,7 +84,7 @@ const Signup = () => {
         toast.error("Failed to fetch states");
       }
     };
-    
+
     if (countries.length > 0 && formData.country) {
       fetchStates();
     }
@@ -94,16 +97,20 @@ const Signup = () => {
         setCities([]);
         return;
       }
-      
+
       try {
         // Get the country and state ISO codes for the API request
-        const selectedCountry = countries.find(country => country.id.toString() === formData.country.toString());
-        const selectedState = states.find(state => state.id.toString() === formData.state.toString());
-        
+        const selectedCountry = countries.find(
+          (country) => country.id.toString() === formData.country.toString()
+        );
+        const selectedState = states.find(
+          (state) => state.id.toString() === formData.state.toString()
+        );
+
         if (selectedCountry && selectedState) {
           const res = await axiosInstance.post(`${apiUrl}/cities-by-state`, {
             countryCode: selectedCountry.iso2,
-            stateCode: selectedState.iso2
+            stateCode: selectedState.iso2,
           });
           setCities(res.data?.data || []);
         }
@@ -112,7 +119,7 @@ const Signup = () => {
         toast.error("Failed to fetch cities");
       }
     };
-    
+
     if (states.length > 0 && formData.state) {
       fetchCities();
     }
@@ -137,13 +144,10 @@ const Signup = () => {
   const sendOtpMutation = useMutation({
     mutationFn: async (credentials) => {
       setIsLoading(true);
-      const response = await axiosInstance.post(
-        `${apiUrl}/send-otp`,
-        {
-          email: credentials.email,
-          contact_number: credentials.contact_number
-        }
-      );
+      const response = await axiosInstance.post(`${apiUrl}/send-otp`, {
+        email: credentials.email,
+        contact_number: credentials.contact_number,
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -154,7 +158,7 @@ const Signup = () => {
     onError: (error) => {
       setIsLoading(false);
       toast.error(error.response?.data?.message || "Failed to send OTP");
-    }
+    },
   });
 
   const handleOtpChange = (index, value) => {
@@ -176,12 +180,12 @@ const Signup = () => {
         `${apiUrl}/signup`,
         {
           ...credentials,
-          otp: credentials.otp.join('') // Convert OTP array to string
+          otp: credentials.otp.join(""), // Convert OTP array to string
         },
         {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
       return response.data;
@@ -189,14 +193,20 @@ const Signup = () => {
     onSuccess: (data) => {
       setIsLoading(false);
       toast.success("Registered successfully");
-      localStorage.setItem('accessToken', JSON.stringify(data.data.accessToken));
-      localStorage.setItem('userId', data?.data?.user?._id);
-      localStorage.setItem('role', data?.data?.user?.role);
-      localStorage.setItem('email', data?.data?.user?.email);      
-      localStorage.setItem('accessToken', JSON.stringify(data.data.accessToken));
-      
-      if(data?.data?.user?.role === 'student') {
-        navigate('/');
+      localStorage.setItem(
+        "accessToken",
+        JSON.stringify(data.data.accessToken)
+      );
+      localStorage.setItem("userId", data?.data?.user?._id);
+      localStorage.setItem("role", data?.data?.user?.role);
+      localStorage.setItem("email", data?.data?.user?.email);
+      localStorage.setItem(
+        "accessToken",
+        JSON.stringify(data.data.accessToken)
+      );
+
+      if (data?.data?.user?.role === "student") {
+        navigate("/");
       } else {
         window.location.href = "https://admin.eduroutez.com/";
       }
@@ -204,49 +214,53 @@ const Signup = () => {
     onError: (error) => {
       setIsLoading(false);
       toast.error(error.response?.data?.message || "Failed to sign up");
-    }
+    },
   });
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    
+
     if (id === "country") {
       // Find the selected country to get its name
-      const selectedCountry = countries.find(country => country.id.toString() === value);
-      
-      setFormData({ 
-        ...formData, 
-        [id]: value, 
+      const selectedCountry = countries.find(
+        (country) => country.id.toString() === value
+      );
+
+      setFormData({
+        ...formData,
+        [id]: value,
         countryName: selectedCountry?.name || "",
         state: "", // Reset dependent fields
         stateName: "",
         city: "",
-        cityName: "" 
+        cityName: "",
       });
     } else if (id === "state") {
       // Find the selected state to get its name
-      const selectedState = states.find(state => state.id.toString() === value);
-      
-      setFormData({ 
-        ...formData, 
-        [id]: value,
-        stateName: selectedState?.name || "",
-        city: "", // Reset city when state changes
-        cityName: ""
-      });
-    } else if (id === "city") {
-      // Find the selected city to get its name
-      const selectedCity = cities.find(city => city.id.toString() === value);
-      
+      const selectedState = states.find(
+        (state) => state.id.toString() === value
+      );
+
       setFormData({
         ...formData,
         [id]: value,
-        cityName: selectedCity?.name || ""
+        stateName: selectedState?.name || "",
+        city: "", // Reset city when state changes
+        cityName: "",
+      });
+    } else if (id === "city") {
+      // Find the selected city to get its name
+      const selectedCity = cities.find((city) => city.id.toString() === value);
+
+      setFormData({
+        ...formData,
+        [id]: value,
+        cityName: selectedCity?.name || "",
       });
     } else {
       // Normal field update
       setFormData({ ...formData, [id]: value });
-      if (id === 'role') setRole(value);
+      if (id === "role") setRole(value);
     }
   };
 
@@ -259,7 +273,13 @@ const Signup = () => {
       toast.error("Passwords do not match");
       return false;
     }
-    if (!formData.name || !formData.role || !formData.country || !formData.state || !formData.city) {
+    if (
+      !formData.name ||
+      !formData.role ||
+      !formData.country ||
+      !formData.state ||
+      !formData.city
+    ) {
       toast.error("Please fill all required fields");
       return false;
     }
@@ -277,54 +297,62 @@ const Signup = () => {
       toast.error("Please enter OTP");
       return;
     }
-    
+
     // Create the payload with nested location objects
-    const { confirmPassword, countryName, stateName, cityName, ...signupData } = formData;
-    
+    const { confirmPassword, countryName, stateName, cityName, ...signupData } =
+      formData;
+
     // Add location info as objects
     const signupPayload = {
       ...signupData,
       otp,
     };
-    
+
     // Add country, state, city as structured objects similar to ProfilePage
     if (formData.country) {
-      const selectedCountry = countries.find(country => country.id.toString() === formData.country.toString());
+      const selectedCountry = countries.find(
+        (country) => country.id.toString() === formData.country.toString()
+      );
       if (selectedCountry) {
         signupPayload.country = {
           name: selectedCountry.name,
-          iso2: selectedCountry.iso2
+          iso2: selectedCountry.iso2,
         };
       }
     }
-    
+
     if (formData.state) {
-      const selectedState = states.find(state => state.id.toString() === formData.state.toString());
+      const selectedState = states.find(
+        (state) => state.id.toString() === formData.state.toString()
+      );
       if (selectedState) {
         signupPayload.state = {
           name: selectedState.name,
-          iso2: selectedState.iso2
+          iso2: selectedState.iso2,
         };
       }
     }
-    
+
     if (formData.city) {
-      const selectedCity = cities.find(city => city.id.toString() === formData.city.toString());
+      const selectedCity = cities.find(
+        (city) => city.id.toString() === formData.city.toString()
+      );
       if (selectedCity) {
         signupPayload.city = {
-          name: selectedCity.name
+          name: selectedCity.name,
         };
       }
     }
-    
+
     signupMutation.mutate(signupPayload);
   };
 
-  const roleSpecificLabel = role === 'institute'
-    ? 'Institute Name'
-    : role === 'counsellor'
-    ? 'Counsellor Name'
-    : 'Name';
+  const roleSpecificLabel =
+    role === "institute"
+      ? "Institute Name"
+      : role === "counsellor"
+      ? "Counsellor Name"
+      : "Name";
 
   return (
     <div className="flex h-screen">
@@ -345,7 +373,9 @@ const Signup = () => {
 
       {/* Right Section */}
       <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-start overflow-y-scroll items-center px-10">
-        <h1 className="text-[50px] font-bold text-start opacity-80 leading-[50px]">Register Now</h1>
+        <h1 className="text-[50px] font-bold text-start opacity-80 leading-[50px]">
+          Register Now
+        </h1>
         <p className="text-gray-500 mb-8">
           Please fill in the form to create an account
         </p>
@@ -463,7 +493,9 @@ const Signup = () => {
 
           {/* Phone Number Field */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Phone Number *</label>
+            <label className="block text-sm font-medium mb-1">
+              Phone Number *
+            </label>
             <input
               type="tel"
               id="contact_number"
@@ -491,7 +523,9 @@ const Signup = () => {
 
           {/* Confirm Password Field */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Confirm Password *</label>
+            <label className="block text-sm font-medium mb-1">
+              Confirm Password *
+            </label>
             <input
               type="password"
               id="confirmPassword"
@@ -503,20 +537,21 @@ const Signup = () => {
             />
           </div>
 
-          {role === 'student' && (
-  <div className="mb-4">
-    <label className="block text-sm font-medium mb-1">Referral Code</label>
-    <input
-      type="text"
-      id="referal_Code"
-      placeholder="Enter your Referral Code"
-      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-      value={formData.referal_Code}
-      onChange={handleChange}
-    />
-  </div>
-)}
-
+          {role === "student" && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">
+                Referral Code
+              </label>
+              <input
+                type="text"
+                id="referal_Code"
+                placeholder="Enter your Referral Code"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                value={formData.referal_Code}
+                onChange={handleChange}
+              />
+            </div>
+          )}
 
           <button
             type="button"
@@ -531,10 +566,12 @@ const Signup = () => {
         {/* Social Login Section */}
         <div className="my-6 flex items-center">
           <span className="w-1/2 h-px bg-gray-300"></span>
-          <span className="mx-2 text-gray-500 whitespace-nowrap text-sm">Or Sign Up with</span>
+          <span className="mx-2 text-gray-500 whitespace-nowrap text-sm">
+            Or Sign Up with
+          </span>
           <span className="w-1/2 h-px bg-gray-300"></span>
         </div>
-        
+
         <div className="flex justify-center gap-4">
           <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center bg-white rounded-full hover:bg-gray-200">
             <img src={fb} className="h-7" alt="Facebook icon" />
@@ -545,69 +582,88 @@ const Signup = () => {
         </div>
 
         <p className="text-sm text-gray-500 mt-6">
-          Already have an account?{' '}
-          <Link to="/login" className="text-red-500 font-medium hover:underline">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-red-500 font-medium hover:underline"
+          >
             Log in
           </Link>
         </p>
       </div>
 
       {/* OTP Dialog */}
-      {
-        showOtpDialog && (
-          <div className="fixed inset-0 flex p-12 items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-96">
-              {/* Header */}
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Verify OTP</h2>
-                <button onClick={() => setShowOtpDialog(false)} className="text-gray-500 hover:text-gray-700 text-xl">
-                  ×
+      {showOtpDialog && (
+        <div className="fixed inset-0 flex p-12 items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Verify OTP</h2>
+              <button
+                onClick={() => setShowOtpDialog(false)}
+                className="text-gray-500 hover:text-gray-700 text-xl"
+              >
+                ×
+              </button>
+            </div>
+
+            <p className="text-gray-600 text-sm mb-4">
+              Please enter the OTP sent to your email and phone number.
+            </p>
+
+            {/* OTP Inputs */}
+            <div className="flex justify-center gap-3 mb-4">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  id={`otp-${index}`}
+                  type="text"
+                  maxLength="1"
+                  value={digit}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+                />
+              ))}
+            </div>
+
+            {/* Countdown Timer & Resend OTP */}
+            <div className="text-center text-sm text-gray-600 mb-4">
+              {canResend ? (
+                <button
+                  onClick={() => {
+                    handleSendOtp();
+                    setTimer(90);
+                    setCanResend(false);
+                  }}
+                  className="text-red-600 hover:underline"
+                >
+                  Resend OTP
                 </button>
-              </div>
-    
-              <p className="text-gray-600 text-sm mb-4">Please enter the OTP sent to your email and phone number.</p>
-    
-              {/* OTP Inputs */}
-              <div className="flex justify-center gap-3 mb-4">
-                {otp.map((digit, index) => (
-                  <input
-                    key={index}
-                    id={`otp-${index}`}
-                    type="text"
-                    maxLength="1"
-                    value={digit}
-                    onChange={(e) => handleOtpChange(index, e.target.value)}
-                    className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition"
-                  />
-                ))}
-              </div>
-    
-              {/* Countdown Timer & Resend OTP */}
-              <div className="text-center text-sm text-gray-600 mb-4">
-                {canResend ? (
-                  <button onClick={() => { handleSendOtp(); setTimer(90); setCanResend(false); }} className="text-red-600 hover:underline">
-                    Resend OTP
-                  </button>
-                ) : (
-                  `Resend OTP in ${timer}s`
-                )}
-              </div>
-    
-              {/* Buttons */}
-              <div className="flex justify-between">
-                <button onClick={() => setShowOtpDialog(false)} className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 transition">
-                  Cancel
-                </button>
-                <button onClick={handleVerifyOtp} className="px-6 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 transition">
-                  Verify OTP
-                </button>
-              </div>
+              ) : (
+                `Resend OTP in ${timer}s`
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-between">
+              <button
+                onClick={() => setShowOtpDialog(false)}
+                className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleVerifyOtp}
+                className="px-6 py-2 bg-[#b82025] text-white font-semibold rounded-md hover:bg-red-700 transition"
+              >
+                Verify OTP
+              </button>
             </div>
           </div>
-        )
-      }
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default Signup;

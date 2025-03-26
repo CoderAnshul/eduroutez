@@ -1,48 +1,63 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation } from 'react-query';
-import { Send, Loader2, MessageCircle, Clock, Tag, School, User, ArrowUp, ArrowDown, ChevronDown } from 'lucide-react';
-import axiosInstance from '../ApiFunctions/axios';
+import React, { useState } from "react";
+import { useQuery, useMutation } from "react-query";
+import {
+  Send,
+  Loader2,
+  MessageCircle,
+  Clock,
+  Tag,
+  School,
+  User,
+  ArrowUp,
+  ArrowDown,
+  ChevronDown,
+} from "lucide-react";
+import axiosInstance from "../ApiFunctions/axios";
 import { toast, ToastContainer } from "react-toastify";
-import Promotions from './CoursePromotions';
+import Promotions from "./CoursePromotions";
 
-const Card = ({ children, className = '' }) => (
-  <div className={`bg-white rounded-xl shadow-lg border border-gray-200 ${className}`}>
+const Card = ({ children, className = "" }) => (
+  <div
+    className={`bg-white rounded-xl shadow-lg border border-gray-200 ${className}`}
+  >
     {children}
   </div>
 );
 
 const CardHeader = ({ children }) => (
-  <div className="p-5 bg-gray-50 border-b border-gray-200 rounded-t-xl">{children}</div>
+  <div className="p-5 bg-gray-50 border-b border-gray-200 rounded-t-xl">
+    {children}
+  </div>
 );
 
-const CardContent = ({ children }) => (
-  <div className="p-5">{children}</div>
-);
+const CardContent = ({ children }) => <div className="p-5">{children}</div>;
 
 const CategoryFilter = ({ onFilterChange }) => {
   const categories = [
-    'Courses',
-    'Career',
-    'Institute',
-    'Placement',
-    'Admission'
+    "Courses",
+    "Career",
+    "Institute",
+    "Placement",
+    "Admission",
   ];
-  
+
   const [selectedCategories, setSelectedCategories] = useState([]);
-  
+
   const handleCategoryChange = (category) => {
     const newSelectedCategories = selectedCategories.includes(category)
-      ? selectedCategories.filter(c => c !== category)
+      ? selectedCategories.filter((c) => c !== category)
       : [...selectedCategories, category];
-    
+
     setSelectedCategories(newSelectedCategories);
     onFilterChange(newSelectedCategories);
   };
-  
+
   return (
     <Card className="mb-6">
       <CardHeader>
-        <h2 className="text-2xl font-semibold text-gray-800">Filter by Category</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">
+          Filter by Category
+        </h2>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
@@ -55,7 +70,10 @@ const CategoryFilter = ({ onFilterChange }) => {
                 onChange={() => handleCategoryChange(category)}
                 className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
               />
-              <label htmlFor={`category-${category}`} className="ml-2 text-gray-700">
+              <label
+                htmlFor={`category-${category}`}
+                className="ml-2 text-gray-700"
+              >
                 {category}
               </label>
             </div>
@@ -69,28 +87,34 @@ const CategoryFilter = ({ onFilterChange }) => {
 // New component for displaying answers with "View More" functionality
 const AnswersList = ({ answers }) => {
   const [showAllAnswers, setShowAllAnswers] = useState(false);
-  
+
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
-  
+
   if (!answers || answers.length === 0) {
     return <div className="italic text-gray-500">No answers yet</div>;
   }
-  
+
   // Show first answer or all answers based on state
   const displayedAnswers = showAllAnswers ? answers : [answers[0]];
   const remainingCount = answers.length - 1;
-  
+
   return (
     <div className="space-y-4">
       {displayedAnswers.map((answer, index) => (
-        <div key={index} className="p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
-          <div dangerouslySetInnerHTML={{ __html: answer.answer }} className="text-gray-700 mb-2" />
+        <div
+          key={index}
+          className="p-4 bg-red-50 border-l-4 border-red-600 rounded-lg"
+        >
+          <div
+            dangerouslySetInnerHTML={{ __html: answer.answer }}
+            className="text-gray-700 mb-2"
+          />
           <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
             <User className="h-4 w-4" />
             <span>{answer.answeredBy}</span>
@@ -99,14 +123,15 @@ const AnswersList = ({ answers }) => {
           </div>
         </div>
       ))}
-      
+
       {!showAllAnswers && remainingCount > 0 && (
-        <button 
+        <button
           onClick={() => setShowAllAnswers(true)}
           className="flex items-center gap-2 text-red-600 hover:text-red-800 font-medium transition-colors"
         >
           <ChevronDown className="h-4 w-4" />
-          View {remainingCount} more {remainingCount === 1 ? 'answer' : 'answers'}
+          View {remainingCount} more{" "}
+          {remainingCount === 1 ? "answer" : "answers"}
         </button>
       )}
     </div>
@@ -114,65 +139,78 @@ const AnswersList = ({ answers }) => {
 };
 
 const CombinedQuestionsPage = () => {
-  const [formData, setFormData] = useState({ question: '', grade: '', label: '' });
-  const [searchQuery, setSearchQuery] = useState('');
+  const [formData, setFormData] = useState({
+    question: "",
+    grade: "",
+    label: "",
+  });
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilters, setActiveFilters] = useState([]);
-  const [sortOrder, setSortOrder] = useState('desc'); // Default to newest first
+  const [sortOrder, setSortOrder] = useState("desc"); // Default to newest first
 
-  const grades = ['8th', '9th', '10th', '11th', '12th'];
-  const labels = ['Courses', 'Career', 'Institute', 'Placement', 'Admission'];
+  const grades = ["8th", "9th", "10th", "11th", "12th"];
+  const labels = ["Courses", "Career", "Institute", "Placement", "Admission"];
   const apiUrl = import.meta.env.VITE_BASE_URL;
-  const userEmail = localStorage.getItem('email') || 'user@example.com';
+  const userEmail = localStorage.getItem("email") || "user@example.com";
 
-  const { data: questionsData, isLoading, error, refetch } = useQuery({
-    queryKey: ['questions', currentPage, searchQuery, activeFilters, sortOrder],
+  const {
+    data: questionsData,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["questions", currentPage, searchQuery, activeFilters, sortOrder],
     queryFn: async () => {
       // Create filters object in the requested format
       let queryParams = {
         page: currentPage,
         search: searchQuery,
         sort: JSON.stringify({ createdAt: sortOrder }), // Add sort parameter
-        searchFields: JSON.stringify({ question: searchQuery }) // Add searchFields parameter
+        searchFields: JSON.stringify({ question: searchQuery }), // Add searchFields parameter
       };
       // Add filters in the JSON format if there are active filters
       if (activeFilters.length > 0) {
         // Create the filters object with label containing the pipe-separated categories
         queryParams.filters = JSON.stringify({
-          label: [activeFilters.join('|')]
+          label: [activeFilters.join("|")],
         });
       }
-      
+
       const response = await axiosInstance.get(`${apiUrl}/question-answers`, {
-        params: queryParams
+        params: queryParams,
       });
-      
+
       return response.data.data;
     },
   });
 
   const { mutate, isPending: isSubmitting } = useMutation({
     mutationFn: async (formData) => {
-      const response = await axiosInstance.post(`${apiUrl}/question-answer`, {
-        ...formData,
-        askedBy: userEmail,
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken')
+      const response = await axiosInstance.post(
+        `${apiUrl}/question-answer`,
+        {
+          ...formData,
+          askedBy: userEmail,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
         }
-      });
+      );
       return response.data;
     },
     onSuccess: () => {
       toast.success("Question Submitted successfully!");
-      document.getElementById('questionForm').reset();
-      setFormData({ question: '', grade: '', label: '' });
+      document.getElementById("questionForm").reset();
+      setFormData({ question: "", grade: "", label: "" });
       refetch();
     },
     onError: () => {
-      toast.error('An error occurred. Please try again.');
+      toast.error("An error occurred. Please try again.");
     },
   });
 
@@ -200,15 +238,15 @@ const CombinedQuestionsPage = () => {
   };
 
   const toggleSortOrder = () => {
-    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     setCurrentPage(1); // Reset to first page when sort order changes
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -218,7 +256,7 @@ const CombinedQuestionsPage = () => {
       <div className="mb-4">
         <button
           onClick={() => window.history.back()}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors"
         >
           &larr; Back to Dashboard
         </button>
@@ -234,16 +272,22 @@ const CombinedQuestionsPage = () => {
           <div className="sticky top-24">
             {/* Category Filter - Added above the Ask a Question card */}
             <CategoryFilter onFilterChange={handleFilterChange} />
-            
+
             <Card>
               <CardHeader>
-                <h2 className="text-2xl font-semibold text-gray-800">Ask a Question</h2>
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  Ask a Question
+                </h2>
                 <p className="text-sm text-gray-500 mt-1">
                   Get guidance from experts and peers!
                 </p>
               </CardHeader>
               <CardContent>
-                <form id="questionForm" onSubmit={handleSubmit} className="space-y-5">
+                <form
+                  id="questionForm"
+                  onSubmit={handleSubmit}
+                  className="space-y-5"
+                >
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Your Question
@@ -303,8 +347,8 @@ const CombinedQuestionsPage = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors ${
-                      isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
+                    className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors ${
+                      isSubmitting ? "opacity-75 cursor-not-allowed" : ""
                     }`}
                   >
                     {isSubmitting ? (
@@ -341,11 +385,11 @@ const CombinedQuestionsPage = () => {
                 onChange={handleSearchChange}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
-              <button 
+              <button
                 onClick={toggleSortOrder}
                 className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
               >
-                {sortOrder === 'desc' ? (
+                {sortOrder === "desc" ? (
                   <>
                     <ArrowDown className="w-4 h-4" />
                     Newest First
@@ -373,9 +417,14 @@ const CombinedQuestionsPage = () => {
             ) : (
               <div className="space-y-6">
                 {questionsData?.result?.map((question) => (
-                  <Card key={question._id} className="hover:shadow-xl transition-shadow">
+                  <Card
+                    key={question._id}
+                    className="hover:shadow-xl transition-shadow"
+                  >
                     <CardHeader>
-                      <h3 className="text-lg font-bold text-gray-800">{question.question}</h3>
+                      <h3 className="text-lg font-bold text-gray-800">
+                        {question.question}
+                      </h3>
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-2">
                         <div className="flex items-center gap-1">
                           <School className="h-4 w-4" />
@@ -401,8 +450,12 @@ const CombinedQuestionsPage = () => {
                 {questionsData?.result?.length === 0 && (
                   <div className="text-center py-12">
                     <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-2xl font-semibold text-gray-800">No Questions Yet</h3>
-                    <p className="text-gray-600">Be the first to ask a question!</p>
+                    <h3 className="text-2xl font-semibold text-gray-800">
+                      No Questions Yet
+                    </h3>
+                    <p className="text-gray-600">
+                      Be the first to ask a question!
+                    </p>
                   </div>
                 )}
 
@@ -410,7 +463,11 @@ const CombinedQuestionsPage = () => {
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-4 py-2 ${currentPage === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-400'} text-gray-700 rounded-lg transition-colors`}
+                    className={`px-4 py-2 ${
+                      currentPage === 1
+                        ? "bg-gray-200 cursor-not-allowed"
+                        : "bg-gray-300 hover:bg-gray-400"
+                    } text-gray-700 rounded-lg transition-colors`}
                   >
                     Previous
                   </button>
@@ -418,7 +475,11 @@ const CombinedQuestionsPage = () => {
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={questionsData?.hasNextPage === false}
-                    className={`px-4 py-2 ${questionsData?.hasNextPage === false ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'} text-white rounded-lg transition-colors`}
+                    className={`px-4 py-2 ${
+                      questionsData?.hasNextPage === false
+                        ? "bg-red-300 cursor-not-allowed"
+                        : "bg-[#b82025] hover:bg-red-700"
+                    } text-white rounded-lg transition-colors`}
                   >
                     Next
                   </button>
@@ -430,6 +491,6 @@ const CombinedQuestionsPage = () => {
       </div>
     </div>
   );
-}
+};
 
 export default CombinedQuestionsPage;

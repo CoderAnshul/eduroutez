@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useParams , useNavigate} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import CoursesName from "../Ui components/CoursesName";
 import TabSlider from "../Ui components/TabSlider";
 import QueryForm from "../Ui components/QueryForm";
@@ -32,7 +32,7 @@ const Coursesinfopage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [courseData, setCourseData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-    const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [isError, setIsError] = useState(false);
 
   // Get current user ID from localStorage
@@ -82,7 +82,6 @@ const Coursesinfopage = () => {
             // we need to get the course directly by its slug through a custom API call
             try {
               const response = await getCoursesById(courseId);
-
 
               // If we got a response, grab the ID for future use
               if (response && response.data) {
@@ -154,7 +153,7 @@ const Coursesinfopage = () => {
   const handleLike = async () => {
     if (!currentUserId) {
       setShowLoginPopup(true);
-            return;
+      return;
     }
 
     try {
@@ -202,7 +201,7 @@ const Coursesinfopage = () => {
   const handleRedirectToLogin = () => {
     setShowLoginPopup(false);
     // Navigate to login page
-    navigate('/login', { state: { returnUrl: window.location.pathname } });
+    navigate("/login", { state: { returnUrl: window.location.pathname } });
   };
 
   // Close the login popup
@@ -347,7 +346,7 @@ const Coursesinfopage = () => {
             onClick={handleLike}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
                 ${
-                    isLiked
+                  isLiked
                     ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
                     : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
                 } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
@@ -548,27 +547,42 @@ const Coursesinfopage = () => {
         <ConsellingBanner />
       </div>
 
-             {/* Login Popup Modal */}
+      {/* Login Popup Modal */}
       {showLoginPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">Login Required</h2>
-              <button 
+              <h2 className="text-xl font-bold text-gray-800">
+                Login Required
+              </h2>
+              <button
                 onClick={handleClosePopup}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
             </div>
-            
+
             <div className="text-gray-600 mb-6">
-              <p>You need to be logged in to like this Course. Would you like to log in now?</p>
+              <p>
+                You need to be logged in to like this Course. Would you like to
+                log in now?
+              </p>
             </div>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={handleClosePopup}
@@ -578,7 +592,7 @@ const Coursesinfopage = () => {
               </button>
               <button
                 onClick={handleRedirectToLogin}
-                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                className="px-4 py-2 bg-[#b82025] text-white rounded-md hover:bg-[#b82025] transition-colors"
               >
                 Login
               </button>
@@ -586,7 +600,6 @@ const Coursesinfopage = () => {
           </div>
         </div>
       )}
-
     </>
   );
 };

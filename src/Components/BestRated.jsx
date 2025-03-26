@@ -115,7 +115,7 @@ const BestRated = () => {
         <h3 className="text-xl font-bold">Best Rated Institutes</h3>
         <button
           onClick={handleViewMore}
-          className="bg-red-500 text-white py-2 px-4 rounded"
+          className="bg-[#b82025] text-white py-2 px-4 rounded"
         >
           View more
         </button>
