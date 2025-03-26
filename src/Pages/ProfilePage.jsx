@@ -23,6 +23,7 @@ const fetchUserData = async () => {
 const ProfilePage = () => {
   const [formData, setFormData] = useState({
     name: "",
+    email: "", 
     phone: "",
     dateOfBirth: "",
     gender: "Male",
@@ -59,6 +60,7 @@ const ProfilePage = () => {
       // Set form data with user data
       setFormData({
         name: data.name || "",
+        email: data.email || localStorage.getItem('email')?.replace(/^"|"$/g, ''),
         phone: data.phone || "",
         dateOfBirth: formattedDate,
         gender: data.gender || "Male",
@@ -362,6 +364,18 @@ const ProfilePage = () => {
                   placeholder="Anshul Sharma"
                   className="w-full border rounded px-4 py-2"
                   required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-2">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  readOnly
+                  className="w-full border rounded px-4 py-2 bg-gray-100 cursor-not-allowed"
                 />
               </div>
               <div className="mb-4">
