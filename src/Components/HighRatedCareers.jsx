@@ -140,7 +140,7 @@ const HighRatedCareers = () => {
                 />
               </div>
               <div className="textContainer">
-                <h3 className="text-xl md:text-xl lg:text-2xl font-semibold text-[#0B104A]">
+                <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
                   {box?.title || "Untitled"}
                 </h3>
 

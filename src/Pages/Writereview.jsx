@@ -10,6 +10,7 @@ import { createReview } from "../ApiFunctions/api";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import Promotions from "./CoursePromotions";
+import successImage from "../assets/Images/check.png";
 // import { useMutation, useQuery } from '@tanstack/react-query';
 
 const Writereview = () => {
@@ -33,7 +34,7 @@ const Writereview = () => {
 
   // Move to the next step
   const nextStep = () => {
-    if (currentStep < steps.length -1) {
+    if (currentStep < steps.length - 1) {
       if (!submit) {
         alert("All fields are required");
       } else {
@@ -124,13 +125,13 @@ const Writereview = () => {
 
   return (
     <>
-      <div className="w-full items-center max-w-4xl h-24 mx-auto">
+      <div className="w-full items-center max-w-4xl h-[90px] overflow-hidden mx-auto">
         <Promotions location="REVIEW_PAGE" className="h-[90px]" />
       </div>
-      <div className="p-3 h-[600px] pb-14 bg-white relative flex flex-col">
+      <div className="p-3 h-fit pb-14 bg-white relative flex flex-col">
         {/* Step Content */}
 
-        <div className=" p-2 md:p-6 rounded h-[300px] relative overflow-hidden shadow flex-1">
+        <div className=" p-2 md:p-6 rounded h-full relative  shadow flex-1">
           {renderStepContent()}
         </div>
 
@@ -173,15 +174,14 @@ const Writereview = () => {
         {/* Modal for Submission */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-              <h2 className="text-xl font-bold text-gray-800">
-                Review Submitted!
-              </h2>
-              <p className="mt-2 text-gray-600">
+            <div className="bg-white flex flex-col items-center  pt-10 rounded-lg shadow-lg p-6 w-96">
+              <img className="h-20 w-20 mb-4" src={successImage} />
+              <h2 className="text-2xl font-bold text-gray-800">Thank you!</h2>
+              <p className="mt-2 text-center  text-gray-600">
                 Thank you for submitting your review. We appreciate your
                 feedback!
               </p>
-              <div className="flex justify-center">
+              <div className="flex mt-4 justify-center">
                 <Link to="/">
                   <button
                     onClick={() => setIsModalOpen(false)}
