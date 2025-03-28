@@ -409,7 +409,7 @@ export const alltrendingInstitute = async () => {
 //careerCategories
 export const careerCategories = async () => {
   try {
-    const response = await axios.get(`${baseURL}/career-category`);
+    const response = await axios.get(`${baseURL}/career-category?page=0`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching career categories `, error);
