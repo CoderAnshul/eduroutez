@@ -4,7 +4,6 @@ import { ChevronDown } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
 
 const Faqs = ({ instituteData }) => {
-  console.log("d gfhgjkl faqf", instituteData.data?._id);
   const [faqs, setFaqs] = useState([]);
   const [showMore, setShowMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +19,6 @@ const Faqs = ({ instituteData }) => {
         const response = await axiosInstance.get(
           `${apiUrl}/faq-by-institute/${instituteData?.data?._id}`
         );
-        console.log("faq data ghj", response);
         const faqData = response?.data?.data || [];
         setFaqs(Array.isArray(faqData) ? faqData : []);
         setIsLoading(false);
@@ -37,8 +35,15 @@ const Faqs = ({ instituteData }) => {
 
   const renderContent = () => {
     if (isLoading) return <div>Loading FAQs...</div>;
-    if (error) return null; // Return null instead of error message
-    if (!faqs || faqs.length === 0) return null; // Return null instead of "No FAQs available"
+    if (error) return null;
+
+    if (!faqs || faqs.length === 0) {
+      return (
+        <div className="text-gray-500 italic">
+          No FAQs available for this institute.
+        </div>
+      );
+    }
 
     return (
       <>
@@ -84,11 +89,6 @@ const Faqs = ({ instituteData }) => {
       </>
     );
   };
-
-  // If loading is complete and there are no FAQs or there was an error, don't render anything
-  if (!isLoading && (error || !faqs || faqs.length === 0)) {
-    return null;
-  }
 
   return (
     <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4">
