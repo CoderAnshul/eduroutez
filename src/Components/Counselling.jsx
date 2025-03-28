@@ -1,9 +1,9 @@
 import React from "react";
-import img1 from "../assets/Images/Information Technology.jpg";
-import img2 from "../assets/Images/Medical.jpg";
-import img3 from "../assets/Images/Engineering.jpg";
-import img4 from "../assets/Images/Hospitality & Tourism.jpg";
-import img5 from "../assets/Images/Management.jpg";
+import img1 from "../assets/Images/Information_Technology_03.jpg";
+import img2 from "../assets/Images/Medical_02.jpg";
+import img3 from "../assets/Images/Engineering_02.jpg";
+import img4 from "../assets/Images/HospitalityTourism_03.jpg";
+import img5 from "../assets/Images/Management_02.jpg";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
