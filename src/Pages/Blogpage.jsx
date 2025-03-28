@@ -71,7 +71,7 @@ const Blogpage = () => {
   } = useQuery(
     ["blog-categories"],
     async () => {
-      const response = await axios.get(`${baseURL}/blog-category`);
+      const response = await axios.get(`${baseURL}/blog-category?page=0`);
       return response.data;
     },
     {
