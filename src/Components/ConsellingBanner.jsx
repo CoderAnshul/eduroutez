@@ -5,7 +5,17 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import uparrow from "../assets/Images/uparrow.png";
-import banner from "../assets/Images/counsellingbanner.png";
+import banner from "../assets/Images/Counsellor Image_01.jpg";
+import banner2 from "../assets/Images/Counsellor Image_02.jpg";
+import banner3 from "../assets/Images/Counsellor Image_03.jpg";
+
+import banner4 from "../assets/Images/Counsellor Image_04.jpg";
+import banner5 from "../assets/Images/Counsellor Image_05.jpg";
+import banner6 from "../assets/Images/Counsellor Image_06.jpg";
+import banner7 from "../assets/Images/Counsellor Image_07.jpg";
+
+import banner8 from "../assets/Images/Counsellor Image_08.jpg";
+
 import "../assets/swipers/conseling.css";
 
 const ConsellingBanner = ({ className = "" }) => {
@@ -13,11 +23,16 @@ const ConsellingBanner = ({ className = "" }) => {
     {
       id: 1,
       img: banner,
-      title: "Still confused with career planning?",
+      title: "",
       subtitle: "",
     },
-    { id: 2, img: banner, title: "Explore your opportunities", subtitle: "" },
-    { id: 3, img: banner, title: "Get expert counseling now!", subtitle: "" },
+    { id: 2, img: banner2, title: "", subtitle: "" },
+    { id: 3, img: banner3, title: "", subtitle: "" },
+    { id: 4, img: banner4, title: "", subtitle: "" },
+    { id: 5, img: banner5, title: "", subtitle: "" },
+    { id: 6, img: banner6, title: "", subtitle: "" },
+    { id: 7, img: banner7, title: "", subtitle: "" },
+    { id: 8, img: banner8, title: "", subtitle: "" },
   ];
 
   return (

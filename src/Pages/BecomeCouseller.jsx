@@ -30,7 +30,7 @@ const BecomeCounselor = () => {
   useEffect(() => {
     const fetchStreams = async () => {
       try {
-        const response = await axios.get(`${VITE_BASE_URL}/streams`);
+        const response = await axios.get(`${VITE_BASE_URL}/streams?page=0&sort={"createdAt":"asc"}`);
         setStreams(response.data?.data?.result);
       } catch (err) {
         console.error("Error fetching streams", err);

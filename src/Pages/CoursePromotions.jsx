@@ -109,7 +109,7 @@ const Promotions = ({ location, className }) => {
                 <img
                   src={`${imageUrl}/${randomPromo.image}`}
                   alt={randomPromo.title || 'Promotion'}
-                  className="w-full h-full object-contain rounded-lg"
+                  className={`w-full h-full object-cover md:object-contain rounded-lg ${className || ''}`}
                 />
               )}
               {/* Gradient overlay */}
@@ -139,7 +139,7 @@ const Promotions = ({ location, className }) => {
                 <img
                   src={`${imageUrl}/${randomPromo.image}`}
                   alt={randomPromo.title || 'Promotion'}
-                  className="w-full h-full object-contain rounded-lg"
+                  className={`w-full h-full object-cover md:object-contain rounded-lg ${className || ''}`}
                 />
               )}
               {/* Gradient overlay */}
