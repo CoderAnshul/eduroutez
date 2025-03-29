@@ -15,7 +15,7 @@ import {
 import logo from '../assets/Images/footer-logo.png';
 import facebook from '../assets/Images/facebook.png';
 import instagram from '../assets/Images/instagram.png';
-import twitter from '../assets/Images/twitter.png';
+import twitter from '../assets/Images/linkedin-sign.png';
 import youtube from '../assets/Images/youtube.png';
 
 const Footer = () => {
@@ -205,7 +205,7 @@ const Footer = () => {
           </div>
 
           <div className="flex gap-4 mt-6">
-            <Link to="/">
+            <Link to="https://www.facebook.com/eduroutez" target="_blank">
               <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
                 <img 
                   className="h-6 -mt-[2px] object-cover transition-opacity duration-300 hover:opacity-80" 
@@ -214,7 +214,7 @@ const Footer = () => {
                 />
               </div>
             </Link>
-            <Link to="/">
+            <Link to="https://www.instagram.com/eduroutez/" target="_blank">
               <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
                 <img 
                   className="h-5 object-cover transition-opacity duration-300 hover:opacity-80" 
@@ -223,16 +223,16 @@ const Footer = () => {
                 />
               </div>
             </Link>
-            <Link to="/">
+            <Link to="https://www.linkedin.com/company/eduroutez-official " target="_blank">
               <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
                 <img 
                   className="h-5 object-cover transition-opacity duration-300 hover:opacity-80" 
                   src={twitter} 
-                  alt="Twitter" 
+                  alt="LinkedIn" 
                 />
               </div>
             </Link>
-            <Link to="/">
+            <Link to="https://www.youtube.com/channel/UCijwjFtGJ92YK6dUWXcepIg" target="_blank">
               <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
                 <img 
                   className="h-[34px] object-cover transition-opacity duration-300 hover:opacity-80" 

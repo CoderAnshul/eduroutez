@@ -154,7 +154,7 @@ const DetailPage = () => {
     [&>p]:text-black  [&>p]:leading-relaxed
     
     [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:my-4
-    [&>ul>li]:text-gray-700 [&>ul>li]:my-2
+    [&>ul>li]:text-black [&>ul>li]:my-2
     
     [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:my-4
     [&>ol>li]:text-black [&>ol>li]:my-2
