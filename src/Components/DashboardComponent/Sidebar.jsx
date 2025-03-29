@@ -78,7 +78,7 @@ const Sidebar = () => {
       </aside>
 
       {/* Navbar for small screens */}
-      <nav className="w-14 bg-gray-100 p-4 flex flex-col gap-14 items-center md:hidden">
+      <nav className="w-14 bg-gray-100 p-4 flex flex-col gap-14 items-center md:hidden min-h-fit">
         <Link to="/">
           <img className="h-6 hidden md:flex" src={logo} alt="mainLogo" />
           <img className="h-6 mt-3 md:hidden" src={favicon} alt="mainLogo" />
