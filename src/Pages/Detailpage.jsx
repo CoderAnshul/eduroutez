@@ -143,6 +143,7 @@ const DetailPage = () => {
       topColleges: data.topColleges || [],
     };
     return DOMPurify.sanitize(content[tabId]);
+    // [&>p]:text-gray-700 [&>p]:my-3 [&>p]:leading-relaxed
   };
 
   const contentStyles = `
@@ -150,7 +151,7 @@ const DetailPage = () => {
     [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:my-4
     [&>h2]:text-xl [&>h2]:font-bold [&>h2]:my-3
     [&>h3]:text-lg [&>h3]:font-bold [&>h3]:my-2
-    [&>p]:text-gray-700 [&>p]:my-3 [&>p]:leading-relaxed
+    [&>p]:text-gray-700  [&>p]:leading-relaxed
     
     [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:my-4
     [&>ul>li]:text-gray-700 [&>ul>li]:my-2
