@@ -126,7 +126,7 @@ const BlogComponent = () => {
                 </div>
 
                 {/* Card Content */}
-                <div className="p-6">
+                <div className="p-2 md:p-6">
                   <h3 className="text-xl min-h-[3em]  md:text-xl lg:text-xl font-bold text-gray-800">
                     {blog.title.length > 30
                       ? `${blog.title.slice(0, 35)}...`
@@ -141,7 +141,7 @@ const BlogComponent = () => {
                   <div className="mt-4"></div>
                   <div className="mt-4">
                     <div className="flex justify-between items-center text-gray-600">
-                      <button className="bg-[#b82025] text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
+                      <button className="bg-[#b82025] whitespace-nowrap text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
                         Read More
                       </button>
 

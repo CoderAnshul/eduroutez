@@ -269,7 +269,7 @@ const Navbar = () => {
 
       {showLoginPopup && (
         <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
-          <div className="popup bg-white p-12 m-20s rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
+          <div className="popup bg-white min-w-[290px] p-12 m-20s rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
             <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
               Hey there! We'd love to hear your thoughts. Please log in to share
               your review with us and help others make informed decisions.
@@ -284,7 +284,7 @@ const Navbar = () => {
               <Link
                 to="/login"
                 onClick={handleLoginPopupClose}
-                className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
+                className="bg-[#b82025] whitespace-nowrap text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
               >
                 Log In
               </Link>

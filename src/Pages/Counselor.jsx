@@ -262,7 +262,7 @@ const CounselorListPage = () => {
                         className="bg-white shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300"
                       >
                         <div className="p-2 md:p-6">
-                          <div className="flex gap-6">
+                          <div className="flex gap-6 flex-col sm:flex-row">
                             {counselor.profilePhoto ? (
                               <img
                                 src={`${Images}/${counselor.profilePhoto.replace(
