@@ -114,15 +114,57 @@ const BlogComponent = () => {
               {/* Image and main content wrapped in Link */}
               <Link
                 to={`/blogdetailpage/${blog.slug}`}
-                className="block text-black"
+                className="block group text-black"
               >
                 {/* Image */}
-                <div className="h-56 min-h-56 max-h-56 w-full overflow-hidden">
+                <div className="h-56  relative min-h-56 max-h-56 w-full overflow-hidden">
                   <img
                     className="w-full h-full object-cover object-top rounded-t-xl"
                     src={`${Images}/${blog?.thumbnail}`}
                     alt={blog.title}
                   />
+                  <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-2 bg-white px-3 py-1 rounded-full text-black">
+                    {blog.views && (
+                      <div className="flex items-center gap-2 text-black">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="22"
+                          height="22"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span className="text-black">{blog.views}</span>
+                      </div>
+                    )}
+                    {blog.likes && blog.likes.length > 0 && (
+                      <div className="flex items-center gap-2 text-black">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="22"
+                          height="22"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
+                          <path d="M9 22V12"></path>
+                        </svg>
+                        <span className="text-black">
+                          {blog.likes.length > 0 && blog.likes.length}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Card Content */}
@@ -146,50 +188,6 @@ const BlogComponent = () => {
                       </button>
 
                       <div className="flex gap-4">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          {blog.views && (
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="22"
-                                height="22"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                              </svg>
-                              <span className="text-gray-500">
-                                {blog.views}
-                              </span>
-                            </div>
-                          )}
-                          {blog.likes && blog.likes.length > 0 && (
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="22"
-                                height="22"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
-                                <path d="M9 22V12"></path>
-                              </svg>
-                              <span className="">
-                                {blog.likes.length > 0 && blog.likes.length}
-                              </span>
-                            </div>
-                          )}
-                        </div>
                         {/* Social Share component */}
                         <div onClick={(e) => handleShareClick(e, blog)}>
                           <SocialShare
