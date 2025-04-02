@@ -99,7 +99,7 @@ const Navbar = () => {
       <nav className="fixed top-0 left-0 right-0 z-[999] bg-white ">
         <div className="h-16 w-full p-5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={toggleMenu} className="xl:hidden">
+            <button onClick={toggleMenu} className="lg:hidden">
               <img className="h-6" src={menubar} alt="open menu" />
             </button>
             <Link to="/">
@@ -212,7 +212,7 @@ const Navbar = () => {
       <div className="h-16"></div>
 
       {/* SecondMenu - Not fixed */}
-      <div className="hidden xl:block ">
+      <div className="hidden lg:block ">
         <SecondMenu categories={categoriesData} />
       </div>
 
@@ -261,7 +261,7 @@ const Navbar = () => {
               Write a Review
             </Link>
           </li>
-          <div className="xl:hidden overflow-y-scroll scrollbar-thumb-transparent">
+          <div className="lg:hidden overflow-y-scroll scrollbar-thumb-transparent">
             <MobileNavbar categories={categoriesData} />
           </div>
         </ul>
