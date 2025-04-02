@@ -392,7 +392,7 @@ const BlogDetailPage = () => {
                     />
                   </div>
 
-                  <div className="lg:w-1/5 md:w-[30%] h-full min-w-[200px] mt-8 lg:mt-0">
+                  <div className="lg:w-1/5 md:w-full h-full min-w-[200px] mt-8 lg:mt-0">
                     <div className="sticky top-20">
                       <h3 className="text-lg font-semibold mb-4">
                         Recently Uploaded Blogs
@@ -400,7 +400,7 @@ const BlogDetailPage = () => {
                       <div className="space-y-4">
                         {recentBlogs?.map((blog) => (
                           <Link key={blog._id} to={getBlogUrl(blog)}>
-                            <div className="flex items-center p-3 bg-white rounded-lg shadow-md">
+                            <div className="flex items-center mb-4 p-3 bg-white rounded-lg shadow-md">
                               <div className="w-1/3">
                                 <img
                                   src={`${Images}/${blog?.thumbnail}`}

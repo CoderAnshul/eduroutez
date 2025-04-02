@@ -55,7 +55,7 @@ const ConsellingBanner = ({ className = "" }) => {
                 alt={`slide-${slide.id}`}
               />
               <div className="h-full w-full text-white flex justify-end pb-16 pl-[4vw] md:pl-[100px] flex-col absolute left-0 top-0 z-50 bg-[#00000075]">
-                <h2 className="text-[40px] font-semibold mb-6 text-white">
+                <h2 className="text-[40px] font-semibold text-white">
                   {slide.title}
                   <h3 className="text-3xl text-white">{slide.subtitle}</h3>
                 </h2>

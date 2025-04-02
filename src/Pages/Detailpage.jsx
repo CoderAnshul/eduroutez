@@ -146,31 +146,31 @@ const DetailPage = () => {
     // [&>p]:text-gray-700 [&>p]:my-3 [&>p]:leading-relaxed
   };
 
-  const contentStyles = `
-    html-content
-    [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:my-4
-    [&>h2]:text-xl [&>h2]:font-bold [&>h2]:my-3
-    [&>h3]:text-lg [&>h3]:font-bold [&>h3]:my-2
-    [&>p]:text-black  [&>p]:leading-relaxed
+  // const contentStyles = `
+  //   html-content
+  //   [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:my-4
+  //   [&>h2]:text-xl [&>h2]:font-bold [&>h2]:my-3
+  //   [&>h3]:text-lg [&>h3]:font-bold [&>h3]:my-2
+  //   [&>p]:text-black  [&>p]:leading-relaxed
     
-    [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:my-4
-    [&>ul>li]:text-black [&>ul>li]:my-2
+  //   [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:my-4
+  //   [&>ul>li]:text-black [&>ul>li]:my-2
     
-    [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:my-4
-    [&>ol>li]:text-black [&>ol>li]:my-2
+  //   [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:my-4
+  //   [&>ol>li]:text-black [&>ol>li]:my-2
     
-    [&>table]:w-full [&>table]:border-collapse [&>table]:my-4
-    [&>table>thead>tr>th]:bg-gray-50 [&>table>thead>tr>th]:text-left 
-    [&>table>thead>tr>th]:p-3 [&>table>thead>tr>th]:border [&>table>thead>tr>th]:border-gray-200
-    [&>table>tbody>tr>td]:p-3 [&>table>tbody>tr>td]:border [&>table>tbody>tr>td]:border-gray-200
+  //   [&>table]:w-full [&>table]:border-collapse [&>table]:my-4
+  //   [&>table>thead>tr>th]:bg-gray-50 [&>table>thead>tr>th]:text-left 
+  //   [&>table>thead>tr>th]:p-3 [&>table>thead>tr>th]:border [&>table>thead>tr>th]:border-gray-200
+  //   [&>table>tbody>tr>td]:p-3 [&>table>tbody>tr>td]:border [&>table>tbody>tr>td]:border-gray-200
     
-    [&>a]:text-blue-600 [&>a]:underline [&>a:hover]:text-blue-800
+  //   [&>a]:text-blue-600 [&>a]:underline [&>a:hover]:text-blue-800
     
-    [&>img]:max-w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:my-4
+  //   [&>img]:max-w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:my-4
     
-    [&>blockquote]:pl-4 [&>blockquote]:border-l-4 [&>blockquote]:border-gray-300 
-    [&>blockquote]:italic [&>blockquote]:my-4 [&>blockquote]:text-gray-600
-  `;
+  //   [&>blockquote]:pl-4 [&>blockquote]:border-l-4 [&>blockquote]:border-gray-300 
+  //   [&>blockquote]:italic [&>blockquote]:my-4 [&>blockquote]:text-gray-600
+  // `;
 
   return (
     <>
@@ -186,7 +186,7 @@ const DetailPage = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-4 sticky top-0 z-50">
+          <div className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)]  rounded-xl p-4 sticky top-0 z-50">
             <h1 className="text-2xl font-bold mb-6 px-4">
               {data.title || "Career Details"}
             </h1>
@@ -223,7 +223,8 @@ const DetailPage = () => {
                   key={tab.id}
                   className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-8 scroll-mt-24"
                 >
-                  <h3 ref={tab.titleRef} className="text-lg font-bold mb-6">
+                  <h3 ref={tab.titleRef} className="font-bold mb-6">
+                  {/* <h3 ref={tab.titleRef} className="text-lg font-bold mb-6"> */}
                     {tab.name}
                   </h3>
                   {isArray ? (
@@ -231,14 +232,15 @@ const DetailPage = () => {
                       {content.map((item, idx) => (
                         <li
                           key={idx}
-                          className={contentStyles}
+                          // className={contentStyles}
                           dangerouslySetInnerHTML={{ __html: item }}
                         />
                       ))}
                     </ul>
                   ) : (
                     <div
-                      className={`${contentStyles} text-base prose prose-gray max-w-full`}
+                      className={`text-base prose prose-gray max-w-full`}
+                      // className={`${contentStyles} text-base prose prose-gray max-w-full`}
                       dangerouslySetInnerHTML={{ __html: content }}
                     />
                   )}
