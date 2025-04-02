@@ -128,7 +128,7 @@ const BestRated = () => {
               <Link
                 to={getInstituteUrl(institute)}
                 key={institute._id || index}
-                className="box w-full text-black max-w-sm lg:max-w-[500px] shadow-lg"
+                className="box w-full text-black max-w-sm lg:max-w-[500px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg"
               >
                 <div className="imageContainer">
                   <img
