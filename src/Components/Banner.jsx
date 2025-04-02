@@ -150,9 +150,9 @@ const Banner = () => {
 
   return (
     // <div className="h-[480px] w-full relative">
-    <div className="h-fit min-h-56 max-h-96 w-full relative mb-8">
+    <div className="h-fit min-h-56 max-h-96 w-full relative mb-8 overflow-hidden">
       {/* Dynamic Promotions component instead of static banners */}
-      <Promotions location="HOME_MAIN_PAGE" className="!h-full min-h-56" />
+      <Promotions location="HOME_MAIN_PAGE" className="!h-full min-h-56 !mt-0" />
 
       <div className="h-full w-full bg-[#00000049] p-2 absolute top-0  z-10 flex flex-col items-center justify-center">
         <h1 className="text-4xl text-white text-center font-semibold mb-5">
