@@ -115,7 +115,7 @@ const BestRatedInstitute = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-2 sm:px-4 py-8">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
         <h1 className="text-4xl font-bold mb-4">Best Rated Institutes</h1>
@@ -154,12 +154,12 @@ const BestRatedInstitute = () => {
                 </div>
 
                 {/* Institute Details */}
-                <div className="p-6">
+                <div className="!p-6">
                   <h2 className="text-2xl font-bold mb-2 text-gray-800">
                     {institute.instituteName}
                   </h2>
 
-                  <p className="text-gray-600 mb-4 line-clamp-3">
+                  <p className="text-gray-600 mb-4 p4 line-clamp-3">
                     {institute.about ? (
                       <span
                         dangerouslySetInnerHTML={{ __html: institute.about }}
