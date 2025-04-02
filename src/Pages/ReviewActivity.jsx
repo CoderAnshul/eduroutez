@@ -415,11 +415,11 @@ const ReviewsFilterPage = () => {
   const reviewTypes = ["blog", "course", "institute", "counselor"];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 max-sm:px-2 py-8">
       <h1 className="text-3xl font-bold mb-6">My Reviews</h1>
 
       {/* Filters */}
-      <div className="mb-6 bg-white shadow rounded-lg p-6">
+      <div className="mb-6 bg-white shadow rounded-lg p-6 max-sm:px-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold flex items-center">
             <Filter className="mr-2 h-5 w-5" /> Filter by Type
@@ -437,7 +437,7 @@ const ReviewsFilterPage = () => {
           )}
         </div>
 
-        <div className="flex space-x-4">
+        <div className="flex max-sm:items-start max-sm:flex-wrap max-sm:space-y-2 space-x-4">
           {reviewTypes.map((type) => (
             <button
               key={type}
@@ -510,7 +510,7 @@ const ReviewsFilterPage = () => {
 
               {renderReviewContent(review, filterType)}
 
-              <div className="text-sm text-gray-500 flex justify-between items-center mt-4">
+              <div className="text-sm text-gray-500 flex max-sm:flex-col max-sm:items-start justify-between items-center mt-4">
                 <span>{review.email || review.studentEmail}</span>
                 <span className="text-xs text-gray-400">
                   Review ID: {review._id}

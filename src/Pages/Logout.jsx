@@ -33,7 +33,7 @@ const Logout = () => {
     <>
       {showPopup && (
         <div className="popup fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="popup-inner bg-white rounded-lg shadow-lg w-1/3 p-6 text-center">
+          <div className="popup-inner bg-white rounded-lg shadow-lg w-1/3 max-sm:w-2/3 p-6 text-center">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
               Are you sure you want to logout?
             </h2>

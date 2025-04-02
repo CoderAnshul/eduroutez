@@ -190,7 +190,7 @@ const TrendingCourses = () => {
   const trendingCourses = data?.data?.result || [];
 
   return (
-    <div className="w-full max-w-[1420px] mx-auto p-6">
+    <div className="w-full max-w-[1420px] mx-auto p-4">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3 max-sm:space-x-0">
           <TrendingUp className="text-gray-700 w-6 h-6 block max-sm:hidden" />
