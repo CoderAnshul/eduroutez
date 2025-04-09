@@ -25,13 +25,13 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 max-sm:p-2">
       <h1 className="text-2xl font-bold mb-6">Settings</h1>
       {/* Tabs */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex max-sm:flex-wrap gap-4 mb-6">
         <button
           onClick={() => setActiveTab('editProfile')}
-          className={`px-4 py-2 rounded-md ${
+          className={`px-4 max-sm:px-2 py-2 rounded-md ${
             activeTab === 'editProfile'
               ? 'bg-red-100 text-red-600 border border-red-600'
               : 'bg-gray-100 text-gray-600'
@@ -41,7 +41,7 @@ const SettingsPage = () => {
         </button>
         <button
           onClick={() => setActiveTab('security')}
-          className={`px-4 py-2 rounded-md ${
+          className={`px-4 max-sm:px-2 py-2 rounded-md ${
             activeTab === 'security'
               ? 'bg-red-100 text-red-600 border border-red-600'
               : 'bg-gray-100 text-gray-600'
@@ -51,7 +51,7 @@ const SettingsPage = () => {
         </button>
         <button
           onClick={() => setActiveTab('bankDetails')}
-          className={`px-4 py-2 rounded-md ${
+          className={`px-4 max-sm:px-2 py-2 rounded-md ${
             activeTab === 'bankDetails'
               ? 'bg-red-100 text-red-600 border border-red-600'
               : 'bg-gray-100 text-gray-600'
@@ -61,7 +61,7 @@ const SettingsPage = () => {
         </button>
         <button
           onClick={() => setActiveTab('educations')}
-          className={`px-4 py-2 rounded-md ${
+          className={`px-4 max-sm:px-2 py-2 rounded-md ${
             activeTab === 'educations'
               ? 'bg-red-100 text-red-600 border border-red-600'
               : 'bg-gray-100 text-gray-600'

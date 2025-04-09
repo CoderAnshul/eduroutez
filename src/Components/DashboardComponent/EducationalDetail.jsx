@@ -110,7 +110,7 @@ const EducationalDetail = () => {
 
   return (
     <div className="p-2 md:p-2 border border-gray-300 rounded-lg">
-      <div className="max-w-6xl mx-auto bg-gray-50 rounded-lg shadow-md p-8">
+      <div className="max-w-6xl mx-auto bg-gray-50 rounded-lg shadow-md p-8 max-sm:px-2">
         <h2 className="text-2xl font-semibold mb-6">Educational Details</h2>
         <form onSubmit={handleSubmit}>
           {/* Institute */}

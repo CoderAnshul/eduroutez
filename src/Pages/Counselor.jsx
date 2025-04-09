@@ -226,54 +226,68 @@ const CounselorListPage = () => {
         </div>
 
         <div className="flex flex-col md:flex-row">
-  {/* Mobile Filter Button - Only visible on small screens */}
-  <button 
-    className="md:hidden mb-4 flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg shadow-sm"
-    onClick={toggleSidebar}
-  >
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
-    </svg>
-    {showSidebar ? 'Hide Filters' : 'Show Filters'}
-  </button>
-
-  {/* Sidebar - Shown/hidden on mobile, always visible on larger screens */}
-  <div className={`${showSidebar ? 'block' : 'hidden'} md:block w-full md:w-1/4 transition-all duration-300`}>
-    <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
-      <h3 className="text-lg font-semibold mb-4">Filter by Stream</h3>
-      <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
-        {streams.map((stream) => (
-          <label
-            key={stream._id}
-            className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
+          {/* Mobile Filter Button - Only visible on small screens */}
+          <button
+            className="md:hidden mb-4 flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg shadow-sm"
+            onClick={toggleSidebar}
           >
-            <input
-              type="checkbox"
-              value={stream.name}
-              checked={selectedStreams.includes(stream.name)}
-              onChange={() => handleStreamChange(stream.name)}
-            />
-            {stream.name}
-          </label>
-        ))}
-      </div>
-    </div>
-    <Promotions
-      location="COUNSELING_PAGE_SIDEBAR"
-      className="h-[250px] w-fit"
-    />
-  </div>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h7"
+              />
+            </svg>
+            {showSidebar ? "Hide Filters" : "Show Filters"}
+          </button>
 
-  <div className="w-full md:w-3/4 md:pl-6">
-    {/* Your existing content here */}
-    {loading ? (
-      <div className="flex justify-center items-center h-64">
-        <div className="w-16 h-16 border-4 border-red-600 border-t-transparent animate-spin"></div>
-      </div>
-    ) : (
+          {/* Sidebar - Shown/hidden on mobile, always visible on larger screens */}
+          <div
+            className={`${
+              showSidebar ? "block" : "hidden"
+            } md:block w-full md:w-1/4 transition-all duration-300`}
+          >
+            <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
+              <h3 className="text-lg font-semibold mb-4">Filter by Stream</h3>
+              <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
+                {streams.map((stream) => (
+                  <label
+                    key={stream._id}
+                    className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      value={stream.name}
+                      checked={selectedStreams.includes(stream.name)}
+                      onChange={() => handleStreamChange(stream.name)}
+                    />
+                    {stream.name}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <Promotions
+              location="COUNSELING_PAGE_SIDEBAR"
+              className="h-[250px] w-fit"
+            />
+          </div>
+
+          <div className="w-full md:w-3/4 md:pl-6">
+            {/* Your existing content here */}
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="w-16 h-16 border-4 border-red-600 border-t-transparent animate-spin"></div>
+              </div>
+            ) : (
               <>
                 {displayedCounselors.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-1 2xl:grid-cols-2 gap-6">
                     {displayedCounselors.map((counselor, index) => (
                       <div
                         key={index}

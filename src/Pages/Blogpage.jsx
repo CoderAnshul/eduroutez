@@ -342,7 +342,7 @@ const Blogpage = () => {
           </>
         )}
 
-        {pageNumbers.map((number) => (
+        {pageNumbers.slice(0,3).map((number) => (
           <button
             key={number}
             onClick={() => handlePageChange(number)}
@@ -480,7 +480,7 @@ const Blogpage = () => {
         </div>
 
         {/* Content */}
-        <div className="w-full md:w-3/4 pl-6">
+        <div className="w-full md:w-3/4 pl-6 max-sm:pl-0">
           {/* Display selected categories as red badges */}
           <div className="mb-4">
             {selectedCategories.map((category) => (

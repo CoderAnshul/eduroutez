@@ -190,15 +190,15 @@ const TrendingCourses = () => {
   const trendingCourses = data?.data?.result || [];
 
   return (
-    <div className="w-full max-w-[1420px] mx-auto p-6">
+    <div className="w-full max-w-[1420px] mx-auto p-2 md:p-6">
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center space-x-3">
-          <TrendingUp className="text-gray-700 w-6 h-6" />
+        <div className="flex items-center space-x-3 max-sm:space-x-0">
+          <TrendingUp className="text-gray-700 w-6 h-6 block max-sm:hidden" />
           <h2 className="text-2xl font-bold text-red-600">Trending Courses</h2>
         </div>
         <Link to="/trendingCourses">
           <button className="bg-[#b82025] text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-700 transition-all shadow-md">
-            <span>View All</span>
+            <span className="whitespace-nowrap">View All</span>
             <ArrowRight size={18} />
           </button>
         </Link>
@@ -274,7 +274,7 @@ const TrendingCourses = () => {
 
                   {/* Course content */}
                   <div className="p-6">
-                    <div className="space-y-4">
+                    <div className="space-y-4 px-2 pt-3">
                       {/* Short description */}
                       <div className="text-gray-600 line-clamp-3 h-18">
                         {stripHtml(course.shortDescription || "")}
@@ -283,7 +283,13 @@ const TrendingCourses = () => {
                       <div className="flex w-full justify-between gap-3 pt-2">
                         <div className="flex items-center text-sm text-gray-500">
                           {course.likes?.length > 0 && (
-                          <><ThumbsUp size={16} className="mr-2 text-gray-500" /><span>{course.likes?.length}</span></>
+                            <>
+                              <ThumbsUp
+                                size={16}
+                                className="mr-2 text-gray-500"
+                              />
+                              <span>{course.likes?.length}</span>
+                            </>
                           )}
                         </div>
 

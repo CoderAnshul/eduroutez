@@ -117,7 +117,7 @@ const BlogComponent = () => {
                 className="block group text-black"
               >
                 {/* Image */}
-                <div className="h-56  relative min-h-56 max-h-56 w-full overflow-hidden">
+                <div className="h-56 relative min-h-56 max-h-56 w-full overflow-hidden">
                   <img
                     className="w-full h-full object-cover object-top rounded-t-xl"
                     src={`${Images}/${blog?.thumbnail}`}

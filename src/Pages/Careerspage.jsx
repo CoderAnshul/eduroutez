@@ -238,7 +238,7 @@ const Careerspage = () => {
       />
 
       <button
-        className="mx-[20px] mt-[30px] z-[500] bg-blue-600 text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
+        className="mx-[20px] mt-[30px] z-[500] bg-[#B82025] text-white rounded-lg px-4 py-2 shadow-lg md:hidden"
         onClick={() => setIsFilterOpen(true)}
       >
         Filters
@@ -334,7 +334,7 @@ const Careerspage = () => {
           </p>
         </div>
 
-        <div className="w-full md:w-3/4 px-6">
+        <div className="w-full md:w-3/4 md:px-6 px-1">
           {isLoadingAllData && !visibleData.length ? (
             <p className="text-center py-8">Loading all career data...</p>
           ) : visibleData.length === 0 ? (

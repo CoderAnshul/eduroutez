@@ -279,153 +279,154 @@ const TrendingCourses = () => {
   };
 
   return (
-    <div className="w-full max-w-[1420px] mx-auto p-6">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
-        <h1 className="text-4xl font-bold mb-4">Trending Courses</h1>
-        <p className="text-xl">
-          Discover trending Courses that can transform your academic journey
-        </p>
-      </div>
+    <>
+      <div className="w-full max-w-[1420px] mx-auto p-6">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
+          <h1 className="text-4xl font-bold mb-4">Trending Courses</h1>
+          <p className="text-xl">
+            Discover trending Courses that can transform your academic journey
+          </p>
+        </div>
 
-      {/* Mobile Filter Button */}
-      <button
-        className="mb-6 bg-[#b82025] text-white rounded-lg px-4 py-2 shadow-lg md:hidden flex items-center"
-        onClick={() => setIsFilterOpen(true)}
-      >
-        <Filter size={16} className="mr-2" />
-        Filters
-      </button>
+        {/* Mobile Filter Button */}
+        <button
+          className="mb-6 bg-[#b82025] text-white rounded-lg px-4 py-2 shadow-lg md:hidden flex items-center"
+          onClick={() => setIsFilterOpen(true)}
+        >
+          <Filter size={16} className="mr-2" />
+          Filters
+        </button>
 
-      {/* Mobile Filter Overlay */}
-      <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-[1000] flex transition-opacity duration-300 ${
-          isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-      >
+        {/* Mobile Filter Overlay */}
         <div
-          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${
-            isFilterOpen ? "translate-x-0" : "-translate-x-full"
+          className={`fixed inset-0 bg-black bg-opacity-50 z-[1000] flex transition-opacity duration-300 ${
+            isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         >
-          <button
-            className="text-gray-800 font-bold text-xl mb-4"
-            onClick={() => setIsFilterOpen(false)}
+          <div
+            className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${
+              isFilterOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
           >
-            X
-          </button>
-          <h3 className="text-lg font-semibold mb-6">Filter by Category</h3>
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Search courses..."
-              className="w-full p-2 border-2 border-gray-300 rounded-lg"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-          </div>
-          <div className="space-y-4">
-            {categories.map((category) => (
-              <label
-                key={category}
-                className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg shadow hover:bg-gray-200 cursor-pointer transition-all duration-200"
-              >
-                <input
-                  type="checkbox"
-                  value={category}
-                  checked={selectedCategories.includes(category)}
-                  onChange={() => handleCategoryChange(category)}
-                  className="form-checkbox h-5 w-5 text-red-500"
-                />
-                <span className="text-base font-medium">{category}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-        <div
-          className="flex-grow cursor-pointer"
-          onClick={() => setIsFilterOpen(false)}
-        ></div>
-      </div>
-
-      {/* Desktop Layout with Filters */}
-      <div className="flex flex-col md:flex-row gap-8 mb-8">
-        {/* Desktop Sidebar Filter */}
-        <div className="hidden md:block w-1/4 bg-white p-4 rounded-xl shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
-          <h3 className="text-lg font-semibold mb-4">Filter Courses</h3>
-          <div className="mb-6">
-            <input
-              type="text"
-              placeholder="Search courses..."
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-          </div>
-          <div className="mb-2 font-medium text-gray-700">Categories</div>
-          <div className="flex flex-col gap-2 border border-gray-200 rounded-lg p-4 max-h-96 overflow-y-auto">
-            {categories.length > 0 ? (
-              categories.map((category) => (
+            <button
+              className="text-gray-800 font-bold text-xl mb-4"
+              onClick={() => setIsFilterOpen(false)}
+            >
+              X
+            </button>
+            <h3 className="text-lg font-semibold mb-6">Filter by Category</h3>
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search courses..."
+                className="w-full p-2 border-2 border-gray-300 rounded-lg"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
+            <div className="space-y-4">
+              {categories.map((category) => (
                 <label
                   key={category}
-                  className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
+                  className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg shadow hover:bg-gray-200 cursor-pointer transition-all duration-200"
                 >
                   <input
                     type="checkbox"
                     value={category}
                     checked={selectedCategories.includes(category)}
                     onChange={() => handleCategoryChange(category)}
-                    className="form-checkbox h-4 w-4 text-red-500 rounded"
+                    className="form-checkbox h-5 w-5 text-red-500"
                   />
-                  <span className="text-sm">{category}</span>
+                  <span className="text-base font-medium">{category}</span>
                 </label>
-              ))
-            ) : (
-              <p className="text-gray-500 text-sm">No categories available</p>
-            )}
+              ))}
+            </div>
           </div>
-          {(selectedCategories.length > 0 || searchTerm) && (
-            <button
-              onClick={clearFilters}
-              className="mt-4 text-sm text-red-600 hover:text-red-800"
-            >
-              Clear filters
-            </button>
-          )}
+          <div
+            className="flex-grow cursor-pointer"
+            onClick={() => setIsFilterOpen(false)}
+          ></div>
         </div>
 
-        {/* Course Grid */}
-        <div className="w-full md:w-3/4">
-          {currentCourses.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {currentCourses.map((course) => {
-                  const levelBadge = getLevelBadge(course.courseLevel);
+        {/* Desktop Layout with Filters */}
+        <div className="flex flex-col md:flex-row gap-8 mb-8">
+          {/* Desktop Sidebar Filter */}
+          <div className="hidden md:block w-1/4 bg-white p-4 rounded-xl shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-4">Filter Courses</h3>
+            <div className="mb-6">
+              <input
+                type="text"
+                placeholder="Search courses..."
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
+            <div className="mb-2 font-medium text-gray-700">Categories</div>
+            <div className="flex flex-col gap-2 border border-gray-200 rounded-lg p-4 max-h-96 overflow-y-auto">
+              {categories.length > 0 ? (
+                categories.map((category) => (
+                  <label
+                    key={category}
+                    className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      value={category}
+                      checked={selectedCategories.includes(category)}
+                      onChange={() => handleCategoryChange(category)}
+                      className="form-checkbox h-4 w-4 text-red-500 rounded"
+                    />
+                    <span className="text-sm">{category}</span>
+                  </label>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">No categories available</p>
+              )}
+            </div>
+            {(selectedCategories.length > 0 || searchTerm) && (
+              <button
+                onClick={clearFilters}
+                className="mt-4 text-sm text-red-600 hover:text-red-800"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
 
-                  return (
-                    <Link
-                      key={course._id}
-                      to={`/coursesinfopage/${course?.slug}`}
-                      className="group"
-                    >
-                      <div className="bg-white rounded-xl shadow-md overflow-hidden h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                        <div className="relative h-48 overflow-hidden">
-                          <img
-                            src={`${Images}/${course.coursePreviewThumbnail}`}
-                            alt={course.courseTitle}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+          {/* Course Grid */}
+          <div className="w-full md:w-3/4">
+            {currentCourses.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {currentCourses.map((course) => {
+                    const levelBadge = getLevelBadge(course.courseLevel);
 
-                          <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                            <div className="flex justify-between items-start">
-                              <div
-                                className={`${levelBadge.color} text-xs font-semibold px-3 py-1 rounded-full`}
-                              >
-                                {levelBadge.label}
-                              </div>
+                    return (
+                      <Link
+                        key={course._id}
+                        to={`/coursesinfopage/${course?.slug}`}
+                        className="group"
+                      >
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                          <div className="relative h-48 overflow-hidden">
+                            <img
+                              src={`${Images}/${course.coursePreviewThumbnail}`}
+                              alt={course.courseTitle}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-30"></div>
 
-                              {/* {course.isCourseFree === "free" ? (
+                            <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                              <div className="flex justify-between items-start">
+                                <div
+                                  className={`${levelBadge.color} text-xs font-semibold px-3 py-1 rounded-full`}
+                                >
+                                  {levelBadge.label}
+                                </div>
+
+                                {/* {course.isCourseFree === "free" ? (
                                 <div className="bg-white text-green-600 text-xs font-bold px-3 py-1 rounded-full">
                                   Free
                                 </div>
@@ -434,54 +435,58 @@ const TrendingCourses = () => {
                                   Paid
                                 </div>
                               )} */}
-                            </div>
+                              </div>
 
-                            <div>
-                              <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md">
-                                {course.courseTitle}
-                              </h3>
-                              <div className="flex items-center mt-2 text-white text-opacity-90 text-sm drop-shadow-md">
-                                <Clock size={14} className="mr-1" />
-                                {course.courseDurationYears > 0
-                                  ? `${course.courseDurationYears} Years `
-                                  : ""}
-                                {course.courseDurationMonths > 0
-                                  ? `${course.courseDurationMonths} months`
-                                  : ""}{" "}
+                              <div>
+                                <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md">
+                                  {course.courseTitle}
+                                </h3>
+                                <div className="flex items-center mt-2 text-white text-opacity-90 text-sm drop-shadow-md">
+                                  <Clock size={14} className="mr-1" />
+                                  {course.courseDurationYears > 0
+                                    ? `${course.courseDurationYears} Years `
+                                    : ""}
+                                  {course.courseDurationMonths > 0
+                                    ? `${course.courseDurationMonths} months`
+                                    : ""}{" "}
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Course content */}
-                        <div className="p-6">
-                          <div className="space-y-4">
-                            {/* Short description */}
-                            <div className="text-gray-600 line-clamp-3 h-18">
-                              {stripHtml(course.shortDescription || "")}
-                            </div>
-
-                            {/* Course info */}
-                            <div className="flex w-full justify-between gap-3 pt-2">
-
-                              <div className="flex items-center text-sm text-gray-500">
-                                
-                                {course.likes?.length > 0 && (
-                                                         <><ThumbsUp size={16} className="mr-2 text-gray-500" /><span>{course.likes?.length}</span></>
-                                                         )}
+                          {/* Course content */}
+                          <div className="p-6">
+                            <div className="space-y-4">
+                              {/* Short description */}
+                              <div className="text-gray-600 line-clamp-3 h-18">
+                                {stripHtml(course.shortDescription || "")}
                               </div>
 
-                              <div className="flex items-center text-sm text-gray-500">
-                                <Users
-                                  size={16}
-                                  className="mr-2 text-gray-500"
-                                />
-                                <span>{course.views || 0} views</span>
-                              </div>
-                            </div>
+                              {/* Course info */}
+                              <div className="flex w-full justify-between gap-3 pt-2">
+                                <div className="flex items-center text-sm text-gray-500">
+                                  {course.likes?.length > 0 && (
+                                    <>
+                                      <ThumbsUp
+                                        size={16}
+                                        className="mr-2 text-gray-500"
+                                      />
+                                      <span>{course.likes?.length}</span>
+                                    </>
+                                  )}
+                                </div>
 
-                            {/* Application dates if available */}
-                            {/* {course.applicationStartDate ? (
+                                <div className="flex items-center text-sm text-gray-500">
+                                  <Users
+                                    size={16}
+                                    className="mr-2 text-gray-500"
+                                  />
+                                  <span>{course.views || 0} views</span>
+                                </div>
+                              </div>
+
+                              {/* Application dates if available */}
+                              {/* {course.applicationStartDate ? (
                               <div className="border-t border-gray-100 pt-4 mt-4">
                                 <div className="text-xs text-gray-500 mb-1">Application period:</div>
                                 <div className="text-sm">
@@ -493,112 +498,112 @@ const TrendingCourses = () => {
                             ) : (
                               <div className="border-t border-gray-100 pt-4 mt-4">
                                 {/* Empty space - no text */}
-                            {/* <div className="h-6"></div>
+                              {/* <div className="h-6"></div>
                               </div>
                             )} */}
-                          </div>
+                            </div>
 
-                          {/* Action button */}
-                          <div className="mt-6">
-                            <div className="w-full bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-center font-medium flex items-center justify-center group-hover:bg-[#b82025] group-hover:text-white transition-colors">
-                              <span>View Course</span>
-                              <ArrowRight
-                                size={16}
-                                className="ml-2 transition-transform group-hover:translate-x-1"
-                              />
+                            {/* Action button */}
+                            <div className="mt-6">
+                              <div className="w-full bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-center font-medium flex items-center justify-center group-hover:bg-[#b82025] group-hover:text-white transition-colors">
+                                <span>View Course</span>
+                                <ArrowRight
+                                  size={16}
+                                  className="ml-2 transition-transform group-hover:translate-x-1"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-12 flex justify-center">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={goToPrevPage}
-                      disabled={currentPage === 1}
-                      className={`p-2 rounded-md ${
-                        currentPage === 1
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      <ChevronLeft size={20} />
-                    </button>
-
-                    {/* Page numbers */}
-                    <div className="flex space-x-1">
-                      {[...Array(totalPages)].map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => paginate(index + 1)}
-                          className={`w-8 h-8 rounded-md text-sm ${
-                            currentPage === index + 1
-                              ? "bg-[#b82025] text-white"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
-                        >
-                          {index + 1}
-                        </button>
-                      ))}
-                    </div>
-
-                    <button
-                      onClick={goToNextPage}
-                      disabled={currentPage === totalPages}
-                      className={`p-2 rounded-md ${
-                        currentPage === totalPages
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      <ChevronRight size={20} />
-                    </button>
-                  </div>
+                      </Link>
+                    );
+                  })}
                 </div>
-              )}
 
-              {/* Pagination info */}
-              <div className="mt-4 text-center text-sm text-gray-500">
-                {totalPages > 0
-                  ? `Page ${currentPage} of ${totalPages} (${totalCourses} courses)`
-                  : `${totalCourses} courses`}
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="mt-12 flex justify-center">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={goToPrevPage}
+                        disabled={currentPage === 1}
+                        className={`p-2 rounded-md ${
+                          currentPage === 1
+                            ? "text-gray-400 cursor-not-allowed"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        <ChevronLeft size={20} />
+                      </button>
+
+                      {/* Page numbers */}
+                      <div className="flex space-x-1">
+                        {[...Array(totalPages)].map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => paginate(index + 1)}
+                            className={`w-8 h-8 rounded-md text-sm ${
+                              currentPage === index + 1
+                                ? "bg-[#b82025] text-white"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                          >
+                            {index + 1}
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages}
+                        className={`p-2 rounded-md ${
+                          currentPage === totalPages
+                            ? "text-gray-400 cursor-not-allowed"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        <ChevronRight size={20} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Pagination info */}
+                <div className="mt-4 text-center text-sm text-gray-500">
+                  {totalPages > 0
+                    ? `Page ${currentPage} of ${totalPages} (${totalCourses} courses)`
+                    : `${totalCourses} courses`}
+                </div>
+              </>
+            ) : (
+              <div className="bg-white rounded-xl shadow-md p-8 text-center">
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BookOpen size={24} className="text-gray-500" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">No Courses Found</h3>
+                <p className="text-gray-600 mb-6">
+                  We couldn't find any courses matching your filters.
+                </p>
+                <button
+                  className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
+                  onClick={clearFilters}
+                >
+                  Clear Filters
+                </button>
               </div>
-            </>
-          ) : (
-            <div className="bg-white rounded-xl shadow-md p-8 text-center">
-              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BookOpen size={24} className="text-gray-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">No Courses Found</h3>
-              <p className="text-gray-600 mb-6">
-                We couldn't find any courses matching your filters.
-              </p>
-              <button
-                className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
-                onClick={clearFilters}
-              >
-                Clear Filters
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+
+        <HighRatedCareers />
+        <BlogComponent />
+        <BestRated />
       </div>
-
-      <HighRatedCareers />
-      <BlogComponent />
-      <BestRated />
-
-      <div className="w-full flex items-start mt-10">
+      <div className="flex gap-2 flex-col sm:flex-row items-center">
         <Events />
         <ConsellingBanner />
       </div>
-    </div>
+    </>
   );
 };
 
