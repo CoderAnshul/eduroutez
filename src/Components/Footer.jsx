@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, Code } from "lucide-react";
 import {
   trendingCareers,
   popularCourses,
@@ -266,26 +266,38 @@ const Footer = () => {
 
         {/* Copyright and Policy Links */}
         <div className="pt-6 mt-4 border-t border-gray-700">
-          <div className="flex flex-wrap items-center justify-center text-center gap-x-4 gap-y-2 text-xs text-gray-400">
-            <span>
-              &copy; {new Date().getFullYear()} Eduroutez. All rights reserved.
-            </span>
-            <span className="hidden sm:inline">|</span>
-            <Link
-              to="/terms-&-conditions"
-              className="hover:text-white text-gray-400 transition-colors"
-            >
-              Terms & Conditions
-            </Link>
-            <span className="hidden sm:inline">|</span>
-            <Link
-              to="/policy"
-              className="hover:text-white text-gray-400 transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            {/* <span className="hidden sm:inline">|</span> */}
-            {/* <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link> */}
+          <div className="flex flex-wrap items-center justify-between">
+            <div className="flex flex-wrap items-center justify-center text-center gap-x-4 gap-y-2 text-xs text-gray-400">
+              <span>
+                &copy; {new Date().getFullYear()} Eduroutez. All rights reserved.
+              </span>
+              <span className="hidden sm:inline">|</span>
+              <Link
+                to="/terms-&-conditions"
+                className="hover:text-white text-gray-400 transition-colors"
+              >
+                Terms & Conditions
+              </Link>
+              <span className="hidden sm:inline">|</span>
+              <Link
+                to="/policy"
+                className="hover:text-white text-gray-400 transition-colors"
+              >
+                Privacy Policy
+              </Link>
+            </div>
+            
+            {/* Developed by Nexprism */}
+            <div className="w-full sm:w-auto mt-4 sm:mt-0 flex items-center justify-center sm:justify-end">
+              <Link 
+                to="https://nexprism.com" 
+                target="_blank" 
+                className="flex items-center px-4 py-1.5 rounded-md bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-105 group"
+              >
+                <Code size={16} className="mr-2 text-white group-hover:animate-pulse" />
+                <span className="text-xs font-medium text-white">Developed by Nexprism</span>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

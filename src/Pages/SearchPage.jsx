@@ -111,10 +111,11 @@ const SearchPage = () => {
       setLoading(true);
       getInstitutes(inputField, inputField, inputField, inputField)
         .then((data) => {
-          const { result, totalDocuments } = data.data;
+          const { result, totalDocuments, currentPage, totalPages } = data.data;
           setContent(result);
           setFilteredContent(result);
           setTotalDocuments(totalDocuments);
+          setCurrentPage(currentPage || 1);
 
           if (result && result.length > 0) {
             updateIdMapping(result);
@@ -497,6 +498,7 @@ const SearchPage = () => {
       window.scrollTo(0, scrollPosition);
     }, 0);
   };
+  
   const handleFilterChange = (filterCategory, filterValue) => {
     // This function should do nothing or be removed entirely
     // Let Filter component handle all filter state
@@ -541,13 +543,14 @@ const SearchPage = () => {
       const response = await axios.get(`${baseURL}/institutes?${queryString}`);
 
       if (response.data) {
-        const institutes = response.data.data.result;
-        setContent(institutes);
-        setFilteredContent(institutes);
-        setTotalDocuments(response.data.data.totalDocuments);
+        const { result, currentPage, totalPages, totalDocuments } = response.data.data;
+        setContent(result);
+        setFilteredContent(result);
+        setTotalDocuments(totalDocuments);
+        setCurrentPage(currentPage || 1); // Update current page from API response
 
-        if (institutes && institutes.length > 0) {
-          updateIdMapping(institutes);
+        if (result && result.length > 0) {
+          updateIdMapping(result);
         }
       }
     } catch (error) {
@@ -570,19 +573,122 @@ const SearchPage = () => {
   }, [searchQuery, content]);
 
   const handlePageChange = (newPage) => {
+    // When page changes, fetch the new page from the server
     setCurrentPage(newPage);
+    // The useEffect will handle fetching new data
   };
 
-  const getPaginatedContent = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredContent.slice(startIndex, endIndex);
+  const renderPagination = () => {
+    const totalPages = Math.ceil(totalDocuments / itemsPerPage);
+    if (totalPages <= 1) return null;
+
+    // Logic to show a reasonable number of page buttons
+    const maxButtonsToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+    
+    // Adjust if we're near the end
+    if (endPage - startPage + 1 < maxButtonsToShow) {
+      startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+    }
+
+    const pageButtons = [];
+    
+    // Previous button
+    if (currentPage > 1) {
+      pageButtons.push(
+        <button
+          key="prev"
+          onClick={() => handlePageChange(currentPage - 1)}
+          className="px-4 py-2 bg-gray-200 mx-1"
+        >
+          &laquo;
+        </button>
+      );
+    }
+    
+    // First page button if not starting from page 1
+    if (startPage > 1) {
+      pageButtons.push(
+        <button
+          key="1"
+          onClick={() => handlePageChange(1)}
+          className="px-4 py-2 bg-gray-200 mx-1"
+        >
+          1
+        </button>
+      );
+      
+      // Show ellipsis if there's a gap
+      if (startPage > 2) {
+        pageButtons.push(
+          <span key="startEllipsis" className="px-2">...</span>
+        );
+      }
+    }
+    
+    // Page number buttons
+    for (let i = startPage; i <= endPage; i++) {
+      pageButtons.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-4 py-2 mx-1 ${
+            currentPage === i
+              ? "bg-[#b82025] text-white"
+              : "bg-gray-200"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    
+    // Show ellipsis if there's a gap before the last page
+    if (endPage < totalPages - 1) {
+      pageButtons.push(
+        <span key="endEllipsis" className="px-2">...</span>
+      );
+    }
+    
+    // Last page button if not ending at the last page
+    if (endPage < totalPages) {
+      pageButtons.push(
+        <button
+          key={totalPages}
+          onClick={() => handlePageChange(totalPages)}
+          className="px-4 py-2 bg-gray-200 mx-1"
+        >
+          {totalPages}
+        </button>
+      );
+    }
+    
+    // Next button
+    if (currentPage < totalPages) {
+      pageButtons.push(
+        <button
+          key="next"
+          onClick={() => handlePageChange(currentPage + 1)}
+          className="px-4 py-2 bg-gray-200 mx-1"
+        >
+          &raquo;
+        </button>
+      );
+    }
+
+    return (
+      <div className="pagination flex flex-wrap justify-center my-6">
+        {pageButtons}
+      </div>
+    );
   };
 
   const handleFiltersChanged = (filters) => {
     console.log("Filters changed in Filter component:", filters);
     setSelectedFilters(filters);
     setFiltersApplied(true);
+    setCurrentPage(1); // Reset to first page when filters change
     // No need to call fetchFilteredInstitutes here, the useEffect will handle it
   };
 
@@ -624,7 +730,7 @@ const SearchPage = () => {
                     className="h-[90px] w-full max-sm:w-[100%] !p-0"
                   ></Promotions>
                 </div>
-                {getPaginatedContent().map((institute, index) => (
+                {filteredContent.map((institute, index) => (
                   <SearchResultBox
                     key={index}
                     institute={institute}
@@ -632,26 +738,7 @@ const SearchPage = () => {
                     className="!mt-4"
                   />
                 ))}
-                <div className="pagination">
-                  {Array.from(
-                    {
-                      length: Math.ceil(filteredContent.length / itemsPerPage),
-                    },
-                    (_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handlePageChange(index + 1)}
-                        className={`px-4 py-2 ${
-                          currentPage === index + 1
-                            ? "bg-[#b82025] text-white"
-                            : "bg-gray-200"
-                        }`}
-                      >
-                        {index + 1}
-                      </button>
-                    )
-                  )}
-                </div>
+                {renderPagination()}
               </>
             ) : (
               <div className="text-center py-8 text-gray-500">
