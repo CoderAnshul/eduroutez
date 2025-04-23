@@ -506,13 +506,7 @@ const SearchPage = () => {
     // Do not update selectedFilters here - it will be updated via onFiltersChanged
   };
 
-  // Effect to fetch data when filters change - this is now separate from the initialization effect
-  useEffect(() => {
-    if (initialLoadComplete && filtersApplied) {
-      fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
-    }
-  }, [selectedFilters, currentPage, initialLoadComplete, filtersApplied]);
-
+  // Modified fetchFilteredInstitutes function - made more robust
   const fetchFilteredInstitutes = async (filters, page, limit) => {
     setLoading(true);
     setFetchError(false);
@@ -540,10 +534,14 @@ const SearchPage = () => {
       const queryString = `filters=${encodeURIComponent(
         JSON.stringify(apiFilters)
       )}&page=${page}&limit=${limit}`;
+      
+      console.log(`Fetching data with query: ${queryString}`);
       const response = await axios.get(`${baseURL}/institutes?${queryString}`);
 
       if (response.data) {
         const { result, currentPage, totalPages, totalDocuments } = response.data.data;
+        console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
+        
         setContent(result);
         setFilteredContent(result);
         setTotalDocuments(totalDocuments);
@@ -561,6 +559,31 @@ const SearchPage = () => {
     }
   };
 
+  // Modified useEffect that runs when filters or page changes
+  useEffect(() => {
+    if (initialLoadComplete) {
+      // Remove the filtersApplied check to ensure pagination works regardless of filter status
+      fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
+    }
+  }, [selectedFilters, currentPage, initialLoadComplete]);
+
+  // Modified handlePageChange to ensure API is called
+  const handlePageChange = (newPage) => {
+    console.log(`Changing to page ${newPage}`);
+    // Save current scroll position
+    const scrollPosition = window.scrollY;
+    
+    // Update current page state
+    setCurrentPage(newPage);
+    
+    // Explicitly fetch new page data to ensure it happens
+    // This is a backup to the useEffect, providing redundancy
+    fetchFilteredInstitutes(selectedFilters, newPage, itemsPerPage);
+    
+    // Scroll to top after page change
+    window.scrollTo(0, 0);
+  };
+
   useEffect(() => {
     if (searchQuery.length > 0) {
       const filtered = content.filter((item) =>
@@ -571,12 +594,6 @@ const SearchPage = () => {
       setFilteredContent(content);
     }
   }, [searchQuery, content]);
-
-  const handlePageChange = (newPage) => {
-    // When page changes, fetch the new page from the server
-    setCurrentPage(newPage);
-    // The useEffect will handle fetching new data
-  };
 
   const renderPagination = () => {
     const totalPages = Math.ceil(totalDocuments / itemsPerPage);
