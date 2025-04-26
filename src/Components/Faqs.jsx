@@ -49,7 +49,7 @@ const Faqs = ({ instituteData }) => {
       <>
         <div
           className="border-2 rounded-xl p-3 overflow-hidden transition-all"
-          style={{ maxHeight: showMore ? "1000px" : "calc(8 * 60px)" }}
+          // style={{ maxHeight: showMore ? "1000px" : "calc(8 * 60px)" }}
         >
           {faqs.slice(0, showMore ? faqs.length : 8).map((faq, index) => (
             <div key={index} className="border-b last:border-b-0 py-2">
