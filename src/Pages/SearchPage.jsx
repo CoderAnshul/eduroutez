@@ -30,6 +30,7 @@ const SearchPage = () => {
   const inputField = useSelector((store) => store.input.inputField);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
+  const [searchSource, setSearchSource] = useState(null);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -42,6 +43,124 @@ const SearchPage = () => {
   const ratingsFromUrl = searchParams.get("Ratings");
   const organizationTypeFromUrl = searchParams.get("organisationType");
   const specializationFromUrl = searchParams.get("specialization");
+
+
+  useEffect(() => {
+    const fromSearch = searchParams.get("fromSearch") === "true";
+    const hasUrlFilters = checkForUrlFilters();
+    
+    // Determine search source priority
+    if (fromSearch && inputField) {
+      setSearchSource("input");
+    } else if (hasUrlFilters) {
+      setSearchSource("url");
+    } else {
+      setSearchSource("default");
+    }
+    
+    function checkForUrlFilters() {
+      return !!(streamFromUrl || stateFromUrl || cityFromUrl || 
+        examFromUrl || feesFromUrl || ratingsFromUrl || 
+        organizationTypeFromUrl || specializationFromUrl);
+    }
+  }, []);
+  
+  // This effect handles the initial data loading based on search source
+  useEffect(() => {
+    if (!searchSource) return; // Wait until search source is determined
+    
+    setLoading(true);
+    setFetchError(false);
+    
+    if (searchSource === "input" && inputField) {
+      console.log("Loading data from Redux input:", inputField);
+      // Load data based on the inputField from Redux
+      getInstitutes(inputField, inputField, inputField, inputField)
+        .then((data) => {
+          const { result, totalDocuments, currentPage, totalPages } = data.data;
+          setContent(result);
+          setFilteredContent(result);
+          setTotalDocuments(totalDocuments);
+          setCurrentPage(currentPage || 1);
+  
+          if (result && result.length > 0) {
+            updateIdMapping(result);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching institutes:", error);
+          setFetchError(true);
+        })
+        .finally(() => {
+          setLoading(false);
+          setInitialLoadComplete(true);
+        });
+    } 
+    else if (searchSource === "url") {
+      // Build filters from URL parameters
+      const initialFilters = buildInitialFiltersFromUrl();
+      console.log("Loading data from URL filters:", initialFilters);
+      
+      setSelectedFilters(initialFilters);
+      setFiltersApplied(true);
+      
+      fetchFilteredInstitutes(initialFilters, 1, itemsPerPage)
+        .finally(() => {
+          setInitialLoadComplete(true);
+        });
+    } 
+    else {
+      // Default data loading
+      console.log("Loading default data");
+      setSelectedFilters({});
+      
+      getInstitutes("", "", "", "")
+        .then((data) => {
+          const { result, totalDocuments, currentPage, totalPages } = data.data;
+          setContent(result);
+          setFilteredContent(result);
+          setTotalDocuments(totalDocuments);
+          setCurrentPage(currentPage || 1);
+  
+          if (result && result.length > 0) {
+            updateIdMapping(result);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching institutes:", error);
+          setFetchError(true);
+        })
+        .finally(() => {
+          setLoading(false);
+          setInitialLoadComplete(true);
+        });
+    }
+  }, [searchSource]);
+  
+  // Helper function to build filters from URL params
+  function buildInitialFiltersFromUrl() {
+    const initialFilters = {};
+    
+    if (streamFromUrl) {
+      const streamValues = streamFromUrl
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (streamValues.length > 0) {
+        initialFilters.streams = streamValues;
+      }
+    }
+  
+    if (stateFromUrl) initialFilters.state = [stateFromUrl];
+    if (cityFromUrl) initialFilters.city = [cityFromUrl];
+    if (examFromUrl) initialFilters.Exam = [examFromUrl];
+    if (feesFromUrl) initialFilters.Fees = [feesFromUrl];
+    if (ratingsFromUrl) initialFilters.Ratings = [ratingsFromUrl];
+    if (organizationTypeFromUrl) initialFilters.organisationType = [organizationTypeFromUrl];
+    if (specializationFromUrl) initialFilters.specialization = [specializationFromUrl];
+    
+    return initialFilters;
+  }
 
   useEffect(() => {
     if (!window.instituteIdMap) {
@@ -507,65 +626,125 @@ const SearchPage = () => {
   };
 
   // Modified fetchFilteredInstitutes function - made more robust
-  const fetchFilteredInstitutes = async (filters, page, limit) => {
-    setLoading(true);
-    setFetchError(false);
+  // const fetchFilteredInstitutes = async (filters, page, limit) => {
+  //   setLoading(true);
+  //   setFetchError(false);
 
-    try {
-      // Create a deep copy of filters to avoid modifying the original
-      const apiFilters = JSON.parse(JSON.stringify(filters));
+  //   try {
+  //     // Create a deep copy of filters to avoid modifying the original
+  //     const apiFilters = JSON.parse(JSON.stringify(filters));
 
-      // Ensure we're using "streams" (plural) for the API
-      if (apiFilters.stream && !apiFilters.streams) {
-        apiFilters.streams = apiFilters.stream;
-        delete apiFilters.stream;
-      }
+  //     // Ensure we're using "streams" (plural) for the API
+  //     if (apiFilters.stream && !apiFilters.streams) {
+  //       apiFilters.streams = apiFilters.stream;
+  //       delete apiFilters.stream;
+  //     }
 
-      // Make sure all filter arrays are properly formatted
-      Object.keys(apiFilters).forEach((key) => {
-        // If the value is not already an array, convert it to an array
-        if (!Array.isArray(apiFilters[key])) {
-          apiFilters[key] = [apiFilters[key]];
-        }
-      });
+  //     // Make sure all filter arrays are properly formatted
+  //     Object.keys(apiFilters).forEach((key) => {
+  //       // If the value is not already an array, convert it to an array
+  //       if (!Array.isArray(apiFilters[key])) {
+  //         apiFilters[key] = [apiFilters[key]];
+  //       }
+  //     });
 
-      console.log("Sending filters to API:", apiFilters);
+  //     console.log("Sending filters to API:", apiFilters);
 
-      const queryString = `filters=${encodeURIComponent(
-        JSON.stringify(apiFilters)
-      )}&page=${page}&limit=${limit}`;
+  //     const queryString = `filters=${encodeURIComponent(
+  //       JSON.stringify(apiFilters)
+  //     )}&page=${page}&limit=${limit}`;
       
-      console.log(`Fetching data with query: ${queryString}`);
-      const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+  //     console.log(`Fetching data with query: ${queryString}`);
+  //     const response = await axios.get(`${baseURL}/institutes?${queryString}`);
 
-      if (response.data) {
-        const { result, currentPage, totalPages, totalDocuments } = response.data.data;
-        console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
+  //     if (response.data) {
+  //       const { result, currentPage, totalPages, totalDocuments } = response.data.data;
+  //       console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
         
-        setContent(result);
-        setFilteredContent(result);
-        setTotalDocuments(totalDocuments);
-        setCurrentPage(currentPage || 1); // Update current page from API response
+  //       setContent(result);
+  //       setFilteredContent(result);
+  //       setTotalDocuments(totalDocuments);
+  //       setCurrentPage(currentPage || 1); // Update current page from API response
 
-        if (result && result.length > 0) {
-          updateIdMapping(result);
-        }
+  //       if (result && result.length > 0) {
+  //         updateIdMapping(result);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching filtered institutes:", error);
+  //     setFetchError(true);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // Modified fetchFilteredInstitutes function - return the promise
+const fetchFilteredInstitutes = async (filters, page, limit) => {
+  setLoading(true);
+  setFetchError(false);
+
+  try {
+    // Create a deep copy of filters to avoid modifying the original
+    const apiFilters = JSON.parse(JSON.stringify(filters));
+
+    // Ensure we're using "streams" (plural) for the API
+    if (apiFilters.stream && !apiFilters.streams) {
+      apiFilters.streams = apiFilters.stream;
+      delete apiFilters.stream;
+    }
+
+    // Make sure all filter arrays are properly formatted
+    Object.keys(apiFilters).forEach((key) => {
+      // If the value is not already an array, convert it to an array
+      if (!Array.isArray(apiFilters[key])) {
+        apiFilters[key] = [apiFilters[key]];
       }
-    } catch (error) {
-      console.error("Error fetching filtered institutes:", error);
-      setFetchError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
+    });
 
-  // Modified useEffect that runs when filters or page changes
-  useEffect(() => {
-    if (initialLoadComplete) {
-      // Remove the filtersApplied check to ensure pagination works regardless of filter status
-      fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
+    console.log("Sending filters to API:", apiFilters);
+
+    const queryString = `filters=${encodeURIComponent(
+      JSON.stringify(apiFilters)
+    )}&page=${page}&limit=${limit}`;
+    
+    console.log(`Fetching data with query: ${queryString}`);
+    const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+
+    if (response.data) {
+      const { result, currentPage, totalPages, totalDocuments } = response.data.data;
+      console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
+      
+      setContent(result);
+      setFilteredContent(result);
+      setTotalDocuments(totalDocuments);
+      setCurrentPage(currentPage || 1); // Update current page from API response
+
+      if (result && result.length > 0) {
+        updateIdMapping(result);
+      }
     }
-  }, [selectedFilters, currentPage, initialLoadComplete]);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching filtered institutes:", error);
+    setFetchError(true);
+    throw error;
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Modified useEffect for filter changes
+useEffect(() => {
+  // Only run this effect if:
+  // 1. Initial loading is complete
+  // 2. Either filters have been explicitly applied OR we're changing pages with existing filters
+  if (initialLoadComplete && (filtersApplied || (Object.keys(selectedFilters).length > 0 && currentPage > 1))) {
+    console.log("Fetching data based on filters/pagination:", selectedFilters, "Page:", currentPage);
+    fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
+  }
+}, [selectedFilters, currentPage, initialLoadComplete, filtersApplied]);
+
+
 
   // Modified handlePageChange to ensure API is called
   const handlePageChange = (newPage) => {
@@ -703,11 +882,38 @@ const SearchPage = () => {
 
   const handleFiltersChanged = (filters) => {
     console.log("Filters changed in Filter component:", filters);
+    
+    // Save current scroll position
+    const scrollPosition = window.scrollY;
+    
+    // Reset page to 1 when filters change
+    setCurrentPage(1);
     setSelectedFilters(filters);
     setFiltersApplied(true);
-    setCurrentPage(1); // Reset to first page when filters change
-    // No need to call fetchFilteredInstitutes here, the useEffect will handle it
+    
+    // Restore scroll position
+    setTimeout(() => {
+      window.scrollTo(0, scrollPosition);
+    }, 0);
   };
+  
+  // const handlePageChange = (newPage) => {
+  //   console.log(`Changing to page ${newPage}`);
+    
+  //   // Update current page state
+  //   setCurrentPage(newPage);
+    
+  //   // Scroll to top after page change
+  //   window.scrollTo(0, 0);
+  // };
+
+  // const handleFiltersChanged = (filters) => {
+  //   console.log("Filters changed in Filter component:", filters);
+  //   setSelectedFilters(filters);
+  //   setFiltersApplied(true);
+  //   setCurrentPage(1); // Reset to first page when filters change
+  //   // No need to call fetchFilteredInstitutes here, the useEffect will handle it
+  // };
 
   return (
     <>

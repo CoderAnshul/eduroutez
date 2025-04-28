@@ -110,43 +110,37 @@ const Banner = () => {
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    if (searchType === "course") {
-      setInputField(suggestion.courseTitle);
-      dispatch(setInput(suggestion.courseTitle));
-    } else if (searchType === "counsellor") {
-      setInputField(suggestion.firstname + " " + suggestion.lastname);
-    } else {
-      setInputField(suggestion.instituteName);
-      dispatch(setInput(suggestion.instituteName));
-    }
+  // In Banner.jsx
+const handleSuggestionClick = (suggestion) => {
+  if (searchType === "course") {
+    setInputField(suggestion.courseTitle);
+    dispatch(setInput(suggestion.courseTitle));
+    navigate("/searchpage");
+  } else if (searchType === "counsellor") {
+    setInputField(suggestion.firstname + " " + suggestion.lastname);
+    navigate(`/counselor?name=${encodeURIComponent(suggestion.firstname + " " + suggestion.lastname)}`);
+  } else {
+    // For institutes, include a search flag to indicate this came from search
+    setInputField(suggestion.instituteName);
+    dispatch(setInput(suggestion.instituteName));
+    navigate("/searchpage?fromSearch=true");
+  }
+  setShowSuggestions(false);
+};
 
-    setShowSuggestions(false);
+const handleBtnClick = () => {
+  if (inputField === "") {
+    alert("Please enter something");
+    return;
+  }
 
-    if (searchType === "counsellor") {
-      navigate(
-        `/counselor?name=${encodeURIComponent(
-          suggestion.firstname + " " + suggestion.lastname
-        )}`
-      );
-    } else {
-      navigate("/searchpage");
-    }
-  };
-
-  const handleBtnClick = () => {
-    if (inputField === "") {
-      alert("Please enter something");
-      return;
-    }
-
-    if (searchType === "counsellor") {
-      navigate(`/counselor?name=${encodeURIComponent(inputField)}`);
-    } else {
-      dispatch(setInput(inputField));
-      navigate("/searchpage");
-    }
-  };
+  if (searchType === "counsellor") {
+    navigate(`/counselor?name=${encodeURIComponent(inputField)}`);
+  } else {
+    dispatch(setInput(inputField));
+    navigate("/searchpage?fromSearch=true");
+  }
+};
 
   return (
     // <div className="h-[480px] w-full relative">
