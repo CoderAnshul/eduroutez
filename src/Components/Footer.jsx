@@ -289,13 +289,12 @@ const Footer = () => {
             
             {/* Developed by Nexprism */}
             <div className="w-full sm:w-auto mt-4 sm:mt-0 flex items-center justify-center sm:justify-end">
-              <Link 
-                to="https://nexprism.com" 
+              <Link
+                to="https://nexprism.com"
                 target="_blank" 
-                className="flex items-center px-4 py-1.5 rounded-md bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-105 group"
+                className="hover:text-white text-gray-400 transition-colors"
               >
-                <Code size={16} className="mr-2 text-white group-hover:animate-pulse" />
-                <span className="text-xs font-medium text-white">Developed by Nexprism</span>
+                Developed by Nexprism
               </Link>
             </div>
           </div>
