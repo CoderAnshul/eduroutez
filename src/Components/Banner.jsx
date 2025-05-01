@@ -156,7 +156,7 @@ const handleBtnClick = () => {
         </h1>
 
         <div className="relative max-w-[800px] w-full">
-          <div className="search ml-5 max-sm:ml-0 mr-5 h-12 bg-white border-[1.5px] relative border-gray-500 rounded-lg items-center gap-2 w-full max-lg:w-[95%] overflow-hidden flex">
+          <div className="search ml-5 max-sm:ml-0 mr-5 h-12 bg-white border-[1.5px] relative border-gray-500 rounded-lg items-center gap-2 w-full max-lg:w-[95%] flex">
             <select
               className="h-full max-sm:w-20 bg-gray-100 border-r border-gray-300 px-2 text-sm outline-none cursor-pointer"
               value={searchType}
