@@ -288,11 +288,11 @@ const Footer = () => {
             </div>
             
             {/* Developed by Nexprism */}
-            <div className="w-full sm:w-auto mt-4 sm:mt-0 flex items-center justify-center sm:justify-end">
+            <div className="w-full sm:w-auto mt-4 sm:mt-0 flex items-center justify-center sm:justify-end text-xs text-gray-400">
               <Link
                 to="https://nexprism.com"
                 target="_blank" 
-                className="hover:text-white text-gray-400 transition-colors"
+                className="hover:text-white text-gray-400 transition-colors text-xs"
               >
                 Developed by Nexprism
               </Link>
