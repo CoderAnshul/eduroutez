@@ -33,8 +33,8 @@ const CourseList = ({ filteredCourses, visibleCourses, getCourseSlug }) => (
   >
     {filteredCourses.slice(0, visibleCourses).map((course) => (
       <Link 
-        to={`/coursesinfopage/${getCourseSlug(course)}`} 
-        key={course._id} 
+      to={`/coursesinfopage/${course.slug}`}  
+             key={course._id} 
         className="flex-1 w-full max-w-sm !text-black"
       >
         <CourseCard course={course} />
