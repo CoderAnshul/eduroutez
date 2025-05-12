@@ -1,36 +1,37 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import ImageSlider from "../Ui components/ImageSlider";
-import InstitueName from "../Ui components/InstitueName";
-import TabSlider from "../Ui components/TabSlider";
-import CollegeInfo from "../Components/CollegeInfo";
-import InstituteCourses from "../Components/InstituteCourses";
-import QueryForm from "../Ui components/QueryForm";
-import ReviewandRating from "../Components/ReviewandRating";
-import InstituteFacilites from "../Components/InstituteFacilites";
-import RecruitersSlider from "../Ui components/RecruitersSlider";
-import Faqs from "../Components/Faqs";
-import BestRated from "../Components/BestRated";
-import Events from "../Components/Events";
 import { useQuery } from "react-query";
 import { getInstituteById } from "../ApiFunctions/api";
 import Loader from "../Components/Loader";
-import Addmissioninfo from "../Components/Addmissioninfo";
-import Placementinfo from "../Components/Placementinfo";
-import CampusInfo from "../Components/CampusInfo";
-import ScholarshipInfo from "../Components/ScholarshipInfo";
-import GalleryInfo from "../Components/GalleryInfo";
-import FeeInfo from "../Components/FeeInfo";
-import CutTOffInfo from "../Components/CutTOffInfo";
-import Ranking from "../Components/Ranking";
-import News from "../Components/News";
-import Webinar from "../Components/Webinar";
-import HighRatedCareers from "../Components/HighRatedCareers";
-import BlogComponent from "../Components/BlogComponent";
-import Promotions from "../Pages/CoursePromotions";
-import axiosInstance from "../ApiFunctions/axios";
-import ConsellingBanner from "../Components/ConsellingBanner";
 import axios from "axios";
+
+// Lazy load components
+const ImageSlider = React.lazy(() => import("../Ui components/ImageSlider"));
+const InstitueName = React.lazy(() => import("../Ui components/InstitueName"));
+const TabSlider = React.lazy(() => import("../Ui components/TabSlider"));
+const CollegeInfo = React.lazy(() => import("../Components/CollegeInfo"));
+const InstituteCourses = React.lazy(() => import("../Components/InstituteCourses"));
+const QueryForm = React.lazy(() => import("../Ui components/QueryForm"));
+const ReviewandRating = React.lazy(() => import("../Components/ReviewandRating"));
+const InstituteFacilites = React.lazy(() => import("../Components/InstituteFacilites"));
+const RecruitersSlider = React.lazy(() => import("../Ui components/RecruitersSlider"));
+const Faqs = React.lazy(() => import("../Components/Faqs"));
+const BestRated = React.lazy(() => import("../Components/BestRated"));
+const Events = React.lazy(() => import("../Components/Events"));
+const Addmissioninfo = React.lazy(() => import("../Components/Addmissioninfo"));
+const Placementinfo = React.lazy(() => import("../Components/Placementinfo"));
+const CampusInfo = React.lazy(() => import("../Components/CampusInfo"));
+const ScholarshipInfo = React.lazy(() => import("../Components/ScholarshipInfo"));
+const GalleryInfo = React.lazy(() => import("../Components/GalleryInfo"));
+const FeeInfo = React.lazy(() => import("../Components/FeeInfo"));
+const CutTOffInfo = React.lazy(() => import("../Components/CutTOffInfo"));
+const Ranking = React.lazy(() => import("../Components/Ranking"));
+const News = React.lazy(() => import("../Components/News"));
+const Webinar = React.lazy(() => import("../Components/Webinar"));
+const HighRatedCareers = React.lazy(() => import("../Components/HighRatedCareers"));
+const BlogComponent = React.lazy(() => import("../Components/BlogComponent"));
+const Promotions = React.lazy(() => import("../Pages/CoursePromotions"));
+const ConsellingBanner = React.lazy(() => import("../Components/ConsellingBanner"));
 
 // Base tabs array - we'll filter this based on available data
 const allPossibleTabs = [
