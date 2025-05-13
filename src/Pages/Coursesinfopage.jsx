@@ -1,20 +1,28 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CoursesName from "../Ui components/CoursesName";
 import TabSlider from "../Ui components/TabSlider";
-import QueryForm from "../Ui components/QueryForm";
-import ProsandCons from "../Ui components/ProsandCons";
-import BestRated from "../Components/BestRated";
-import Events from "../Components/Events";
 import { getCoursesById } from "../ApiFunctions/api";
-import { useQuery } from "react-query";
-import ConsellingBanner from "../Components/ConsellingBanner";
-import HighRatedCareers from "../Components/HighRatedCareers";
-import BlogComponent from "../Components/BlogComponent";
-import Promotions from "../Pages/CoursePromotions";
-import CourseReviewForm from "../Components/CourseReviewForm";
 import axiosInstance from "../ApiFunctions/axios";
 import SocialShare from "../Components/SocialShare";
+
+// Lazy loaded components
+const QueryForm = lazy(() => import("../Ui components/QueryForm"));
+const ProsandCons = lazy(() => import("../Ui components/ProsandCons"));
+const BestRated = lazy(() => import("../Components/BestRated"));
+const Events = lazy(() => import("../Components/Events"));
+const ConsellingBanner = lazy(() => import("../Components/ConsellingBanner"));
+const HighRatedCareers = lazy(() => import("../Components/HighRatedCareers"));
+const BlogComponent = lazy(() => import("../Components/BlogComponent"));
+const Promotions = lazy(() => import("../Pages/CoursePromotions"));
+const CourseReviewForm = lazy(() => import("../Components/CourseReviewForm"));
+
+// Loading component for Suspense fallback
+const LoadingComponent = () => (
+  <div className="flex justify-center items-center py-6">
+    <div className="animate-pulse w-full h-32 bg-gray-200 rounded-md"></div>
+  </div>
+);
 
 const tabs = [
   "Overview",
@@ -27,7 +35,8 @@ const tabs = [
 ];
 
 const Coursesinfopage = () => {
-  const { id } = useParams(); // This can be either ID or slug
+  const { id } = useParams();
+  const [activeTab, setActiveTab] = useState(0);
   const sectionRefs = tabs.map(() => useRef(null));
   const [isLiked, setIsLiked] = useState(false);
   const [courseData, setCourseData] = useState(null);
@@ -39,6 +48,7 @@ const Coursesinfopage = () => {
   const currentUserId = localStorage.getItem("userId");
   const baseURL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
+
   // Initialize courseIdMap from localStorage
   useEffect(() => {
     if (!window.courseIdMap) {
@@ -56,10 +66,12 @@ const Coursesinfopage = () => {
 
   // Combined fetch function for course data
   useEffect(() => {
-    const fetchCourseData = async () => {
-      if (!id) return;
+    if (!id) return;
 
-      setIsLoading(true);
+    let isMounted = true;
+    setIsLoading(true);
+
+    const fetchCourseData = async () => {
       try {
         // First, determine if we're dealing with an ID or a slug
         const isSlug = isNaN(parseInt(id)) || id.includes("-");
@@ -81,7 +93,8 @@ const Coursesinfopage = () => {
             // If courseIdMap doesn't exist or doesn't have the slug,
             // we need to get the course directly by its slug through a custom API call
             try {
-              const response = await getCoursesById(courseId);
+              const result = await getCoursesById(courseId);
+              response = result;
 
               // If we got a response, grab the ID for future use
               if (response && response.data) {
@@ -93,9 +106,6 @@ const Coursesinfopage = () => {
                 localStorage.setItem(
                   "courseIdMap",
                   JSON.stringify(window.courseIdMap)
-                );
-                console.log(
-                  `Saved mapping: ${id} -> ${courseId} in localStorage`
                 );
               }
             } catch (slugError) {
@@ -120,35 +130,86 @@ const Coursesinfopage = () => {
               "courseIdMap",
               JSON.stringify(window.courseIdMap)
             );
-            console.log(
-              `Saved mapping: ${slug} -> ${courseId} in localStorage`
-            );
           }
         }
 
         if (!response || !response.data) {
-          setIsError(true);
+          if (isMounted) {
+            setIsError(true);
+            setIsLoading(false);
+          }
           return;
         }
 
-        setCourseData(response);
-
-        // Check if user has already liked this course
-        if (response.data.likes && currentUserId) {
-          const userHasLiked = response.data.likes.includes(currentUserId);
-          setIsLiked(userHasLiked);
+        if (isMounted) {
+          setCourseData(response);
+          // Check if user has already liked this course
+          if (response.data.likes && currentUserId) {
+            const userHasLiked = response.data.likes.includes(currentUserId);
+            setIsLiked(userHasLiked);
+          }
+          setIsLoading(false);
         }
-
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching course data:", error);
-        setIsError(true);
-        setIsLoading(false);
+        if (isMounted) {
+          setIsError(true);
+          setIsLoading(false);
+        }
       }
     };
 
     fetchCourseData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [id, currentUserId]);
+
+  // Handle intersection observer for lazy loading sections
+  useEffect(() => {
+    if (!courseData) return;
+
+    // Create an Intersection Observer to watch when sections come into view
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+    
+    const handleIntersect = (entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Find which tab this section belongs to
+          const index = sectionRefs.findIndex(ref => 
+            ref.current === entry.target
+          );
+          
+          if (index !== -1) {
+            setActiveTab(index);
+          }
+        }
+      });
+    };
+    
+    const observer = new IntersectionObserver(handleIntersect, observerOptions);
+    
+    // Observe all section refs that exist
+    sectionRefs.forEach(ref => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
+    
+    return () => {
+      // Clean up observer when component unmounts
+      sectionRefs.forEach(ref => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      });
+    };
+  }, [courseData, sectionRefs]);
 
   const handleLike = async () => {
     if (!currentUserId) {
@@ -200,7 +261,6 @@ const Coursesinfopage = () => {
   // Handle redirect to login page
   const handleRedirectToLogin = () => {
     setShowLoginPopup(false);
-    // Navigate to login page
     navigate("/login", { state: { returnUrl: window.location.pathname } });
   };
 
@@ -218,7 +278,8 @@ const Coursesinfopage = () => {
     }
   };
 
-  const renderHTML = (htmlContent) => {
+  // Memoized HTML renderer
+  const renderHTML = React.useMemo(() => (htmlContent) => {
     if (!htmlContent)
       return <p className="text-gray-500">No content available</p>;
     return (
@@ -232,12 +293,7 @@ const Coursesinfopage = () => {
           li {
             margin-bottom: 0.5rem;
           }
-          h1,
-          h2,
-          h3,
-          h4,
-          h5,
-          h6 {
+          h1, h2, h3, h4, h5, h6 {
             margin-top: 1rem;
             color: #1a202c;
           }
@@ -277,7 +333,7 @@ const Coursesinfopage = () => {
         `}</style>
       </div>
     );
-  };
+  }, []);
 
   if (!id) {
     return (
@@ -290,7 +346,10 @@ const Coursesinfopage = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading...
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-64"></div>
+          <div className="h-64 bg-gray-200 rounded w-full max-w-3xl"></div>
+        </div>
       </div>
     );
   }
@@ -377,8 +436,8 @@ const Coursesinfopage = () => {
           </button>
         </div>
 
-        {/* Rest of the component remains the same */}
-        <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
+        {/* Tab Slider */}
+        <TabSlider tabs={tabs} sectionRefs={sectionRefs} activeTab={activeTab} />
 
         {/* Main Content Area with Sidebar */}
         <div className="w-full mt-5 flex gap-8">
@@ -411,10 +470,6 @@ const Coursesinfopage = () => {
                       </>
                     )}
                   </p>
-                  {/* <p>
-                    <strong>Cost:</strong>{" "}
-                    {content.isCourseFree === "free" ? "Free" : "Paid"}
-                  </p> */}
                   <p>
                     <strong>Category:</strong>{" "}
                     {content.category?.title || "Not specified"}
@@ -482,7 +537,10 @@ const Coursesinfopage = () => {
               </div>
             )}
 
-            <Promotions location="COURSES_PAGE" />
+            {/* Promotions Section */}
+            <Suspense fallback={<LoadingComponent />}>
+              <Promotions location="COURSES_PAGE" />
+            </Suspense>
 
             {/* Opportunities Section */}
             {content.courseOpportunities && (
@@ -519,32 +577,51 @@ const Coursesinfopage = () => {
               </div>
             )}
 
-            {/* Reviews Section - New */}
+            {/* Reviews Section */}
             <div ref={sectionRefs[6]} id="reviews" className="mb-6">
-              <CourseReviewForm course={content} />
+              <Suspense fallback={<LoadingComponent />}>
+                <CourseReviewForm course={content} />
+              </Suspense>
             </div>
 
             {/* Pros and Cons */}
             <div className="mb-6">
-              <ProsandCons course={content} />
+              <Suspense fallback={<LoadingComponent />}>
+                <ProsandCons course={content} />
+              </Suspense>
             </div>
           </div>
 
           {/* Right Sidebar */}
           <div className="hidden lg:block lg:w-1/3 space-y-6">
-            <QueryForm />
+            <Suspense fallback={<LoadingComponent />}>
+              <QueryForm />
+            </Suspense>
           </div>
         </div>
 
         {/* Additional Sections */}
-        <HighRatedCareers />
-        <BlogComponent />
-        <BestRated />
+        <Suspense fallback={<LoadingComponent />}>
+          <HighRatedCareers />
+        </Suspense>
+        
+        <Suspense fallback={<LoadingComponent />}>
+          <BlogComponent />
+        </Suspense>
+        
+        <Suspense fallback={<LoadingComponent />}>
+          <BestRated />
+        </Suspense>
       </div>
 
       <div className="w-full flex items-start mt-10">
-        <Events />
-        <ConsellingBanner />
+        <Suspense fallback={<LoadingComponent />}>
+          <Events />
+        </Suspense>
+        
+        <Suspense fallback={<LoadingComponent />}>
+          <ConsellingBanner />
+        </Suspense>
       </div>
 
       {/* Login Popup Modal */}

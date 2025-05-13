@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
-import Rating from "@mui/material/Rating";
-import rupee from "../assets/Images/rupee.png";
+
 import CustomButton from "../Ui components/CustomButton";
 import { allbestRatedInstitute } from "../ApiFunctions/api";
 

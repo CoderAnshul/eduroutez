@@ -1,26 +1,21 @@
-import React, { useState, useEffect } from "react";
-import Rating from "@mui/material/Rating";
-import Stack from "@mui/material/Stack";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+
 import { Link } from "react-router-dom";
 import cardPhoto from "../assets/Images/teacher.jpg";
-import rupee from "../assets/Images/rupee.png";
-import CustomButton from "../Ui components/CustomButton";
+
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { bestRatedInstitute } from "../ApiFunctions/api";
 
-const BestRated = () => {
+const BestRated = React.memo(() => {
   const [content, setContent] = useState([]);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
-
   const navigate = useNavigate();
 
-  const handleViewMore = () => {
-    console.log("Navigating to institutes");
+  const handleViewMore = useCallback(() => {
     navigate("/institute");
-  };
+  }, [navigate]);
 
-  // Initialize window.instituteIdMap from localStorage on component mount
   useEffect(() => {
     if (!window.instituteIdMap) {
       try {
@@ -35,8 +30,7 @@ const BestRated = () => {
     }
   }, []);
 
-  // Batch update the ID mapping when data arrives
-  const updateIdMapping = (institutes) => {
+  const updateIdMapping = useCallback((institutes) => {
     let hasChanges = false;
 
     institutes.forEach((institute) => {
@@ -50,39 +44,82 @@ const BestRated = () => {
       }
     });
 
-    // Only update localStorage if there are actual changes
     if (hasChanges) {
       localStorage.setItem(
         "instituteIdMap",
         JSON.stringify(window.instituteIdMap)
       );
     }
-  };
+  }, []);
 
-  // Helper function to get URL for display - consistent with other components
-  const getInstituteUrl = (institute) => {
-    // Prefer slugs for SEO, fall back to IDs
-    return institute?.slug
-      ? `/institute/${institute.slug}`
-      : `/institute/${institute?._id}`;
-  };
+  const getInstituteUrl = useCallback(
+    (institute) =>
+      institute?.slug
+        ? `/institute/${institute.slug}`
+        : `/institute/${institute?._id}`,
+    []
+  );
 
   const { data, isLoading, isError } = useQuery(
     ["best-rated-institutes"],
-    () => bestRatedInstitute(),
+    bestRatedInstitute,
     {
       enabled: true,
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
         const institutes = data.data || [];
-        setContent(institutes);
+        setContent((prevContent) =>
+          JSON.stringify(prevContent) !== JSON.stringify(institutes)
+            ? institutes
+            : prevContent
+        );
 
-        // Update ID mapping
         if (institutes.length > 0) {
           updateIdMapping(institutes);
         }
       },
     }
+  );
+
+  const renderedContent = useMemo(
+    () =>
+      content.slice(0, 3).map((institute, index) => (
+        <Link
+          to={getInstituteUrl(institute)}
+          key={institute._id || index}
+          className="box w-full text-black max-w-sm lg:max-w-[500px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg"
+        >
+          <div className="imageContainer">
+            <img
+              className="h-full w-full object-cover"
+              src={
+                institute.thumbnailImage
+                  ? `${Images}/${institute.thumbnailImage}`
+                  : cardPhoto
+              }
+              alt="Institute"
+              loading="lazy"
+            />
+          </div>
+          <div className="textContainer p-4">
+            <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
+              {institute.instituteName || "Institute Name Not Available"}
+            </h3>
+            <p className="text-sm mt-2">
+              {institute.about ? (
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: institute.about.slice(0, 100) + "...",
+                  }}
+                />
+              ) : (
+                "No information available"
+              )}
+            </p>
+          </div>
+        </Link>
+      )),
+    [content, getInstituteUrl, Images]
   );
 
   if (isLoading) {
@@ -122,51 +159,10 @@ const BestRated = () => {
       </div>
 
       <div className="boxWrapper w-full flex flex-col md:flex-row flex-wrap items-center gap-6">
-        {content.length > 0 ? (
-          content.slice(0, 3).map((institute, index) => {
-            return (
-              <Link
-                to={getInstituteUrl(institute)}
-                key={institute._id || index}
-                className="box w-full text-black max-w-sm lg:max-w-[500px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg"
-              >
-                <div className="imageContainer">
-                  <img
-                    className="h-full w-full object-cover"
-                    src={
-                      institute.thumbnailImage
-                        ? `${Images}/${institute.thumbnailImage}`
-                        : cardPhoto
-                    }
-                    alt="Institute"
-                  />
-                </div>
-                <div className="textContainer p-4">
-                  <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
-                    {institute.instituteName || "Institute Name Not Available"}
-                  </h3>
-
-                  <p className="text-sm mt-2">
-                    {institute.about ? (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: institute.about.slice(0, 100) + "...",
-                        }}
-                      />
-                    ) : (
-                      "No information available"
-                    )}
-                  </p>
-                </div>
-              </Link>
-            );
-          })
-        ) : (
-          <p>No best-rated institutes available</p>
-        )}
+        {renderedContent}
       </div>
     </div>
   );
-};
+});
 
 export default BestRated;

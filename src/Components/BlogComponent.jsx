@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import agricultureImg from "../assets/Images/agriculture.jpg";
 import BlogCard from "../Ui components/BlogCard";
 import CustomButton from "../Ui components/CustomButton";
-import { getBlogs, blogById } from "../ApiFunctions/api";
+import { getBlogs } from "../ApiFunctions/api";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import SocialShare from "./SocialShare";
@@ -14,60 +14,33 @@ const blogIdMap = {};
 
 const BlogComponent = () => {
   const [content, setContent] = useState([]);
-  const [imageUrls, setImageUrls] = useState({});
-  const [error, setError] = useState(null);
-  const [datas, setData] = useState(null);
 
-  const { data, isLoading, isError } = useQuery(["blog"], () => getBlogs(), {
-    enabled: true,
-    onSuccess: (data) => {
-      console.log("Received data:", data);
-      const blogs = data?.data?.result || [];
+  const { data, isLoading, isError } = useQuery(
+    ["blog"],
+    () => getBlogs(),
+    {
+      onSuccess: (data) => {
+        const blogs = data?.data?.result || [];
 
-      // Store the ID mapping for each blog using the slug from backend
-      blogs.forEach((blog) => {
-        if (blog.slug) {
-          blogIdMap[blog.slug] = blog._id;
-        }
-      });
+        // Store the ID mapping for each blog using the slug from backend
+        blogs.forEach((blog) => {
+          if (blog.slug) {
+            blogIdMap[blog.slug] = blog._id;
+          }
+        });
 
-      // Make the mapping available globally
-      window.blogIdMap = blogIdMap;
+        // Make the mapping available globally
+        window.blogIdMap = blogIdMap;
 
-      setContent(blogs);
-    },
-  });
+        setContent(blogs);
+      },
+    }
+  );
 
-  useEffect(() => {
-    const fetchBlog = async (id) => {
-      try {
-        const response = await blogById(id);
-        if (!response || !response.data) {
-          setError(new Error("No blog data found"));
-          return;
-        }
-        setData(response.data);
-
-        // Safely handle image fetching
-        if (response.data.image) {
-          const imageResponse = await fetch(`${Images}/${response.data.image}`);
-          const imageBlob = await imageResponse.blob();
-          const imageObjectURL = URL.createObjectURL(imageBlob);
-          setImageUrls((prevState) => ({ ...prevState, [id]: imageObjectURL }));
-        }
-      } catch (error) {
-        console.error("Error fetching blog:", error);
-        setError(error);
-      }
-    };
-
-    // Fetch blog data for each blog in content
-    Array.isArray(content) && content.forEach((blog) => fetchBlog(blog._id));
-
-    return () => {
-      Object.values(imageUrls).forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [content]);
+  const handleShareClick = useCallback((e, blog) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
 
   if (isLoading) {
     return (
@@ -84,12 +57,6 @@ const BlogComponent = () => {
       </div>
     );
   }
-
-  // Handle share click to prevent navigation
-  const handleShareClick = (e, blog) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
 
   return (
     <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
@@ -122,6 +89,7 @@ const BlogComponent = () => {
                     className="w-full h-full object-cover object-top rounded-t-xl"
                     src={`${Images}/${blog?.thumbnail}`}
                     alt={blog.title}
+                    loading="lazy" // Lazy load images
                   />
                   <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-2 bg-white px-3 py-1 rounded-full text-black">
                     {blog.views && (
