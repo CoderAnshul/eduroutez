@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/Images/logo.png";
-import searchImg from "../assets/Images/searchLogo.png";
-import edit from "../assets/Images/editBtn.png";
 import explore from "../assets/Images/explore.png";
-import notification from "../assets/Images/notification.png";
+
+import edit from "../assets/Images/editBtn.png";
 import menu from "../assets/Images/menuBar.png";
 import menubar from "../assets/Images/secondMenu.png";
 import SecondMenu from "./SubNavbar";
 import MobileNavbar from "./MobileNavbar";
-import categories from "../DataFiles/categories";
-import Cookies from "js-cookie";
-import { ContactPageSharp } from "@mui/icons-material";
 import axiosInstance from "../ApiFunctions/axios";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";

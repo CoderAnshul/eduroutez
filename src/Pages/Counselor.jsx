@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import axios from "axios";
-import { useSearchParams } from "react-router-dom";
-import ScheduleCallPopup from "../Components/DashboardComponent/ScheduleCallPopup";
-import ReviewFeedbackPopup from "../Components/DashboardComponent/ReviewFeedbackPopup";
-import { Link } from "react-router-dom";
-import Promotions from "./CoursePromotions";
-import DynamicSchedule from "../Components/DynamicSchedule";
+import { useSearchParams, Link } from "react-router-dom";
+
+// Lazy load components
+const ScheduleCallPopup = lazy(() =>
+  import("../Components/DashboardComponent/ScheduleCallPopup")
+);
+const ReviewFeedbackPopup = lazy(() =>
+  import("../Components/DashboardComponent/ReviewFeedbackPopup")
+);
+const Promotions = lazy(() => import("./CoursePromotions"));
+const DynamicSchedule = lazy(() =>
+  import("../Components/DynamicSchedule")
+);
+
 const CounselorListPage = () => {
   const [searchParams] = useSearchParams();
   const category = searchParams.get("category");
@@ -200,7 +208,8 @@ const CounselorListPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-8xl mx-auto">
-        <div className="mb-12 text-center">
+        {/* Existing content */}
+         <div className="mb-12 text-center">
           <div className="animate-fade-in-out">
             <blockquote className="text-2xl md:text-3xl font-light text-gray-700 italic mb-4">
               "{currentQuote.quote}"
@@ -595,7 +604,9 @@ const CounselorListPage = () => {
             )}
           </div>
         </div>
-        <Promotions location="COUNSELING_PAGE_MAIN" className="h-[90px]" />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Promotions location="COUNSELING_PAGE_MAIN" className="h-[90px]" />
+        </Suspense>
       </div>
 
       {showLoginPopup && (
@@ -624,22 +635,24 @@ const CounselorListPage = () => {
         </div>
       )}
 
-      <ScheduleCallPopup
-        isOpen={isCallPopupOpen}
-        onClose={() => {
-          setIsCallPopupOpen(false);
-          setSelectedCounselor(null);
-        }}
-        counselor={selectedCounselor}
-      />
-      <ReviewFeedbackPopup
-        isOpen={isReviewPopupOpen}
-        onClose={() => {
-          setIsReviewPopupOpen(false);
-          setSelectedCounselor(null);
-        }}
-        counselor={selectedCounselor}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <ScheduleCallPopup
+          isOpen={isCallPopupOpen}
+          onClose={() => {
+            setIsCallPopupOpen(false);
+            setSelectedCounselor(null);
+          }}
+          counselor={selectedCounselor}
+        />
+        <ReviewFeedbackPopup
+          isOpen={isReviewPopupOpen}
+          onClose={() => {
+            setIsReviewPopupOpen(false);
+            setSelectedCounselor(null);
+          }}
+          counselor={selectedCounselor}
+        />
+      </Suspense>
     </div>
   );
 };

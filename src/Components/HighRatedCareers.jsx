@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from "react";
-import Rating from "@mui/material/Rating";
-import Stack from "@mui/material/Stack";
+import React, { useState, useEffect, useMemo } from "react";
+
 import { Link } from "react-router-dom";
 import cardPhoto from "../assets/Images/teacher.jpg";
-import rupee from "../assets/Images/rupee.png";
-import CustomButton from "../Ui components/CustomButton";
 import { useQuery } from "react-query";
 import { career } from "../ApiFunctions/api";
 import SocialShare from "./SocialShare";
@@ -15,7 +12,6 @@ const HighRatedCareers = () => {
 
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
-  // Initialize careerIdMap from localStorage
   useEffect(() => {
     try {
       const storedCareerIdMap = JSON.parse(
@@ -29,73 +25,54 @@ const HighRatedCareers = () => {
   }, []);
 
   const handleShareClick = (e, blog) => {
-    e.preventDefault(); // Prevent the Link navigation
-    e.stopPropagation(); // Stop event from bubbling up
-    // Any additional share handling logic can go here
+    e.preventDefault();
+    e.stopPropagation();
   };
 
-  const { data, isLoading, isError } = useQuery(["career"], () => career(), {
-    enabled: true,
-    onSuccess: async (data) => {
-      const { result } = data?.data || {}; // safely access result
-      if (result) {
-        // Update careerIdMap
-        const careerIdMap = { ...window.careerIdMap };
+  const { data, isLoading, isError } = useQuery(
+    ["career"],
+    () => career(),
+    {
+      enabled: true,
+      onSuccess: async (data) => {
+        const { result } = data?.data || {};
+        if (result) {
+          const careerIdMap = { ...window.careerIdMap };
 
-        result.forEach((blog) => {
-          if (blog.slug) {
-            careerIdMap[blog.slug] = blog._id;
-          }
-        });
-
-        // Save to window and localStorage
-        window.careerIdMap = careerIdMap;
-        localStorage.setItem("careerIdMap", JSON.stringify(careerIdMap));
-
-        setContent(result); // update content if result is not null or undefined
-
-        // Fetch images for each career
-        const imagePromises = result.map(async (career) => {
-          if (career.thumbnail) {
-            try {
-              const imageResponse = await fetch(
-                `${Images}/${career.thumbnail}`
-              );
-              const imageBlob = await imageResponse.blob();
-              const imageObjectURL = URL.createObjectURL(imageBlob);
-              return { id: career._id, url: imageObjectURL };
-            } catch (error) {
-              console.error(
-                `Error fetching image for career ${career._id}:`,
-                error
-              );
-              return { id: career._id, url: cardPhoto };
+          result.forEach((blog) => {
+            if (blog.slug) {
+              careerIdMap[blog.slug] = blog._id;
             }
-          }
-          return { id: career._id, url: cardPhoto };
-        });
+          });
 
-        const imageResults = await Promise.all(imagePromises);
-        const imageMap = imageResults.reduce((acc, image) => {
-          acc[image.id] = image.url;
-          return acc;
-        }, {});
-        setImages(imageMap);
-      }
-    },
-  });
+          window.careerIdMap = careerIdMap;
+          localStorage.setItem("careerIdMap", JSON.stringify(careerIdMap));
+
+          setContent(result);
+
+          const imageMap = result.reduce((acc, career) => {
+            acc[career._id] = career.thumbnail
+              ? `${Images}/${career.thumbnail}`
+              : cardPhoto;
+            return acc;
+          }, {});
+          setImages(imageMap);
+        }
+      },
+    }
+  );
 
   useEffect(() => {
-    // Cleanup function to revoke object URLs
     return () => {
       Object.values(images).forEach((url) => {
         if (url !== cardPhoto) {
-          // Don't revoke static images
           URL.revokeObjectURL(url);
         }
       });
     };
   }, [images]);
+
+  const memoizedContent = useMemo(() => content, [content]);
 
   if (isLoading) {
     return (
@@ -125,8 +102,8 @@ const HighRatedCareers = () => {
       </div>
 
       <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
-        {content && content.length > 0 ? (
-          content.map((box, index) => (
+        {memoizedContent && memoizedContent.length > 0 ? (
+          memoizedContent.map((box, index) => (
             <Link
               to={`/detailpage/${box.slug}`}
               key={index}
@@ -137,6 +114,7 @@ const HighRatedCareers = () => {
                   className="h-full w-full object-cover"
                   src={images[box._id] || cardPhoto}
                   alt="boxphoto"
+                  loading="lazy"
                 />
               </div>
               <div className="textContainer">

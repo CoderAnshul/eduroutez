@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import prosIcon from "../assets/Images/pros.png";
 import dislikeIcon from "../assets/Images/dislike.png";
 import parse from 'html-react-parser';
@@ -7,16 +7,19 @@ const ProsandCons = ({ course }) => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayContent, setOverlayContent] = useState("");
 
-  const handleMoreClick = (type) => {
+  const handleMoreClick = useCallback((type) => {
     setOverlayContent(type === "pros" ? course.pros || "No additional information available." : course.cons || "No additional information available.");
     setShowOverlay(true);
-  };
+  }, [course]);
 
-  const handleCloseOverlay = () => {
+  const handleCloseOverlay = useCallback(() => {
     setShowOverlay(false);
-  };
+  }, []);
 
-  const hasProsOrCons = course?.pros || course?.cons;
+  const hasProsOrCons = useMemo(() => course?.pros || course?.cons, [course]);
+
+  const parsedPros = useMemo(() => course?.pros && parse(course.pros), [course?.pros]);
+  const parsedCons = useMemo(() => course?.cons && parse(course.cons), [course?.cons]);
 
   return (
     <div className="container mt-4">
@@ -25,11 +28,11 @@ const ProsandCons = ({ course }) => {
         {course?.cons && (
           <div className="flex-1 bg-red-100 min-w-[300px] rounded-lg border-red-500 p-4">
             <div className="flex items-center text-red-500 mb-2">
-              <img className='h-4 mb-[-1em]' src={dislikeIcon} alt="Dislikes" />
+              <img className='h-4 mb-[-1em]' src={dislikeIcon} alt="Dislikes" loading="lazy" />
               <h3 className="ml-2 font-bold">Dislikes</h3>
             </div>
             <ul className="list-disc ml-0 text-sm text-gray-700">
-              {parse(course.cons)}
+              {parsedCons}
             </ul>
             <div className="flex justify-center">
               <button className="text-blue-500 mt-2" onClick={() => handleMoreClick("cons")}>More</button>
@@ -40,11 +43,11 @@ const ProsandCons = ({ course }) => {
         {course?.pros && (
           <div className="flex-1 bg-green-100 min-w-[300px] rounded-xl border-green-500 p-4">
             <div className="flex items-center text-green-500 mb-2">
-              <img className='h-4 mb-[-1em]' src={prosIcon} alt="Likes" />
+              <img className='h-4 mb-[-1em]' src={prosIcon} alt="Likes" loading="lazy" />
               <h3 className="ml-2 font-bold">Likes</h3>
             </div>
             <ul className="list-disc ml-0 text-sm text-gray-700">
-              {parse(course.pros)}
+              {parsedPros}
             </ul>
             <div className="flex justify-center">
               <button className="text-blue-500 mt-2" onClick={() => handleMoreClick("pros")}>More</button>

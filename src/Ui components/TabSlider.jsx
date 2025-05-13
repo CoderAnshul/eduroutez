@@ -1,4 +1,5 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import debounce from "lodash.debounce"; // Install lodash.debounce if not already installed
 
 const TabSlider = ({ tabs, sectionRefs, className }) => {
   const sliderRef = useRef();
@@ -9,39 +10,38 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
   const [containerTop, setContainerTop] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
 
-  const checkOverflow = () => {
+  const checkOverflow = useCallback(() => {
     const slider = sliderRef.current;
     if (slider) {
       setIsOverflowing(slider.scrollWidth > slider.clientWidth);
     }
-  };
+  }, []);
 
   useEffect(() => {
     checkOverflow();
 
-    // Store the original position and width of the container
     if (tabContainerRef.current) {
       const rect = tabContainerRef.current.getBoundingClientRect();
       setContainerTop(rect.top + window.scrollY);
       setContainerWidth(rect.width);
     }
 
-    const handleScroll = () => {
+    const handleScroll = debounce(() => {
       if (tabContainerRef.current) {
         const scrollPosition = window.scrollY;
-        const shouldBeFixed = scrollPosition > containerTop - 64; // 64px is equivalent to top-16
+        const shouldBeFixed = scrollPosition > containerTop - 64;
         setIsFixed(shouldBeFixed);
       }
-    };
+    }, 50);
 
-    const handleResize = () => {
+    const handleResize = debounce(() => {
       checkOverflow();
       if (tabContainerRef.current) {
         setContainerWidth(tabContainerRef.current.offsetWidth);
         const rect = tabContainerRef.current.getBoundingClientRect();
         setContainerTop(rect.top + window.scrollY);
       }
-    };
+    }, 100);
 
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
@@ -50,7 +50,7 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
     };
-  }, [containerTop]);
+  }, [checkOverflow, containerTop]);
 
   const handleTabClick = (index) => {
     setActiveIndex(index);
@@ -79,7 +79,6 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
 
   return (
     <>
-      {/* Placeholder div to maintain layout when tab bar becomes fixed */}
       {isFixed && <div style={{ height: "56px" }}></div>}
 
       <div
@@ -87,7 +86,7 @@ const TabSlider = ({ tabs, sectionRefs, className }) => {
         className={`${className}`}
         style={{
           position: isFixed ? "fixed" : "relative",
-          top: isFixed ? "64px" : "auto", // Equivalent to top-16
+          top: isFixed ? "64px" : "auto",
           width: isFixed ? containerWidth : "100%",
           zIndex: 998,
           backgroundColor: "white",

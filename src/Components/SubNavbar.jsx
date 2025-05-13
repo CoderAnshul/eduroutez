@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import downArrow from "../assets/Images/downArrow.png";
 import axiosInstance from "../ApiFunctions/axios";
-import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
-
-// Import or create the courseIdMap for reference
-// You can either import from the PopularCourses component or recreate it here
 const courseIdMap = {};
 const newsIdMap = {};
 const SubNavbar = ({ categories }) => {
@@ -19,31 +15,17 @@ const SubNavbar = ({ categories }) => {
   const [popularInstitutes, setPopularInstitutes] = useState({});
   const [recentInstitutes, setRecentInstitutes] = useState({});
   const [topColleges, setTopColleges] = useState([]);
-  const [recentColleges, setRecentColleges] = useState([]);
   const [collegesByCity, setCollegesByCity] = useState({});
   const [collegesByState, setCollegesByState] = useState({});
   const [activeStream, setActiveStream] = useState(null);
-  const [hoveredCity, setHoveredCity] = useState(null);
-  const [hoveredState, setHoveredState] = useState(null);
-  const [hoveredStream, setHoveredStream] = useState(null);
   const [examBlogs, setExamBlogs] = useState({});
-
-  const [hoveredInstitute, setHoveredInstitute] = useState(null);
   const navigate = useNavigate();
-
-  // Static data for Maharashtra cities
   const staticTopCities = [
-    { name: "Mumbai", count: 158 },
-    { name: "Delhi", count: 126 },
-    { name: "Chandigarh", count: 87 },
-    { name: "Jaipur", count: 62 },
-    { name: "Bangalore", count: 53 },
+    { name: "Mumbai", count: 158 },{ name: "Delhi", count: 126 },{ name: "Chandigarh", count: 87 },{ name: "Jaipur", count: 62 },{ name: "Bangalore", count: 53 },
     { name: "Chennai", count: 45 },
     { name: "Amravati", count: 38 },
     { name: "Solapur", count: 32 },
   ];
-
-  // Static data for states
   const staticTopStates = [
     { name: "Maharashtra", count: 763 },
     { name: "Delhi", count: 592 },

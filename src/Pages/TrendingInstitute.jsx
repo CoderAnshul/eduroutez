@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Rating from "@mui/material/Rating";
-import Stack from "@mui/material/Stack";
 import { Link } from "react-router-dom";
 import cardPhoto from "../assets/Images/teacher.jpg";
-import rupee from "../assets/Images/rupee.png";
-import CustomButton from "../Ui components/CustomButton";
 import {
-  alltrendingInstitute,
-  allbestRatedInstitute,
-  getInstituteById,
-  trendingInstitute,
+  alltrendingInstitute
 } from "../ApiFunctions/api";
-import { useParams } from "react-router-dom";
+
 import { useQuery } from "react-query";
 import BlogComponent from "../Components/BlogComponent";
 import HighRatedCareers from "../Components/HighRatedCareers";

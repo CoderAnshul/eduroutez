@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery } from 'react-query';
 import axiosInstance from '../ApiFunctions/axios';
 
@@ -10,8 +10,8 @@ const fetchPromotions = async () => {
     headers: {
       'Content-Type': 'application/json',
       'x-access-token': localStorage.getItem('accessToken'),
-      'x-refresh-token': localStorage.getItem('refreshToken')
-    }
+      'x-refresh-token': localStorage.getItem('refreshToken'),
+    },
   });
   if (response.status !== 200) {
     throw new Error('Failed to fetch promotions');
@@ -27,47 +27,48 @@ const Promotions = ({ location, className }) => {
     fetchPromotions,
     {
       staleTime: 5 * 60 * 1000,
-      retry: 2
+      retry: 2,
     }
   );
 
-  useEffect(() => {
+  const filteredPromotions = useMemo(() => {
     if (promotionsData?.data?.result) {
-      const filteredPromotions = promotionsData.data.result.filter(
-        promo => promo.location === location
+      return promotionsData.data.result.filter(
+        (promo) => promo.location === location
       );
-      
-      if (filteredPromotions.length > 0) {
-        const randomIndex = Math.floor(Math.random() * filteredPromotions.length);
-        setRandomPromo(filteredPromotions[randomIndex]);
-      }
     }
+    return [];
   }, [promotionsData, location]);
 
-  // Fix the handler to properly handle the link redirect
-  const handlePromoClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (randomPromo && randomPromo.link) {
-      // Check if link is a valid URL
-      let url = randomPromo.link;
-      
-      // Add http:// if it doesn't have a protocol
-      if (!/^https?:\/\//i.test(url)) {
-        url = 'https://' + url;
-      }
-      
-      try {
-        // Open in a new tab
-        window.open(url, '_blank');
-      } catch (error) {
-        console.error('Error opening link:', error);
-        // Fallback to direct navigation if window.open fails
-        window.location.href = url;
-      }
+  useEffect(() => {
+    if (filteredPromotions.length > 0) {
+      const randomIndex = Math.floor(Math.random() * filteredPromotions.length);
+      setRandomPromo(filteredPromotions[randomIndex]);
     }
-  };
+  }, [filteredPromotions]);
+
+  const handlePromoClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (randomPromo && randomPromo.link) {
+        let url = randomPromo.link;
+
+        if (!/^https?:\/\//i.test(url)) {
+          url = 'https://' + url;
+        }
+
+        try {
+          window.open(url, '_blank');
+        } catch (error) {
+          console.error('Error opening link:', error);
+          window.location.href = url;
+        }
+      }
+    },
+    [randomPromo]
+  );
 
   if (isLoading) {
     return (
@@ -90,14 +91,13 @@ const Promotions = ({ location, className }) => {
     return null;
   }
 
-  // Determine if we should show the banner as clickable
   const isClickable = Boolean(randomPromo.link);
 
   return (
     <div className={`w-full mt-4 ${className || ''}`}>
       <div className={`w-full ${className || ''}`}>
         {isClickable ? (
-          <a 
+          <a
             href={randomPromo.link}
             target="_blank"
             rel="noopener noreferrer"
@@ -110,17 +110,15 @@ const Promotions = ({ location, className }) => {
                   src={`${imageUrl}/${randomPromo.image}`}
                   alt={randomPromo.title || 'Promotion'}
                   className={`w-full h-full object-cover md:object-contain rounded-lg ${className || ''}`}
+                  loading="lazy"
                 />
               )}
-              {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg" />
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               {randomPromo.title && (
-                <h3 className="text-2xl font-bold mb-2">
-                  {randomPromo.title}
-                </h3>
+                <h3 className="text-2xl font-bold mb-2">{randomPromo.title}</h3>
               )}
               {randomPromo.description && (
                 <p className="text-sm text-white/90 mb-2">
@@ -140,18 +138,13 @@ const Promotions = ({ location, className }) => {
                   src={`${imageUrl}/${randomPromo.image}`}
                   alt={randomPromo.title || 'Promotion'}
                   className={`w-full h-full object-cover md:object-contain rounded-lg ${className || ''}`}
+                  loading="lazy"
                 />
               )}
-              {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg" />
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-              {/* {randomPromo.title && (
-                <h3 className="text-2xl font-bold mb-2">
-                  {randomPromo.title}
-                </h3>
-              )} */}
               {randomPromo.description && (
                 <p className="text-sm text-white/90 mb-2">
                   {randomPromo.description}
