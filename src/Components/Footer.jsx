@@ -36,10 +36,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Trending Careers */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">MBA</h3>
+            <h3 className="font-semibold text-red-500 mb-3 !text-[16px]">MBA</h3>
             <div className="flex flex-col gap-1">
               {/* First Column */}
-              <ul className="space-y-1 text-sm">
+              <ul className="space-y-1 text-sm !ml-0 ">
                 {trendingCareersFirstHalf.map((career, index) => (
                   <li key={index}>
                     <Link to={career.link} className="footerText">
@@ -49,7 +49,7 @@ const Footer = () => {
                 ))}
               </ul>
               {/* Second Column */}
-              <ul className="space-y-1 text-sm">
+              <ul className="space-y-1 text-sm !ml-0 ">
                 {trendingCareersSecondHalf.map((career, index) => (
                   <li key={index}>
                     <Link to={career.link} className="footerText">
@@ -63,10 +63,10 @@ const Footer = () => {
 
           {/* Popular Courses */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">Engineering</h3>
+            <h3 className="font-semibold text-red-500 mb-3 !text-[16px]">Engineering</h3>
             <div className="flex flex-col gap-1">
               {/* First Column */}
-              <ul className="space-y-1 text-sm">
+              <ul className="space-y-1 text-sm !ml-0 ">
                 {popularCoursesFirstHalf.map((course, index) => (
                   <li key={index}>
                     <Link to={course.link} className="footerText">
@@ -76,7 +76,7 @@ const Footer = () => {
                 ))}
               </ul>
               {/* Second Column */}
-              <ul className="space-y-1 text-sm">
+              <ul className="space-y-1 text-sm !ml-0 ">
                 {popularCoursesSecondHalf.map((course, index) => (
                   <li key={index}>
                     <Link to={course.link} className="footerText">
@@ -90,8 +90,8 @@ const Footer = () => {
 
           {/* Medicine */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">Medicine</h3>
-            <ul className="space-y-1 text-sm">
+            <h3 className="font-semibold text-red-500 mb-3 !text-[16px]">Medicine</h3>
+            <ul className="space-y-1 text-sm !ml-0 ">
               {topInstitutes.map((institute, index) => (
                 <li key={index}>
                   <Link to={institute.link} className="footerText">
@@ -104,8 +104,8 @@ const Footer = () => {
 
           {/* Best Rated Colleges */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">Explore Courses</h3>
-            <ul className="space-y-1 text-sm">
+            <h3 className="font-semibold text-red-500 mb-3 !text-[16px]">Explore Courses</h3>
+            <ul className="space-y-1 text-sm !ml-0 ">
               {bestRatedColleges.map((college, index) => (
                 <li key={index}>
                   <Link to={college.link} className="footerText">
@@ -118,9 +118,9 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">Career Guidance</h3>
+            <h3 className="font-semibold text-red-500 mb-3 !text-[16px]">Career Guidance</h3>
             <div className="flex flex-col gap-1">
-              <ul className="space-y-1 text-sm">
+              <ul className="space-y-1 text-sm !ml-0 ">
                 {otherLinks.map((link, index) => (
                   <li key={index}>
                     <Link to={link.link} className="footerText">
@@ -129,7 +129,7 @@ const Footer = () => {
                   </li>
                 ))}
               </ul>
-              <ul className="space-y-1 text-sm mt-1">
+              <ul className="space-y-1 text-sm !ml-0  mt-1">
                 {examResults.map((result, index) => (
                   <li key={index}>
                     <Link to={result.link} className="footerText">
@@ -143,8 +143,8 @@ const Footer = () => {
 
           {/* Free Courses */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">Eduroutez Hub</h3>
-            <ul className="space-y-1 text-sm">
+            <h3 className="font-semibold text-red-500 mb-3 !text-[16px]">Eduroutez Hub</h3>
+            <ul className="space-y-1 text-sm !ml-0  ">
               {freeCourses.map((course, index) => (
                 <li key={index}>
                   <Link to={course.link} className="footerText">
@@ -157,8 +157,8 @@ const Footer = () => {
 
           {/* About Eduroutez */}
           <div>
-            <h3 className="font-semibold text-red-500 mb-3">Study Abroad</h3>
-            <ul className="space-y-1 text-sm">
+            <h3 className="font-semibold text-red-500 mb-3 !text-[16px]">Study Abroad</h3>
+            <ul className="space-y-1 text-sm !ml-0 ">
               {aboutLinks.map((link, index) => (
                 <li key={index}>
                   <Link to={link.link} className="footerText">
