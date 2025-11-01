@@ -22,7 +22,7 @@ const Navbar = () => {
   console.log("categoriesData", categoriesData);
   useEffect(() => {
     if (error) {
-      console.error("Navbar Error:", error);
+      console.log("Navbar Error:", error?.message);
     }
   }, [error]);
 
