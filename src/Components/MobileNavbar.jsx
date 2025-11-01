@@ -70,7 +70,7 @@ const MobileNavbar = ({ categories }) => {
   const fetchPopularCourses = async () => {
     try {
       const response = await axiosInstance.get(
-        `${import.meta.env.VITE_BASE_URL}/courses?filters={"isCoursePopular":true}`
+        `${import.meta.env.VITE_BASE_URL}/courses?filters={"isCoursePopular":true}&limit=3`
       );
       setPopularCourses(response.data?.data);
     } catch (error) {

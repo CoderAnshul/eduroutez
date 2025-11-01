@@ -12,7 +12,7 @@ const useCategories = () => {
         const [collegeResponse, examResponse, coursesResponse] = await Promise.all([
           axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams?limit=15&sort={"createdAt":"asc"}`),
           axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams?limit=15&sort={"createdAt":"asc"}`),
-          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/courses?filters={"isCoursePopular":true}`)
+          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/courses?filters={"isCoursePopular":true}&limit=15&sort={"createdAt":"asc"}`),
         ]);
         console.log('coursesResponse',coursesResponse)
 
