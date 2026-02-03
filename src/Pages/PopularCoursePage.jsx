@@ -1,18 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import cardPhoto from "../assets/Images/teacher.jpg";
-import BlogComponent from "../Components/BlogComponent";
-import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import Promotions from "./CoursePromotions";
+import SocialShare from "../Components/SocialShare";
+import { Sparkles } from "lucide-react";
 
 const StreamLevelPage = () => {
   const [pageData, setPageData] = useState(null);
+  const [streamDetails, setStreamDetails] = useState(null);
+  const [streamBlogs, setStreamBlogs] = useState([]);
+  const [streamInstitutes, setStreamInstitutes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [blogsLoading, setBlogsLoading] = useState(true);
+  const [institutesLoading, setInstitutesLoading] = useState(true);
   const [error, setError] = useState(null);
   const location = useLocation();
+  const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+  const baseURL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     const fetchPageData = async () => {
@@ -20,22 +27,112 @@ const StreamLevelPage = () => {
         setIsLoading(true);
         // Parse the URL parameters
         const params = new URLSearchParams(location.search);
-        const stream = params.get("stream");
+        const streamId = params.get("stream");
         const level = params.get("level");
 
-        if (!stream || !level) {
+        if (!streamId || !level) {
           throw new Error("Stream and level parameters are required");
         }
 
         // Fetch page data from the API
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/page/${stream}/${level}`
+        const pageResponse = await axios.get(
+          `${baseURL}/page/${streamId}/${level}`
         );
 
-        if (response.data) {
-          setPageData(response.data.data);
+        if (pageResponse.data) {
+          setPageData(pageResponse.data.data);
         } else {
-          throw new Error(response.data.message || "Failed to fetch page data");
+          throw new Error(pageResponse.data.message || "Failed to fetch page data");
+        }
+
+        // Fetch stream details to get stream name - use public streams endpoint
+        try {
+          // Fetch all streams and find the matching one (public endpoint)
+          const streamsResponse = await axios.get(
+            `${baseURL}/streams?page=0&limit=1000`
+          );
+          const allStreams = streamsResponse.data?.data?.result || [];
+          const stream = allStreams.find((s) => s._id === streamId);
+          
+          if (stream) {
+            setStreamDetails(stream);
+            const streamName = stream.name;
+            
+            // Fetch stream-related blogs using stream ID
+            try {
+              const blogsResponse = await axios.get(
+                `${baseURL}/blogs?filters={"stream":["${streamId}"]}&sort={"createdAt":"desc"}&limit=6`
+              );
+              setStreamBlogs(blogsResponse.data?.data?.result || []);
+            } catch (blogErr) {
+              console.error("Error fetching blogs:", blogErr);
+            } finally {
+              setBlogsLoading(false);
+            }
+
+            // Fetch stream-related institutes using stream name
+            try {
+              const institutesResponse = await axios.get(
+                `${baseURL}/best-rated-institute?filters={"streams":["${streamName}"]}&limit=6`
+              );
+              setStreamInstitutes(institutesResponse.data?.data || []);
+            } catch (instituteErr) {
+              console.error("Error fetching institutes:", instituteErr);
+            } finally {
+              setInstitutesLoading(false);
+            }
+          } else {
+            // Stream not found, still try to fetch blogs and institutes
+            console.warn("Stream not found in list, trying to fetch content anyway");
+            
+            // Try fetching blogs with stream ID
+            try {
+              const blogsResponse = await axios.get(
+                `${baseURL}/blogs?filters={"stream":["${streamId}"]}&sort={"createdAt":"desc"}&limit=6`
+              );
+              setStreamBlogs(blogsResponse.data?.data?.result || []);
+            } catch (blogErr) {
+              console.error("Error fetching blogs:", blogErr);
+            } finally {
+              setBlogsLoading(false);
+            }
+
+            // Try fetching institutes without stream name filter
+            try {
+              const institutesResponse = await axios.get(
+                `${baseURL}/best-rated-institute?limit=6`
+              );
+              setStreamInstitutes(institutesResponse.data?.data || []);
+            } catch (instituteErr) {
+              console.error("Error fetching institutes:", instituteErr);
+            } finally {
+              setInstitutesLoading(false);
+            }
+          }
+        } catch (streamErr) {
+          console.error("Error fetching stream details:", streamErr);
+          // Still try to fetch blogs and institutes even if stream fetch fails
+          try {
+            const blogsResponse = await axios.get(
+              `${baseURL}/blogs?filters={"stream":["${streamId}"]}&sort={"createdAt":"desc"}&limit=6`
+            );
+            setStreamBlogs(blogsResponse.data?.data?.result || []);
+          } catch (blogErr) {
+            console.error("Error fetching blogs:", blogErr);
+          } finally {
+            setBlogsLoading(false);
+          }
+
+          try {
+            const institutesResponse = await axios.get(
+              `${baseURL}/best-rated-institute?limit=6`
+            );
+            setStreamInstitutes(institutesResponse.data?.data || []);
+          } catch (instituteErr) {
+            console.error("Error fetching institutes:", instituteErr);
+          } finally {
+            setInstitutesLoading(false);
+          }
         }
       } catch (err) {
         console.error("Error fetching page data:", err);
@@ -51,14 +148,14 @@ const StreamLevelPage = () => {
   }, [location.search]);
 
   if (isLoading) {
-    return;
-
+    return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] px-4">
       <h2 className="text-2xl font-bold text-gray-700 mb-4">Loading...</h2>
       <p className="text-gray-600 text-center">
         Please wait while we fetch the page content.
       </p>
-    </div>;
+      </div>
+    );
   }
 
   if (error) {
@@ -165,8 +262,222 @@ const StreamLevelPage = () => {
         <Promotions location="STREAM_LEVEL_PAGE" className="h-[90px]" />
       </div>
 
-      <BlogComponent />
-      <BestRated />
+      {/* Latest Blogs - Stream Related */}
+      {streamBlogs.length > 0 && (
+        <div className="container mx-auto px-4 py-12">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-2">
+              <Sparkles className="text-red-500 w-6 h-6" />
+              <h2 className="text-3xl font-bold text-gray-900">Latest Blogs</h2>
+              <span className="text-gray-500 text-sm">({streamDetails?.name || 'Stream'} Related)</span>
+            </div>
+            <Link to="/blogpage">
+              <button className="bg-[#b82025] text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                View more
+              </button>
+            </Link>
+          </div>
+          {blogsLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-16 h-16 border-4 border-red-600 border-t-transparent animate-spin"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {streamBlogs.map((blog, index) => {
+                const handleShareClick = (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                };
+
+                return (
+                  <div
+                    key={blog._id || index}
+                    className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl relative"
+                  >
+                    {/* Image and main content wrapped in Link */}
+                    <Link
+                      to={`/blogdetailpage/${blog.slug || blog._id}`}
+                      className="block group text-black"
+                    >
+                      {/* Image */}
+                      <div className="h-56 relative min-h-56 max-h-56 w-full overflow-hidden">
+                        <img
+                          className="w-full h-full object-cover object-top rounded-t-xl"
+                          src={
+                            blog?.thumbnail
+                              ? `${Images}/${blog.thumbnail}`
+                              : cardPhoto
+                          }
+                          alt={blog.title || "Blog"}
+                          loading="lazy"
+                          onError={(e) => {
+                            e.target.src = cardPhoto;
+                            e.target.onerror = null;
+                          }}
+                        />
+                        <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-2 bg-white px-3 py-1 rounded-full text-black">
+                          {blog.views && (
+                            <div className="flex items-center gap-2 text-black">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="22"
+                                height="22"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                              </svg>
+                              <span className="text-black">{blog.views}</span>
+                            </div>
+                          )}
+                          {blog.likes && blog.likes.length > 0 && (
+                            <div className="flex items-center gap-2 text-black">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="22"
+                                height="22"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M14 9V5a3 3 0 0 0-6 0v4H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3z"></path>
+                                <path d="M9 22V12"></path>
+                              </svg>
+                              <span className="text-black">
+                                {blog.likes.length}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Card Content */}
+                      <div className="p-2 md:p-6">
+                        <h3 className="text-xl min-h-[3em] md:text-xl lg:text-xl font-bold text-gray-800">
+                          {blog.title
+                            ? blog.title.length > 50
+                              ? `${blog.title.slice(0, 50)}...`
+                              : blog.title
+                            : "Untitled Blog"}
+                        </h3>
+                        {blog.description && (
+                          <p
+                            className="text-sm min-h-[3em] text-gray-600 mt-3 line-clamp-3"
+                            dangerouslySetInnerHTML={{
+                              __html: blog.description.slice(0, 100) + "...",
+                            }}
+                          ></p>
+                        )}
+                        {blog.author && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            By {blog.author}
+                          </p>
+                        )}
+                        {blog.createdAt && (
+                          <p className="text-xs text-gray-500">
+                            {new Date(blog.createdAt).toLocaleDateString()}
+                          </p>
+                        )}
+                        <div className="mt-4">
+                          <div className="flex justify-between items-center text-gray-600">
+                            <button className="bg-[#b82025] whitespace-nowrap text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-all">
+                              Read More
+                            </button>
+
+                            <div className="flex gap-4">
+                              {/* Social Share component */}
+                              <div onClick={(e) => handleShareClick(e)}>
+                                <SocialShare
+                                  title={blog.title || "Blog"}
+                                  url={`${window.location.origin}/blogdetailpage/${blog.slug || blog._id}`}
+                                  contentType="blog"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Best Rated Institutes - Stream Related */}
+      {streamInstitutes.length > 0 && (
+        <div className="container mx-auto px-4 py-12">
+          <div className="flex items-center gap-2 mb-8">
+            <Sparkles className="text-red-500 w-6 h-6" />
+            <h2 className="text-3xl font-bold text-gray-900">Best Rated Institutes</h2>
+            <span className="text-gray-500 text-sm">({streamDetails?.name || 'Stream'} Related)</span>
+          </div>
+          {institutesLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-16 h-16 border-4 border-red-600 border-t-transparent animate-spin"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {streamInstitutes.map((institute) => (
+                <Link
+                  to={institute.slug ? `/institute/${institute.slug}` : `/institute/${institute._id}`}
+                  key={institute._id}
+                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                >
+                  <div className="h-48 w-full overflow-hidden">
+                    <img
+                      className="h-full w-full object-cover"
+                      src={
+                        institute.thumbnailImage
+                          ? `${Images}/${institute.thumbnailImage}`
+                          : cardPhoto
+                      }
+                      alt={institute.instituteName || "Institute"}
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {institute.instituteName || "Institute Name Not Available"}
+                    </h3>
+                    <p className="text-gray-600 text-sm line-clamp-3">
+                      {institute.about ? (
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: institute.about.slice(0, 150) + "...",
+                          }}
+                        />
+                      ) : (
+                        "No information available"
+                      )}
+                    </p>
+                    {institute.overallRating && (
+                      <div className="mt-4 flex items-center gap-2">
+                        <span className="text-yellow-500 font-semibold">
+                          ⭐ {institute.overallRating.toFixed(1)}
+                        </span>
+                        <span className="text-gray-500 text-sm">
+                          ({institute.reviews?.length || 0} reviews)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="w-full flex items-start mt-10">
         <Events />
