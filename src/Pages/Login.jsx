@@ -59,6 +59,10 @@ const Login = () => {
       
       toast.success("Logged in successfully!");
 
+      // Check for pending application
+      const pendingApplication = sessionStorage.getItem('pendingApplication');
+      const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+      
       // Check for pending webinar link
       const pendingWebinarLink = sessionStorage.getItem('pendingWebinarLink');
       
@@ -69,6 +73,13 @@ const Login = () => {
         window.open(pendingWebinarLink, '_blank');
         // Navigate to home page
         navigate("/");
+      } else if (redirectAfterLogin) {
+        // Clear the stored redirect URL
+        sessionStorage.removeItem('redirectAfterLogin');
+        // Navigate back to the institute page
+        // If there's a pending application, it will auto-submit
+        // Otherwise, user can click Apply Now again to open the form
+        navigate(redirectAfterLogin);
       } else {
         // Default navigation for students
         navigate("/");
