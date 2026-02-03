@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo, Suspense } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import { getInstituteById } from "../ApiFunctions/api";
 import Loader from "../Components/Loader";
 import axios from "axios";
+import { Video, ArrowRight } from "lucide-react";
 
 // Lazy load components
 const ImageSlider = React.lazy(() => import("../Ui components/ImageSlider"));
@@ -492,7 +493,28 @@ const Instituepage = () => {
             </div>
           </div>
           <div className="w-[300px]">
-            <div className="sticky top-20 z-10">
+            <div className="sticky top-20 z-10 space-y-4">
+              {/* Career Guidance Webinar Button */}
+              <Link to="/counselor">
+                <div className="w-full bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 p-6 cursor-pointer">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-white bg-opacity-20 rounded-full p-3">
+                        <Video className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold">Career Guidance</h3>
+                        <p className="text-sm text-white text-opacity-90">Webinar</p>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm text-white text-opacity-80">
+                    Get expert career guidance from our counselors
+                  </p>
+                </div>
+              </Link>
+              
               <QueryForm instituteData={instituteData} />
             </div>
             <Promotions location="INSTITUTE_PAGE " className="h-[250px] mt-4" />
