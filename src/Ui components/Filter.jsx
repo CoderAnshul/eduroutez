@@ -68,6 +68,19 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     const ratings = ratingsParam ? ratingsParam.split(",").map(r => r.trim()).filter(Boolean) : [];
     setSelectedRatings(ratings);
     
+    // Debug: Log filter states to help identify issues
+    console.log("Filter states initialized from URL:", {
+      streams,
+      cities,
+      states,
+      orgTypes,
+      specializations,
+      fees,
+      exams,
+      ratings,
+      url: location.search
+    });
+    
     // Update the prev search params ref
     prevSearchParams.current = location.search;
     
@@ -199,12 +212,18 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     }
   };
   
-  // Helper function to toggle items in array
+  // Helper function to toggle items in array (case-insensitive)
   const toggleArrayItem = (array, setArray, item) => {
-    const isSelected = array.includes(item);
-    if (isSelected) {
-      setArray(array.filter(element => element !== item));
+    // Find if item exists (case-insensitive)
+    const itemIndex = array.findIndex(
+      element => element.toLowerCase().trim() === item.toLowerCase().trim()
+    );
+    
+    if (itemIndex !== -1) {
+      // Item exists, remove it
+      setArray(array.filter((_, index) => index !== itemIndex));
     } else {
+      // Item doesn't exist, add it (use the original item name from the list)
       setArray([...array, item]);
     }
   };
@@ -250,37 +269,54 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
                   const sectionLower = section.title.toLowerCase();
                   let isChecked = false;
                   
-                  // Check if item is selected based on section type
+                  // Helper function to check if item matches (case-insensitive)
+                  const itemMatches = (selectedArray, itemToCheck) => {
+                    return selectedArray.some(selected => 
+                      selected.toLowerCase().trim() === itemToCheck.toLowerCase().trim()
+                    );
+                  };
+                  
+                  // Check if item is selected based on section type (case-insensitive)
                   if (sectionLower === "streams" || sectionLower === "stream") {
-                    isChecked = selectedStreams.includes(item);
+                    isChecked = itemMatches(selectedStreams, item);
                   } else if (sectionLower === "city") {
-                    isChecked = selectedCities.includes(item);
+                    isChecked = itemMatches(selectedCities, item);
                   } else if (sectionLower === "state") {
-                    isChecked = selectedStates.includes(item);
+                    isChecked = itemMatches(selectedStates, item);
                   } else if (sectionLower === "organisationtype") {
-                    isChecked = selectedOrganisationTypes.includes(item);
+                    isChecked = itemMatches(selectedOrganisationTypes, item);
                   } else if (sectionLower === "specialization") {
-                    isChecked = selectedSpecializations.includes(item);
+                    isChecked = itemMatches(selectedSpecializations, item);
                   } else if (sectionLower === "fees") {
-                    isChecked = selectedFees.includes(item);
+                    isChecked = itemMatches(selectedFees, item);
                   } else if (sectionLower === "exam") {
-                    isChecked = selectedExams.includes(item);
+                    isChecked = itemMatches(selectedExams, item);
                   } else if (sectionLower === "ratings") {
-                    isChecked = selectedRatings.includes(item);
+                    isChecked = itemMatches(selectedRatings, item);
                   }
                   
                   return (
                     <label
                       key={idx}
-                      className="flex items-center text-sm text-gray-600 cursor-pointer hover:text-red-500 hover:ml-1 transition-all"
+                      className={`flex items-center text-sm cursor-pointer hover:ml-1 transition-all ${
+                        isChecked 
+                          ? "text-red-600 font-semibold bg-red-50 px-2 py-1 rounded" 
+                          : "text-gray-600 hover:text-red-500"
+                      }`}
                     >
                       <input
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => handleCheckboxChange(section.title, item)}
-                        className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
+                        className={`w-4 h-4 border-gray-300 rounded focus:ring-red-400 ${
+                          isChecked 
+                            ? "text-red-600 border-red-500" 
+                            : "text-blue-500"
+                        }`}
                       />
-                      <span className="ml-2">{item}</span>
+                      <span className={`ml-2 ${isChecked ? "font-semibold" : ""}`}>
+                        {item}
+                      </span>
                     </label>
                   );
                 })
