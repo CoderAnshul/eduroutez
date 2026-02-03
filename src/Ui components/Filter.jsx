@@ -25,6 +25,9 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
   // Ref to store previous URL search params
   const prevSearchParams = useRef(location.search);
   
+  // Ref to track if this is the initial mount (to prevent duplicate filter notifications)
+  const isInitialMount = useRef(true);
+  
   // Initialize filters from URL parameters when component mounts or URL changes
   useEffect(() => {
     // Skip URL update after initialization
@@ -34,31 +37,68 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     
     // Handle all parameters as multi-select with comma separation
     const streamParam = params.get("stream");
-    setSelectedStreams(streamParam ? streamParam.split(",") : []);
+    const streams = streamParam ? streamParam.split(",").map(s => s.trim()).filter(Boolean) : [];
+    setSelectedStreams(streams);
     
     const cityParam = params.get("city");
-    setSelectedCities(cityParam ? cityParam.split(",") : []);
+    const cities = cityParam ? cityParam.split(",").map(c => c.trim()).filter(Boolean) : [];
+    setSelectedCities(cities);
     
     const stateParam = params.get("state");
-    setSelectedStates(stateParam ? stateParam.split(",") : []);
+    const states = stateParam ? stateParam.split(",").map(s => s.trim()).filter(Boolean) : [];
+    setSelectedStates(states);
     
     const orgTypeParam = params.get("organisationType");
-    setSelectedOrganisationTypes(orgTypeParam ? orgTypeParam.split(",") : []);
+    const orgTypes = orgTypeParam ? orgTypeParam.split(",").map(o => o.trim()).filter(Boolean) : [];
+    setSelectedOrganisationTypes(orgTypes);
     
     const specParam = params.get("specialization");
-    setSelectedSpecializations(specParam ? specParam.split(",") : []);
+    const specializations = specParam ? specParam.split(",").map(s => s.trim()).filter(Boolean) : [];
+    setSelectedSpecializations(specializations);
     
     const feesParam = params.get("Fees");
-    setSelectedFees(feesParam ? feesParam.split(",") : []);
+    const fees = feesParam ? feesParam.split(",").map(f => f.trim()).filter(Boolean) : [];
+    setSelectedFees(fees);
     
     const examParam = params.get("Exam");
-    setSelectedExams(examParam ? examParam.split(",") : []);
+    const exams = examParam ? examParam.split(",").map(e => e.trim()).filter(Boolean) : [];
+    setSelectedExams(exams);
     
     const ratingsParam = params.get("Ratings");
-    setSelectedRatings(ratingsParam ? ratingsParam.split(",") : []);
+    const ratings = ratingsParam ? ratingsParam.split(",").map(r => r.trim()).filter(Boolean) : [];
+    setSelectedRatings(ratings);
     
     // Update the prev search params ref
     prevSearchParams.current = location.search;
+    
+    // Notify parent component about filters from URL so it can fetch results
+    // This is important for page refresh scenarios
+    // Only notify on initial mount if URL has params (page refresh scenario)
+    if (onFiltersChanged && isInitialMount.current) {
+      const apiFilters = {};
+      if (streams.length > 0) apiFilters.streams = streams;
+      if (cities.length > 0) apiFilters.city = cities;
+      if (states.length > 0) apiFilters.state = states;
+      if (orgTypes.length > 0) apiFilters.organisationType = orgTypes;
+      if (specializations.length > 0) apiFilters.specialization = specializations;
+      if (fees.length > 0) apiFilters.Fees = fees;
+      if (exams.length > 0) apiFilters.Exam = exams;
+      if (ratings.length > 0) apiFilters.Ratings = ratings;
+      
+      // Only notify if there are filters to apply
+      if (Object.keys(apiFilters).length > 0) {
+        // Use setTimeout to avoid calling during render
+        setTimeout(() => {
+          onFiltersChanged(apiFilters);
+          isInitialMount.current = false; // Mark that initial mount is complete
+        }, 0);
+      } else {
+        isInitialMount.current = false;
+      }
+    } else if (!isInitialMount.current) {
+      // On subsequent URL changes (not initial mount), reset the flag
+      isInitialMount.current = false;
+    }
   }, [location.search]);
   
   // Separate effect for updating URL and notifying parent

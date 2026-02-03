@@ -97,17 +97,42 @@ const SearchPage = () => {
         });
     } 
     else if (searchSource === "url") {
-      // Build filters from URL parameters
+      // Build filters from URL parameters for state management
+      // But let Filter component handle the actual fetch via onFiltersChanged
       const initialFilters = buildInitialFiltersFromUrl();
-      console.log("Loading data from URL filters:", initialFilters);
+      console.log("URL filters detected, waiting for Filter component to initialize:", initialFilters);
       
       setSelectedFilters(initialFilters);
-      setFiltersApplied(true);
+      // Don't set filtersApplied yet - let Filter component trigger it via onFiltersChanged
+      // This prevents duplicate fetches
       
-      fetchFilteredInstitutes(initialFilters, 1, itemsPerPage)
-        .finally(() => {
-          setInitialLoadComplete(true);
-        });
+      // If no filters in URL, load default data
+      if (Object.keys(initialFilters).length === 0) {
+        getInstitutes("", "", "", "", 1, itemsPerPage)
+          .then((data) => {
+            const { result, totalDocuments, currentPage, totalPages } = data.data;
+            setContent(result);
+            setFilteredContent(result);
+            setTotalDocuments(totalDocuments);
+            setCurrentPage(currentPage || 1);
+
+            if (result && result.length > 0) {
+              updateIdMapping(result);
+            }
+            setLoading(false);
+            setInitialLoadComplete(true);
+          })
+          .catch((error) => {
+            console.error("Error fetching institutes:", error);
+            setFetchError(true);
+            setLoading(false);
+            setInitialLoadComplete(true);
+          });
+      } else {
+        // Filters exist in URL - Filter component will trigger fetch via onFiltersChanged
+        setInitialLoadComplete(true);
+        setLoading(false);
+      }
     } 
     else {
       // Default data loading with pagination limit
@@ -176,80 +201,9 @@ const SearchPage = () => {
     }
   }, []);
 
-  // This effect builds initial filters from URL parameters only once on component mount
-  useEffect(() => {
-    // Build initial filters from URL parameters
-    const initialFilters = {};
-
-    if (streamFromUrl) {
-      const streamValues = streamFromUrl
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      if (streamValues.length > 0) {
-        initialFilters.streams = streamValues;
-      }
-    }
-
-    if (stateFromUrl) {
-      initialFilters.state = [stateFromUrl];
-    }
-
-    if (cityFromUrl) {
-      initialFilters.city = [cityFromUrl];
-    }
-
-    if (examFromUrl) {
-      initialFilters.Exam = [examFromUrl];
-    }
-
-    if (feesFromUrl) {
-      initialFilters.Fees = [feesFromUrl];
-    }
-
-    if (ratingsFromUrl) {
-      initialFilters.Ratings = [ratingsFromUrl];
-    }
-
-    if (organizationTypeFromUrl) {
-      initialFilters.organisationType = [organizationTypeFromUrl];
-    }
-
-    if (specializationFromUrl) {
-      initialFilters.specialization = [specializationFromUrl];
-    }
-
-    // Apply URL filters or fetch default data
-    if (Object.keys(initialFilters).length > 0) {
-      setSelectedFilters(initialFilters);
-      setFiltersApplied(true);
-      fetchFilteredInstitutes(initialFilters, 1, itemsPerPage);
-    } else {
-      // If no URL parameters, fetch default data and reset filters with pagination
-      setSelectedFilters({});
-      setLoading(true);
-      getInstitutes(inputField, inputField, inputField, inputField, 1, itemsPerPage)
-        .then((data) => {
-          const { result, totalDocuments, currentPage, totalPages } = data.data;
-          setContent(result);
-          setFilteredContent(result);
-          setTotalDocuments(totalDocuments);
-          setCurrentPage(currentPage || 1);
-
-          if (result && result.length > 0) {
-            updateIdMapping(result);
-          }
-          setLoading(false);
-          setInitialLoadComplete(true);
-        })
-        .catch((error) => {
-          console.error("Error fetching institutes:", error);
-          setFetchError(true);
-          setLoading(false);
-          setInitialLoadComplete(true);
-        });
-    }
-  }, []); // Empty dependency array means this runs once on mount
+  // Note: URL filter initialization is now handled by the Filter component
+  // This effect is kept for backward compatibility but should not conflict
+  // The Filter component will call handleFiltersChanged when it initializes from URL
 
   const updateIdMapping = (institutes) => {
     let hasChanges = false;
@@ -740,12 +694,16 @@ const fetchFilteredInstitutes = async (filters, page, limit) => {
 useEffect(() => {
   // Only run this effect if:
   // 1. Initial loading is complete
-  // 2. Either filters have been explicitly applied OR we're changing pages with existing filters
-  if (initialLoadComplete && (filtersApplied || (Object.keys(selectedFilters).length > 0 && currentPage > 1))) {
-    console.log("Fetching data based on filters/pagination:", selectedFilters, "Page:", currentPage);
-    fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
+  // 2. Filters have been applied (either from URL or user selection)
+  // 3. This handles pagination changes after filters are applied
+  if (initialLoadComplete && filtersApplied && Object.keys(selectedFilters).length > 0) {
+    // Only fetch if page changed (not on initial filter application, which is handled in handleFiltersChanged)
+    if (currentPage > 1) {
+      console.log("Fetching data for page change:", selectedFilters, "Page:", currentPage);
+      fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
+    }
   }
-}, [selectedFilters, currentPage, initialLoadComplete, filtersApplied]);
+}, [currentPage]); // Only depend on currentPage - filter changes are handled in handleFiltersChanged
 
 
 
@@ -893,6 +851,50 @@ useEffect(() => {
     setCurrentPage(1);
     setSelectedFilters(filters);
     setFiltersApplied(true);
+    
+    // Immediately fetch filtered data - don't wait for useEffect
+    // This ensures data is fetched right away when filters change
+    // Always fetch if filters are provided, regardless of initialLoadComplete
+    // (initialLoadComplete might not be set yet during initial mount from URL)
+    if (Object.keys(filters).length > 0) {
+      setLoading(true);
+      setFetchError(false);
+      fetchFilteredInstitutes(filters, 1, itemsPerPage)
+        .then(() => {
+          // Mark initial load as complete if it wasn't already
+          if (!initialLoadComplete) {
+            setInitialLoadComplete(true);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching filtered institutes:", error);
+          setFetchError(true);
+          setLoading(false);
+        });
+    } else {
+      // No filters - load default data
+      if (initialLoadComplete) {
+        setLoading(true);
+        getInstitutes("", "", "", "", 1, itemsPerPage)
+          .then((data) => {
+            const { result, totalDocuments, currentPage, totalPages } = data.data;
+            setContent(result);
+            setFilteredContent(result);
+            setTotalDocuments(totalDocuments);
+            setCurrentPage(currentPage || 1);
+
+            if (result && result.length > 0) {
+              updateIdMapping(result);
+            }
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error("Error fetching institutes:", error);
+            setFetchError(true);
+            setLoading(false);
+          });
+      }
+    }
     
     // Restore scroll position
     setTimeout(() => {
