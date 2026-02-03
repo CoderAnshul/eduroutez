@@ -262,29 +262,31 @@ const CounselorListPage = () => {
               showSidebar ? "block" : "hidden"
             } md:block w-full md:w-1/4 transition-all duration-300`}
           >
-            <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
-              <h3 className="text-lg font-semibold mb-4">Filter by Stream</h3>
-              <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
-                {streams.map((stream) => (
-                  <label
-                    key={stream._id}
-                    className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      value={stream.name}
-                      checked={selectedStreams.includes(stream.name)}
-                      onChange={() => handleStreamChange(stream.name)}
-                    />
-                    {stream.name}
-                  </label>
-                ))}
+            <div className="md:sticky md:top-20 md:h-fit md:max-h-[calc(100vh-2rem)] md:overflow-y-auto">
+              <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
+                <h3 className="text-lg font-semibold mb-4">Filter by Stream</h3>
+                <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
+                  {streams.map((stream) => (
+                    <label
+                      key={stream._id}
+                      className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        value={stream.name}
+                        checked={selectedStreams.includes(stream.name)}
+                        onChange={() => handleStreamChange(stream.name)}
+                      />
+                      {stream.name}
+                    </label>
+                  ))}
+                </div>
               </div>
+              <Promotions
+                location="COUNSELING_PAGE_SIDEBAR"
+                className="h-[250px] w-fit"
+              />
             </div>
-            <Promotions
-              location="COUNSELING_PAGE_SIDEBAR"
-              className="h-[250px] w-fit"
-            />
           </div>
 
           <div className="w-full md:w-3/4 md:pl-6">
