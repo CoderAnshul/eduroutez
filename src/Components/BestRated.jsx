@@ -66,6 +66,10 @@ const BestRated = React.memo(() => {
     {
       enabled: true,
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+      cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+      retry: 2, // Retry failed requests 2 times
+      retryDelay: 1000, // Wait 1 second between retries
       onSuccess: (data) => {
         const institutes = data.data || [];
         setContent((prevContent) =>
@@ -124,8 +128,21 @@ const BestRated = React.memo(() => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
+      <div className="w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
+        <div className="flex items-center justify-between mb-10">
+          <h3 className="text-xl font-bold">Best Rated Institutes</h3>
+        </div>
+        <div className="boxWrapper w-full flex flex-col md:flex-row flex-wrap items-center gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="box w-full max-w-sm lg:max-w-[500px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg animate-pulse">
+              <div className="imageContainer h-48 bg-gray-200"></div>
+              <div className="textContainer p-4">
+                <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

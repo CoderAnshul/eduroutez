@@ -74,8 +74,8 @@ const SearchPage = () => {
     
     if (searchSource === "input" && inputField) {
       console.log("Loading data from Redux input:", inputField);
-      // Load data based on the inputField from Redux
-      getInstitutes(inputField, inputField, inputField, inputField)
+      // Load data based on the inputField from Redux with pagination
+      getInstitutes(inputField, inputField, inputField, inputField, 1, itemsPerPage)
         .then((data) => {
           const { result, totalDocuments, currentPage, totalPages } = data.data;
           setContent(result);
@@ -110,11 +110,11 @@ const SearchPage = () => {
         });
     } 
     else {
-      // Default data loading
+      // Default data loading with pagination limit
       console.log("Loading default data");
       setSelectedFilters({});
       
-      getInstitutes("", "", "", "")
+      getInstitutes("", "", "", "", 1, itemsPerPage)
         .then((data) => {
           const { result, totalDocuments, currentPage, totalPages } = data.data;
           setContent(result);
@@ -225,10 +225,10 @@ const SearchPage = () => {
       setFiltersApplied(true);
       fetchFilteredInstitutes(initialFilters, 1, itemsPerPage);
     } else {
-      // If no URL parameters, fetch default data and reset filters
+      // If no URL parameters, fetch default data and reset filters with pagination
       setSelectedFilters({});
       setLoading(true);
-      getInstitutes(inputField, inputField, inputField, inputField)
+      getInstitutes(inputField, inputField, inputField, inputField, 1, itemsPerPage)
         .then((data) => {
           const { result, totalDocuments, currentPage, totalPages } = data.data;
           setContent(result);
@@ -288,6 +288,9 @@ const SearchPage = () => {
       return response.data;
     },
     {
+      staleTime: 10 * 60 * 1000, // Cache streams for 10 minutes (they don't change often)
+      cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+      refetchOnWindowFocus: false,
       onSuccess: (data) => {
         const streamNames =
           data.data?.result
@@ -933,7 +936,16 @@ useEffect(() => {
 
           <div className="filterResult w-full">
             {loading ? (
-              <div className="text-center py-8">Loading results...</div>
+              <div className="space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="bg-white rounded-lg shadow p-4 animate-pulse">
+                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                ))}
+              </div>
             ) : fetchError ? (
               <div className="text-center py-8 text-red-500">
                 Error fetching results
