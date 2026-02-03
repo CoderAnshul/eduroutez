@@ -491,9 +491,11 @@ const Instituepage = () => {
               )}
             </div>
           </div>
-          <div className="w-[300px] h-[250px]">
-            <QueryForm instituteData={instituteData} />
-            <Promotions location="INSTITUTE_PAGE " className="h-[250px]" />
+          <div className="w-[300px]">
+            <div className="sticky top-20 z-10">
+              <QueryForm instituteData={instituteData} />
+            </div>
+            <Promotions location="INSTITUTE_PAGE " className="h-[250px] mt-4" />
           </div>
         </div>
         <HighRatedCareers />

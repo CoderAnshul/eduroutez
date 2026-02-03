@@ -8,7 +8,7 @@ const QueryForm = ({ instituteData }) => {
 
   const validateForm = (formData) => {
     const newErrors = {};
-    const requiredFields = ["name", "email", "number", "city", "relatedTopic", "query"];
+    const requiredFields = ["name", "email", "number", "query"];
     
     requiredFields.forEach(field => {
       if (!formData.get(field)) {
@@ -50,8 +50,6 @@ const QueryForm = ({ instituteData }) => {
       name: formData.get("name"),
       email: formData.get("email"),
       phoneNo: formData.get("number"),
-      city: formData.get("city"),
-      queryRelatedTo: formData.get("relatedTopic"),
       query: formData.get("query"),
       instituteId: formData.get("instituteId")
     };
@@ -131,34 +129,6 @@ const QueryForm = ({ instituteData }) => {
               }`}
             />
             {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number}</p>}
-          </div>
-          <div>
-            <label className="block text-gray-500 text-xs font-medium mb-1">
-              City
-            </label>
-            <input
-              type="text"
-              name="city"
-              placeholder="Enter your city"
-              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                errors.city ? "border-red-500" : ""
-              }`}
-            />
-            {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-          </div>
-          <div>
-            <label className="block text-gray-500 text-xs font-medium mb-1">
-              Query Related to
-            </label>
-            <input
-              type="text"
-              name="relatedTopic"
-              placeholder="Enter related topic"
-              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                errors.relatedTopic ? "border-red-500" : ""
-              }`}
-            />
-            {errors.relatedTopic && <p className="text-red-500 text-xs mt-1">{errors.relatedTopic}</p>}
           </div>
           <div>
             <label className="block text-gray-500 text-xs font-medium mb-1">
