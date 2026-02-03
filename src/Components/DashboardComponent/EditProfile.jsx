@@ -21,7 +21,9 @@ const EditProfile = () => {
     const fetchUserData = async () => {
       try {
         const userId = localStorage.getItem("userId"); // Get user ID from localStorage
-        if (!userId) throw new Error("User ID not found in localStorage");
+        if (!userId || userId === "null" || userId === "undefined") {
+          throw new Error("User ID not found in localStorage");
+        }
 
         const response = await axios.get(`${VITE_BASE_URL}/student/${userId}`, {
           headers: {

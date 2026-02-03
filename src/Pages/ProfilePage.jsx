@@ -7,7 +7,7 @@ const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 // Fetch the user data
 const fetchUserData = async () => {
   const userId = localStorage.getItem("userId");
-  if (!userId) {
+  if (!userId || userId === "null" || userId === "undefined") {
     throw new Error("User ID not found in localStorage");
   }
   const response = await axiosInstance.get(
