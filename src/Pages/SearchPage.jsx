@@ -50,8 +50,9 @@ const SearchPage = () => {
     const fromSearch = searchParams.get("fromSearch") === "true";
     const hasUrlFilters = checkForUrlFilters();
     
-    // Determine search source priority
+    // Set search query for display
     if (fromSearch && inputField) {
+      setSearchQuery(inputField);
       setSearchSource("input");
     } else if (hasUrlFilters) {
       setSearchSource("url");
@@ -64,7 +65,7 @@ const SearchPage = () => {
         examFromUrl || feesFromUrl || ratingsFromUrl || 
         organizationTypeFromUrl || specializationFromUrl || sortFromUrl);
     }
-  }, []);
+  }, [inputField]);
   
   // This effect handles the initial data loading based on search source
   useEffect(() => {
@@ -959,6 +960,18 @@ useEffect(() => {
           </div>
 
           <div className="filterResult w-full">
+            {/* Display search query if available */}
+            {(inputField || searchQuery) && (
+              <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-gray-600 font-medium">Search Results for:</span>
+                  <span className="text-red-600 font-bold text-lg">
+                    "{inputField || searchQuery}"
+                  </span>
+                </div>
+              </div>
+            )}
+            
             {loading ? (
               <div className="space-y-4">
                 <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>

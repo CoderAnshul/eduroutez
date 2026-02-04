@@ -11,6 +11,7 @@ const Banner = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const baseURL = import.meta.env.VITE_BASE_URL;
@@ -131,18 +132,24 @@ const handleSuggestionClick = (suggestion) => {
   setShowSuggestions(false);
 };
 
-const handleBtnClick = () => {
+const handleBtnClick = async () => {
   if (inputField === "") {
     alert("Please enter something");
     return;
   }
 
-  if (searchType === "counsellor") {
-    navigate(`/counselor?name=${encodeURIComponent(inputField)}`);
-  } else {
-    dispatch(setInput(inputField));
-    navigate("/searchpage?fromSearch=true");
-  }
+  setIsSearching(true);
+  
+  // Small delay to show loading state
+  setTimeout(() => {
+    if (searchType === "counsellor") {
+      navigate(`/counselor?name=${encodeURIComponent(inputField)}`);
+    } else {
+      dispatch(setInput(inputField));
+      navigate("/searchpage?fromSearch=true");
+    }
+    setIsSearching(false);
+  }, 300);
 };
 
   return (
@@ -198,10 +205,21 @@ const handleBtnClick = () => {
             </div>
 
             <button
-              className="!h-full right-0 !rounded-sm w-1/5 max-sm:w-1/6 absolute top-0 bg-[#b82025] min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white"
+              className="!h-full right-0 !rounded-sm w-1/5 max-sm:w-1/6 absolute top-0 bg-[#b82025] min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
               onClick={handleBtnClick}
+              disabled={isSearching}
             >
-              Search
+              {isSearching ? (
+                <div className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Searching...</span>
+                </div>
+              ) : (
+                "Search"
+              )}
             </button>
           </div>
 
