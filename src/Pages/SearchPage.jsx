@@ -43,6 +43,7 @@ const SearchPage = () => {
   const ratingsFromUrl = searchParams.get("Ratings");
   const organizationTypeFromUrl = searchParams.get("organisationType");
   const specializationFromUrl = searchParams.get("specialization");
+  const sortFromUrl = searchParams.get("sort"); // For sorting by rating (top colleges)
 
 
   useEffect(() => {
@@ -61,7 +62,7 @@ const SearchPage = () => {
     function checkForUrlFilters() {
       return !!(streamFromUrl || stateFromUrl || cityFromUrl || 
         examFromUrl || feesFromUrl || ratingsFromUrl || 
-        organizationTypeFromUrl || specializationFromUrl);
+        organizationTypeFromUrl || specializationFromUrl || sortFromUrl);
     }
   }, []);
   
@@ -107,7 +108,7 @@ const SearchPage = () => {
       // This prevents duplicate fetches
       
       // If no filters in URL, load default data
-      if (Object.keys(initialFilters).length === 0) {
+      if (Object.keys(initialFilters).length === 0 && !sortFromUrl) {
         getInstitutes("", "", "", "", 1, itemsPerPage)
           .then((data) => {
             const { result, totalDocuments, currentPage, totalPages } = data.data;
@@ -129,9 +130,23 @@ const SearchPage = () => {
             setInitialLoadComplete(true);
           });
       } else {
-        // Filters exist in URL - Filter component will trigger fetch via onFiltersChanged
-        setInitialLoadComplete(true);
-        setLoading(false);
+        // Filters or sort exist in URL - Filter component will trigger fetch via onFiltersChanged
+        // But if only sort is present, fetch immediately
+        if (sortFromUrl && Object.keys(initialFilters).length === 0) {
+          fetchFilteredInstitutes({}, 1, itemsPerPage, sortFromUrl)
+            .then(() => {
+              setInitialLoadComplete(true);
+            })
+            .catch((error) => {
+              console.error("Error fetching sorted institutes:", error);
+              setFetchError(true);
+              setLoading(false);
+              setInitialLoadComplete(true);
+            });
+        } else {
+          setInitialLoadComplete(true);
+          setLoading(false);
+        }
       }
     } 
     else {
@@ -636,7 +651,7 @@ const SearchPage = () => {
   // };
 
   // Modified fetchFilteredInstitutes function - return the promise
-const fetchFilteredInstitutes = async (filters, page, limit) => {
+const fetchFilteredInstitutes = async (filters, page, limit, sortField = null) => {
   setLoading(true);
   setFetchError(false);
 
@@ -660,9 +675,16 @@ const fetchFilteredInstitutes = async (filters, page, limit) => {
 
     console.log("Sending filters to API:", apiFilters);
 
-    const queryString = `filters=${encodeURIComponent(
+    // Build query string with sort parameter if provided
+    let queryString = `filters=${encodeURIComponent(
       JSON.stringify(apiFilters)
     )}&page=${page}&limit=${limit}`;
+    
+    // Add sort parameter if provided (e.g., sort=rating for top colleges)
+    if (sortField) {
+      const sortObj = { [sortField]: "desc" }; // Sort descending for rating (highest first)
+      queryString += `&sort=${encodeURIComponent(JSON.stringify(sortObj))}`;
+    }
     
     console.log(`Fetching data with query: ${queryString}`);
     const response = await axios.get(`${baseURL}/institutes?${queryString}`);
@@ -700,7 +722,7 @@ useEffect(() => {
     // Only fetch if page changed (not on initial filter application, which is handled in handleFiltersChanged)
     if (currentPage > 1) {
       console.log("Fetching data for page change:", selectedFilters, "Page:", currentPage);
-      fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
+      fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage, sortFromUrl || null);
     }
   }
 }, [currentPage]); // Only depend on currentPage - filter changes are handled in handleFiltersChanged
@@ -718,7 +740,7 @@ useEffect(() => {
     
     // Explicitly fetch new page data to ensure it happens
     // This is a backup to the useEffect, providing redundancy
-    fetchFilteredInstitutes(selectedFilters, newPage, itemsPerPage);
+    fetchFilteredInstitutes(selectedFilters, newPage, itemsPerPage, sortFromUrl || null);
     
     // Scroll to top after page change
     window.scrollTo(0, 0);
@@ -856,10 +878,10 @@ useEffect(() => {
     // This ensures data is fetched right away when filters change
     // Always fetch if filters are provided, regardless of initialLoadComplete
     // (initialLoadComplete might not be set yet during initial mount from URL)
-    if (Object.keys(filters).length > 0) {
+    if (Object.keys(filters).length > 0 || sortFromUrl) {
       setLoading(true);
       setFetchError(false);
-      fetchFilteredInstitutes(filters, 1, itemsPerPage)
+      fetchFilteredInstitutes(filters, 1, itemsPerPage, sortFromUrl || null)
         .then(() => {
           // Mark initial load as complete if it wasn't already
           if (!initialLoadComplete) {
