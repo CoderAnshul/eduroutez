@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "react-query";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Send,
   Loader2,
@@ -139,6 +140,8 @@ const AnswersList = ({ answers }) => {
 };
 
 const CombinedQuestionsPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     question: "",
     grade: "",
@@ -153,6 +156,37 @@ const CombinedQuestionsPage = () => {
   const labels = ["Courses", "Career", "Institute", "Placement", "Admission"];
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const userEmail = localStorage.getItem("email") || "user@example.com";
+
+  // Check for pending question after login redirect
+  useEffect(() => {
+    const pendingQuestion = sessionStorage.getItem("pendingQuestion");
+    const accessToken = localStorage.getItem("accessToken");
+    
+    if (pendingQuestion && accessToken) {
+      try {
+        const questionData = JSON.parse(pendingQuestion);
+        // Pre-fill the form
+        setFormData(questionData);
+        
+        // Clear session storage
+        sessionStorage.removeItem("pendingQuestion");
+        
+        // Auto-submit after a short delay to ensure form is ready
+        setTimeout(() => {
+          if (questionData.question && questionData.label && questionData.grade) {
+            const questionToSubmit = {
+              ...questionData,
+              askedBy: localStorage.getItem("email") || "user@example.com",
+            };
+            mutate(questionToSubmit);
+          }
+        }, 500);
+      } catch (error) {
+        console.error("Error parsing pending question:", error);
+        sessionStorage.removeItem("pendingQuestion");
+      }
+    }
+  }, []);
 
   const {
     data: questionsData,
@@ -221,6 +255,18 @@ const CombinedQuestionsPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Check if user is logged in
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      // Store current page URL for redirect after login
+      sessionStorage.setItem("redirectAfterLogin", location.pathname);
+      sessionStorage.setItem("pendingQuestion", JSON.stringify(formData));
+      // Redirect to login
+      navigate("/login");
+      return;
+    }
+    
     mutate(formData);
   };
 
