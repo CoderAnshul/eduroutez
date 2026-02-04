@@ -262,14 +262,13 @@ const StreamLevelPage = () => {
         <Promotions location="STREAM_LEVEL_PAGE" className="h-[90px]" />
       </div>
 
-      {/* Latest Blogs - Stream Related */}
+      {/* Stream Related Blogs */}
       {streamBlogs.length > 0 && (
         <div className="container mx-auto px-4 py-12">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
               <Sparkles className="text-red-500 w-6 h-6" />
-              <h2 className="text-3xl font-bold text-gray-900">Latest Blogs</h2>
-              <span className="text-gray-500 text-sm">({streamDetails?.name || 'Stream'} Related)</span>
+              <h2 className="text-3xl font-bold text-gray-900">Stream Related Blogs</h2>
             </div>
             <Link to="/blogpage">
               <button className="bg-[#b82025] text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
@@ -414,13 +413,12 @@ const StreamLevelPage = () => {
         </div>
       )}
 
-      {/* Best Rated Institutes - Stream Related */}
+      {/* Related Institutes */}
       {streamInstitutes.length > 0 && (
         <div className="container mx-auto px-4 py-12">
           <div className="flex items-center gap-2 mb-8">
             <Sparkles className="text-red-500 w-6 h-6" />
-            <h2 className="text-3xl font-bold text-gray-900">Best Rated Institutes</h2>
-            <span className="text-gray-500 text-sm">({streamDetails?.name || 'Stream'} Related)</span>
+            <h2 className="text-3xl font-bold text-gray-900">Related Institutes</h2>
           </div>
           {institutesLoading ? (
             <div className="flex justify-center items-center h-64">
