@@ -243,8 +243,19 @@ const CombinedQuestionsPage = () => {
       setFormData({ question: "", grade: "", label: "" });
       refetch();
     },
-    onError: () => {
-      toast.error("An error occurred. Please try again.");
+    onError: (error) => {
+      // Check if it's an authentication error (401 Unauthorized)
+      if (error.response?.status === 401 || error.response?.data?.message?.includes("Unauthorized") || error.response?.data?.message?.includes("token")) {
+        // Store form data and redirect to login
+        sessionStorage.setItem("redirectAfterLogin", location.pathname);
+        sessionStorage.setItem("pendingQuestion", JSON.stringify(formData));
+        toast.error("Please log in to submit your question");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
     },
   });
 
@@ -256,9 +267,9 @@ const CombinedQuestionsPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Check if user is logged in
+    // Check if user is logged in (check for token existence and validity)
     const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) {
+    if (!accessToken || accessToken === "null" || accessToken === "undefined" || accessToken === "") {
       // Store current page URL for redirect after login
       sessionStorage.setItem("redirectAfterLogin", location.pathname);
       sessionStorage.setItem("pendingQuestion", JSON.stringify(formData));

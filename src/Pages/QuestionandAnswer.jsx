@@ -159,10 +159,10 @@ const QuestionandAnswer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check for access token before submission
+    // Check for access token before submission (check for token existence and validity)
     const accessToken = localStorage.getItem("accessToken");
 
-    if (!accessToken) {
+    if (!accessToken || accessToken === "null" || accessToken === "undefined" || accessToken === "") {
       // Store current page URL and form data for redirect after login
       sessionStorage.setItem("redirectAfterLogin", location.pathname);
       sessionStorage.setItem("pendingQuestion", JSON.stringify(form));
@@ -214,7 +214,18 @@ const QuestionandAnswer = () => {
     },
     onError: (error) => {
       console.error("Submission error:", error);
-      alert("Failed to submit question");
+      // Check if it's an authentication error (401 Unauthorized)
+      if (error.response?.status === 401 || error.response?.data?.message?.includes("Unauthorized") || error.response?.data?.message?.includes("token")) {
+        // Store form data and redirect to login
+        sessionStorage.setItem("redirectAfterLogin", location.pathname);
+        sessionStorage.setItem("pendingQuestion", JSON.stringify(form));
+        alert("Please log in to submit your question. Redirecting to login...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      } else {
+        alert("Failed to submit question. Please try again.");
+      }
     },
   });
 
