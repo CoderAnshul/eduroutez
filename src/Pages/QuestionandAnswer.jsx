@@ -124,7 +124,8 @@ const QuestionandAnswer = () => {
     const pendingQuestion = sessionStorage.getItem("pendingQuestion");
     const accessToken = localStorage.getItem("accessToken");
     
-    if (pendingQuestion && accessToken) {
+    // Only auto-submit if we have both pending question AND valid access token
+    if (pendingQuestion && accessToken && accessToken !== "null" && accessToken !== "undefined" && accessToken !== "") {
       try {
         const questionData = JSON.parse(pendingQuestion);
         // Pre-fill the form
@@ -158,6 +159,7 @@ const QuestionandAnswer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
 
     // Check for access token before submission (check for token existence and validity)
     const accessToken = localStorage.getItem("accessToken");
@@ -166,14 +168,14 @@ const QuestionandAnswer = () => {
       // Store current page URL and form data for redirect after login
       sessionStorage.setItem("redirectAfterLogin", location.pathname);
       sessionStorage.setItem("pendingQuestion", JSON.stringify(form));
-      // Redirect to login immediately
-      navigate("/login");
-      return;
+      // Redirect to login immediately without any delay or alerts
+      navigate("/login", { replace: true });
+      return false;
     }
 
     if (!form.question || !form.label || !form.grade) {
       alert("Please fill all required fields");
-      return;
+      return false;
     }
 
     try {
@@ -189,6 +191,7 @@ const QuestionandAnswer = () => {
       console.error("Submission error:", error);
       alert("Failed to submit question");
     }
+    return false;
   };
 
   const { mutate, isPending: isSubmitting } = useMutation({
@@ -216,13 +219,11 @@ const QuestionandAnswer = () => {
       console.error("Submission error:", error);
       // Check if it's an authentication error (401 Unauthorized)
       if (error.response?.status === 401 || error.response?.data?.message?.includes("Unauthorized") || error.response?.data?.message?.includes("token")) {
-        // Store form data and redirect to login
+        // Store form data and redirect to login immediately without alert or delay
         sessionStorage.setItem("redirectAfterLogin", location.pathname);
         sessionStorage.setItem("pendingQuestion", JSON.stringify(form));
-        alert("Please log in to submit your question. Redirecting to login...");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
+        // Redirect immediately without alert or delay to prevent page blink
+        navigate("/login", { replace: true });
       } else {
         alert("Failed to submit question. Please try again.");
       }

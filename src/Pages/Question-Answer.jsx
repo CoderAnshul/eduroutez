@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "react-query";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -156,13 +156,30 @@ const CombinedQuestionsPage = () => {
   const labels = ["Courses", "Career", "Institute", "Placement", "Admission"];
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const userEmail = localStorage.getItem("email") || "user@example.com";
+  
+  // Check if user is logged in - check localStorage directly
+  const isLoggedIn = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    const accessToken = localStorage.getItem("accessToken");
+    const isValid = !!(accessToken && accessToken !== "null" && accessToken !== "undefined" && accessToken !== "");
+    return isValid;
+  }, []);
+
+  // Redirect to login immediately if not logged in (before rendering content)
+  useEffect(() => {
+    if (!isLoggedIn) {
+      // Redirect immediately without toast to prevent blinking
+      navigate("/login", { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
 
   // Check for pending question after login redirect
   useEffect(() => {
     const pendingQuestion = sessionStorage.getItem("pendingQuestion");
     const accessToken = localStorage.getItem("accessToken");
     
-    if (pendingQuestion && accessToken) {
+    // Only auto-submit if we have both pending question AND valid access token
+    if (pendingQuestion && accessToken && accessToken !== "null" && accessToken !== "undefined" && accessToken !== "") {
       try {
         const questionData = JSON.parse(pendingQuestion);
         // Pre-fill the form
@@ -196,6 +213,13 @@ const CombinedQuestionsPage = () => {
   } = useQuery({
     queryKey: ["questions", currentPage, searchQuery, activeFilters, sortOrder],
     queryFn: async () => {
+      // Double-check authentication before making API call
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken || accessToken === "null" || accessToken === "undefined" || accessToken === "") {
+        console.log("API call prevented: User not logged in");
+        throw new Error("User not authenticated");
+      }
+
       // Create filters object in the requested format
       let queryParams = {
         page: currentPage,
@@ -217,6 +241,8 @@ const CombinedQuestionsPage = () => {
 
       return response.data.data;
     },
+    enabled: isLoggedIn, // Only fetch if user is logged in
+    retry: false, // Don't retry if it fails
   });
 
   const { mutate, isPending: isSubmitting } = useMutation({
@@ -246,13 +272,11 @@ const CombinedQuestionsPage = () => {
     onError: (error) => {
       // Check if it's an authentication error (401 Unauthorized)
       if (error.response?.status === 401 || error.response?.data?.message?.includes("Unauthorized") || error.response?.data?.message?.includes("token")) {
-        // Store form data and redirect to login
+        // Store form data and redirect to login immediately without showing error
         sessionStorage.setItem("redirectAfterLogin", location.pathname);
         sessionStorage.setItem("pendingQuestion", JSON.stringify(formData));
-        toast.error("Please log in to submit your question");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
+        // Redirect immediately without toast or delay to prevent page blink
+        navigate("/login", { replace: true });
       } else {
         toast.error("An error occurred. Please try again.");
       }
@@ -266,6 +290,7 @@ const CombinedQuestionsPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     
     // Check if user is logged in (check for token existence and validity)
     const accessToken = localStorage.getItem("accessToken");
@@ -273,12 +298,13 @@ const CombinedQuestionsPage = () => {
       // Store current page URL for redirect after login
       sessionStorage.setItem("redirectAfterLogin", location.pathname);
       sessionStorage.setItem("pendingQuestion", JSON.stringify(formData));
-      // Redirect to login
-      navigate("/login");
-      return;
+      // Redirect to login immediately without any delay or error messages
+      navigate("/login", { replace: true });
+      return false;
     }
     
     mutate(formData);
+    return false;
   };
 
   const handleSearchChange = (e) => {
@@ -306,6 +332,11 @@ const CombinedQuestionsPage = () => {
       year: "numeric",
     });
   };
+
+  // Don't render page content if not logged in - prevents blinking
+  if (!isLoggedIn) {
+    return null; // Return null to prevent any rendering
+  }
 
   return (
     <div className="max-w-8xl mx-auto p-4 md:p-6 min-h-screen h-fit">
