@@ -210,12 +210,16 @@ const InstitueName = ({ instituteData }) => {
   const handleApplyNow = () => {
     // Check if user is logged in
     if (!isLoggedIn()) {
+      // Show error message first
+      toast.error("Please login first");
       // Store the current page URL to redirect back after login
       sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
       // Store institute ID for reference
       sessionStorage.setItem('pendingInstituteId', instituteData?.data?._id);
-      // Redirect to login
-      navigate("/login");
+      // Redirect to login after showing the error message
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
       return;
     }
     
