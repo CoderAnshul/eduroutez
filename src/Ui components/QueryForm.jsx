@@ -1,10 +1,17 @@
 import React, { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { createQuery } from "../ApiFunctions/api";
 
 const QueryForm = ({ instituteData }) => {
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
+
+  // Helper function to check if user is logged in
+  const isLoggedIn = () => {
+    const accessToken = localStorage.getItem("accessToken");
+    return !!accessToken && accessToken !== "null" && accessToken !== "undefined";
+  };
 
   const validateForm = (formData) => {
     const newErrors = {};
@@ -35,6 +42,18 @@ const QueryForm = ({ instituteData }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submission initiated");
+
+    // Check if user is logged in
+    if (!isLoggedIn()) {
+      toast.error("Please login first");
+      // Store the current page URL to redirect back after login
+      sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+      // Redirect to login after showing the error message
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+      return;
+    }
 
     const formData = new FormData(e.target);
     
@@ -67,21 +86,9 @@ const QueryForm = ({ instituteData }) => {
   };
 
   return (
-    <div className="hidden lg:block items-center pt-4 min-w-[400px] justify-center min-h-44 w-1/5">
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      
+    <div className="hidden lg:block w-full">
       <form
-        className="w-full max-w-sm p-2 bg-[#F0FDF4] rounded-lg shadow-md"
+        className="w-full p-2 bg-[#F0FDF4] rounded-lg shadow-md"
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">

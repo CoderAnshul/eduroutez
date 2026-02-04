@@ -106,6 +106,34 @@ const CounselorListPage = () => {
     fetchAllCounselors();
   }, [category]);
 
+  // Sync category from URL with selectedStreams when coming from homepage
+  const [urlCategorySynced, setUrlCategorySynced] = useState(false);
+  
+  useEffect(() => {
+    if (category && streams.length > 0 && !urlCategorySynced) {
+      // Decode URL-encoded category (e.g., "Hospitality%20&%20Tourism" -> "Hospitality & Tourism")
+      const decodedCategory = decodeURIComponent(category);
+      
+      // Find matching stream by name (case-insensitive)
+      const normalizedCategory = decodedCategory.trim().toLowerCase();
+      const matchingStream = streams.find((stream) => {
+        const streamName = stream.name.trim().toLowerCase();
+        return streamName === normalizedCategory || 
+               streamName.includes(normalizedCategory) || 
+               normalizedCategory.includes(streamName);
+      });
+      
+      if (matchingStream) {
+        // Set the filter from URL, making it clickable
+        setSelectedStreams([matchingStream.name]);
+        setUrlCategorySynced(true);
+      }
+    } else if (!category) {
+      // Reset sync flag when category is removed from URL
+      setUrlCategorySynced(false);
+    }
+  }, [category, streams, urlCategorySynced]);
+
   const fetchAllCounselors = async () => {
     try {
       setLoading(true);

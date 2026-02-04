@@ -12,6 +12,7 @@ import axiosInstance from "../ApiFunctions/axios";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useCategories from "../DataFiles/categories";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,7 +43,20 @@ const Navbar = () => {
   };
 
   const handleQuestion = () => {
-    navigate("/question-&-answers");
+    // Check if user is logged in
+    const token = localStorage.getItem("accessToken");
+    const isLoggedIn = token && token !== "null" && token !== "undefined" && token !== "";
+    
+    if (isLoggedIn) {
+      // User is logged in, redirect to question-answer page
+      navigate("/question-&-answers");
+    } else {
+      // User is not logged in, show error and redirect to login
+      toast.error("Please login first");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    }
   };
 
   const handleLoginPopupClose = () => {
