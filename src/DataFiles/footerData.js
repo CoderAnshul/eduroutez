@@ -1,7 +1,7 @@
 export const trendingCareers = [
-  { name: "Top MBA Colleges", link: "/searchpage" },
-  { name: "MBA Colleges", link: "/searchpage" },
-  { name: "Executive MBA Colleges", link: "/searchpage" },
+  { name: "Top MBA Colleges", link: "/searchpage?stream=MBA&sort=rating" },
+  { name: "MBA Colleges", link: "/searchpage?stream=MBA" },
+  { name: "Executive MBA Colleges", link: "/searchpage?stream=Executive MBA" },
   { name: "MBA Exams", link: "/blogdetailpage/67c56776dc12f17c818f6207" },
   { name: "CAT", link: "/blogdetailpage/67c56d75dc12f17c818f66e5" },
   { name: "MAT", link: "/blogdetailpage/67c56eccdc12f17c818f69d8" },
@@ -9,8 +9,8 @@ export const trendingCareers = [
 ];
 
 export const popularCourses = [
-  { name: "Top Engineering Colleges", link: "/searchpage" },
-  { name: "Engineering Colleges", link: "/searchpage" },
+  { name: "Top Engineering Colleges", link: "/searchpage?stream=Engineering&sort=rating" },
+  { name: "Engineering Colleges", link: "/searchpage?stream=Engineering" },
   { name: "Engineering Exams", link: "/blogdetailpage/67bdae04db37623876ace5f7" },
   { name: "JEE Main", link: "/blogdetailpage/67bea9a2dfc5843fb292096b" },
   { name: "JEE Advanced", link: "/blogdetailpage/67beb3d4dfc5843fb2921a99" } 
@@ -23,8 +23,8 @@ export const topInstitutes = [
   { name: "NEET MDS", link: "/blogdetailpage/67bedff46890ce0aea1ba839" },
   { name: "INI CET", link: "/blogdetailpage/67bee2336890ce0aea1badf5" },
   { name: "FMGE", link: "/blogdetailpage/67bee3266890ce0aea1bafba" },
-  { name: "Top Medical Colleges", link: "/searchpage" },
-  { name: "Medical Colleges", link: "/searchpage" },
+  { name: "Top Medical Colleges", link: "/searchpage?stream=Medical&sort=rating" },
+  { name: "Medical Colleges", link: "/searchpage?stream=Medical" },
   { name: "Medical Exams", link: "/blogdetailpage/67c5778edc12f17c818f6bd5" },
 ];
 
