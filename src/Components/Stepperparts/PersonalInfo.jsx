@@ -61,12 +61,16 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
     ["student"],
     async () => {
       const id = localStorage.getItem("userId");
+      if (!id || id === "null" || id === "undefined") {
+        throw new Error("User ID not found in localStorage");
+      }
       const response = await axiosInstance.get(
         `${VITE_BASE_URL}/student/${id}`
       );
       return response.data;
     },
     {
+      enabled: !!localStorage.getItem("userId") && localStorage.getItem("userId") !== "null",
       onSuccess: (data) => {
         if (data?.data) {
           setEmail(data.data.email || "");

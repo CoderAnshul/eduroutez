@@ -18,6 +18,9 @@ const StudentDocument = () => {
   // Fetch student data
   const { data, isLoading, error } = useQuery("studentData", async () => {
     const userId = localStorage.getItem("userId");
+    if (!userId || userId === "null" || userId === "undefined") {
+      throw new Error("User ID not found in localStorage");
+    }
     const response = await axiosInstance.get(`${apiUrl}/student/${userId}`, {
       headers: {
         "x-access-token": localStorage.getItem("accessToken"),
@@ -26,6 +29,8 @@ const StudentDocument = () => {
       withCredentials: true,
     });
     return response.data;
+  }, {
+    enabled: !!localStorage.getItem("userId") && localStorage.getItem("userId") !== "null"
   });
 
   // Set initial previews from backend

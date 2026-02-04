@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, Code } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 import {
   trendingCareers,
   popularCourses,
@@ -284,17 +284,6 @@ const Footer = () => {
                 className="hover:text-white text-gray-400 transition-colors"
               >
                 Privacy Policy
-              </Link>
-            </div>
-            
-            {/* Developed by Nexprism */}
-            <div className="w-full sm:w-auto mt-4 sm:mt-0 flex items-center justify-center sm:justify-end text-xs text-gray-400">
-              <Link
-                to="https://nexprism.com"
-                target="_blank" 
-                className="hover:text-white text-gray-400 transition-colors text-xs"
-              >
-                Developed by Nexprism
               </Link>
             </div>
           </div>

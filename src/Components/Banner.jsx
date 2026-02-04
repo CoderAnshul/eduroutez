@@ -32,7 +32,9 @@ const Banner = () => {
           searchType === "counsellor" ? "counselors" : "institutes";
         console.log("Fetching from:", `${baseURL}/${endpoint}`);
 
-        const response = await axios.get(`${baseURL}/${endpoint}`);
+        // Add limit to reduce payload size and improve loading time
+        const limit = searchType === "counsellor" ? 50 : 100;
+        const response = await axios.get(`${baseURL}/${endpoint}?limit=${limit}&page=1`);
         console.log("API Response:", response.data);
 
         if (!isMounted) return;
@@ -92,7 +94,8 @@ const Banner = () => {
       }
     };
 
-    const debounceTimer = setTimeout(fetchSuggestions, 300);
+    // Increased debounce time to reduce API calls
+    const debounceTimer = setTimeout(fetchSuggestions, 500);
 
     return () => {
       isMounted = false;
