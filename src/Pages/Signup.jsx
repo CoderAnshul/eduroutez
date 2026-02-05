@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
@@ -7,10 +7,12 @@ import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 import { toast } from "react-toastify";
+import PasswordStrength from "../Components/PasswordStrength";
 
 const Signup = () => {
   const [showOtpDialog, setShowOtpDialog] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const otpInputRefs = useRef([]);
   const [timer, setTimer] = useState(90); // 90-second countdown
   const [canResend, setCanResend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -129,6 +131,16 @@ const Signup = () => {
     if (showOtpDialog) {
       setTimer(90);
       setCanResend(false);
+      // Reset OTP when dialog opens
+      setOtp(["", "", "", "", "", ""]);
+      // Focus first OTP input when dialog opens
+      setTimeout(() => {
+        const firstInput = otpInputRefs.current[0];
+        if (firstInput) {
+          firstInput.focus();
+          firstInput.select();
+        }
+      }, 150);
     }
   }, [showOtpDialog]);
 
@@ -161,15 +173,99 @@ const Signup = () => {
     },
   });
 
-  const handleOtpChange = (index, value) => {
-    if (!/^[0-9]?$/.test(value)) return;
+  const handleOtpChange = (index, e) => {
+    const value = e.target.value;
+
+    // Only allow numbers
+    if (value && !/^[0-9]$/.test(value)) {
+      e.target.value = otp[index]; // Reset to previous value
+      return;
+    }
+
+    // Only allow single digit - take the last character if multiple entered
+    const digit = value.slice(-1);
+
     const newOtp = [...otp];
-    newOtp[index] = value;
+    newOtp[index] = digit;
     setOtp(newOtp);
 
-    // Move to next input
-    if (value && index < otp.length - 1) {
-      document.getElementById(`otp-${index + 1}`).focus();
+    // Move to next input automatically when a digit is entered
+    if (digit && index < otp.length - 1) {
+      // Use requestAnimationFrame for better focus handling
+      requestAnimationFrame(() => {
+        const nextInput = otpInputRefs.current[index + 1];
+        if (nextInput) {
+          nextInput.focus();
+          nextInput.select(); // Select the text for easy replacement
+        }
+      });
+    }
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    // Handle backspace - move to previous input if current is empty
+    if (e.key === "Backspace") {
+      if (!otp[index] && index > 0) {
+        e.preventDefault();
+        const prevInput = otpInputRefs.current[index - 1];
+        if (prevInput) {
+          prevInput.focus();
+          prevInput.select();
+        }
+      } else if (otp[index]) {
+        // Clear current input on backspace
+        const newOtp = [...otp];
+        newOtp[index] = "";
+        setOtp(newOtp);
+      }
+    }
+
+    // Handle arrow keys
+    if (e.key === "ArrowLeft" && index > 0) {
+      e.preventDefault();
+      const prevInput = otpInputRefs.current[index - 1];
+      if (prevInput) {
+        prevInput.focus();
+        prevInput.select();
+      }
+    }
+    if (e.key === "ArrowRight" && index < otp.length - 1) {
+      e.preventDefault();
+      const nextInput = otpInputRefs.current[index + 1];
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      }
+    }
+
+    // Handle delete key
+    if (e.key === "Delete") {
+      const newOtp = [...otp];
+      newOtp[index] = "";
+      setOtp(newOtp);
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text');
+    const pastedNumbers = pastedData.replace(/[^\d]/g, '').split('').slice(0, 6);
+
+    if (pastedNumbers.length > 0) {
+      const newOtp = [...otp];
+      pastedNumbers.forEach((num, index) => {
+        if (index < otp.length) {
+          newOtp[index] = num;
+        }
+      });
+      setOtp(newOtp);
+
+      // Focus the next empty input or the last one
+      const nextEmptyIndex = newOtp.findIndex((val, idx) => !val && idx >= pastedNumbers.length);
+      const focusIndex = nextEmptyIndex === -1 ? Math.min(pastedNumbers.length - 1, otp.length - 1) : nextEmptyIndex;
+      setTimeout(() => {
+        otpInputRefs.current[focusIndex]?.focus();
+      }, 0);
     }
   };
 
@@ -193,17 +289,10 @@ const Signup = () => {
     onSuccess: (data) => {
       setIsLoading(false);
       toast.success("Registered successfully");
-      localStorage.setItem(
-        "accessToken",
-        JSON.stringify(data.data.accessToken)
-      );
+      localStorage.setItem("accessToken", data.data.accessToken);
       localStorage.setItem("userId", data?.data?.user?._id);
       localStorage.setItem("role", data?.data?.user?.role);
       localStorage.setItem("email", data?.data?.user?.email);
-      localStorage.setItem(
-        "accessToken",
-        JSON.stringify(data.data.accessToken)
-      );
 
       if (data?.data?.user?.role === "student") {
         navigate("/");
@@ -351,8 +440,8 @@ const Signup = () => {
     role === "institute"
       ? "Institute Name"
       : role === "counsellor"
-      ? "Counsellor Name"
-      : "Name";
+        ? "Counsellor Name"
+        : "Name";
 
   return (
     <div className="flex h-screen">
@@ -519,6 +608,7 @@ const Signup = () => {
               onChange={handleChange}
               required
             />
+            <PasswordStrength password={formData.password} />
           </div>
 
           {/* Confirm Password Field */}
@@ -617,11 +707,21 @@ const Signup = () => {
                 <input
                   key={index}
                   id={`otp-${index}`}
+                  ref={(el) => {
+                    if (el) otpInputRefs.current[index] = el;
+                  }}
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength="1"
                   value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onChange={(e) => handleOtpChange(index, e)}
+                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                  onPaste={handleOtpPaste}
+                  onFocus={(e) => e.target.select()}
                   className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+                  autoComplete="off"
+                  autoFocus={index === 0 && showOtpDialog}
                 />
               ))}
             </div>

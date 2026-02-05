@@ -49,23 +49,23 @@ const Login = () => {
       }
 
       console.log("Data", data);
-      
+
       // Store auth data
-      localStorage.setItem('accessToken', JSON.stringify(data.data.accessToken));
+      localStorage.setItem('accessToken', data.data.accessToken);
       localStorage.setItem('userId', data?.data?.user?._id);
       localStorage.setItem('role', data?.data?.user?.role);
       localStorage.setItem('email', data?.data?.user?.email);
-      localStorage.setItem('refreshToken', JSON.stringify(data.data.refreshToken));
-      
+      localStorage.setItem('refreshToken', data.data.refreshToken);
+
       toast.success("Logged in successfully!");
 
       // Check for pending application
       const pendingApplication = sessionStorage.getItem('pendingApplication');
       const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
-      
+
       // Check for pending webinar link
       const pendingWebinarLink = sessionStorage.getItem('pendingWebinarLink');
-      
+
       if (pendingWebinarLink) {
         // Clear the stored link
         sessionStorage.removeItem('pendingWebinarLink');
@@ -129,7 +129,7 @@ const Login = () => {
               className="block text-sm font-medium mb-1"
               htmlFor="email"
             >
-              Email 
+              Email
             </label>
             <input
               type="text"
