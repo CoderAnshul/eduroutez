@@ -60,16 +60,16 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
   );
 
   const overallRating =
-    institute.reviews.length > 0
+    institute?.reviews?.length > 0
       ? institute?.reviews.reduce(
-          (sum, review) =>
-            sum +
-            (review.placementStars || 0) +
-            (review.campusLifeStars || 0) +
-            (review.facultyStars || 0) +
-            (review.suggestionsStars || 0),
-          0
-        ) / (institute?.reviews.length * 4 || 1)
+        (sum, review) =>
+          sum +
+          (review.placementStars || 0) +
+          (review.campusLifeStars || 0) +
+          (review.facultyStars || 0) +
+          (review.suggestionsStars || 0),
+        0
+      ) / (institute?.reviews.length * 4 || 1)
       : 0;
   console.log("h", isNaN(overallRating) ? 3 : overallRating);
 
@@ -183,7 +183,7 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
                 {overallRating}
               </span>
             )}
-            <span>{institute.reviews.length} Reviews</span>
+            <span>{institute?.reviews?.length || 0} Reviews</span>
             <span className="flex items-center gap-2 text-gray-600">
               {institute.state?.name && (
                 <>

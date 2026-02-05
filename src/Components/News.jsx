@@ -77,22 +77,43 @@ const News = ({ instituteData, showNews = true }) => {
       if (!news?.image) {
         return PLACEHOLDER_IMAGE;
       }
-      
+
+      let imagePath = news.image;
+
+      // Replace backslashes with forward slashes (fix for Windows paths)
+      imagePath = imagePath.replace(/\\/g, '/');
+
       // If image already contains http/https, use it as is
-      if (news.image.startsWith('http://') || news.image.startsWith('https://')) {
-        return news.image;
+      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
       }
-      
+
       // Otherwise, prepend the image base URL
       if (Images) {
-        // Ensure there's no double slash
+        // Ensure strictly no double slash at the join
         const baseUrl = Images.endsWith('/') ? Images.slice(0, -1) : Images;
-        const imagePath = news.image.startsWith('/') ? news.image.slice(1) : news.image;
+
+        // Remove leading slash from image path if present
+        if (imagePath.startsWith('/')) {
+          imagePath = imagePath.slice(1);
+        }
+
+        // Robust handling: If base URL is the uploads directory, we likely just want the filename
+        // This handles "C:\fakepath\img.jpg", "uploads/img.jpg", "public/uploads/img.jpg"
+        if (baseUrl.endsWith('/uploads')) {
+          // If it looks like a path (has slashes), take the last part (filename)
+          if (imagePath.includes('/') || imagePath.includes('\\')) {
+            const parts = imagePath.split(/[/\\]/); // Split by / or \
+            imagePath = parts[parts.length - 1];
+          }
+        }
+
+        console.log(`News Image Processing: Original="${news.image}" | Processed="${baseUrl}/${imagePath}"`);
         return `${baseUrl}/${imagePath}`;
       }
-      
+
       // Fallback if Images is not set
-      return news.image.startsWith('/') ? news.image : `/${news.image}`;
+      return imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
     }, [news?.image, Images]);
 
     const [imgSrc, setImgSrc] = useState(imageUrl);

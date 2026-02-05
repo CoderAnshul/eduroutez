@@ -23,7 +23,7 @@ const BecomeCounselor = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
   const otpInputs = useRef(new Array(6).fill(null));
-  
+
   const navigate = useNavigate();
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -59,7 +59,7 @@ const BecomeCounselor = () => {
         email: formData.email,
         contact_number: formData.contactno
       });
-      
+
       if (response.data) {
         setIsOtpSent(true);
         setShowOtpModal(true);
@@ -79,29 +79,70 @@ const BecomeCounselor = () => {
     if (value.length > 1) {
       value = value.slice(-1);
     }
-  
+
     // Only allow numbers
     if (value && !/^\d+$/.test(value)) return;
-  
+
     const newOtpValues = [...otpValues];
     newOtpValues[index] = value;
     setOtpValues(newOtpValues);
-  
+
     // Set combined OTP in form data
     setFormData(prev => ({
       ...prev,
       otp: newOtpValues.join('')
     }));
-  
-    // Move to next input if typing a number
+
+    // Move to next input if typing a number - use requestAnimationFrame for better focus
     if (value && index < 5) {
-      otpInputs.current[index + 1]?.focus();
+      requestAnimationFrame(() => {
+        const nextInput = otpInputs.current[index + 1];
+        if (nextInput) {
+          nextInput.focus();
+          nextInput.select();
+        }
+      });
     }
   };
-  
+
   const handleKeyDown = (index, event) => {
-    if (event.key === "Backspace" && !otpValues[index] && index > 0) {
-      otpInputs.current[index - 1]?.focus();
+    // Handle backspace - move to previous input if current is empty
+    if (event.key === "Backspace") {
+      if (!otpValues[index] && index > 0) {
+        event.preventDefault();
+        const prevInput = otpInputs.current[index - 1];
+        if (prevInput) {
+          prevInput.focus();
+          prevInput.select();
+        }
+      } else if (otpValues[index]) {
+        // Clear current input on backspace
+        const newOtpValues = [...otpValues];
+        newOtpValues[index] = '';
+        setOtpValues(newOtpValues);
+        setFormData(prev => ({
+          ...prev,
+          otp: newOtpValues.join('')
+        }));
+      }
+    }
+
+    // Handle arrow keys
+    if (event.key === "ArrowLeft" && index > 0) {
+      event.preventDefault();
+      const prevInput = otpInputs.current[index - 1];
+      if (prevInput) {
+        prevInput.focus();
+        prevInput.select();
+      }
+    }
+    if (event.key === "ArrowRight" && index < 5) {
+      event.preventDefault();
+      const nextInput = otpInputs.current[index + 1];
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      }
     }
   };
 
@@ -109,7 +150,7 @@ const BecomeCounselor = () => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text');
     const pastedNumbers = pastedData.match(/\d/g);
-    
+
     if (pastedNumbers) {
       const newOtpValues = [...otpValues];
       pastedNumbers.slice(0, 6).forEach((num, index) => {
@@ -136,7 +177,7 @@ const BecomeCounselor = () => {
         contact_number: formData.contactno,
         otp: combinedOtp
       });
-      
+
       if (response.data) {
         setIsOtpVerified(true);
         setShowOtpModal(false);
@@ -149,7 +190,7 @@ const BecomeCounselor = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!isOtpVerified) {
       toast.error("Please verify your email/phone first");
       return;
@@ -175,7 +216,7 @@ const BecomeCounselor = () => {
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
           {/* Close button */}
-          <button 
+          <button
             onClick={() => setShowOtpModal(false)}
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
           >
@@ -196,12 +237,17 @@ const BecomeCounselor = () => {
                 key={index}
                 ref={el => otpInputs.current[index] = el}
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 maxLength={1}
                 value={value}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onPaste={handlePaste}
+                onFocus={(e) => e.target.select()}
                 className="w-12 h-12 text-center text-xl font-semibold border-2 rounded-lg focus:border-red-500 focus:outline-none"
+                autoComplete="off"
+                autoFocus={index === 0}
               />
             ))}
           </div>
@@ -233,7 +279,7 @@ const BecomeCounselor = () => {
     <div className="flex flex-col md:flex-row h-auto">
       <ToastContainer />
       <OtpModal />
-      
+
       {/* Left Section */}
       <div className="w-full md:w-1/2 bg-red-700 text-white flex flex-col justify-center items-center px-10 py-8 md:py-0">
         <h1 className="text-4xl lg:text-[45px] font-semibold mb-4 w-11/12 text-center md:text-start">

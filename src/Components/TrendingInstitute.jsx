@@ -94,11 +94,7 @@ const TrendingInstitute = () => {
   }
 
   if (content.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        No trending institutes available.
-      </div>
-    );
+    return null;
   }
 
   return (
