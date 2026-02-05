@@ -333,23 +333,7 @@ const TrendingCourses = () => {
             );
           })}
         </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-md p-8 text-center">
-          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BookOpen size={24} className="text-gray-500" />
-          </div>
-          <h3 className="text-xl font-semibold mb-2">
-            No Trending Courses Found
-          </h3>
-          <p className="text-gray-600 mb-6">
-            We couldn't find any trending courses at the moment. Check back
-            later!
-          </p>
-          <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
-            Refresh
-          </button>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 };

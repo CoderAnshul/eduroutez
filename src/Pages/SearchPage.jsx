@@ -27,7 +27,7 @@ const SearchPage = () => {
   const [streams, setStreams] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set the number of items per page
-  const inputField = useSelector((store) => store.input.inputField);
+  const inputField = useSelector((store) => store?.input?.inputField || "");
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const [searchSource, setSearchSource] = useState(null);
@@ -49,7 +49,7 @@ const SearchPage = () => {
   useEffect(() => {
     const fromSearch = searchParams.get("fromSearch") === "true";
     const hasUrlFilters = checkForUrlFilters();
-    
+
     // Set search query for display
     if (fromSearch && inputField) {
       setSearchQuery(inputField);
@@ -59,55 +59,57 @@ const SearchPage = () => {
     } else {
       setSearchSource("default");
     }
-    
+
     function checkForUrlFilters() {
-      return !!(streamFromUrl || stateFromUrl || cityFromUrl || 
-        examFromUrl || feesFromUrl || ratingsFromUrl || 
+      return !!(streamFromUrl || stateFromUrl || cityFromUrl ||
+        examFromUrl || feesFromUrl || ratingsFromUrl ||
         organizationTypeFromUrl || specializationFromUrl || sortFromUrl);
     }
   }, [inputField]);
-  
+
   // This effect handles the initial data loading based on search source
   useEffect(() => {
     if (!searchSource) return; // Wait until search source is determined
-    
+
     setLoading(true);
     setFetchError(false);
-    
+
     if (searchSource === "input" && inputField) {
       console.log("Loading data from Redux input:", inputField);
       // Load data based on the inputField from Redux with pagination
       getInstitutes(inputField, inputField, inputField, inputField, 1, itemsPerPage)
         .then((data) => {
-          const { result, totalDocuments, currentPage, totalPages } = data.data;
-          setContent(result);
-          setFilteredContent(result);
+          const { result = [], totalDocuments, currentPage, totalPages } = data?.data || {};
+          const safeResult = Array.isArray(result) ? result : [];
+          setContent(safeResult);
+          setFilteredContent(safeResult);
           setTotalDocuments(totalDocuments);
           setCurrentPage(currentPage || 1);
-  
+
           if (result && result.length > 0) {
             updateIdMapping(result);
           }
+          // Set loading to false as soon as data is received
+          setLoading(false);
+          setInitialLoadComplete(true);
         })
         .catch((error) => {
           console.error("Error fetching institutes:", error);
           setFetchError(true);
-        })
-        .finally(() => {
           setLoading(false);
           setInitialLoadComplete(true);
         });
-    } 
+    }
     else if (searchSource === "url") {
       // Build filters from URL parameters for state management
       // But let Filter component handle the actual fetch via onFiltersChanged
       const initialFilters = buildInitialFiltersFromUrl();
       console.log("URL filters detected, waiting for Filter component to initialize:", initialFilters);
-      
+
       setSelectedFilters(initialFilters);
       // Don't set filtersApplied yet - let Filter component trigger it via onFiltersChanged
       // This prevents duplicate fetches
-      
+
       // If no filters in URL, load default data
       if (Object.keys(initialFilters).length === 0 && !sortFromUrl) {
         getInstitutes("", "", "", "", 1, itemsPerPage)
@@ -149,20 +151,21 @@ const SearchPage = () => {
           setLoading(false);
         }
       }
-    } 
+    }
     else {
       // Default data loading with pagination limit
       console.log("Loading default data");
       setSelectedFilters({});
-      
+
       getInstitutes("", "", "", "", 1, itemsPerPage)
         .then((data) => {
-          const { result, totalDocuments, currentPage, totalPages } = data.data;
-          setContent(result);
-          setFilteredContent(result);
+          const { result = [], totalDocuments, currentPage, totalPages } = data?.data || {};
+          const safeResult = Array.isArray(result) ? result : [];
+          setContent(safeResult);
+          setFilteredContent(safeResult);
           setTotalDocuments(totalDocuments);
           setCurrentPage(currentPage || 1);
-  
+
           if (result && result.length > 0) {
             updateIdMapping(result);
           }
@@ -177,11 +180,11 @@ const SearchPage = () => {
         });
     }
   }, [searchSource]);
-  
+
   // Helper function to build filters from URL params
   function buildInitialFiltersFromUrl() {
     const initialFilters = {};
-    
+
     if (streamFromUrl) {
       const streamValues = streamFromUrl
         .split(",")
@@ -191,7 +194,7 @@ const SearchPage = () => {
         initialFilters.streams = streamValues;
       }
     }
-  
+
     if (stateFromUrl) initialFilters.state = [stateFromUrl];
     if (cityFromUrl) initialFilters.city = [cityFromUrl];
     if (examFromUrl) initialFilters.Exam = [examFromUrl];
@@ -199,7 +202,7 @@ const SearchPage = () => {
     if (ratingsFromUrl) initialFilters.Ratings = [ratingsFromUrl];
     if (organizationTypeFromUrl) initialFilters.organisationType = [organizationTypeFromUrl];
     if (specializationFromUrl) initialFilters.specialization = [specializationFromUrl];
-    
+
     return initialFilters;
   }
 
@@ -590,7 +593,7 @@ const SearchPage = () => {
       window.scrollTo(0, scrollPosition);
     }, 0);
   };
-  
+
   const handleFilterChange = (filterCategory, filterValue) => {
     // This function should do nothing or be removed entirely
     // Let Filter component handle all filter state
@@ -626,14 +629,14 @@ const SearchPage = () => {
   //     const queryString = `filters=${encodeURIComponent(
   //       JSON.stringify(apiFilters)
   //     )}&page=${page}&limit=${limit}`;
-      
+
   //     console.log(`Fetching data with query: ${queryString}`);
   //     const response = await axios.get(`${baseURL}/institutes?${queryString}`);
 
   //     if (response.data) {
   //       const { result, currentPage, totalPages, totalDocuments } = response.data.data;
   //       console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
-        
+
   //       setContent(result);
   //       setFilteredContent(result);
   //       setTotalDocuments(totalDocuments);
@@ -652,81 +655,82 @@ const SearchPage = () => {
   // };
 
   // Modified fetchFilteredInstitutes function - return the promise
-const fetchFilteredInstitutes = async (filters, page, limit, sortField = null) => {
-  setLoading(true);
-  setFetchError(false);
+  const fetchFilteredInstitutes = async (filters, page, limit, sortField = null) => {
+    setLoading(true);
+    setFetchError(false);
 
-  try {
-    // Create a deep copy of filters to avoid modifying the original
-    const apiFilters = JSON.parse(JSON.stringify(filters));
+    try {
+      // Create a deep copy of filters to avoid modifying the original
+      const apiFilters = JSON.parse(JSON.stringify(filters));
 
-    // Ensure we're using "streams" (plural) for the API
-    if (apiFilters.stream && !apiFilters.streams) {
-      apiFilters.streams = apiFilters.stream;
-      delete apiFilters.stream;
-    }
-
-    // Make sure all filter arrays are properly formatted
-    Object.keys(apiFilters).forEach((key) => {
-      // If the value is not already an array, convert it to an array
-      if (!Array.isArray(apiFilters[key])) {
-        apiFilters[key] = [apiFilters[key]];
+      // Ensure we're using "streams" (plural) for the API
+      if (apiFilters.stream && !apiFilters.streams) {
+        apiFilters.streams = apiFilters.stream;
+        delete apiFilters.stream;
       }
-    });
 
-    console.log("Sending filters to API:", apiFilters);
+      // Make sure all filter arrays are properly formatted
+      Object.keys(apiFilters).forEach((key) => {
+        // If the value is not already an array, convert it to an array
+        if (!Array.isArray(apiFilters[key])) {
+          apiFilters[key] = [apiFilters[key]];
+        }
+      });
 
-    // Build query string with sort parameter if provided
-    let queryString = `filters=${encodeURIComponent(
-      JSON.stringify(apiFilters)
-    )}&page=${page}&limit=${limit}`;
-    
-    // Add sort parameter if provided (e.g., sort=rating for top colleges)
-    if (sortField) {
-      const sortObj = { [sortField]: "desc" }; // Sort descending for rating (highest first)
-      queryString += `&sort=${encodeURIComponent(JSON.stringify(sortObj))}`;
+      console.log("Sending filters to API:", apiFilters);
+
+      // Build query string with sort parameter if provided
+      let queryString = `filters=${encodeURIComponent(
+        JSON.stringify(apiFilters)
+      )}&page=${page}&limit=${limit}`;
+
+      // Add sort parameter if provided (e.g., sort=rating for top colleges)
+      if (sortField) {
+        const sortObj = { [sortField]: "desc" }; // Sort descending for rating (highest first)
+        queryString += `&sort=${encodeURIComponent(JSON.stringify(sortObj))}`;
+      }
+
+      console.log(`Fetching data with query: ${queryString}`);
+      const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+
+      if (response.data) {
+        const { result = [], currentPage, totalPages, totalDocuments } = response?.data?.data || {};
+        console.log(`Received page ${currentPage} of ${totalPages}, with ${result?.length || 0} results out of ${totalDocuments} total`);
+
+        const safeResult = Array.isArray(result) ? result : [];
+        setContent(safeResult);
+        setFilteredContent(safeResult);
+        setTotalDocuments(totalDocuments);
+        setCurrentPage(currentPage || 1); // Update current page from API response
+
+        if (result && result.length > 0) {
+          updateIdMapping(result);
+        }
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching filtered institutes:", error);
+      setFetchError(true);
+      throw error;
+    } finally {
+      setLoading(false);
     }
-    
-    console.log(`Fetching data with query: ${queryString}`);
-    const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+  };
 
-    if (response.data) {
-      const { result, currentPage, totalPages, totalDocuments } = response.data.data;
-      console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
-      
-      setContent(result);
-      setFilteredContent(result);
-      setTotalDocuments(totalDocuments);
-      setCurrentPage(currentPage || 1); // Update current page from API response
-
-      if (result && result.length > 0) {
-        updateIdMapping(result);
+  // Modified useEffect for filter changes
+  useEffect(() => {
+    // Only run this effect if:
+    // 1. Initial loading is complete
+    // 2. Filters have been applied (either from URL or user selection)
+    // 3. This handles pagination changes after filters are applied
+    if (initialLoadComplete && filtersApplied && Object.keys(selectedFilters).length > 0) {
+      // Only fetch if page changed (not on initial filter application, which is handled in handleFiltersChanged)
+      if (currentPage > 1) {
+        console.log("Fetching data for page change:", selectedFilters, "Page:", currentPage);
+        fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage, sortFromUrl || null);
       }
     }
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching filtered institutes:", error);
-    setFetchError(true);
-    throw error;
-  } finally {
-    setLoading(false);
-  }
-};
-
-// Modified useEffect for filter changes
-useEffect(() => {
-  // Only run this effect if:
-  // 1. Initial loading is complete
-  // 2. Filters have been applied (either from URL or user selection)
-  // 3. This handles pagination changes after filters are applied
-  if (initialLoadComplete && filtersApplied && Object.keys(selectedFilters).length > 0) {
-    // Only fetch if page changed (not on initial filter application, which is handled in handleFiltersChanged)
-    if (currentPage > 1) {
-      console.log("Fetching data for page change:", selectedFilters, "Page:", currentPage);
-      fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage, sortFromUrl || null);
-    }
-  }
-}, [currentPage]); // Only depend on currentPage - filter changes are handled in handleFiltersChanged
+  }, [currentPage]); // Only depend on currentPage - filter changes are handled in handleFiltersChanged
 
 
 
@@ -735,23 +739,24 @@ useEffect(() => {
     console.log(`Changing to page ${newPage}`);
     // Save current scroll position
     const scrollPosition = window.scrollY;
-    
+
     // Update current page state
     setCurrentPage(newPage);
-    
+
     // Explicitly fetch new page data to ensure it happens
     // This is a backup to the useEffect, providing redundancy
     fetchFilteredInstitutes(selectedFilters, newPage, itemsPerPage, sortFromUrl || null);
-    
+
     // Scroll to top after page change
     window.scrollTo(0, 0);
   };
 
   useEffect(() => {
-    if (searchQuery.length > 0) {
-      const filtered = content.filter((item) =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    if (searchQuery.length > 0 && Array.isArray(content)) {
+      const filtered = content.filter((item) => {
+        const name = item.instituteName || item.name || "";
+        return name.toLowerCase().includes(searchQuery.toLowerCase());
+      });
       setFilteredContent(filtered);
     } else {
       setFilteredContent(content);
@@ -766,14 +771,14 @@ useEffect(() => {
     const maxButtonsToShow = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
     let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-    
+
     // Adjust if we're near the end
     if (endPage - startPage + 1 < maxButtonsToShow) {
       startPage = Math.max(1, endPage - maxButtonsToShow + 1);
     }
 
     const pageButtons = [];
-    
+
     // Previous button
     if (currentPage > 1) {
       pageButtons.push(
@@ -786,7 +791,7 @@ useEffect(() => {
         </button>
       );
     }
-    
+
     // First page button if not starting from page 1
     if (startPage > 1) {
       pageButtons.push(
@@ -798,7 +803,7 @@ useEffect(() => {
           1
         </button>
       );
-      
+
       // Show ellipsis if there's a gap
       if (startPage > 2) {
         pageButtons.push(
@@ -806,31 +811,30 @@ useEffect(() => {
         );
       }
     }
-    
+
     // Page number buttons
     for (let i = startPage; i <= endPage; i++) {
       pageButtons.push(
         <button
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`px-4 py-2 mx-1 ${
-            currentPage === i
-              ? "bg-[#b82025] text-white"
-              : "bg-gray-200"
-          }`}
+          className={`px-4 py-2 mx-1 ${currentPage === i
+            ? "bg-[#b82025] text-white"
+            : "bg-gray-200"
+            }`}
         >
           {i}
         </button>
       );
     }
-    
+
     // Show ellipsis if there's a gap before the last page
     if (endPage < totalPages - 1) {
       pageButtons.push(
         <span key="endEllipsis" className="px-2">...</span>
       );
     }
-    
+
     // Last page button if not ending at the last page
     if (endPage < totalPages) {
       pageButtons.push(
@@ -843,7 +847,7 @@ useEffect(() => {
         </button>
       );
     }
-    
+
     // Next button
     if (currentPage < totalPages) {
       pageButtons.push(
@@ -866,15 +870,15 @@ useEffect(() => {
 
   const handleFiltersChanged = (filters) => {
     console.log("Filters changed in Filter component:", filters);
-    
+
     // Save current scroll position
     const scrollPosition = window.scrollY;
-    
+
     // Reset page to 1 when filters change
     setCurrentPage(1);
     setSelectedFilters(filters);
     setFiltersApplied(true);
-    
+
     // Immediately fetch filtered data - don't wait for useEffect
     // This ensures data is fetched right away when filters change
     // Always fetch if filters are provided, regardless of initialLoadComplete
@@ -900,9 +904,10 @@ useEffect(() => {
         setLoading(true);
         getInstitutes("", "", "", "", 1, itemsPerPage)
           .then((data) => {
-            const { result, totalDocuments, currentPage, totalPages } = data.data;
-            setContent(result);
-            setFilteredContent(result);
+            const { result = [], totalDocuments, currentPage, totalPages } = data?.data || {};
+            const safeResult = Array.isArray(result) ? result : [];
+            setContent(safeResult);
+            setFilteredContent(safeResult);
             setTotalDocuments(totalDocuments);
             setCurrentPage(currentPage || 1);
 
@@ -918,19 +923,19 @@ useEffect(() => {
           });
       }
     }
-    
+
     // Restore scroll position
     setTimeout(() => {
       window.scrollTo(0, scrollPosition);
     }, 0);
   };
-  
+
   // const handlePageChange = (newPage) => {
   //   console.log(`Changing to page ${newPage}`);
-    
+
   //   // Update current page state
   //   setCurrentPage(newPage);
-    
+
   //   // Scroll to top after page change
   //   window.scrollTo(0, 0);
   // };
@@ -971,7 +976,7 @@ useEffect(() => {
                 </div>
               </div>
             )}
-            
+
             {loading ? (
               <div className="space-y-4">
                 <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>

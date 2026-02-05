@@ -206,24 +206,10 @@ const InstitueName = ({ instituteData }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle Apply Now button click - check login status first
+  // Handle Apply Now button click - always open the form
   const handleApplyNow = () => {
-    // Check if user is logged in
-    if (!isLoggedIn()) {
-      // Show error message first
-      toast.error("Please login first");
-      // Store the current page URL to redirect back after login
-      sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-      // Store institute ID for reference
-      sessionStorage.setItem('pendingInstituteId', instituteData?.data?._id);
-      // Redirect to login after showing the error message
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
-      return;
-    }
-    
-    // User is logged in, open the form popup
+    // Always open the form popup
+    // Login check will happen on form submission
     setIsPopupVisible(true);
   };
 
@@ -232,6 +218,9 @@ const InstitueName = ({ instituteData }) => {
 
     // Check if user is logged in
     if (!isLoggedIn()) {
+      // Show error message first
+      toast.error("Please login first");
+      
       // Store form data in sessionStorage
       const applicationData = {
         name: formData.name,
@@ -249,10 +238,14 @@ const InstitueName = ({ instituteData }) => {
       
       // Store the current page URL to redirect back after login
       sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+      // Store institute ID for reference
+      sessionStorage.setItem('pendingInstituteId', instituteData?.data?._id);
       
-      // Close popup and redirect to login
+      // Close popup and redirect to login after showing error
       setIsPopupVisible(false);
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
       return;
     }
 
