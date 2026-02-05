@@ -130,7 +130,7 @@ const BestRated = React.memo(() => {
     return (
       <div className="w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
         <div className="flex items-center justify-between mb-10">
-          <h3 className="text-xl font-bold">Best Rated Institutes</h3>
+          <h3 className="text-2xl font-bold">Best Rated Institutes</h3>
         </div>
         <div className="boxWrapper w-full flex flex-col md:flex-row flex-wrap items-center gap-6">
           {[1, 2, 3].map((i) => (
@@ -166,7 +166,7 @@ const BestRated = React.memo(() => {
   return (
     <div className="w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
       <div className="flex items-center justify-between mb-10">
-        <h3 className="text-xl font-bold">Best Rated Institutes</h3>
+        <h3 className="text-2xl font-bold">Best Rated Institutes</h3>
         <button
           onClick={handleViewMore}
           className="bg-[#b82025] text-white py-2 px-4 rounded"
