@@ -492,7 +492,7 @@ const Instituepage = () => {
               )}
             </div>
           </div>
-          <div className="w-[300px] flex-shrink-0 h-fit">
+          <div className="w-[300px] flex-shrink-0 h-fit pt-4">
             <div className="sticky top-20 z-10 space-y-4">
               {/* Career Guidance Webinar Button */}
               <Link to="/counselor">

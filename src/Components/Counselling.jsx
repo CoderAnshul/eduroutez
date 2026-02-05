@@ -40,7 +40,7 @@ const Counselling = () => {
   return (
     <div className="w-full max-w-[1420px] min-h-44 pl-[10px] pb-10">
       <div className="flex items-center justify-between mb-10">
-        <h3 className="text-xl font-bold">Admission Counselling</h3>
+        <h3 className="text-2xl font-bold">Admission Counselling</h3>
         <Link to="/counselor">
           <button className="bg-[#b82025] text-white py-2 px-4 rounded">
             View more
