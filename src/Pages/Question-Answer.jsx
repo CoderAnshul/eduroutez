@@ -165,14 +165,6 @@ const CombinedQuestionsPage = () => {
     return isValid;
   }, []);
 
-  // Redirect to login immediately if not logged in (before rendering content)
-  useEffect(() => {
-    if (!isLoggedIn) {
-      // Redirect immediately without toast to prevent blinking
-      navigate("/login", { replace: true });
-    }
-  }, [isLoggedIn, navigate]);
-
   // Check for pending question after login redirect
   useEffect(() => {
     const pendingQuestion = sessionStorage.getItem("pendingQuestion");
@@ -295,11 +287,15 @@ const CombinedQuestionsPage = () => {
     // Check if user is logged in (check for token existence and validity)
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken || accessToken === "null" || accessToken === "undefined" || accessToken === "") {
-      // Store current page URL for redirect after login
+      // Show error message first
+      toast.error("Please login first");
+      // Store current page URL and form data for redirect after login
       sessionStorage.setItem("redirectAfterLogin", location.pathname);
       sessionStorage.setItem("pendingQuestion", JSON.stringify(formData));
-      // Redirect to login immediately without any delay or error messages
-      navigate("/login", { replace: true });
+      // Redirect to login after showing error
+      setTimeout(() => {
+        navigate("/login", { replace: true });
+      }, 1500);
       return false;
     }
     
@@ -332,11 +328,6 @@ const CombinedQuestionsPage = () => {
       year: "numeric",
     });
   };
-
-  // Don't render page content if not logged in - prevents blinking
-  if (!isLoggedIn) {
-    return null; // Return null to prevent any rendering
-  }
 
   return (
     <div className="max-w-8xl mx-auto p-4 md:p-6 min-h-screen h-fit">
@@ -494,7 +485,17 @@ const CombinedQuestionsPage = () => {
 
           {/* Questions List (Scrollable) */}
           <div className="mt-4 relative z-10">
-            {isLoading ? (
+            {!isLoggedIn ? (
+              <div className="text-center py-12">
+                <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-2xl font-semibold text-gray-800">
+                  Please Login to View Questions
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  You can still ask a question using the form on the left. After submitting, you'll be redirected to login.
+                </p>
+              </div>
+            ) : isLoading ? (
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
               </div>

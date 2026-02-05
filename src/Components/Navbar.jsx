@@ -43,20 +43,9 @@ const Navbar = () => {
   };
 
   const handleQuestion = () => {
-    // Check if user is logged in
-    const token = localStorage.getItem("accessToken");
-    const isLoggedIn = token && token !== "null" && token !== "undefined" && token !== "";
-    
-    if (isLoggedIn) {
-      // User is logged in, redirect to question-answer page
-      navigate("/question-&-answers");
-    } else {
-      // User is not logged in, show error and redirect to login
-      toast.error("Please login first");
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
-    }
+    // Always navigate to question-answer page
+    // The page will handle login check on form submission
+    navigate("/question-&-answers");
   };
 
   const handleLoginPopupClose = () => {
