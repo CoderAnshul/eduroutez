@@ -72,10 +72,15 @@ const StreamLevelPage = () => {
 
             // Fetch stream-related institutes using stream name
             try {
-              const institutesResponse = await axios.get(
-                `${baseURL}/best-rated-institute?filters={"streams":["${streamName}"]}&limit=6`
-              );
-              setStreamInstitutes(institutesResponse.data?.data || []);
+              // Use the /institutes endpoint with filters to get stream-related institutes
+              const filters = JSON.stringify({ streams: [streamName] });
+              const apiUrl = `${baseURL}/institutes?filters=${encodeURIComponent(filters)}&limit=6&sort=${encodeURIComponent(JSON.stringify({ overallRating: "desc" }))}`;
+              console.log("Fetching institutes for stream:", streamName);
+              console.log("API URL:", apiUrl);
+              const institutesResponse = await axios.get(apiUrl);
+              const institutes = institutesResponse.data?.data?.result || [];
+              console.log(`Found ${institutes.length} institutes for stream "${streamName}"`);
+              setStreamInstitutes(institutes);
             } catch (instituteErr) {
               console.error("Error fetching institutes:", instituteErr);
             } finally {
@@ -99,10 +104,11 @@ const StreamLevelPage = () => {
 
             // Try fetching institutes without stream name filter
             try {
+              // Use the /institutes endpoint sorted by rating
               const institutesResponse = await axios.get(
-                `${baseURL}/best-rated-institute?limit=6`
+                `${baseURL}/institutes?limit=6&sort=${encodeURIComponent(JSON.stringify({ overallRating: "desc" }))}`
               );
-              setStreamInstitutes(institutesResponse.data?.data || []);
+              setStreamInstitutes(institutesResponse.data?.data?.result || []);
             } catch (instituteErr) {
               console.error("Error fetching institutes:", instituteErr);
             } finally {
@@ -124,10 +130,11 @@ const StreamLevelPage = () => {
           }
 
           try {
+            // Use the /institutes endpoint sorted by rating
             const institutesResponse = await axios.get(
-              `${baseURL}/best-rated-institute?limit=6`
+              `${baseURL}/institutes?limit=6&sort=${encodeURIComponent(JSON.stringify({ overallRating: "desc" }))}`
             );
-            setStreamInstitutes(institutesResponse.data?.data || []);
+            setStreamInstitutes(institutesResponse.data?.data?.result || []);
           } catch (instituteErr) {
             console.error("Error fetching institutes:", instituteErr);
           } finally {
