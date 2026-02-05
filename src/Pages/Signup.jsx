@@ -16,6 +16,7 @@ const Signup = () => {
   const [timer, setTimer] = useState(90); // 90-second countdown
   const [canResend, setCanResend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const roleTypes = [
     { value: "institute", label: "University/College/Institute" },
@@ -362,6 +363,10 @@ const Signup = () => {
       toast.error("Passwords do not match");
       return false;
     }
+    if (!isPasswordValid) {
+      toast.error("Password does not meet all requirements");
+      return false;
+    }
     if (
       !formData.name ||
       !formData.role ||
@@ -608,7 +613,10 @@ const Signup = () => {
               onChange={handleChange}
               required
             />
-            <PasswordStrength password={formData.password} />
+            <PasswordStrength
+              password={formData.password}
+              onValidationChange={(isValid) => setIsPasswordValid(isValid)}
+            />
           </div>
 
           {/* Confirm Password Field */}
