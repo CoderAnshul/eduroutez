@@ -3,6 +3,7 @@ import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import PasswordStrength from "../Components/PasswordStrength";
 
 const BecomeCounselor = () => {
   const [formData, setFormData] = useState({
@@ -378,6 +379,7 @@ const BecomeCounselor = () => {
               placeholder="Create a password"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             />
+            <PasswordStrength password={formData.password} />
           </div>
 
           <div className="mb-4">

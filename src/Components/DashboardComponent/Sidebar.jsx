@@ -19,7 +19,7 @@ const Sidebar = () => {
     { name: "Logout", path: "/dashboard/logout", icon: "🚪" },
   ];
 
-  const handleLogout = async () => {
+  const handleLogout = async (name) => {
     if (name === "Logout") {
       try {
         const response = await axiosInstance(
@@ -62,8 +62,7 @@ const Sidebar = () => {
                   to={item.path}
                   end={item.path === "/dashboard"} // Add 'end' only for the Dashboard route
                   className={({ isActive }) =>
-                    `flex items-center gap-3 p-2 rounded-md ${
-                      isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
+                    `flex items-center gap-3 p-2 rounded-md ${isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
                     }`
                   }
                   onClick={() => handleLogout(item.name)}
@@ -90,8 +89,7 @@ const Sidebar = () => {
                 to={item.path}
                 end={item.path === "/dashboard"} // Add 'end' only for the Dashboard route
                 className={({ isActive }) =>
-                  `flex items-center gap-2 p-2 rounded-md ${
-                    isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
+                  `flex items-center gap-2 p-2 rounded-md ${isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
                   }`
                 }
               >
