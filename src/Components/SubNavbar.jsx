@@ -239,10 +239,10 @@ const SubNavbar = ({ categories }) => {
       category.label === "MEDIA"
         ? "transform translate-x-[-50%]"
         : boundingBox.left <= categoryWidth
-        ? "left-0"
-        : viewportWidth - boundingBox.right <= categoryWidth
-        ? "right-0"
-        : "left-0"
+          ? "left-0"
+          : viewportWidth - boundingBox.right <= categoryWidth
+            ? "right-0"
+            : "left-0"
     );
 
     setHoveredCategory(category.label);
@@ -307,8 +307,8 @@ const SubNavbar = ({ categories }) => {
   const handleViewAllCourses = () => { navigate("/popularcourses"); setHoveredCategory(null); };
   const handleViewAllCareers = () => { navigate("/careerspage"); setHoveredCategory(null); };
   const handleViewAllColleges = () => { navigate("/topcolleges"); setHoveredCategory(null); };
-  const handleAllCollegesByCity = () => { navigate("/searchpage"); setHoveredCategory(null); };
-  const handleAllCollegesByState = () => { navigate("/searchpage"); setHoveredCategory(null); };
+  const handleAllCollegesByCity = () => { navigate(`/searchpage${activeStream ? `?stream=${encodeURIComponent(activeStream)}` : ""}`); setHoveredCategory(null); };
+  const handleAllCollegesByState = () => { navigate(`/searchpage${activeStream ? `?stream=${encodeURIComponent(activeStream)}` : ""}`); setHoveredCategory(null); };
   const handleMouseLeave = () => { setHoveredCategory(null); setDropdownAlignment(""); };
   const handleViewAllNews = () => { navigate("/news"); setHoveredCategory(null); };
 
@@ -557,9 +557,8 @@ const SubNavbar = ({ categories }) => {
             {category?.sidebarItems?.map((item) => (
               <li
                 key={item.id}
-                className={`px-2 py-2 group mb-0 text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${
-                  activeContent[category.label] === item.id ? "bg-black border-l-2 border-black text-white" : "bg-[#b82025] text-white"
-                }`}
+                className={`px-2 py-2 group mb-0 text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${activeContent[category.label] === item.id ? "bg-black border-l-2 border-black text-white" : "bg-[#b82025] text-white"
+                  }`}
                 onMouseEnter={() => {
                   setActiveContent((prev) => ({ ...prev, [category.label]: item.id }));
                   if (category.label === "Colleges" || category.label === "Exams") {
@@ -651,14 +650,14 @@ const SubNavbar = ({ categories }) => {
                       {category.label === "Courses"
                         ? renderCoursesContent()
                         : category.label === "Careers"
-                        ? renderCareersContent()
-                        : category.label === "Latest Updates"
-                        ? renderNewsContent()
-                        : category.label === "Top Colleges"
-                        ? renderTopCollegesContent()
-                        : category.label === "More"
-                        ? renderMoreContent()
-                        : renderRegularContent(category)}
+                          ? renderCareersContent()
+                          : category.label === "Latest Updates"
+                            ? renderNewsContent()
+                            : category.label === "Top Colleges"
+                              ? renderTopCollegesContent()
+                              : category.label === "More"
+                                ? renderMoreContent()
+                                : renderRegularContent(category)}
                     </div>
                   )}
                 </div>

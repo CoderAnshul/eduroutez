@@ -1,7 +1,7 @@
 export const trendingCareers = [
-  { name: "Top MBA Colleges", link: "/searchpage?stream=MBA&sort=rating" },
-  { name: "MBA Colleges", link: "/searchpage?stream=MBA" },
-  { name: "Executive MBA Colleges", link: "/searchpage?stream=Executive MBA" },
+  { name: "Top MBA Colleges", link: "/searchpage?stream=Management&sort=rating" },
+  { name: "MBA Colleges", link: "/searchpage?stream=Management" },
+  { name: "Executive MBA Colleges", link: "/searchpage?stream=Management" },
   { name: "MBA Exams", link: "/blogdetailpage/67c56776dc12f17c818f6207" },
   { name: "CAT", link: "/blogdetailpage/67c56d75dc12f17c818f66e5" },
   { name: "MAT", link: "/blogdetailpage/67c56eccdc12f17c818f69d8" },
@@ -13,7 +13,7 @@ export const popularCourses = [
   { name: "Engineering Colleges", link: "/searchpage?stream=Engineering" },
   { name: "Engineering Exams", link: "/blogdetailpage/67bdae04db37623876ace5f7" },
   { name: "JEE Main", link: "/blogdetailpage/67bea9a2dfc5843fb292096b" },
-  { name: "JEE Advanced", link: "/blogdetailpage/67beb3d4dfc5843fb2921a99" } 
+  { name: "JEE Advanced", link: "/blogdetailpage/67beb3d4dfc5843fb2921a99" }
 ];
 
 export const topInstitutes = [

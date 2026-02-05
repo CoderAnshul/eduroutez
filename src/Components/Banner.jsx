@@ -107,50 +107,45 @@ const Banner = () => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setInputField(value);
-    if (value.length >= 2) {
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
-    }
   };
 
   // In Banner.jsx
-const handleSuggestionClick = (suggestion) => {
-  if (searchType === "course") {
-    setInputField(suggestion.courseTitle);
-    dispatch(setInput(suggestion.courseTitle));
-    navigate("/searchpage");
-  } else if (searchType === "counsellor") {
-    setInputField(suggestion.firstname + " " + suggestion.lastname);
-    navigate(`/counselor?name=${encodeURIComponent(suggestion.firstname + " " + suggestion.lastname)}`);
-  } else {
-    // For institutes, include a search flag to indicate this came from search
-    setInputField(suggestion.instituteName);
-    dispatch(setInput(suggestion.instituteName));
-    navigate("/searchpage?fromSearch=true");
-  }
-  setShowSuggestions(false);
-};
+  const handleSuggestionClick = (suggestion) => {
+    if (searchType === "course") {
+      setInputField(suggestion.courseTitle);
+      dispatch(setInput(suggestion.courseTitle));
+      navigate("/searchpage");
+    } else if (searchType === "counsellor") {
+      setInputField(suggestion.firstname + " " + suggestion.lastname);
+      navigate(`/counselor?name=${encodeURIComponent(suggestion.firstname + " " + suggestion.lastname)}`);
+    } else {
+      // For institutes, include a search flag to indicate this came from search
+      setInputField(suggestion.instituteName);
+      dispatch(setInput(suggestion.instituteName));
+      navigate("/searchpage?fromSearch=true");
+    }
+    setShowSuggestions(false);
+  };
 
-const handleBtnClick = async () => {
-  if (inputField === "") {
-    alert("Please enter something");
-    return;
-  }
+  const handleBtnClick = async () => {
+    if (inputField === "") {
+      alert("Please enter something");
+      return;
+    }
 
-  setIsSearching(true);
-  
-  // Small delay to show loading state
-  setTimeout(() => {
+    setIsSearching(true);
+
+    // Navigate immediately - no artificial delay
     if (searchType === "counsellor") {
       navigate(`/counselor?name=${encodeURIComponent(inputField)}`);
+      setIsSearching(false);
     } else {
       dispatch(setInput(inputField));
       navigate("/searchpage?fromSearch=true");
+      // Reset loading state immediately after navigation
+      setIsSearching(false);
     }
-    setIsSearching(false);
-  }, 300);
-};
+  };
 
   return (
     // <div className="h-[480px] w-full relative">
@@ -198,8 +193,8 @@ const handleBtnClick = async () => {
                   searchType === "counsellor"
                     ? "Search for counsellor names..."
                     : searchType === "course"
-                    ? "Search for courses..."
-                    : "Search for institutes..."
+                      ? "Search for courses..."
+                      : "Search for institutes..."
                 }
               />
             </div>
@@ -223,12 +218,10 @@ const handleBtnClick = async () => {
             </button>
           </div>
 
-          {/* Suggestions dropdown with loading state */}
+          {/* Suggestions dropdown with loading hidden (silent update) */}
           {showSuggestions && (
             <div className="absolute ml-5 mr-5 mt-1 w-[calc(100%-40px)] bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto">
-              {isLoading ? (
-                <div className="px-4 py-2 text-gray-500">Loading...</div>
-              ) : suggestions.length > 0 ? (
+              {suggestions.length > 0 ? (
                 suggestions.map((suggestion, index) => (
                   <div
                     key={index}
@@ -239,8 +232,8 @@ const handleBtnClick = async () => {
                       {searchType === "course"
                         ? suggestion.courseTitle
                         : searchType === "counsellor"
-                        ? suggestion.firstname + " " + suggestion.lastname
-                        : suggestion.instituteName}
+                          ? suggestion.firstname + " " + suggestion.lastname
+                          : suggestion.instituteName}
                     </div>
                     {searchType === "course" && (
                       <div className="text-sm text-gray-600">
@@ -261,10 +254,11 @@ const handleBtnClick = async () => {
                   </div>
                 ))
               ) : (
-                <div className="px-4 py-2 text-gray-500">No results found</div>
+                !isLoading && <div className="px-4 py-2 text-gray-500">No results found</div>
               )}
             </div>
           )}
+
         </div>
       </div>
     </div>
