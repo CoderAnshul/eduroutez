@@ -162,10 +162,10 @@ const TrendingInstitute = () => {
                   />
                 </div>
                 <div className="textContainer p-4">
-                  <h3 className="text-xl md:text-xl lg:text-2xl font-bold text-[#0B104A] mb-2">
+                  <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
                     {institute.instituteName}
                   </h3>
-                  <div className="description text-gray-700 mb-3">
+                  <div className="text-sm mt-2 mb-4 line-clamp-3">
                     <span
                       dangerouslySetInnerHTML={{
                         __html: institute.about

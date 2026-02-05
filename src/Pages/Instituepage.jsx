@@ -495,23 +495,37 @@ const Instituepage = () => {
           <div className="w-[300px] flex-shrink-0 h-fit pt-4">
             <div className="sticky top-20 z-10 space-y-4">
               {/* Career Guidance Webinar Button */}
-              <Link to="/counselor">
-                <div className="w-full bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 p-6 cursor-pointer">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-white bg-opacity-20 rounded-full p-3">
-                        <Video className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold">Career Guidance</h3>
-                        <p className="text-sm text-white text-opacity-90">Webinar</p>
-                      </div>
+              <Link to="/counselor" className="block group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
+                {/* Background Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#800e13] to-[#b82025] transition-transform duration-500 group-hover:scale-105" />
+                
+                {/* Decorative Elements */}
+                <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10 blur-3xl transition-transform duration-700 group-hover:translate-x-[-10px] group-hover:translate-y-[10px]" />
+                <div className="absolute -left-12 -bottom-12 h-32 w-32 rounded-full bg-black/10 blur-2xl" />
+
+                {/* Content Container */}
+                <div className="relative p-7 flex flex-col h-full justify-between z-10">
+                  <div className="flex justify-between items-start mb-8">
+                    {/* Glass Icon Container */}
+                    <div className="h-12 w-12 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-inner group-hover:bg-white/20 transition-colors duration-300">
+                      <Video className="w-6 h-6 text-white drop-shadow-md" />
                     </div>
-                    <ArrowRight className="w-5 h-5" />
+                    {/* Arrow Icon */}
+                    <div className="bg-white/5 p-2 rounded-full backdrop-blur-sm group-hover:bg-white/20 transition-all duration-300">
+                      <ArrowRight className="w-4 h-4 text-white/90 group-hover:text-white group-hover:translate-x-0.5 transition-transform duration-300" />
+                    </div>
                   </div>
-                  <p className="text-sm text-white text-opacity-80">
-                    Get expert career guidance from our counselors
-                  </p>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                       <span className="h-0.5 w-6 bg-red-300/50 rounded-full"></span>
+                       <p className="text-xs font-bold tracking-widest text-red-100/90 uppercase">Webinar</p>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2 leading-tight tracking-wide font-sans">Career Guidance</h3>
+                    <p className="text-sm text-red-50/80 leading-relaxed font-light">
+                      Get expert career guidance directly from our top counselors.
+                    </p>
+                  </div>
                 </div>
               </Link>
               
