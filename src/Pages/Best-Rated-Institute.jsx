@@ -173,11 +173,13 @@ const BestRatedInstitute = () => {
 
                 {/* Institute Details */}
                 <div className="!p-6">
-                  <h2 className="text-2xl font-bold mb-2 text-gray-800">
+                  <h2 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
+                  {/* <h2 className="text-2xl font-bold mb-2 text-gray-800"> */}
                     {institute.instituteName}
                   </h2>
 
-                  <p className="text-gray-600 mb-4 p4 line-clamp-3">
+                  <p className="text-sm mt-2 mb-4 line-clamp-3">
+                  {/* <p className="text-gray-600 mb-4 p4 line-clamp-3"> */}
                     {institute.about ? (
                       <span
                         dangerouslySetInnerHTML={{ __html: institute.about }}

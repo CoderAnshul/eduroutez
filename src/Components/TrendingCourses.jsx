@@ -273,6 +273,7 @@ const TrendingCourses = () => {
                   </div>
 
                   {/* Course content */}
+                  {/* <div className="p-0"> */}
                   <div className="p-6">
                     <div className="space-y-4 px-2 pt-3">
                       {/* Short description */}
