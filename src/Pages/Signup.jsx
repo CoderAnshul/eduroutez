@@ -801,7 +801,7 @@ const Signup = () => {
                   onFocus={(e) => e.target.select()}
                   className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition"
                   autoComplete="off"
-                  autoFocus={index === 0 && showOtpDialog}
+                  autoFocus={index === 0}
                 />
               ))}
             </div>

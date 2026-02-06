@@ -254,77 +254,74 @@ const BecomeCounselor = () => {
     }
   };
 
-  // OTP Modal Component
-  const OtpModal = () => {
-    if (!showOtpModal) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
-          {/* Close button */}
-          <button
-            onClick={() => setShowOtpModal(false)}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
-
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Enter Verification Code</h2>
-            <p className="text-gray-600">
-              We have sent OTP to {formData.email}
-            </p>
-          </div>
-
-          {/* OTP Input Boxes */}
-          <div className="flex justify-center gap-2 mb-6">
-            {otpValues.map((value, index) => (
-              <input
-                key={index}
-                ref={el => otpInputs.current[index] = el}
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={1}
-                value={value}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                onPaste={handlePaste}
-                onFocus={(e) => e.target.select()}
-                className="w-12 h-12 text-center text-xl font-semibold border-2 rounded-lg focus:border-red-500 focus:outline-none"
-                autoComplete="off"
-                autoFocus={index === 0}
-              />
-            ))}
-          </div>
-
-          <div className="text-center mb-6">
-            <p className="text-gray-600 mb-2">
-              Didn't receive the code?
-            </p>
-            <button
-              onClick={handleSendOTP}
-              className="text-red-600 font-semibold hover:text-red-800"
-            >
-              Resend OTP
-            </button>
-          </div>
-
-          <button
-            onClick={handleVerifyOTP}
-            className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800"
-          >
-            Verify OTP
-          </button>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="flex flex-col md:flex-row h-auto">
       <ToastContainer />
-      <OtpModal />
+
+      {/* OTP Modal */}
+      {showOtpModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
+            {/* Close button */}
+            <button
+              onClick={() => setShowOtpModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Enter Verification Code</h2>
+              <p className="text-gray-600">
+                We have sent OTP to {formData.email}
+              </p>
+            </div>
+
+            {/* OTP Input Boxes */}
+            <div className="flex justify-center gap-2 mb-6">
+              {otpValues.map((value, index) => (
+                <input
+                  key={index}
+                  ref={el => otpInputs.current[index] = el}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={1}
+                  value={value}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={handlePaste}
+                  onFocus={(e) => e.target.select()}
+                  className="w-12 h-12 text-center text-xl font-semibold border-2 rounded-lg focus:border-red-500 focus:outline-none"
+                  autoComplete="off"
+                  autoFocus={index === 0}
+                />
+              ))}
+            </div>
+
+            <div className="text-center mb-6">
+              <p className="text-gray-600 mb-2">
+                Didn't receive the code?
+              </p>
+              <button
+                type="button"
+                onClick={handleSendOTP}
+                className="text-red-600 font-semibold hover:text-red-800"
+              >
+                Resend OTP
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleVerifyOTP}
+              className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800"
+            >
+              Verify OTP
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Left Section */}
       <div className="w-full md:w-1/2 bg-red-700 text-white flex flex-col justify-center items-center px-10 py-8 md:py-0">
