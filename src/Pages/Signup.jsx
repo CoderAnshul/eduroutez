@@ -8,6 +8,7 @@ import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 import { toast } from "react-toastify";
 import PasswordStrength from "../Components/PasswordStrength";
+import { Eye, EyeOff } from "lucide-react";
 
 const Signup = () => {
   const [showOtpDialog, setShowOtpDialog] = useState(false);
@@ -17,6 +18,19 @@ const Signup = () => {
   const [canResend, setCanResend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    return /^\d{10}$/.test(phone);
+  };
 
   const roleTypes = [
     { value: "institute", label: "University/College/Institute" },
@@ -351,6 +365,22 @@ const Signup = () => {
       // Normal field update
       setFormData({ ...formData, [id]: value });
       if (id === "role") setRole(value);
+
+      if (id === "email") {
+        if (value && !validateEmail(value)) {
+          setEmailError("Please enter a valid email address");
+        } else {
+          setEmailError("");
+        }
+      }
+
+      if (id === "contact_number") {
+        if (value && !validatePhone(value)) {
+          setPhoneError("Phone number must be exactly 10 digits");
+        } else {
+          setPhoneError("");
+        }
+      }
     }
   };
 
@@ -365,6 +395,14 @@ const Signup = () => {
     }
     if (!formData.email || !formData.contact_number) {
       toast.error("Please enter both email and phone number");
+      return false;
+    }
+    if (emailError) {
+      toast.error("Please fix the email error first");
+      return false;
+    }
+    if (phoneError) {
+      toast.error("Please fix the phone number error first");
       return false;
     }
     if (
@@ -578,11 +616,15 @@ const Signup = () => {
               type="email"
               id="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
               value={formData.email}
               onChange={handleChange}
               required
             />
+            {emailError && (
+              <p className="text-red-500 text-xs mt-1">{emailError}</p>
+            )}
           </div>
 
           {/* Phone Number Field */}
@@ -593,26 +635,43 @@ const Signup = () => {
             <input
               type="tel"
               id="contact_number"
-              placeholder="Enter your phone number"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Enter your contact number"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${phoneError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
               value={formData.contact_number}
               onChange={handleChange}
               required
             />
+            {phoneError && (
+              <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+            )}
           </div>
 
           {/* Password Field */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Password *</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Create a password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                placeholder="Create a password"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-[10px] text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
             <PasswordStrength
               password={formData.password}
               onValidationChange={(isValid) => setIsPasswordValid(isValid)}
@@ -624,15 +683,28 @@ const Signup = () => {
             <label className="block text-sm font-medium mb-1">
               Confirm Password *
             </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              placeholder="Confirm your password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                placeholder="Confirm your password"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
 
           {role === "student" && (
@@ -729,7 +801,7 @@ const Signup = () => {
                   onFocus={(e) => e.target.select()}
                   className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition"
                   autoComplete="off"
-                  autoFocus={index === 0 && showOtpDialog}
+                  autoFocus={index === 0}
                 />
               ))}
             </div>

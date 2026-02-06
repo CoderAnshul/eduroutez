@@ -98,18 +98,8 @@ const HighRatedCareers = ({ title = "High Rated careers", streamId, categoryId }
     return null; // Hide on error
   }
 
-  if ((streamId || categoryId) && content.length === 0) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex items-center gap-2 mb-8">
-          <Sparkles className="text-red-500 w-6 h-6" />
-          <h2 className="text-3xl font-bold text-gray-900">{title}</h2>
-        </div>
-        <div className="text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-          <p className="text-gray-500 italic">No related careers found for this selection.</p>
-        </div>
-      </div>
-    );
+  if (content.length === 0) {
+    return null;
   }
 
   return (
