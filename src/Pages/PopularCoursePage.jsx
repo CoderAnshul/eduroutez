@@ -7,17 +7,16 @@ import ConsellingBanner from "../Components/ConsellingBanner";
 import Promotions from "./CoursePromotions";
 import SocialShare from "../Components/SocialShare";
 import { Sparkles } from "lucide-react";
+import HighRatedCareers from "../Components/HighRatedCareers";
 
 const StreamLevelPage = () => {
   const [pageData, setPageData] = useState(null);
   const [streamDetails, setStreamDetails] = useState(null);
   const [streamBlogs, setStreamBlogs] = useState([]);
   const [streamInstitutes, setStreamInstitutes] = useState([]);
-  const [streamCareers, setStreamCareers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [blogsLoading, setBlogsLoading] = useState(true);
   const [institutesLoading, setInstitutesLoading] = useState(true);
-  const [careersLoading, setCareersLoading] = useState(true);
   const [error, setError] = useState(null);
   const location = useLocation();
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
@@ -91,19 +90,6 @@ const StreamLevelPage = () => {
               setInstitutesLoading(false);
             }
 
-            // Fetch stream-related careers using stream ID
-            try {
-              const careerFilters = JSON.stringify({ stream: [streamId] });
-              const careerSort = JSON.stringify({ createdAt: "desc" });
-              const careersResponse = await axios.get(
-                `${baseURL}/careers?filters=${encodeURIComponent(careerFilters)}&sort=${encodeURIComponent(careerSort)}&limit=6`
-              );
-              setStreamCareers(careersResponse.data?.data?.result || []);
-            } catch (careerErr) {
-              console.error("Error fetching careers:", careerErr);
-            } finally {
-              setCareersLoading(false);
-            }
           } else {
             // Stream not found, still try to fetch blogs and institutes
             console.warn("Stream not found in list, trying to fetch content anyway");
@@ -135,18 +121,6 @@ const StreamLevelPage = () => {
               setInstitutesLoading(false);
             }
 
-            // Try fetching careers without stream filter (fallback to latest careers)
-            try {
-              const careerSort = JSON.stringify({ createdAt: "desc" });
-              const careersResponse = await axios.get(
-                `${baseURL}/careers?limit=6&sort=${encodeURIComponent(careerSort)}`
-              );
-              setStreamCareers(careersResponse.data?.data?.result || []);
-            } catch (careerErr) {
-              console.error("Error fetching careers:", careerErr);
-            } finally {
-              setCareersLoading(false);
-            }
           }
         } catch (streamErr) {
           console.error("Error fetching stream details:", streamErr);
@@ -176,17 +150,6 @@ const StreamLevelPage = () => {
             setInstitutesLoading(false);
           }
 
-          try {
-            const careerSort = JSON.stringify({ createdAt: "desc" });
-            const careersResponse = await axios.get(
-              `${baseURL}/careers?limit=6&sort=${encodeURIComponent(careerSort)}`
-            );
-            setStreamCareers(careersResponse.data?.data?.result || []);
-          } catch (careerErr) {
-            console.error("Error fetching careers:", careerErr);
-          } finally {
-            setCareersLoading(false);
-          }
         }
       } catch (err) {
         console.error("Error fetching page data:", err);
@@ -467,86 +430,12 @@ const StreamLevelPage = () => {
         </div>
       )}
 
+
       {/* Related Careers */}
-      {streamCareers.length > 0 && (
-        <div className="container mx-auto px-4 py-12">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2">
-              <Sparkles className="text-red-500 w-6 h-6" />
-              <h2 className="text-3xl font-bold text-gray-900">Stream Related Careers</h2>
-            </div>
-            <Link to="/careerspage">
-              <button className="bg-[#b82025] text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
-                View more
-              </button>
-            </Link>
-          </div>
-          {careersLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="w-16 h-16 border-4 border-red-600 border-t-transparent animate-spin"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {streamCareers.map((box, index) => (
-                <Link
-                  to={`/detailpage/${box.slug}`}
-                  key={box._id || index}
-                  className="bg-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl group"
-                >
-                  <div className="h-56 relative overflow-hidden rounded-t-xl">
-                    <img
-                      className="w-full h-full object-cover"
-                      src={box.thumbnail ? `${Images}/${box.thumbnail}` : cardPhoto}
-                      alt={box.title || "Career"}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.target.src = cardPhoto;
-                        e.target.onerror = null;
-                      }}
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-red-500 transition-colors duration-300">
-                      {box.title || "Untitled"}
-                    </h3>
-                    <p
-                      className="text-sm text-gray-600 mt-2 line-clamp-3"
-                      dangerouslySetInnerHTML={{
-                        __html: box.description?.slice(0, 100) + "..." || "No description available",
-                      }}
-                    ></p>
-                    <div className="mt-4 flex items-center justify-between">
-                      <button className="text-red-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                        Read More
-                        <span>&rarr;</span>
-                      </button>
-                      {box.views > 0 && (
-                        <div className="flex items-center gap-1 text-gray-500 text-sm">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                          </svg>
-                          <span>{box.views}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      <HighRatedCareers
+        title="Related Careers"
+        streamId={new URLSearchParams(location.search).get("stream")}
+      />
 
       {/* Related Institutes */}
       {streamInstitutes.length > 0 && (
