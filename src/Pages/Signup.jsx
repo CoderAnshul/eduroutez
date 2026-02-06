@@ -20,6 +20,12 @@ const Signup = () => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const roleTypes = [
     { value: "institute", label: "University/College/Institute" },
@@ -354,6 +360,14 @@ const Signup = () => {
       // Normal field update
       setFormData({ ...formData, [id]: value });
       if (id === "role") setRole(value);
+
+      if (id === "email") {
+        if (value && !validateEmail(value)) {
+          setEmailError("Please enter a valid email address");
+        } else {
+          setEmailError("");
+        }
+      }
     }
   };
 
@@ -368,6 +382,10 @@ const Signup = () => {
     }
     if (!formData.email || !formData.contact_number) {
       toast.error("Please enter both email and phone number");
+      return false;
+    }
+    if (emailError) {
+      toast.error("Please fix the email error first");
       return false;
     }
     if (
@@ -581,11 +599,15 @@ const Signup = () => {
               type="email"
               id="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
               value={formData.email}
               onChange={handleChange}
               required
             />
+            {emailError && (
+              <p className="text-red-500 text-xs mt-1">{emailError}</p>
+            )}
           </div>
 
           {/* Phone Number Field */}

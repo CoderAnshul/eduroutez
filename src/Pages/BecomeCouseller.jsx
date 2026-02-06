@@ -26,7 +26,13 @@ const BecomeCounselor = () => {
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
   const otpInputs = useRef(new Array(6).fill(null));
   const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const navigate = useNavigate();
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -50,6 +56,14 @@ const BecomeCounselor = () => {
       ...prevState,
       [name]: value,
     }));
+
+    if (name === "email") {
+      if (value && !validateEmail(value)) {
+        setEmailError("Please enter a valid email address");
+      } else {
+        setEmailError("");
+      }
+    }
   };
 
   const handleSendOTP = async () => {
@@ -60,6 +74,11 @@ const BecomeCounselor = () => {
 
     if (!formData.email || !formData.contactno) {
       toast.error("Please enter both email and phone number");
+      return;
+    }
+
+    if (emailError) {
+      toast.error("Please fix the email error first");
       return;
     }
 
@@ -355,8 +374,12 @@ const BecomeCounselor = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
             />
+            {emailError && (
+              <p className="text-red-500 text-xs mt-1">{emailError}</p>
+            )}
           </div>
 
           <div className="mb-4">
