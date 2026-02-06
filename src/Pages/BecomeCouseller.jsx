@@ -27,11 +27,16 @@ const BecomeCounselor = () => {
   const otpInputs = useRef(new Array(6).fill(null));
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    return /^\d{10}$/.test(phone);
   };
 
   const navigate = useNavigate();
@@ -64,6 +69,14 @@ const BecomeCounselor = () => {
         setEmailError("");
       }
     }
+
+    if (name === "contactno") {
+      if (value && !validatePhone(value)) {
+        setPhoneError("Phone number must be exactly 10 digits");
+      } else {
+        setPhoneError("");
+      }
+    }
   };
 
   const handleSendOTP = async () => {
@@ -79,6 +92,11 @@ const BecomeCounselor = () => {
 
     if (emailError) {
       toast.error("Please fix the email error first");
+      return;
+    }
+
+    if (phoneError) {
+      toast.error("Please fix the phone number error first");
       return;
     }
 
@@ -393,8 +411,12 @@ const BecomeCounselor = () => {
               value={formData.contactno}
               onChange={handleChange}
               placeholder="Enter your phone number"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${phoneError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
             />
+            {phoneError && (
+              <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+            )}
           </div>
 
           <div className="mb-4">

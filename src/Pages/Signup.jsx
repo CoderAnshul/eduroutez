@@ -21,10 +21,15 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    return /^\d{10}$/.test(phone);
   };
 
   const roleTypes = [
@@ -368,6 +373,14 @@ const Signup = () => {
           setEmailError("");
         }
       }
+
+      if (id === "contact_number") {
+        if (value && !validatePhone(value)) {
+          setPhoneError("Phone number must be exactly 10 digits");
+        } else {
+          setPhoneError("");
+        }
+      }
     }
   };
 
@@ -386,6 +399,10 @@ const Signup = () => {
     }
     if (emailError) {
       toast.error("Please fix the email error first");
+      return false;
+    }
+    if (phoneError) {
+      toast.error("Please fix the phone number error first");
       return false;
     }
     if (
@@ -618,12 +635,16 @@ const Signup = () => {
             <input
               type="tel"
               id="contact_number"
-              placeholder="Enter your phone number"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Enter your contact number"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${phoneError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
               value={formData.contact_number}
               onChange={handleChange}
               required
             />
+            {phoneError && (
+              <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+            )}
           </div>
 
           {/* Password Field */}
