@@ -86,7 +86,7 @@ const QueryForm = ({ instituteData }) => {
   };
 
   return (
-    <div className="hidden lg:block w-full">
+    <div className="sticky top-28 hidden lg:block w-full">
       <form
         className="w-full p-2 bg-[#F0FDF4] rounded-lg shadow-md"
         onSubmit={handleSubmit}

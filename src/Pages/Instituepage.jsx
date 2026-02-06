@@ -332,7 +332,7 @@ const Instituepage = () => {
         <ImageSlider instituteData={instituteData} />
         <InstitueName instituteData={instituteData} />
         <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
-        <div className="w-full flex gap-4">
+        <div className="w-full flex gap-4 items-stretch relative pb-4">
           <div className="w-full lg:w-[calc(100%-400px)]">
             <div className="w-full min-h-24">
               {/* College Info */}
@@ -492,8 +492,8 @@ const Instituepage = () => {
               )}
             </div>
           </div>
-          <div className="w-[300px] flex-shrink-0 h-fit pt-4">
-            <div className="sticky top-20 z-10 space-y-4">
+          <div className="w-[300px] flex-shrink-0 pt-4">
+            <div className="sticky top-32 z-10 space-y-4">
               {/* Career Guidance Webinar Button */}
               <Link to="/counselor" className="block group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
                 {/* Background Gradient */}
@@ -530,8 +530,8 @@ const Instituepage = () => {
               </Link>
               
               <QueryForm instituteData={instituteData} />
+              <Promotions location="INSTITUTE_PAGE " className="h-[250px]" />
             </div>
-            <Promotions location="INSTITUTE_PAGE " className="h-[250px] mt-4" />
           </div>
         </div>
         <HighRatedCareers />

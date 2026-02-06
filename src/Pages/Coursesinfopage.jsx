@@ -440,7 +440,7 @@ const Coursesinfopage = () => {
         <TabSlider tabs={tabs} sectionRefs={sectionRefs} activeTab={activeTab} />
 
         {/* Main Content Area with Sidebar */}
-        <div className="w-full mt-5 flex gap-8">
+        <div className="w-full mt-5 flex gap-8 pb-4">
           {/* Main Content */}
           <div className="w-full lg:w-2/3">
             {/* Overview Section */}
