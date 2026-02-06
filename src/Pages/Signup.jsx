@@ -355,16 +355,16 @@ const Signup = () => {
   };
 
   const validateForm = () => {
-    if (!formData.email || !formData.contact_number) {
-      toast.error("Please enter both email and phone number");
+    if (!isPasswordValid) {
+      toast.error("Please make your password strong first by fulfilling all requirements");
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return false;
     }
-    if (!isPasswordValid) {
-      toast.error("Password does not meet all requirements");
+    if (!formData.email || !formData.contact_number) {
+      toast.error("Please enter both email and phone number");
       return false;
     }
     if (

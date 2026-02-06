@@ -25,6 +25,8 @@ const BecomeCounselor = () => {
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
   const otpInputs = useRef(new Array(6).fill(null));
 
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+
   const navigate = useNavigate();
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -50,6 +52,11 @@ const BecomeCounselor = () => {
   };
 
   const handleSendOTP = async () => {
+    if (!isPasswordValid) {
+      toast.error("Please make your password strong first by fulfilling all requirements");
+      return;
+    }
+
     if (!formData.email || !formData.contactno) {
       toast.error("Please enter both email and phone number");
       return;
@@ -379,7 +386,10 @@ const BecomeCounselor = () => {
               placeholder="Create a password"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             />
-            <PasswordStrength password={formData.password} />
+            <PasswordStrength
+              password={formData.password}
+              onValidationChange={(isValid) => setIsPasswordValid(isValid)}
+            />
           </div>
 
           <div className="mb-4">
