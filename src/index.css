@@ -35,7 +35,7 @@
 
 html {
   min-width: 300px;
-  overflow-x: hidden;
+  /* overflow-x: hidden; - Removed to fix sticky positioning */
 }
 
 ol {
