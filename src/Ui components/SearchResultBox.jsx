@@ -143,6 +143,10 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
             }
             alt="Institute Thumbnail"
             className="rounded-lg object-cover w-full h-44"
+            onError={(e) => {
+              e.target.src = serachBoximg;
+              e.target.onerror = null;
+            }}
           />
           {hasWishlistFeature && (
             <button

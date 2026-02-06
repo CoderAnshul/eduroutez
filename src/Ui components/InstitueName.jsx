@@ -34,7 +34,7 @@ const InstitueName = ({ instituteData }) => {
   // Direct submit function (can be called with or without event)
   const handleSubmitDirectly = async (dataToSubmit = null) => {
     const data = dataToSubmit || formData;
-    
+
     try {
       const queryPayload = {
         name: data.name,
@@ -84,10 +84,10 @@ const InstitueName = ({ instituteData }) => {
   useEffect(() => {
     const pendingApplication = sessionStorage.getItem('pendingApplication');
     const pendingInstituteId = sessionStorage.getItem('pendingInstituteId');
-    
+
     // Check if user was redirected from login after clicking Apply Now
     const wasRedirectedFromLogin = pendingInstituteId === instituteData?.data?._id;
-    
+
     if (pendingApplication) {
       try {
         const applicationData = JSON.parse(pendingApplication);
@@ -220,7 +220,7 @@ const InstitueName = ({ instituteData }) => {
     if (!isLoggedIn()) {
       // Show error message first
       toast.error("Please login first");
-      
+
       // Store form data in sessionStorage
       const applicationData = {
         name: formData.name,
@@ -233,14 +233,14 @@ const InstitueName = ({ instituteData }) => {
         stream: formData.stream,
         level: formData.level,
       };
-      
+
       sessionStorage.setItem('pendingApplication', JSON.stringify(applicationData));
-      
+
       // Store the current page URL to redirect back after login
       sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
       // Store institute ID for reference
       sessionStorage.setItem('pendingInstituteId', instituteData?.data?._id);
-      
+
       // Close popup and redirect to login after showing error
       setIsPopupVisible(false);
       setTimeout(() => {
@@ -264,6 +264,10 @@ const InstitueName = ({ instituteData }) => {
               : serachBoximg
           }
           alt="instituteLogo"
+          onError={(e) => {
+            e.target.src = serachBoximg;
+            e.target.onerror = null;
+          }}
         />
       </div>
 

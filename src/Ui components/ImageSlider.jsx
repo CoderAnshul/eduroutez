@@ -24,20 +24,11 @@ const ImageSlider = ({ instituteData }) => {
   // Create array of valid images with strict filtering
   const allImages = useMemo(() => {
     const coverImage = instituteData?.data?.coverImage;
-    const galleryImages = instituteData?.data?.gallery || [];
 
-    // Only include cover image if it exists and is valid
     const validImages = [];
     if (isValidImage(coverImage)) {
       validImages.push(coverImage);
     }
-
-    // Add valid gallery images
-    galleryImages.forEach((img) => {
-      if (isValidImage(img) && img !== coverImage) {
-        validImages.push(img);
-      }
-    });
 
     return validImages;
   }, [instituteData, imageLoadError]);
@@ -96,27 +87,15 @@ const ImageSlider = ({ instituteData }) => {
       tabIndex={0}
     >
       <div className="relative aspect-[3/2] w-full overflow-hidden max-h-[400px]">
-        <div className="relative w-full h-full">
-          {allImages.map((src, index) => (
-            <img
-              key={`slide-${index}-${src}`}
-              src={`${Images}/${src}`}
-              alt={`Institute Image ${index + 1}`}
-              className={`absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 ease-in-out ${
-                index === currentIndex
-                  ? "translate-x-0"
-                  : index < currentIndex
-                  ? "-translate-x-full"
-                  : "translate-x-full"
-              }`}
-              style={{ willChange: "transform" }}
-              onError={() => handleImageError(src)}
-            />
-          ))}
-        </div>
+        <img
+          src={`${Images}/${allImages[0]}`}
+          alt={instituteData?.data?.instituteName || "Institute banner"}
+          className="w-full h-full object-cover"
+          onError={() => handleImageError(allImages[0])}
+        />
 
         {/* Gradient overlay */}
-        <div className="absolute top-0 right-0 p-3 lg:w-[400px] ] h-full bg-gradient-to-l from-[#404142] to-transparent z-10 text-white text-end">
+        <div className="absolute top-0 right-0 p-3 lg:w-[400px] h-full bg-gradient-to-l from-[#404142] to-transparent z-10 text-white text-end">
           <div className="bottom-4 left-4">
             <span className="text-3xl font-semibold mb-3">
               #{instituteData?.data?.rank}
@@ -129,16 +108,6 @@ const ImageSlider = ({ instituteData }) => {
           </div>
         </div>
       </div>
-
-      {/* Gallery Button */}
-      {allImages.length > 1 && (
-        <Slidebtn
-          onClick={() => setIsFullscreen(true)}
-          ariaLabel="View gallery"
-        >
-          <img src={gallery} alt="gallery button" />
-        </Slidebtn>
-      )}
 
       {/* Navigation Buttons */}
       {/* <div className="absolute bottom-3 w-full flex justify-end  pr-4 z-20 gap-4">
