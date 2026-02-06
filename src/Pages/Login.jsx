@@ -7,12 +7,14 @@ import { useMutation } from "react-query";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -43,11 +45,6 @@ const Login = () => {
       }
     },
     onSuccess: (data) => {
-      if (data?.data?.user?.role !== 'student') {
-        toast.error("Invalid credentials");
-        return;
-      }
-
       console.log("Data", data);
 
       // Store auth data
@@ -58,6 +55,12 @@ const Login = () => {
       localStorage.setItem('refreshToken', data.data.refreshToken);
 
       toast.success("Logged in successfully!");
+
+      if (data?.data?.user?.role !== 'student') {
+        // Redirect to admin portal for non-student roles
+        window.location.href = "https://admin.eduroutez.com/";
+        return;
+      }
 
       // Check for pending application
       const pendingApplication = sessionStorage.getItem('pendingApplication');
@@ -77,8 +80,6 @@ const Login = () => {
         // Clear the stored redirect URL
         sessionStorage.removeItem('redirectAfterLogin');
         // Navigate back to the institute page
-        // If there's a pending application, it will auto-submit
-        // Otherwise, user can click Apply Now again to open the form
         navigate(redirectAfterLogin);
       } else {
         // Default navigation for students
@@ -147,14 +148,27 @@ const Login = () => {
             >
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Enter your password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.password}
-              onChange={handleChange}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                placeholder="Enter your password"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
           <div className="flex items-center justify-between mb-6">
             <label className="flex items-center">
@@ -208,8 +222,8 @@ const Login = () => {
             Sign up
           </Link>
         </p>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

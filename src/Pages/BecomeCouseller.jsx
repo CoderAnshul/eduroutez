@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import PasswordStrength from "../Components/PasswordStrength";
+import { Eye, EyeOff } from "lucide-react";
 
 const BecomeCounselor = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const BecomeCounselor = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
   const otpInputs = useRef(new Array(6).fill(null));
-
+  const [showPassword, setShowPassword] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const navigate = useNavigate();
@@ -377,15 +378,28 @@ const BecomeCounselor = () => {
             <label className="block text-sm font-medium mb-1" htmlFor="password">
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Create a password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create a password"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
             <PasswordStrength
               password={formData.password}
               onValidationChange={(isValid) => setIsPasswordValid(isValid)}
@@ -443,8 +457,8 @@ const BecomeCounselor = () => {
             Log in
           </Link>
         </p>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 
