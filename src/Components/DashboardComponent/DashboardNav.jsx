@@ -16,8 +16,9 @@ const DashboardNav = () => {
     const fetchUserData = async () => {
       try {
         const userId = localStorage.getItem("userId");
-        if (!userId) {
-          navigate("/");
+        if (!userId || userId === "null" || userId === "undefined") {
+          console.log("User ID not found, skipping fetch");
+          setIsLoading(false);
           return;
         }
 

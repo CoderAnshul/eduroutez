@@ -54,25 +54,18 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance(
-        `${import.meta.env.VITE_BASE_URL}/logout`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": localStorage.getItem("accessToken"),
-            "x-refresh-token": localStorage.getItem("refreshToken"),
-          },
-          credentials: "true",
+      await axiosInstance.post(`${import.meta.env.VITE_BASE_URL}/logout`, {}, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("accessToken"),
+          "x-refresh-token": localStorage.getItem("refreshToken"),
         }
-      );
-
-      if (response) {
-        localStorage.clear();
-        window.location.reload();
-      }
+      });
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.error("Error during logout API call:", error);
+    } finally {
+      localStorage.clear();
+      window.location.href = "/";
     }
   };
 
@@ -223,9 +216,8 @@ const Navbar = () => {
       )}
 
       <div
-        className={`fixed top-0 left-0 h-dvh p-4 w-4/5 max-w-[300px] bg-gray-100 shadow-md z-[1000] overflow-y-scroll transform ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300`}
+        className={`fixed top-0 left-0 h-dvh p-4 w-4/5 max-w-[300px] bg-gray-100 shadow-md z-[1000] overflow-y-scroll transform ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300`}
       >
         <div className="flex items-center justify-between">
           <Link to="/">

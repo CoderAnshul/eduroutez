@@ -156,7 +156,7 @@ const CombinedQuestionsPage = () => {
   const labels = ["Courses", "Career", "Institute", "Placement", "Admission"];
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const userEmail = localStorage.getItem("email") || "user@example.com";
-  
+
   // Check if user is logged in - check localStorage directly
   const isLoggedIn = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -169,17 +169,17 @@ const CombinedQuestionsPage = () => {
   useEffect(() => {
     const pendingQuestion = sessionStorage.getItem("pendingQuestion");
     const accessToken = localStorage.getItem("accessToken");
-    
+
     // Only auto-submit if we have both pending question AND valid access token
     if (pendingQuestion && accessToken && accessToken !== "null" && accessToken !== "undefined" && accessToken !== "") {
       try {
         const questionData = JSON.parse(pendingQuestion);
         // Pre-fill the form
         setFormData(questionData);
-        
+
         // Clear session storage
         sessionStorage.removeItem("pendingQuestion");
-        
+
         // Auto-submit after a short delay to ensure form is ready
         setTimeout(() => {
           if (questionData.question && questionData.label && questionData.grade) {
@@ -205,19 +205,12 @@ const CombinedQuestionsPage = () => {
   } = useQuery({
     queryKey: ["questions", currentPage, searchQuery, activeFilters, sortOrder],
     queryFn: async () => {
-      // Double-check authentication before making API call
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken || accessToken === "null" || accessToken === "undefined" || accessToken === "") {
-        console.log("API call prevented: User not logged in");
-        throw new Error("User not authenticated");
-      }
-
-      // Create filters object in the requested format
+      // Build query params
       let queryParams = {
         page: currentPage,
         search: searchQuery,
-        sort: JSON.stringify({ createdAt: sortOrder }), // Add sort parameter
-        searchFields: JSON.stringify({ question: searchQuery }), // Add searchFields parameter
+        sort: JSON.stringify({ createdAt: sortOrder }),
+        searchFields: JSON.stringify({ question: searchQuery }),
       };
       // Add filters in the JSON format if there are active filters
       if (activeFilters.length > 0) {
@@ -233,8 +226,8 @@ const CombinedQuestionsPage = () => {
 
       return response.data.data;
     },
-    enabled: isLoggedIn, // Only fetch if user is logged in
-    retry: false, // Don't retry if it fails
+    // enabled: isLoggedIn, // Removed: Fetch even if not logged in
+    retry: false,
   });
 
   const { mutate, isPending: isSubmitting } = useMutation({
@@ -283,7 +276,7 @@ const CombinedQuestionsPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Check if user is logged in (check for token existence and validity)
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken || accessToken === "null" || accessToken === "undefined" || accessToken === "") {
@@ -298,7 +291,7 @@ const CombinedQuestionsPage = () => {
       }, 1500);
       return false;
     }
-    
+
     mutate(formData);
     return false;
   };
@@ -426,9 +419,8 @@ const CombinedQuestionsPage = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors ${
-                      isSubmitting ? "opacity-75 cursor-not-allowed" : ""
-                    }`}
+                    className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors ${isSubmitting ? "opacity-75 cursor-not-allowed" : ""
+                      }`}
                   >
                     {isSubmitting ? (
                       <>
@@ -485,17 +477,7 @@ const CombinedQuestionsPage = () => {
 
           {/* Questions List (Scrollable) */}
           <div className="mt-4 relative z-10">
-            {!isLoggedIn ? (
-              <div className="text-center py-12">
-                <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-800">
-                  Please Login to View Questions
-                </h3>
-                <p className="text-gray-600 mt-2">
-                  You can still ask a question using the form on the left. After submitting, you'll be redirected to login.
-                </p>
-              </div>
-            ) : isLoading ? (
+            {isLoading ? (
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
               </div>
@@ -552,11 +534,10 @@ const CombinedQuestionsPage = () => {
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-4 py-2 ${
-                      currentPage === 1
+                    className={`px-4 py-2 ${currentPage === 1
                         ? "bg-gray-200 cursor-not-allowed"
                         : "bg-gray-300 hover:bg-gray-400"
-                    } text-gray-700 rounded-lg transition-colors`}
+                      } text-gray-700 rounded-lg transition-colors`}
                   >
                     Previous
                   </button>
@@ -564,11 +545,10 @@ const CombinedQuestionsPage = () => {
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={questionsData?.hasNextPage === false}
-                    className={`px-4 py-2 ${
-                      questionsData?.hasNextPage === false
+                    className={`px-4 py-2 ${questionsData?.hasNextPage === false
                         ? "bg-red-300 cursor-not-allowed"
                         : "bg-[#b82025] hover:bg-red-700"
-                    } text-white rounded-lg transition-colors`}
+                      } text-white rounded-lg transition-colors`}
                   >
                     Next
                   </button>

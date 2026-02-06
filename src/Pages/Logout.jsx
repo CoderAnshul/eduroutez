@@ -7,25 +7,18 @@ const Logout = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance(
-        `${import.meta.env.VITE_BASE_URL}/logout`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": localStorage.getItem("accessToken"),
-            "x-refresh-token": localStorage.getItem("refreshToken"),
-          },
-          credentials: "true",
+      await axiosInstance.post(`${apiUrl}/logout`, {}, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("accessToken"),
+          "x-refresh-token": localStorage.getItem("refreshToken"),
         }
-      );
-
-      if (response) {
-        localStorage.clear();
-        window.location.reload();
-      }
+      });
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.error("Error during logout API call:", error);
+    } finally {
+      localStorage.clear();
+      window.location.href = "/";
     }
   };
 

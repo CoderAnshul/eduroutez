@@ -1,25 +1,36 @@
 import React, { useMemo } from 'react';
 import { Check, X } from 'lucide-react';
 
-const PasswordStrength = ({ password = '' }) => {
+const PasswordStrength = ({ password = '', onValidationChange }) => {
     const requirements = [
-        { label: 'At least 8 characters', test: (p) => p.length >= 8 },
-        { label: 'Contains uppercase letter', test: (p) => /[A-Z]/.test(p) },
-        { label: 'Contains lowercase letter', test: (p) => /[a-z]/.test(p) },
-        { label: 'Contains number or special character', test: (p) => /[\d!@#$%^&*(),.?":{}|<>]/.test(p) },
+        { id: 'length', label: '8+ Characters', test: (p) => p.length >= 8 },
+        { id: 'upper', label: 'Uppercase', test: (p) => /[A-Z]/.test(p) },
+        { id: 'lower', label: 'Lowercase', test: (p) => /[a-z]/.test(p) },
+        { id: 'special', label: 'Number/Symbol', test: (p) => /[\d!@#$%^&*(),.?":{}|<>]/.test(p) },
     ];
 
-    const strength = useMemo(() => {
-        if (!password) return 0;
-        return requirements.reduce((acc, req) => (req.test(password) ? acc + 1 : acc), 0);
-    }, [password]);
+    const results = requirements.map(req => ({
+        ...req,
+        isMet: req.test(password)
+    }));
+
+    const strength = results.filter(r => r.isMet).length;
+    const isValid = strength === requirements.length;
+
+    React.useEffect(() => {
+        if (onValidationChange) {
+            onValidationChange(isValid);
+        }
+    }, [isValid, onValidationChange]);
+
+    if (!password) return null;
 
     const strengthColor = [
-        'bg-gray-200',
-        'bg-red-500',
-        'bg-orange-500',
-        'bg-yellow-500',
-        'bg-green-500',
+        'text-gray-400',
+        'text-red-500',
+        'text-orange-500',
+        'text-yellow-600',
+        'text-green-600',
     ][strength];
 
     const strengthText = [
@@ -31,41 +42,34 @@ const PasswordStrength = ({ password = '' }) => {
     ][strength];
 
     return (
-        <div className="mt-3 space-y-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-            <div className="flex items-center justify-between gap-2">
-                <div className="flex-1 h-1.5 flex gap-1">
-                    {[1, 2, 3, 4].map((step) => (
-                        <div
-                            key={step}
-                            className={`h-full flex-1 rounded-full transition-colors duration-300 ${step <= strength ? strengthColor : 'bg-gray-200'
-                                }`}
-                        />
-                    ))}
+        <div className="mt-2 space-y-2 px-1">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-gray-500 font-medium">Strength:</span>
+                    <span className={`text-[11px] font-bold ${strengthColor}`}>
+                        {strengthText}
+                    </span>
                 </div>
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${strength <= 1 ? 'text-red-500' :
-                        strength === 2 ? 'text-orange-500' :
-                            strength === 3 ? 'text-yellow-600' :
-                                'text-green-600'
-                    }`}>
-                    {strengthText}
-                </span>
+                {isValid && (
+                    <span className="text-[10px] text-green-600 font-bold flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Secure
+                    </span>
+                )}
             </div>
 
-            <div className="grid grid-cols-1 gap-1.5">
-                {requirements.map((req, index) => {
-                    const isMet = req.test(password);
-                    return (
-                        <div key={index} className="flex items-center gap-2">
-                            <div className={`flex-shrink-0 w-3.5 h-3.5 rounded-full flex items-center justify-center ${isMet ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
-                                }`}>
-                                {isMet ? <Check className="w-2.5 h-2.5" /> : <X className="w-2.5 h-2.5" />}
-                            </div>
-                            <span className={`text-[11px] ${isMet ? 'text-green-700 font-medium' : 'text-gray-500'}`}>
-                                {req.label}
-                            </span>
-                        </div>
-                    );
-                })}
+            <div className="flex flex-wrap gap-2">
+                {results.map((res) => (
+                    <div
+                        key={res.id}
+                        className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] transition-all duration-300 ${res.isMet
+                                ? 'bg-green-50 border-green-200 text-green-700'
+                                : 'bg-gray-50 border-gray-200 text-gray-400'
+                            }`}
+                    >
+                        {res.isMet ? <Check className="w-2.5 h-2.5" /> : <X className="w-2.5 h-2.5" />}
+                        {res.label}
+                    </div>
+                ))}
             </div>
         </div>
     );
