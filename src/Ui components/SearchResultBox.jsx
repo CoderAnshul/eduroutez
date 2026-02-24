@@ -134,7 +134,8 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
       {/* Left Section - Image */}
       <div className="flex justify-between flex-col gap-3"></div>
       <div className="flex justify-between flex-col md:flex-row gap-3">
-        <div className="relative w-full md:w-2/6 !ml-0">
+        {/* Make image clickable */}
+        <Link to={instituteUrl} className="relative w-full md:w-2/6 !ml-0 block group">
           <img
             src={
               institute.thumbnailImage
@@ -142,7 +143,8 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
                 : serachBoximg
             }
             alt="Institute Thumbnail"
-            className="rounded-lg object-cover w-full h-44"
+            className="rounded-lg object-cover w-full h-44 group-hover:opacity-90 transition-opacity duration-200"
+            style={{ cursor: 'pointer' }}
           />
           {hasWishlistFeature && (
             <button
@@ -151,6 +153,10 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
                 isWishlisted ? "Remove from wishlist" : "Add to wishlist"
               }
               onClick={handleAddToWishlist}
+              type="button"
+              tabIndex={-1}
+              onMouseDown={e => e.stopPropagation()}
+              onClickCapture={e => e.stopPropagation()}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -168,12 +174,15 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
               </svg>
             </button>
           )}
-        </div>
+        </Link>
 
         {/* Right Section - Details */}
         <div className="w-full md:w-3/4 flex flex-col">
           <div className="flex justify-between items-center">
-            <h3 className="text-xl font-medium">{institute.instituteName}</h3>
+            {/* Make title clickable */}
+            <Link to={instituteUrl} className="text-xl font-medium hover:underline" style={{ cursor: 'pointer' }}>
+              {institute.instituteName}
+            </Link>
           </div>
 
           <div className="flex items-center space-x-3 text-sm text-gray-600">
@@ -289,13 +298,9 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
           >
             Download Brochure
           </button>
-          <CustomButton
-            to={instituteUrl}
-            className="!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md "
-            text="View more"
-          >
+          <Link to={instituteUrl} className="!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md viewmorebtn bg-[#b82025] text-sm text-white w-32 whitespace-nowrap transition-transform transform active:scale-95 hover:scale-105 flex items-center justify-center" style={{ textDecoration: 'none' }}>
             View more
-          </CustomButton>
+          </Link>
         </div>
       </div>
     </div>
