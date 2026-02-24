@@ -3,6 +3,8 @@ import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import PasswordStrength from "../Components/PasswordStrength";
+import { Eye, EyeOff } from "lucide-react";
 
 const BecomeCounselor = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +25,20 @@ const BecomeCounselor = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
   const otpInputs = useRef(new Array(6).fill(null));
-  
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    return /^\d{10}$/.test(phone);
+  };
+
   const navigate = useNavigate();
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -46,11 +61,42 @@ const BecomeCounselor = () => {
       ...prevState,
       [name]: value,
     }));
+
+    if (name === "email") {
+      if (value && !validateEmail(value)) {
+        setEmailError("Please enter a valid email address");
+      } else {
+        setEmailError("");
+      }
+    }
+
+    if (name === "contactno") {
+      if (value && !validatePhone(value)) {
+        setPhoneError("Phone number must be exactly 10 digits");
+      } else {
+        setPhoneError("");
+      }
+    }
   };
 
   const handleSendOTP = async () => {
+    if (!isPasswordValid) {
+      toast.error("Please make your password strong first by fulfilling all requirements");
+      return;
+    }
+
     if (!formData.email || !formData.contactno) {
       toast.error("Please enter both email and phone number");
+      return;
+    }
+
+    if (emailError) {
+      toast.error("Please fix the email error first");
+      return;
+    }
+
+    if (phoneError) {
+      toast.error("Please fix the phone number error first");
       return;
     }
 
@@ -59,7 +105,7 @@ const BecomeCounselor = () => {
         email: formData.email,
         contact_number: formData.contactno
       });
-      
+
       if (response.data) {
         setIsOtpSent(true);
         setShowOtpModal(true);
@@ -79,29 +125,70 @@ const BecomeCounselor = () => {
     if (value.length > 1) {
       value = value.slice(-1);
     }
-  
+
     // Only allow numbers
     if (value && !/^\d+$/.test(value)) return;
-  
+
     const newOtpValues = [...otpValues];
     newOtpValues[index] = value;
     setOtpValues(newOtpValues);
-  
+
     // Set combined OTP in form data
     setFormData(prev => ({
       ...prev,
       otp: newOtpValues.join('')
     }));
-  
-    // Move to next input if typing a number
+
+    // Move to next input if typing a number - use requestAnimationFrame for better focus
     if (value && index < 5) {
-      otpInputs.current[index + 1]?.focus();
+      requestAnimationFrame(() => {
+        const nextInput = otpInputs.current[index + 1];
+        if (nextInput) {
+          nextInput.focus();
+          nextInput.select();
+        }
+      });
     }
   };
-  
+
   const handleKeyDown = (index, event) => {
-    if (event.key === "Backspace" && !otpValues[index] && index > 0) {
-      otpInputs.current[index - 1]?.focus();
+    // Handle backspace - move to previous input if current is empty
+    if (event.key === "Backspace") {
+      if (!otpValues[index] && index > 0) {
+        event.preventDefault();
+        const prevInput = otpInputs.current[index - 1];
+        if (prevInput) {
+          prevInput.focus();
+          prevInput.select();
+        }
+      } else if (otpValues[index]) {
+        // Clear current input on backspace
+        const newOtpValues = [...otpValues];
+        newOtpValues[index] = '';
+        setOtpValues(newOtpValues);
+        setFormData(prev => ({
+          ...prev,
+          otp: newOtpValues.join('')
+        }));
+      }
+    }
+
+    // Handle arrow keys
+    if (event.key === "ArrowLeft" && index > 0) {
+      event.preventDefault();
+      const prevInput = otpInputs.current[index - 1];
+      if (prevInput) {
+        prevInput.focus();
+        prevInput.select();
+      }
+    }
+    if (event.key === "ArrowRight" && index < 5) {
+      event.preventDefault();
+      const nextInput = otpInputs.current[index + 1];
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      }
     }
   };
 
@@ -109,7 +196,7 @@ const BecomeCounselor = () => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text');
     const pastedNumbers = pastedData.match(/\d/g);
-    
+
     if (pastedNumbers) {
       const newOtpValues = [...otpValues];
       pastedNumbers.slice(0, 6).forEach((num, index) => {
@@ -136,7 +223,7 @@ const BecomeCounselor = () => {
         contact_number: formData.contactno,
         otp: combinedOtp
       });
-      
+
       if (response.data) {
         setIsOtpVerified(true);
         setShowOtpModal(false);
@@ -149,7 +236,7 @@ const BecomeCounselor = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!isOtpVerified) {
       toast.error("Please verify your email/phone first");
       return;
@@ -167,73 +254,75 @@ const BecomeCounselor = () => {
     }
   };
 
-  // OTP Modal Component
-  const OtpModal = () => {
-    if (!showOtpModal) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
-          {/* Close button */}
-          <button 
-            onClick={() => setShowOtpModal(false)}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
-
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Enter Verification Code</h2>
-            <p className="text-gray-600">
-              We have sent OTP to {formData.email}
-            </p>
-          </div>
-
-          {/* OTP Input Boxes */}
-          <div className="flex justify-center gap-2 mb-6">
-            {otpValues.map((value, index) => (
-              <input
-                key={index}
-                ref={el => otpInputs.current[index] = el}
-                type="text"
-                maxLength={1}
-                value={value}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                onPaste={handlePaste}
-                className="w-12 h-12 text-center text-xl font-semibold border-2 rounded-lg focus:border-red-500 focus:outline-none"
-              />
-            ))}
-          </div>
-
-          <div className="text-center mb-6">
-            <p className="text-gray-600 mb-2">
-              Didn't receive the code?
-            </p>
-            <button
-              onClick={handleSendOTP}
-              className="text-red-600 font-semibold hover:text-red-800"
-            >
-              Resend OTP
-            </button>
-          </div>
-
-          <button
-            onClick={handleVerifyOTP}
-            className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800"
-          >
-            Verify OTP
-          </button>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="flex flex-col md:flex-row h-auto">
       <ToastContainer />
-      <OtpModal />
-      
+
+      {/* OTP Modal */}
+      {showOtpModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
+            {/* Close button */}
+            <button
+              onClick={() => setShowOtpModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Enter Verification Code</h2>
+              <p className="text-gray-600">
+                We have sent OTP to {formData.email}
+              </p>
+            </div>
+
+            {/* OTP Input Boxes */}
+            <div className="flex justify-center gap-2 mb-6">
+              {otpValues.map((value, index) => (
+                <input
+                  key={index}
+                  ref={el => otpInputs.current[index] = el}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={1}
+                  value={value}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={handlePaste}
+                  onFocus={(e) => e.target.select()}
+                  className="w-12 h-12 text-center text-xl font-semibold border-2 rounded-lg focus:border-red-500 focus:outline-none"
+                  autoComplete="off"
+                  autoFocus={index === 0}
+                />
+              ))}
+            </div>
+
+            <div className="text-center mb-6">
+              <p className="text-gray-600 mb-2">
+                Didn't receive the code?
+              </p>
+              <button
+                type="button"
+                onClick={handleSendOTP}
+                className="text-red-600 font-semibold hover:text-red-800"
+              >
+                Resend OTP
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleVerifyOTP}
+              className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800"
+            >
+              Verify OTP
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Left Section */}
       <div className="w-full md:w-1/2 bg-red-700 text-white flex flex-col justify-center items-center px-10 py-8 md:py-0">
         <h1 className="text-4xl lg:text-[45px] font-semibold mb-4 w-11/12 text-center md:text-start">
@@ -300,8 +389,12 @@ const BecomeCounselor = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
             />
+            {emailError && (
+              <p className="text-red-500 text-xs mt-1">{emailError}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -315,22 +408,43 @@ const BecomeCounselor = () => {
               value={formData.contactno}
               onChange={handleChange}
               placeholder="Enter your phone number"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${phoneError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
             />
+            {phoneError && (
+              <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+            )}
           </div>
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="password">
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Create a password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create a password"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+            <PasswordStrength
+              password={formData.password}
+              onValidationChange={(isValid) => setIsPasswordValid(isValid)}
             />
           </div>
 
@@ -385,8 +499,8 @@ const BecomeCounselor = () => {
             Log in
           </Link>
         </p>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

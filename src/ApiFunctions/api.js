@@ -3,7 +3,7 @@ import axios from "axios";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
-export const getInstitutes = async (state, city,instituteName,courseTitle) => {
+export const getInstitutes = async (state, city,instituteName,courseTitle, page = 1, limit = 20) => {
   try {
     // Construct the filters object dynamically based on the input
     const searchFields = {
@@ -17,6 +17,8 @@ export const getInstitutes = async (state, city,instituteName,courseTitle) => {
     const response = await axios.get(`${baseURL}/institutes`, {
       params: {
         searchFields: JSON.stringify(searchFields),
+        page: page,
+        limit: limit, // Limit results to improve loading time
       },
     });
 

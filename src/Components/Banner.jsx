@@ -11,6 +11,7 @@ const Banner = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const baseURL = import.meta.env.VITE_BASE_URL;
@@ -32,7 +33,9 @@ const Banner = () => {
           searchType === "counsellor" ? "counselors" : "institutes";
         console.log("Fetching from:", `${baseURL}/${endpoint}`);
 
-        const response = await axios.get(`${baseURL}/${endpoint}`);
+        // Add limit to reduce payload size and improve loading time
+        const limit = searchType === "counsellor" ? 50 : 100;
+        const response = await axios.get(`${baseURL}/${endpoint}?limit=${limit}&page=1`);
         console.log("API Response:", response.data);
 
         if (!isMounted) return;
@@ -92,7 +95,8 @@ const Banner = () => {
       }
     };
 
-    const debounceTimer = setTimeout(fetchSuggestions, 300);
+    // Increased debounce time to reduce API calls
+    const debounceTimer = setTimeout(fetchSuggestions, 500);
 
     return () => {
       isMounted = false;
@@ -103,44 +107,45 @@ const Banner = () => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setInputField(value);
-    if (value.length >= 2) {
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
-    }
   };
 
   // In Banner.jsx
-const handleSuggestionClick = (suggestion) => {
-  if (searchType === "course") {
-    setInputField(suggestion.courseTitle);
-    dispatch(setInput(suggestion.courseTitle));
-    navigate("/searchpage");
-  } else if (searchType === "counsellor") {
-    setInputField(suggestion.firstname + " " + suggestion.lastname);
-    navigate(`/counselor?name=${encodeURIComponent(suggestion.firstname + " " + suggestion.lastname)}`);
-  } else {
-    // For institutes, include a search flag to indicate this came from search
-    setInputField(suggestion.instituteName);
-    dispatch(setInput(suggestion.instituteName));
-    navigate("/searchpage?fromSearch=true");
-  }
-  setShowSuggestions(false);
-};
+  const handleSuggestionClick = (suggestion) => {
+    if (searchType === "course") {
+      setInputField(suggestion.courseTitle);
+      dispatch(setInput(suggestion.courseTitle));
+      navigate("/searchpage");
+    } else if (searchType === "counsellor") {
+      setInputField(suggestion.firstname + " " + suggestion.lastname);
+      navigate(`/counselor?name=${encodeURIComponent(suggestion.firstname + " " + suggestion.lastname)}`);
+    } else {
+      // For institutes, include a search flag to indicate this came from search
+      setInputField(suggestion.instituteName);
+      dispatch(setInput(suggestion.instituteName));
+      navigate("/searchpage?fromSearch=true");
+    }
+    setShowSuggestions(false);
+  };
 
-const handleBtnClick = () => {
-  if (inputField === "") {
-    alert("Please enter something");
-    return;
-  }
+  const handleBtnClick = async () => {
+    if (inputField === "") {
+      alert("Please enter something");
+      return;
+    }
 
-  if (searchType === "counsellor") {
-    navigate(`/counselor?name=${encodeURIComponent(inputField)}`);
-  } else {
-    dispatch(setInput(inputField));
-    navigate("/searchpage?fromSearch=true");
-  }
-};
+    setIsSearching(true);
+
+    // Navigate immediately - no artificial delay
+    if (searchType === "counsellor") {
+      navigate(`/counselor?name=${encodeURIComponent(inputField)}`);
+      setIsSearching(false);
+    } else {
+      dispatch(setInput(inputField));
+      navigate("/searchpage?fromSearch=true");
+      // Reset loading state immediately after navigation
+      setIsSearching(false);
+    }
+  };
 
   return (
     // <div className="h-[480px] w-full relative">
@@ -188,8 +193,8 @@ const handleBtnClick = () => {
                   searchType === "counsellor"
                     ? "Search for counsellor names..."
                     : searchType === "course"
-                    ? "Search for courses..."
-                    : "Search for institutes..."
+                      ? "Search for courses..."
+                      : "Search for institutes..."
                 }
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -200,19 +205,28 @@ const handleBtnClick = () => {
             </div>
 
             <button
-              className="!h-full right-0 !rounded-sm w-1/5 max-sm:w-1/6 absolute top-0 bg-[#b82025] min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white"
+              className="!h-full right-0 !rounded-sm w-1/5 max-sm:w-1/6 absolute top-0 bg-[#b82025] min-w-24 hover:bg-red-400 hover:scale-105 transition-all text-white disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
               onClick={handleBtnClick}
+              disabled={isSearching}
             >
-              Search
+              {isSearching ? (
+                <div className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Searching...</span>
+                </div>
+              ) : (
+                "Search"
+              )}
             </button>
           </div>
 
-          {/* Suggestions dropdown with loading state */}
+          {/* Suggestions dropdown with loading hidden (silent update) */}
           {showSuggestions && (
             <div className="absolute ml-5 mr-5 mt-1 w-[calc(100%-40px)] bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto">
-              {isLoading ? (
-                <div className="px-4 py-2 text-gray-500">Loading...</div>
-              ) : suggestions.length > 0 ? (
+              {suggestions.length > 0 ? (
                 suggestions.map((suggestion, index) => (
                   <div
                     key={index}
@@ -223,8 +237,8 @@ const handleBtnClick = () => {
                       {searchType === "course"
                         ? suggestion.courseTitle
                         : searchType === "counsellor"
-                        ? suggestion.firstname + " " + suggestion.lastname
-                        : suggestion.instituteName}
+                          ? suggestion.firstname + " " + suggestion.lastname
+                          : suggestion.instituteName}
                     </div>
                     {searchType === "course" && (
                       <div className="text-sm text-gray-600">
@@ -245,10 +259,11 @@ const handleBtnClick = () => {
                   </div>
                 ))
               ) : (
-                <div className="px-4 py-2 text-gray-500">No results found</div>
+                !isLoading && <div className="px-4 py-2 text-gray-500">No results found</div>
               )}
             </div>
           )}
+
         </div>
       </div>
     </div>

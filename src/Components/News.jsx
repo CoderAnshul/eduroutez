@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 const News = ({ instituteData, showNews = true }) => {
@@ -14,11 +14,11 @@ const News = ({ instituteData, showNews = true }) => {
   const itemsPerPage = 4;
 
   // Safely access environment variables with fallbacks
-  const Images = import.meta.env.VITE_IMAGE_BASE_URL || "";
+  const Images = import.meta.env.VITE_IMAGE_BASE_URL;
   const baseURL = import.meta.env.VITE_BASE_URL || "";
 
   // Define placeholder image as a constant to avoid repeated network requests
-  const PLACEHOLDER_IMAGE = "/placeholder-image.jpg";
+  const PLACEHOLDER_IMAGE = "https://via.placeholder.com/400x300?text=No+Image";
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -72,13 +72,64 @@ const News = ({ instituteData, showNews = true }) => {
   const displayedNews = newsData?.slice(0, currentPage * itemsPerPage) || [];
 
   const NewsCard = ({ news }) => {
-    const [imgSrc, setImgSrc] = useState(
-      news?.image ? `${Images}/${news.image}` : PLACEHOLDER_IMAGE
-    );
+    // Construct image URL properly using useMemo
+    const imageUrl = useMemo(() => {
+      if (!news?.image) {
+        return PLACEHOLDER_IMAGE;
+      }
+
+      let imagePath = news.image;
+
+      // Replace backslashes with forward slashes (fix for Windows paths)
+      imagePath = imagePath.replace(/\\/g, '/');
+
+      // If image already contains http/https, use it as is
+      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+      }
+
+      // Otherwise, prepend the image base URL
+      if (Images) {
+        // Ensure strictly no double slash at the join
+        const baseUrl = Images.endsWith('/') ? Images.slice(0, -1) : Images;
+
+        // Remove leading slash from image path if present
+        if (imagePath.startsWith('/')) {
+          imagePath = imagePath.slice(1);
+        }
+
+        // Robust handling: If base URL is the uploads directory, we likely just want the filename
+        // This handles "C:\fakepath\img.jpg", "uploads/img.jpg", "public/uploads/img.jpg"
+        if (baseUrl.endsWith('/uploads')) {
+          // If it looks like a path (has slashes), take the last part (filename)
+          if (imagePath.includes('/') || imagePath.includes('\\')) {
+            const parts = imagePath.split(/[/\\]/); // Split by / or \
+            imagePath = parts[parts.length - 1];
+          }
+        }
+
+        console.log(`News Image Processing: Original="${news.image}" | Processed="${baseUrl}/${imagePath}"`);
+        return `${baseUrl}/${imagePath}`;
+      }
+
+      // Fallback if Images is not set
+      return imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    }, [news?.image, Images]);
+
+    const [imgSrc, setImgSrc] = useState(imageUrl);
     const [imgError, setImgError] = useState(false);
+
+    // Update image source when news data changes
+    useEffect(() => {
+      if (imageUrl) {
+        setImgSrc(imageUrl);
+        setImgError(false);
+      }
+    }, [imageUrl]);
 
     const handleImageError = () => {
       if (!imgError) {
+        console.warn("Failed to load news image:", imgSrc);
         setImgSrc(PLACEHOLDER_IMAGE);
         setImgError(true);
       }

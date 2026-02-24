@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo, Suspense } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import { getInstituteById } from "../ApiFunctions/api";
 import Loader from "../Components/Loader";
 import axios from "axios";
+import { Video, ArrowRight } from "lucide-react";
 
 // Lazy load components
 const ImageSlider = React.lazy(() => import("../Ui components/ImageSlider"));
@@ -331,7 +332,7 @@ const Instituepage = () => {
         <ImageSlider instituteData={instituteData} />
         <InstitueName instituteData={instituteData} />
         <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
-        <div className="w-full flex gap-4">
+        <div className="w-full flex gap-4 items-stretch relative pb-4">
           <div className="w-full lg:w-[calc(100%-400px)]">
             <div className="w-full min-h-24">
               {/* College Info */}
@@ -491,9 +492,46 @@ const Instituepage = () => {
               )}
             </div>
           </div>
-          <div className="w-[300px] h-[250px]">
-            <QueryForm instituteData={instituteData} />
-            <Promotions location="INSTITUTE_PAGE " className="h-[250px]" />
+          <div className="w-[300px] flex-shrink-0 pt-4">
+            <div className="sticky top-32 z-10 space-y-4">
+              {/* Career Guidance Webinar Button */}
+              <Link to="/counselor" className="block group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
+                {/* Background Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#800e13] to-[#b82025] transition-transform duration-500 group-hover:scale-105" />
+                
+                {/* Decorative Elements */}
+                <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10 blur-3xl transition-transform duration-700 group-hover:translate-x-[-10px] group-hover:translate-y-[10px]" />
+                <div className="absolute -left-12 -bottom-12 h-32 w-32 rounded-full bg-black/10 blur-2xl" />
+
+                {/* Content Container */}
+                <div className="relative p-7 flex flex-col h-full justify-between z-10">
+                  <div className="flex justify-between items-start mb-8">
+                    {/* Glass Icon Container */}
+                    <div className="h-12 w-12 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-inner group-hover:bg-white/20 transition-colors duration-300">
+                      <Video className="w-6 h-6 text-white drop-shadow-md" />
+                    </div>
+                    {/* Arrow Icon */}
+                    <div className="bg-white/5 p-2 rounded-full backdrop-blur-sm group-hover:bg-white/20 transition-all duration-300">
+                      <ArrowRight className="w-4 h-4 text-white/90 group-hover:text-white group-hover:translate-x-0.5 transition-transform duration-300" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                       <span className="h-0.5 w-6 bg-red-300/50 rounded-full"></span>
+                       <p className="text-xs font-bold tracking-widest text-red-100/90 uppercase">Webinar</p>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2 leading-tight tracking-wide font-sans">Career Guidance</h3>
+                    <p className="text-sm text-red-50/80 leading-relaxed font-light">
+                      Get expert career guidance directly from our top counselors.
+                    </p>
+                  </div>
+                </div>
+              </Link>
+              
+              <QueryForm instituteData={instituteData} />
+              <Promotions location="INSTITUTE_PAGE " className="h-[250px]" />
+            </div>
           </div>
         </div>
         <HighRatedCareers />

@@ -1,14 +1,21 @@
 import React, { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { createQuery } from "../ApiFunctions/api";
 
 const QueryForm = ({ instituteData }) => {
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
+
+  // Helper function to check if user is logged in
+  const isLoggedIn = () => {
+    const accessToken = localStorage.getItem("accessToken");
+    return !!accessToken && accessToken !== "null" && accessToken !== "undefined";
+  };
 
   const validateForm = (formData) => {
     const newErrors = {};
-    const requiredFields = ["name", "email", "number", "city", "relatedTopic", "query"];
+    const requiredFields = ["name", "email", "number", "query"];
     
     requiredFields.forEach(field => {
       if (!formData.get(field)) {
@@ -36,6 +43,18 @@ const QueryForm = ({ instituteData }) => {
     e.preventDefault();
     console.log("Form submission initiated");
 
+    // Check if user is logged in
+    if (!isLoggedIn()) {
+      toast.error("Please login first");
+      // Store the current page URL to redirect back after login
+      sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+      // Redirect to login after showing the error message
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+      return;
+    }
+
     const formData = new FormData(e.target);
     
     // Validate the form
@@ -50,8 +69,6 @@ const QueryForm = ({ instituteData }) => {
       name: formData.get("name"),
       email: formData.get("email"),
       phoneNo: formData.get("number"),
-      city: formData.get("city"),
-      queryRelatedTo: formData.get("relatedTopic"),
       query: formData.get("query"),
       instituteId: formData.get("instituteId")
     };
@@ -69,21 +86,9 @@ const QueryForm = ({ instituteData }) => {
   };
 
   return (
-    <div className="hidden lg:block items-center pt-4 min-w-[400px] justify-center min-h-44 w-1/5">
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      
+    <div className="sticky top-28 hidden lg:block w-full">
       <form
-        className="w-full max-w-sm p-2 bg-[#F0FDF4] rounded-lg shadow-md"
+        className="w-full p-2 bg-[#F0FDF4] rounded-lg shadow-md"
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
@@ -131,34 +136,6 @@ const QueryForm = ({ instituteData }) => {
               }`}
             />
             {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number}</p>}
-          </div>
-          <div>
-            <label className="block text-gray-500 text-xs font-medium mb-1">
-              City
-            </label>
-            <input
-              type="text"
-              name="city"
-              placeholder="Enter your city"
-              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                errors.city ? "border-red-500" : ""
-              }`}
-            />
-            {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-          </div>
-          <div>
-            <label className="block text-gray-500 text-xs font-medium mb-1">
-              Query Related to
-            </label>
-            <input
-              type="text"
-              name="relatedTopic"
-              placeholder="Enter related topic"
-              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                errors.relatedTopic ? "border-red-500" : ""
-              }`}
-            />
-            {errors.relatedTopic && <p className="text-red-500 text-xs mt-1">{errors.relatedTopic}</p>}
           </div>
           <div>
             <label className="block text-gray-500 text-xs font-medium mb-1">

@@ -106,6 +106,34 @@ const CounselorListPage = () => {
     fetchAllCounselors();
   }, [category]);
 
+  // Sync category from URL with selectedStreams when coming from homepage
+  const [urlCategorySynced, setUrlCategorySynced] = useState(false);
+  
+  useEffect(() => {
+    if (category && streams.length > 0 && !urlCategorySynced) {
+      // Decode URL-encoded category (e.g., "Hospitality%20&%20Tourism" -> "Hospitality & Tourism")
+      const decodedCategory = decodeURIComponent(category);
+      
+      // Find matching stream by name (case-insensitive)
+      const normalizedCategory = decodedCategory.trim().toLowerCase();
+      const matchingStream = streams.find((stream) => {
+        const streamName = stream.name.trim().toLowerCase();
+        return streamName === normalizedCategory || 
+               streamName.includes(normalizedCategory) || 
+               normalizedCategory.includes(streamName);
+      });
+      
+      if (matchingStream) {
+        // Set the filter from URL, making it clickable
+        setSelectedStreams([matchingStream.name]);
+        setUrlCategorySynced(true);
+      }
+    } else if (!category) {
+      // Reset sync flag when category is removed from URL
+      setUrlCategorySynced(false);
+    }
+  }, [category, streams, urlCategorySynced]);
+
   const fetchAllCounselors = async () => {
     try {
       setLoading(true);
@@ -132,7 +160,16 @@ const CounselorListPage = () => {
         const response = await axios.get(
           `${VITE_BASE_URL}/streams?&page=0&sort={"createdAt":"asc"}`
         );
-        setStreams(response.data.data.result || []);
+        const streamsData = response.data.data.result || [];
+        
+        // Filter only active streams (status === true)
+        const activeStreams = streamsData.filter(stream => stream.status === true);
+        
+        // Debug: Log all streams to see what's available
+        console.log("All streams from API:", streamsData.map(s => ({ name: s.name, status: s.status })));
+        console.log("Active streams:", activeStreams.map(s => s.name));
+        
+        setStreams(activeStreams);
       } catch (error) {
         console.error("Error fetching streams:", error.message);
       }
@@ -145,12 +182,44 @@ const CounselorListPage = () => {
     let filtered = [...counselors];
 
     if (selectedStreams.length > 0) {
-      filtered = filtered.filter(
-        (counselor) =>
-          counselor &&
-          counselor.category &&
-          selectedStreams.includes(counselor.category)
-      );
+      // Create a mapping for common stream name variations
+      const streamNameMap = {
+        'it': ['information technology', 'it', 'information tech'],
+        'information technology': ['information technology', 'it', 'information tech'],
+      };
+      
+      // Case-insensitive filtering - normalize both stream names and counselor categories
+      filtered = filtered.filter((counselor) => {
+        if (!counselor || !counselor.category) return false;
+        
+        const counselorCategory = counselor.category.trim().toLowerCase();
+        
+        return selectedStreams.some((stream) => {
+          const streamLower = stream.trim().toLowerCase();
+          
+          // Direct match
+          if (streamLower === counselorCategory) return true;
+          
+          // Check if stream has known aliases
+          const aliases = streamNameMap[streamLower] || [];
+          if (aliases.includes(counselorCategory)) return true;
+          
+          // Check if counselor category has known aliases
+          const categoryAliases = streamNameMap[counselorCategory] || [];
+          if (categoryAliases.includes(streamLower)) return true;
+          
+          return false;
+        });
+      });
+      
+      // Debug log to help identify mismatches
+      if (filtered.length === 0 && counselors.length > 0 && selectedStreams.length > 0) {
+        console.log("Selected streams:", selectedStreams);
+        console.log("Available counselor categories:", 
+          [...new Set(counselors.map(c => c.category).filter(Boolean))]
+        );
+        console.log("No matches found - check if stream names match counselor categories");
+      }
     }
 
     if (searchTerm) {
@@ -262,29 +331,45 @@ const CounselorListPage = () => {
               showSidebar ? "block" : "hidden"
             } md:block w-full md:w-1/4 transition-all duration-300`}
           >
-            <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
-              <h3 className="text-lg font-semibold mb-4">Filter by Stream</h3>
-              <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
-                {streams.map((stream) => (
-                  <label
-                    key={stream._id}
-                    className="flex items-center gap-2 hover:ml-1 transition-all hover:text-red-500 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      value={stream.name}
-                      checked={selectedStreams.includes(stream.name)}
-                      onChange={() => handleStreamChange(stream.name)}
-                    />
-                    {stream.name}
-                  </label>
-                ))}
+            <div className="md:sticky md:top-20 md:h-fit md:max-h-[calc(100vh-2rem)] md:overflow-y-auto">
+              <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
+                <h3 className="text-lg font-semibold mb-4">Filter by Stream</h3>
+                <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
+                  {streams.length === 0 ? (
+                    <p className="text-gray-500 text-sm">Loading streams...</p>
+                  ) : (
+                    streams.map((stream) => {
+                      const isChecked = selectedStreams.includes(stream.name);
+                      return (
+                        <label
+                          key={stream._id}
+                          className={`flex items-center gap-2 hover:ml-1 transition-all cursor-pointer ${
+                            isChecked 
+                              ? "text-red-600 font-semibold bg-red-50 px-2 py-1 rounded" 
+                              : "hover:text-red-500"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            value={stream.name}
+                            checked={isChecked}
+                            onChange={() => handleStreamChange(stream.name)}
+                            className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 focus:ring-2 cursor-pointer"
+                          />
+                          <span className={isChecked ? "font-semibold" : ""}>
+                            {stream.name}
+                          </span>
+                        </label>
+                      );
+                    })
+                  )}
+                </div>
               </div>
+              <Promotions
+                location="COUNSELING_PAGE_SIDEBAR"
+                className="h-[250px] w-fit"
+              />
             </div>
-            <Promotions
-              location="COUNSELING_PAGE_SIDEBAR"
-              className="h-[250px] w-fit"
-            />
           </div>
 
           <div className="w-full md:w-3/4 md:pl-6">

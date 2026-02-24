@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import location from "../assets/Images/location.png";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import axiosInstance from "../ApiFunctions/axios";
@@ -9,6 +10,7 @@ const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 const baseURL = import.meta.env.VITE_BASE_URL;
 
 const InstitueName = ({ instituteData }) => {
+  const navigate = useNavigate();
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [streams, setStreams] = useState([]);
   const [formData, setFormData] = useState({
@@ -22,6 +24,104 @@ const InstitueName = ({ instituteData }) => {
     stream: "",
     level: "",
   });
+
+  // Helper function to check if user is logged in
+  const isLoggedIn = () => {
+    const accessToken = localStorage.getItem("accessToken");
+    return !!accessToken && accessToken !== "null" && accessToken !== "undefined";
+  };
+
+  // Direct submit function (can be called with or without event)
+  const handleSubmitDirectly = async (dataToSubmit = null) => {
+    const data = dataToSubmit || formData;
+
+    try {
+      const queryPayload = {
+        name: data.name,
+        email: data.email,
+        phoneNo: data.phone,
+        city: data.city,
+        query: data.message,
+        queryRelatedTo: data.queryRelatedTo,
+        instituteId: data.instituteId || instituteData?.data?._id,
+        stream: data.stream,
+        level: data.level,
+      };
+
+      console.log("Query payload:", queryPayload);
+
+      await axiosInstance.post(`${baseURL}/query`, queryPayload, {
+        headers: {
+          "x-access-token": localStorage.getItem("accessToken") || "",
+          "x-refresh-token": localStorage.getItem("refreshToken") || "",
+        },
+      });
+
+      toast.success("Application submitted successfully!");
+      setIsPopupVisible(false);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+        city: "",
+        queryRelatedTo: "",
+        stream: "",
+        level: "",
+      });
+    } catch (error) {
+      console.error("Submit error:", error);
+      // If it's an auth error and we have pending data, don't show error
+      if (error.response?.status === 401 && !isLoggedIn()) {
+        // User needs to login, but we already handled redirect
+        return;
+      }
+      toast.error("Failed to submit application");
+    }
+  };
+
+  // Check for pending application or redirect flag after component mounts (after login redirect)
+  useEffect(() => {
+    const pendingApplication = sessionStorage.getItem('pendingApplication');
+    const pendingInstituteId = sessionStorage.getItem('pendingInstituteId');
+
+    // Check if user was redirected from login after clicking Apply Now
+    const wasRedirectedFromLogin = pendingInstituteId === instituteData?.data?._id;
+
+    if (pendingApplication) {
+      try {
+        const applicationData = JSON.parse(pendingApplication);
+        // Pre-fill the form with stored data
+        setFormData({
+          name: applicationData.name || "",
+          email: applicationData.email || "",
+          phone: applicationData.phone || "",
+          message: applicationData.message || "",
+          city: applicationData.city || "",
+          queryRelatedTo: applicationData.queryRelatedTo || "",
+          instituteId: applicationData.instituteId || "",
+          stream: applicationData.stream || "",
+          level: applicationData.level || "",
+        });
+        // Open the popup
+        setIsPopupVisible(true);
+        // Clear the stored data
+        sessionStorage.removeItem('pendingApplication');
+        // Auto-submit after a short delay to ensure form is ready
+        setTimeout(() => {
+          handleSubmitDirectly(applicationData);
+        }, 500);
+      } catch (error) {
+        console.error("Error parsing pending application:", error);
+        sessionStorage.removeItem('pendingApplication');
+      }
+    } else if (wasRedirectedFromLogin) {
+      // User was redirected from login after clicking Apply Now
+      // Open the form popup automatically
+      sessionStorage.removeItem('pendingInstituteId');
+      setIsPopupVisible(true);
+    }
+  }, []);
 
   // Fetch streams on component mount
   useEffect(() => {
@@ -106,47 +206,51 @@ const InstitueName = ({ instituteData }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle Apply Now button click - always open the form
+  const handleApplyNow = () => {
+    // Always open the form popup
+    // Login check will happen on form submission
+    setIsPopupVisible(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const queryPayload = {
+    // Check if user is logged in
+    if (!isLoggedIn()) {
+      // Show error message first
+      toast.error("Please login first");
+
+      // Store form data in sessionStorage
+      const applicationData = {
         name: formData.name,
         email: formData.email,
-        phoneNo: formData.phone,
+        phone: formData.phone,
+        message: formData.message,
         city: formData.city,
-        query: formData.message,
         queryRelatedTo: formData.queryRelatedTo,
         instituteId: instituteData?.data?._id,
         stream: formData.stream,
         level: formData.level,
       };
 
-      console.log("Query payload:", queryPayload);
+      sessionStorage.setItem('pendingApplication', JSON.stringify(applicationData));
 
-      await axiosInstance.post(`${baseURL}/query`, queryPayload, {
-        headers: {
-          "x-access-token": localStorage.getItem("accessToken"),
-          "x-refresh-token": localStorage.getItem("refreshToken"),
-        },
-      });
+      // Store the current page URL to redirect back after login
+      sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+      // Store institute ID for reference
+      sessionStorage.setItem('pendingInstituteId', instituteData?.data?._id);
 
-      toast.success("Application submitted successfully!");
+      // Close popup and redirect to login after showing error
       setIsPopupVisible(false);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
-        city: "",
-        queryRelatedTo: "",
-        stream: "",
-        level: "",
-      });
-    } catch (error) {
-      console.error("Submit error:", error);
-      toast.error("Failed to submit application");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+      return;
     }
+
+    // User is logged in, submit directly
+    await handleSubmitDirectly();
   };
 
   return (
@@ -160,6 +264,10 @@ const InstitueName = ({ instituteData }) => {
               : serachBoximg
           }
           alt="instituteLogo"
+          onError={(e) => {
+            e.target.src = serachBoximg;
+            e.target.onerror = null;
+          }}
         />
       </div>
 
@@ -203,7 +311,7 @@ const InstitueName = ({ instituteData }) => {
             </button>
             <button
               className="bg-[#b82025] text-white px-4 py-2 rounded-lg"
-              onClick={() => setIsPopupVisible(true)}
+              onClick={handleApplyNow}
             >
               Apply Now
             </button>

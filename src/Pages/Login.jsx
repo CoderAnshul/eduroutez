@@ -7,18 +7,35 @@ import { useMutation } from "react-query";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_BASE_URL;
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+
+    if (id === "email") {
+      if (value && !validateEmail(value)) {
+        setEmailError("Please enter a valid email address");
+      } else {
+        setEmailError("");
+      }
+    }
   };
 
   const mutation = useMutation({
@@ -43,25 +60,30 @@ const Login = () => {
       }
     },
     onSuccess: (data) => {
-      if (data?.data?.user?.role !== 'student') {
-        toast.error("Invalid credentials");
-        return;
-      }
-
       console.log("Data", data);
-      
+
       // Store auth data
-      localStorage.setItem('accessToken', JSON.stringify(data.data.accessToken));
+      localStorage.setItem('accessToken', data.data.accessToken);
       localStorage.setItem('userId', data?.data?.user?._id);
       localStorage.setItem('role', data?.data?.user?.role);
       localStorage.setItem('email', data?.data?.user?.email);
-      localStorage.setItem('refreshToken', JSON.stringify(data.data.refreshToken));
-      
+      localStorage.setItem('refreshToken', data.data.refreshToken);
+
       toast.success("Logged in successfully!");
+
+      if (data?.data?.user?.role !== 'student') {
+        // Redirect to admin portal for non-student roles
+        window.location.href = "https://admin.eduroutez.com/";
+        return;
+      }
+
+      // Check for pending application
+      const pendingApplication = sessionStorage.getItem('pendingApplication');
+      const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
 
       // Check for pending webinar link
       const pendingWebinarLink = sessionStorage.getItem('pendingWebinarLink');
-      
+
       if (pendingWebinarLink) {
         // Clear the stored link
         sessionStorage.removeItem('pendingWebinarLink');
@@ -69,6 +91,11 @@ const Login = () => {
         window.open(pendingWebinarLink, '_blank');
         // Navigate to home page
         navigate("/");
+      } else if (redirectAfterLogin) {
+        // Clear the stored redirect URL
+        sessionStorage.removeItem('redirectAfterLogin');
+        // Navigate back to the institute page
+        navigate(redirectAfterLogin);
       } else {
         // Default navigation for students
         navigate("/");
@@ -118,16 +145,20 @@ const Login = () => {
               className="block text-sm font-medium mb-1"
               htmlFor="email"
             >
-              Email 
+              Email
             </label>
             <input
               type="text"
               id="email"
               placeholder="Enter your email "
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
               value={formData.email}
               onChange={handleChange}
             />
+            {emailError && (
+              <p className="text-red-500 text-xs mt-1">{emailError}</p>
+            )}
           </div>
           <div className="mb-4">
             <label
@@ -136,14 +167,27 @@ const Login = () => {
             >
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Enter your password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.password}
-              onChange={handleChange}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                placeholder="Enter your password"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
           <div className="flex items-center justify-between mb-6">
             <label className="flex items-center">
@@ -197,8 +241,8 @@ const Login = () => {
             Sign up
           </Link>
         </p>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

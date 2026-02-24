@@ -57,7 +57,18 @@ const Logout = React.lazy(()=> import('./Pages/Logout'))
 const App = () => {
   return (
     <BrowserRouter>
-      <ToastContainer />
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ zIndex: 9999 }}
+      />
       <ScrollToTop />
       <Navbar />
       <Suspense fallback={<Loader />}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
@@ -7,13 +7,30 @@ import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 import { toast } from "react-toastify";
+import PasswordStrength from "../Components/PasswordStrength";
+import { Eye, EyeOff } from "lucide-react";
 
 const Signup = () => {
   const [showOtpDialog, setShowOtpDialog] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const otpInputRefs = useRef([]);
   const [timer, setTimer] = useState(90); // 90-second countdown
   const [canResend, setCanResend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    return /^\d{10}$/.test(phone);
+  };
 
   const roleTypes = [
     { value: "institute", label: "University/College/Institute" },
@@ -129,6 +146,16 @@ const Signup = () => {
     if (showOtpDialog) {
       setTimer(90);
       setCanResend(false);
+      // Reset OTP when dialog opens
+      setOtp(["", "", "", "", "", ""]);
+      // Focus first OTP input when dialog opens
+      setTimeout(() => {
+        const firstInput = otpInputRefs.current[0];
+        if (firstInput) {
+          firstInput.focus();
+          firstInput.select();
+        }
+      }, 150);
     }
   }, [showOtpDialog]);
 
@@ -161,15 +188,99 @@ const Signup = () => {
     },
   });
 
-  const handleOtpChange = (index, value) => {
-    if (!/^[0-9]?$/.test(value)) return;
+  const handleOtpChange = (index, e) => {
+    const value = e.target.value;
+
+    // Only allow numbers
+    if (value && !/^[0-9]$/.test(value)) {
+      e.target.value = otp[index]; // Reset to previous value
+      return;
+    }
+
+    // Only allow single digit - take the last character if multiple entered
+    const digit = value.slice(-1);
+
     const newOtp = [...otp];
-    newOtp[index] = value;
+    newOtp[index] = digit;
     setOtp(newOtp);
 
-    // Move to next input
-    if (value && index < otp.length - 1) {
-      document.getElementById(`otp-${index + 1}`).focus();
+    // Move to next input automatically when a digit is entered
+    if (digit && index < otp.length - 1) {
+      // Use requestAnimationFrame for better focus handling
+      requestAnimationFrame(() => {
+        const nextInput = otpInputRefs.current[index + 1];
+        if (nextInput) {
+          nextInput.focus();
+          nextInput.select(); // Select the text for easy replacement
+        }
+      });
+    }
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    // Handle backspace - move to previous input if current is empty
+    if (e.key === "Backspace") {
+      if (!otp[index] && index > 0) {
+        e.preventDefault();
+        const prevInput = otpInputRefs.current[index - 1];
+        if (prevInput) {
+          prevInput.focus();
+          prevInput.select();
+        }
+      } else if (otp[index]) {
+        // Clear current input on backspace
+        const newOtp = [...otp];
+        newOtp[index] = "";
+        setOtp(newOtp);
+      }
+    }
+
+    // Handle arrow keys
+    if (e.key === "ArrowLeft" && index > 0) {
+      e.preventDefault();
+      const prevInput = otpInputRefs.current[index - 1];
+      if (prevInput) {
+        prevInput.focus();
+        prevInput.select();
+      }
+    }
+    if (e.key === "ArrowRight" && index < otp.length - 1) {
+      e.preventDefault();
+      const nextInput = otpInputRefs.current[index + 1];
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      }
+    }
+
+    // Handle delete key
+    if (e.key === "Delete") {
+      const newOtp = [...otp];
+      newOtp[index] = "";
+      setOtp(newOtp);
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text');
+    const pastedNumbers = pastedData.replace(/[^\d]/g, '').split('').slice(0, 6);
+
+    if (pastedNumbers.length > 0) {
+      const newOtp = [...otp];
+      pastedNumbers.forEach((num, index) => {
+        if (index < otp.length) {
+          newOtp[index] = num;
+        }
+      });
+      setOtp(newOtp);
+
+      // Focus the next empty input or the last one
+      const nextEmptyIndex = newOtp.findIndex((val, idx) => !val && idx >= pastedNumbers.length);
+      const focusIndex = nextEmptyIndex === -1 ? Math.min(pastedNumbers.length - 1, otp.length - 1) : nextEmptyIndex;
+      setTimeout(() => {
+        otpInputRefs.current[focusIndex]?.focus();
+      }, 0);
     }
   };
 
@@ -193,17 +304,10 @@ const Signup = () => {
     onSuccess: (data) => {
       setIsLoading(false);
       toast.success("Registered successfully");
-      localStorage.setItem(
-        "accessToken",
-        JSON.stringify(data.data.accessToken)
-      );
+      localStorage.setItem("accessToken", data.data.accessToken);
       localStorage.setItem("userId", data?.data?.user?._id);
       localStorage.setItem("role", data?.data?.user?.role);
       localStorage.setItem("email", data?.data?.user?.email);
-      localStorage.setItem(
-        "accessToken",
-        JSON.stringify(data.data.accessToken)
-      );
 
       if (data?.data?.user?.role === "student") {
         navigate("/");
@@ -261,16 +365,44 @@ const Signup = () => {
       // Normal field update
       setFormData({ ...formData, [id]: value });
       if (id === "role") setRole(value);
+
+      if (id === "email") {
+        if (value && !validateEmail(value)) {
+          setEmailError("Please enter a valid email address");
+        } else {
+          setEmailError("");
+        }
+      }
+
+      if (id === "contact_number") {
+        if (value && !validatePhone(value)) {
+          setPhoneError("Phone number must be exactly 10 digits");
+        } else {
+          setPhoneError("");
+        }
+      }
     }
   };
 
   const validateForm = () => {
-    if (!formData.email || !formData.contact_number) {
-      toast.error("Please enter both email and phone number");
+    if (!isPasswordValid) {
+      toast.error("Please make your password strong first by fulfilling all requirements");
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
+      return false;
+    }
+    if (!formData.email || !formData.contact_number) {
+      toast.error("Please enter both email and phone number");
+      return false;
+    }
+    if (emailError) {
+      toast.error("Please fix the email error first");
+      return false;
+    }
+    if (phoneError) {
+      toast.error("Please fix the phone number error first");
       return false;
     }
     if (
@@ -351,8 +483,8 @@ const Signup = () => {
     role === "institute"
       ? "Institute Name"
       : role === "counsellor"
-      ? "Counsellor Name"
-      : "Name";
+        ? "Counsellor Name"
+        : "Name";
 
   return (
     <div className="flex h-screen">
@@ -484,11 +616,15 @@ const Signup = () => {
               type="email"
               id="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
               value={formData.email}
               onChange={handleChange}
               required
             />
+            {emailError && (
+              <p className="text-red-500 text-xs mt-1">{emailError}</p>
+            )}
           </div>
 
           {/* Phone Number Field */}
@@ -499,25 +635,46 @@ const Signup = () => {
             <input
               type="tel"
               id="contact_number"
-              placeholder="Enter your phone number"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Enter your contact number"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${phoneError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                }`}
               value={formData.contact_number}
               onChange={handleChange}
               required
             />
+            {phoneError && (
+              <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+            )}
           </div>
 
           {/* Password Field */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Password *</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Create a password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.password}
-              onChange={handleChange}
-              required
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                placeholder="Create a password"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-[10px] text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+            <PasswordStrength
+              password={formData.password}
+              onValidationChange={(isValid) => setIsPasswordValid(isValid)}
             />
           </div>
 
@@ -526,15 +683,28 @@ const Signup = () => {
             <label className="block text-sm font-medium mb-1">
               Confirm Password *
             </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              placeholder="Confirm your password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                placeholder="Confirm your password"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
 
           {role === "student" && (
@@ -617,11 +787,21 @@ const Signup = () => {
                 <input
                   key={index}
                   id={`otp-${index}`}
+                  ref={(el) => {
+                    if (el) otpInputRefs.current[index] = el;
+                  }}
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength="1"
                   value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onChange={(e) => handleOtpChange(index, e)}
+                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                  onPaste={handleOtpPaste}
+                  onFocus={(e) => e.target.select()}
                   className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+                  autoComplete="off"
+                  autoFocus={index === 0}
                 />
               ))}
             </div>

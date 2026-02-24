@@ -63,6 +63,10 @@ const BestRatedInstitute = () => {
     {
       enabled: true,
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+      cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+      retry: 2,
+      retryDelay: 1000,
       onSuccess: (data) => {
         const institutes = data?.data || [];
 
@@ -92,11 +96,26 @@ const BestRatedInstitute = () => {
     );
   };
 
-  // Loading state
+  // Loading state with skeleton
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-500"></div>
+      <div className="container mx-auto px-2 sm:px-4 py-8">
+        <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
+          <h1 className="text-4xl font-bold mb-4">Best Rated Institutes</h1>
+          <p className="text-xl">Discover top-rated educational institutions</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
+              <div className="h-56 bg-gray-200"></div>
+              <div className="p-6">
+                <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -154,11 +173,13 @@ const BestRatedInstitute = () => {
 
                 {/* Institute Details */}
                 <div className="!p-6">
-                  <h2 className="text-2xl font-bold mb-2 text-gray-800">
+                  <h2 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
+                  {/* <h2 className="text-2xl font-bold mb-2 text-gray-800"> */}
                     {institute.instituteName}
                   </h2>
 
-                  <p className="text-gray-600 mb-4 p4 line-clamp-3">
+                  <p className="text-sm mt-2 mb-4 line-clamp-3">
+                  {/* <p className="text-gray-600 mb-4 p4 line-clamp-3"> */}
                     {institute.about ? (
                       <span
                         dangerouslySetInnerHTML={{ __html: institute.about }}

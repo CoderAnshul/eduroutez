@@ -60,16 +60,16 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
   );
 
   const overallRating =
-    institute.reviews.length > 0
+    institute?.reviews?.length > 0
       ? institute?.reviews.reduce(
-          (sum, review) =>
-            sum +
-            (review.placementStars || 0) +
-            (review.campusLifeStars || 0) +
-            (review.facultyStars || 0) +
-            (review.suggestionsStars || 0),
-          0
-        ) / (institute?.reviews.length * 4 || 1)
+        (sum, review) =>
+          sum +
+          (review.placementStars || 0) +
+          (review.campusLifeStars || 0) +
+          (review.facultyStars || 0) +
+          (review.suggestionsStars || 0),
+        0
+      ) / (institute?.reviews.length * 4 || 1)
       : 0;
   console.log("h", isNaN(overallRating) ? 3 : overallRating);
 
@@ -145,6 +145,10 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
             alt="Institute Thumbnail"
             className="rounded-lg object-cover w-full h-44 group-hover:opacity-90 transition-opacity duration-200"
             style={{ cursor: 'pointer' }}
+            onError={(e) => {
+              e.target.src = serachBoximg;
+              e.target.onerror = null;
+            }}
           />
           {hasWishlistFeature && (
             <button
@@ -192,7 +196,7 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
                 {overallRating}
               </span>
             )}
-            <span>{institute.reviews.length} Reviews</span>
+            <span>{institute?.reviews?.length || 0} Reviews</span>
             <span className="flex items-center gap-2 text-gray-600">
               {institute.state?.name && (
                 <>

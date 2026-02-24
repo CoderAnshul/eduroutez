@@ -239,10 +239,10 @@ const SubNavbar = ({ categories }) => {
       category.label === "MEDIA"
         ? "transform translate-x-[-50%]"
         : boundingBox.left <= categoryWidth
-        ? "left-0"
-        : viewportWidth - boundingBox.right <= categoryWidth
-        ? "right-0"
-        : "left-0"
+          ? "left-0"
+          : viewportWidth - boundingBox.right <= categoryWidth
+            ? "right-0"
+            : "left-0"
     );
 
     setHoveredCategory(category.label);
@@ -269,7 +269,7 @@ const SubNavbar = ({ categories }) => {
     const blogs = examBlogs[streamId] || [];
     return (
       <div className="p-4 max-w-[1400px]">
-        <h3 className="font-semibold text-red-500 mb-3">Latest Exam Updates</h3>
+        <h3 className="font-semibold text-red-500 text-base mb-3">Latest Exam Updates</h3>
         {blogs.length === 0 ? (
           <p className="text-sm text-gray-500">Loading exam updates...</p>
         ) : (
@@ -307,8 +307,8 @@ const SubNavbar = ({ categories }) => {
   const handleViewAllCourses = () => { navigate("/popularcourses"); setHoveredCategory(null); };
   const handleViewAllCareers = () => { navigate("/careerspage"); setHoveredCategory(null); };
   const handleViewAllColleges = () => { navigate("/topcolleges"); setHoveredCategory(null); };
-  const handleAllCollegesByCity = () => { navigate("/searchpage"); setHoveredCategory(null); };
-  const handleAllCollegesByState = () => { navigate("/searchpage"); setHoveredCategory(null); };
+  const handleAllCollegesByCity = () => { navigate(`/searchpage${activeStream ? `?stream=${encodeURIComponent(activeStream)}` : ""}`); setHoveredCategory(null); };
+  const handleAllCollegesByState = () => { navigate(`/searchpage${activeStream ? `?stream=${encodeURIComponent(activeStream)}` : ""}`); setHoveredCategory(null); };
   const handleMouseLeave = () => { setHoveredCategory(null); setDropdownAlignment(""); };
   const handleViewAllNews = () => { navigate("/news"); setHoveredCategory(null); };
 
@@ -348,7 +348,7 @@ const SubNavbar = ({ categories }) => {
   const renderCareersContent = () => (
     <div className="p-6 bg-white min-w-[1500px]">
       <div className="space-y-8">
-        <h3 className="font-semibold text-red-500">Latest Careers</h3>
+        <h3 className="font-semibold text-red-500 text-base">Latest Careers</h3>
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-4">
             {careers?.result?.map((career) => (
@@ -372,7 +372,7 @@ const SubNavbar = ({ categories }) => {
       <div className="grid grid-cols-3 gap-6">
         {/* Popular Colleges */}
         <div className="space-y-6">
-          <h3 className="font-semibold text-red-500">Popular Colleges</h3>
+          <h3 className="font-semibold text-red-500 text-base">Popular Colleges</h3>
           <div className="space-y-4">
             {topColleges.map((college) => (
               <a key={college._id} onClick={() => handleInstituteClick(college)} className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between">
@@ -385,7 +385,7 @@ const SubNavbar = ({ categories }) => {
 
         {/* Recent Colleges */}
         <div className="space-y-6">
-          <h3 className="font-semibold text-red-500">Recently Added</h3>
+          <h3 className="font-semibold text-red-500 text-base">Recently Added</h3>
           <div className="space-y-4">
             {topRecentColleges.map((college) => (
               <a key={college._id} onClick={() => handleInstituteClick(college)} className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between">
@@ -398,7 +398,7 @@ const SubNavbar = ({ categories }) => {
 
         {/* Top Cities */}
         <div className="space-y-6">
-          <h3 className="font-semibold text-red-500">Colleges by City</h3>
+          <h3 className="font-semibold text-red-500 text-base">Colleges by City</h3>
           <div className="space-y-4">
             {staticTopCities.map((city, index) => (
               <a key={index} onClick={() => handleLocationClick("city", city.name)} className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between">
@@ -416,7 +416,7 @@ const SubNavbar = ({ categories }) => {
 
         {/* Top States */}
         <div className="space-y-6">
-          <h3 className="font-semibold text-red-500">Colleges by State</h3>
+          <h3 className="font-semibold text-red-500 text-base">Colleges by State</h3>
           <div className="space-y-4">
             {staticTopStates.map((state, index) => (
               <a key={index} onClick={() => handleLocationClick("state", state.name)} className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between">
@@ -479,7 +479,7 @@ const SubNavbar = ({ categories }) => {
     <div className="bg-pink rounded-lg shadow-lg p-6 min-w-[1500px]">
       <div className="grid grid-cols-3 gap-8">
         <div className="space-y-4">
-          <h3 className="font-semibold text-red-500 border-b pb-2">Resources</h3>
+          <h3 className="font-semibold text-red-500 text-base border-b pb-2">Resources</h3>
           <ul className="space-y-2 list-none ml-0">
             <li><a onClick={() => handleLinkClick("/blogpage?category=Exam")} className="text-sm hover:text-red-500 text-black">Entrance Exams</a></li>
             <li><a onClick={() => handleLinkClick("/searchpage")} className="text-sm hover:text-red-500 text-black">Top Colleges</a></li>
@@ -489,14 +489,14 @@ const SubNavbar = ({ categories }) => {
           </ul>
         </div>
         <div className="space-y-4">
-          <h3 className="font-semibold text-red-500 border-b pb-2">Tools</h3>
+          <h3 className="font-semibold text-red-500 text-base border-b pb-2">Tools</h3>
           <ul className="space-y-2 ml-0">
             <li><a onClick={() => handleLinkClick("/blogdetailpage/67cab87fdd3a58f74a0c6b99")} className="text-sm hover:text-red-500 text-black">Career Assessment</a></li>
             <li><a onClick={() => handleLinkClick("/counselor")} className="text-sm hover:text-red-500 text-black">Book Your Counselling</a></li>
           </ul>
         </div>
         <div className="space-y-4 w-fit">
-          <h3 className="font-semibold text-red-500 border-b pb-2">Quick Links</h3>
+          <h3 className="font-semibold text-red-500 text-base border-b pb-2">Quick Links</h3>
           <ul className="space-y-2 ml-0">
             <li><a onClick={() => handleLinkClick("/aboutus")} className="text-sm hover:text-red-500 text-black">About Us</a></li>
             <li><a onClick={() => handleLinkClick("/Contactuspage")} className="text-sm hover:text-red-500 text-black">Contact Us</a></li>
@@ -515,7 +515,7 @@ const SubNavbar = ({ categories }) => {
     return (
       <div className="p-4 flex gap-6">
         <div className="min-w-48">
-          <h3 className="font-semibold text-red-500 mb-3">Popular Colleges</h3>
+          <h3 className="font-semibold text-red-500 text-base mb-3">Popular Colleges</h3>
           {popular.length === 0 ? (
             <p className="text-sm text-gray-500">Loading...</p>
           ) : (
@@ -529,7 +529,7 @@ const SubNavbar = ({ categories }) => {
           )}
         </div>
         <div className="min-w-48">
-          <h3 className="font-semibold text-red-500 mb-3">Top Colleges</h3>
+          <h3 className="font-semibold text-red-500 text-base mb-3">Top Colleges</h3>
           {recent.length === 0 ? (
             <p className="text-sm text-gray-500">Loading...</p>
           ) : (
@@ -557,9 +557,8 @@ const SubNavbar = ({ categories }) => {
             {category?.sidebarItems?.map((item) => (
               <li
                 key={item.id}
-                className={`px-2 py-2 group mb-0 text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${
-                  activeContent[category.label] === item.id ? "bg-black border-l-2 border-black text-white" : "bg-[#b82025] text-white"
-                }`}
+                className={`px-2 py-2 group mb-0 text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${activeContent[category.label] === item.id ? "bg-black border-l-2 border-black text-white" : "bg-[#b82025] text-white"
+                  }`}
                 onMouseEnter={() => {
                   setActiveContent((prev) => ({ ...prev, [category.label]: item.id }));
                   if (category.label === "Colleges" || category.label === "Exams") {
@@ -583,7 +582,7 @@ const SubNavbar = ({ categories }) => {
 
         <div className="ml-4 mt-4 flex gap-10 mr-10 w-full">
           <div className="space-y-6">
-            <h3 className="font-semibold text-red-500">{activeStream ? `${activeStream} Colleges by City` : "Colleges by City"}</h3>
+            <h3 className="font-semibold text-red-500 text-base">{activeStream ? `${activeStream} Colleges by City` : "Colleges by City"}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-2 w-[280px]">
                 {staticTopCities.map((city, index) => (
@@ -607,7 +606,7 @@ const SubNavbar = ({ categories }) => {
           </div>
 
           <div className="space-y-6">
-            <h3 className="font-semibold text-red-500">{activeStream ? `${activeStream} Colleges by State` : "Colleges by State"}</h3>
+            <h3 className="font-semibold text-red-500 text-base">{activeStream ? `${activeStream} Colleges by State` : "Colleges by State"}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
                 {staticTopStates.map((state, index) => (
@@ -651,14 +650,14 @@ const SubNavbar = ({ categories }) => {
                       {category.label === "Courses"
                         ? renderCoursesContent()
                         : category.label === "Careers"
-                        ? renderCareersContent()
-                        : category.label === "Latest Updates"
-                        ? renderNewsContent()
-                        : category.label === "Top Colleges"
-                        ? renderTopCollegesContent()
-                        : category.label === "More"
-                        ? renderMoreContent()
-                        : renderRegularContent(category)}
+                          ? renderCareersContent()
+                          : category.label === "Latest Updates"
+                            ? renderNewsContent()
+                            : category.label === "Top Colleges"
+                              ? renderTopCollegesContent()
+                              : category.label === "More"
+                                ? renderMoreContent()
+                                : renderRegularContent(category)}
                     </div>
                   )}
                 </div>

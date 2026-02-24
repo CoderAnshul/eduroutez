@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useMemo } from "react";
 
 import { Link } from "react-router-dom";
+import axios from "axios";
 import cardPhoto from "../assets/Images/teacher.jpg";
 import { useQuery } from "react-query";
 import { career } from "../ApiFunctions/api";
 import SocialShare from "./SocialShare";
+import { Sparkles } from "lucide-react";
 
-const HighRatedCareers = () => {
+const HighRatedCareers = ({ title = "High Rated careers", streamId, categoryId }) => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
 
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+  const baseURL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     try {
@@ -30,8 +33,21 @@ const HighRatedCareers = () => {
   };
 
   const { data, isLoading, isError } = useQuery(
-    ["career"],
-    () => career(),
+    ["career", streamId, categoryId],
+    async () => {
+      let url = `${baseURL}/careers?limit=3&sort={"createdAt":"desc"}`;
+
+      const filters = {};
+      if (streamId) filters.stream = streamId;
+      if (categoryId) filters.category = categoryId;
+
+      if (Object.keys(filters).length > 0) {
+        url = `${baseURL}/careers?filters=${encodeURIComponent(JSON.stringify(filters))}&limit=3&sort={"createdAt":"desc"}`;
+      }
+
+      const response = await axios.get(url);
+      return response.data;
+    },
     {
       enabled: true,
       onSuccess: async (data) => {
@@ -75,25 +91,24 @@ const HighRatedCareers = () => {
   const memoizedContent = useMemo(() => content, [content]);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
+    return null; // Return nothing while loading to avoid layout shifts
   }
 
   if (isError) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Error loading career
-      </div>
-    );
+    return null; // Hide on error
+  }
+
+  if (content.length === 0) {
+    return null;
   }
 
   return (
-    <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
-      <div className="flex items-center justify-between mb-10">
-        <h3 className="text-xl font-bold">High Rated careers</h3>
+    <div className="container mx-auto px-4 py-12">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-2">
+          <Sparkles className="text-red-500 w-6 h-6" />
+          <h2 className="text-3xl font-bold text-gray-900">{title}</h2>
+        </div>
         <Link to="/careerspage">
           <button className="bg-[#b82025] text-white py-2 px-4 rounded">
             View more

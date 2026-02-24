@@ -94,17 +94,13 @@ const TrendingInstitute = () => {
   }
 
   if (content.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        No trending institutes available.
-      </div>
-    );
+    return null;
   }
 
   return (
     <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
       <div className="flex items-center justify-between mb-10">
-        <h3 className="text-xl font-bold">Trending Institutes</h3>
+        <h3 className="text-2xl font-bold">Trending Institutes</h3>
         <Link to="/trending-institute">
           <button className="bg-[#b82025] text-white py-2 px-4 rounded">
             View more

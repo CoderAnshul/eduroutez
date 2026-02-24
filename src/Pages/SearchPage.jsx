@@ -27,7 +27,7 @@ const SearchPage = () => {
   const [streams, setStreams] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set the number of items per page
-  const inputField = useSelector((store) => store.input.inputField);
+  const inputField = useSelector((store) => store?.input?.inputField || "");
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const [searchSource, setSearchSource] = useState(null);
@@ -43,85 +43,129 @@ const SearchPage = () => {
   const ratingsFromUrl = searchParams.get("Ratings");
   const organizationTypeFromUrl = searchParams.get("organisationType");
   const specializationFromUrl = searchParams.get("specialization");
+  const sortFromUrl = searchParams.get("sort"); // For sorting by rating (top colleges)
 
 
   useEffect(() => {
     const fromSearch = searchParams.get("fromSearch") === "true";
     const hasUrlFilters = checkForUrlFilters();
-    
-    // Determine search source priority
+
+    // Set search query for display
     if (fromSearch && inputField) {
+      setSearchQuery(inputField);
       setSearchSource("input");
     } else if (hasUrlFilters) {
       setSearchSource("url");
     } else {
       setSearchSource("default");
     }
-    
+
     function checkForUrlFilters() {
-      return !!(streamFromUrl || stateFromUrl || cityFromUrl || 
-        examFromUrl || feesFromUrl || ratingsFromUrl || 
-        organizationTypeFromUrl || specializationFromUrl);
+      return !!(streamFromUrl || stateFromUrl || cityFromUrl ||
+        examFromUrl || feesFromUrl || ratingsFromUrl ||
+        organizationTypeFromUrl || specializationFromUrl || sortFromUrl);
     }
-  }, []);
-  
+  }, [inputField]);
+
   // This effect handles the initial data loading based on search source
   useEffect(() => {
     if (!searchSource) return; // Wait until search source is determined
-    
+
     setLoading(true);
     setFetchError(false);
-    
+
     if (searchSource === "input" && inputField) {
       console.log("Loading data from Redux input:", inputField);
-      // Load data based on the inputField from Redux
-      getInstitutes(inputField, inputField, inputField, inputField)
+      // Load data based on the inputField from Redux with pagination
+      getInstitutes(inputField, inputField, inputField, inputField, 1, itemsPerPage)
         .then((data) => {
-          const { result, totalDocuments, currentPage, totalPages } = data.data;
-          setContent(result);
-          setFilteredContent(result);
+          const { result = [], totalDocuments, currentPage, totalPages } = data?.data || {};
+          const safeResult = Array.isArray(result) ? result : [];
+          setContent(safeResult);
+          setFilteredContent(safeResult);
           setTotalDocuments(totalDocuments);
           setCurrentPage(currentPage || 1);
-  
+
           if (result && result.length > 0) {
             updateIdMapping(result);
           }
+          // Set loading to false as soon as data is received
+          setLoading(false);
+          setInitialLoadComplete(true);
         })
         .catch((error) => {
           console.error("Error fetching institutes:", error);
           setFetchError(true);
-        })
-        .finally(() => {
           setLoading(false);
           setInitialLoadComplete(true);
         });
-    } 
+    }
     else if (searchSource === "url") {
-      // Build filters from URL parameters
+      // Build filters from URL parameters for state management
+      // But let Filter component handle the actual fetch via onFiltersChanged
       const initialFilters = buildInitialFiltersFromUrl();
-      console.log("Loading data from URL filters:", initialFilters);
-      
+      console.log("URL filters detected, waiting for Filter component to initialize:", initialFilters);
+
       setSelectedFilters(initialFilters);
-      setFiltersApplied(true);
-      
-      fetchFilteredInstitutes(initialFilters, 1, itemsPerPage)
-        .finally(() => {
+      // Don't set filtersApplied yet - let Filter component trigger it via onFiltersChanged
+      // This prevents duplicate fetches
+
+      // If no filters in URL, load default data
+      if (Object.keys(initialFilters).length === 0 && !sortFromUrl) {
+        getInstitutes("", "", "", "", 1, itemsPerPage)
+          .then((data) => {
+            const { result, totalDocuments, currentPage, totalPages } = data.data;
+            setContent(result);
+            setFilteredContent(result);
+            setTotalDocuments(totalDocuments);
+            setCurrentPage(currentPage || 1);
+
+            if (result && result.length > 0) {
+              updateIdMapping(result);
+            }
+            setLoading(false);
+            setInitialLoadComplete(true);
+          })
+          .catch((error) => {
+            console.error("Error fetching institutes:", error);
+            setFetchError(true);
+            setLoading(false);
+            setInitialLoadComplete(true);
+          });
+      } else {
+        // Filters or sort exist in URL - Filter component will trigger fetch via onFiltersChanged
+        // But if only sort is present, fetch immediately
+        if (sortFromUrl && Object.keys(initialFilters).length === 0) {
+          fetchFilteredInstitutes({}, 1, itemsPerPage, sortFromUrl)
+            .then(() => {
+              setInitialLoadComplete(true);
+            })
+            .catch((error) => {
+              console.error("Error fetching sorted institutes:", error);
+              setFetchError(true);
+              setLoading(false);
+              setInitialLoadComplete(true);
+            });
+        } else {
           setInitialLoadComplete(true);
-        });
-    } 
+          setLoading(false);
+        }
+      }
+    }
     else {
-      // Default data loading
+      // Default data loading with pagination limit
       console.log("Loading default data");
       setSelectedFilters({});
-      
-      getInstitutes("", "", "", "")
+
+      getInstitutes("", "", "", "", 1, itemsPerPage)
         .then((data) => {
-          const { result, totalDocuments, currentPage, totalPages } = data.data;
-          setContent(result);
-          setFilteredContent(result);
+          const { result = [], totalDocuments, currentPage, totalPages } = data?.data || {};
+          const safeResult = Array.isArray(result) ? result : [];
+          setContent(safeResult);
+          setFilteredContent(safeResult);
           setTotalDocuments(totalDocuments);
           setCurrentPage(currentPage || 1);
-  
+
           if (result && result.length > 0) {
             updateIdMapping(result);
           }
@@ -136,11 +180,11 @@ const SearchPage = () => {
         });
     }
   }, [searchSource]);
-  
+
   // Helper function to build filters from URL params
   function buildInitialFiltersFromUrl() {
     const initialFilters = {};
-    
+
     if (streamFromUrl) {
       const streamValues = streamFromUrl
         .split(",")
@@ -150,7 +194,7 @@ const SearchPage = () => {
         initialFilters.streams = streamValues;
       }
     }
-  
+
     if (stateFromUrl) initialFilters.state = [stateFromUrl];
     if (cityFromUrl) initialFilters.city = [cityFromUrl];
     if (examFromUrl) initialFilters.Exam = [examFromUrl];
@@ -158,7 +202,7 @@ const SearchPage = () => {
     if (ratingsFromUrl) initialFilters.Ratings = [ratingsFromUrl];
     if (organizationTypeFromUrl) initialFilters.organisationType = [organizationTypeFromUrl];
     if (specializationFromUrl) initialFilters.specialization = [specializationFromUrl];
-    
+
     return initialFilters;
   }
 
@@ -176,80 +220,9 @@ const SearchPage = () => {
     }
   }, []);
 
-  // This effect builds initial filters from URL parameters only once on component mount
-  useEffect(() => {
-    // Build initial filters from URL parameters
-    const initialFilters = {};
-
-    if (streamFromUrl) {
-      const streamValues = streamFromUrl
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      if (streamValues.length > 0) {
-        initialFilters.streams = streamValues;
-      }
-    }
-
-    if (stateFromUrl) {
-      initialFilters.state = [stateFromUrl];
-    }
-
-    if (cityFromUrl) {
-      initialFilters.city = [cityFromUrl];
-    }
-
-    if (examFromUrl) {
-      initialFilters.Exam = [examFromUrl];
-    }
-
-    if (feesFromUrl) {
-      initialFilters.Fees = [feesFromUrl];
-    }
-
-    if (ratingsFromUrl) {
-      initialFilters.Ratings = [ratingsFromUrl];
-    }
-
-    if (organizationTypeFromUrl) {
-      initialFilters.organisationType = [organizationTypeFromUrl];
-    }
-
-    if (specializationFromUrl) {
-      initialFilters.specialization = [specializationFromUrl];
-    }
-
-    // Apply URL filters or fetch default data
-    if (Object.keys(initialFilters).length > 0) {
-      setSelectedFilters(initialFilters);
-      setFiltersApplied(true);
-      fetchFilteredInstitutes(initialFilters, 1, itemsPerPage);
-    } else {
-      // If no URL parameters, fetch default data and reset filters
-      setSelectedFilters({});
-      setLoading(true);
-      getInstitutes(inputField, inputField, inputField, inputField)
-        .then((data) => {
-          const { result, totalDocuments, currentPage, totalPages } = data.data;
-          setContent(result);
-          setFilteredContent(result);
-          setTotalDocuments(totalDocuments);
-          setCurrentPage(currentPage || 1);
-
-          if (result && result.length > 0) {
-            updateIdMapping(result);
-          }
-          setLoading(false);
-          setInitialLoadComplete(true);
-        })
-        .catch((error) => {
-          console.error("Error fetching institutes:", error);
-          setFetchError(true);
-          setLoading(false);
-          setInitialLoadComplete(true);
-        });
-    }
-  }, []); // Empty dependency array means this runs once on mount
+  // Note: URL filter initialization is now handled by the Filter component
+  // This effect is kept for backward compatibility but should not conflict
+  // The Filter component will call handleFiltersChanged when it initializes from URL
 
   const updateIdMapping = (institutes) => {
     let hasChanges = false;
@@ -288,6 +261,9 @@ const SearchPage = () => {
       return response.data;
     },
     {
+      staleTime: 10 * 60 * 1000, // Cache streams for 10 minutes (they don't change often)
+      cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+      refetchOnWindowFocus: false,
       onSuccess: (data) => {
         const streamNames =
           data.data?.result
@@ -617,7 +593,7 @@ const SearchPage = () => {
       window.scrollTo(0, scrollPosition);
     }, 0);
   };
-  
+
   const handleFilterChange = (filterCategory, filterValue) => {
     // This function should do nothing or be removed entirely
     // Let Filter component handle all filter state
@@ -653,14 +629,14 @@ const SearchPage = () => {
   //     const queryString = `filters=${encodeURIComponent(
   //       JSON.stringify(apiFilters)
   //     )}&page=${page}&limit=${limit}`;
-      
+
   //     console.log(`Fetching data with query: ${queryString}`);
   //     const response = await axios.get(`${baseURL}/institutes?${queryString}`);
 
   //     if (response.data) {
   //       const { result, currentPage, totalPages, totalDocuments } = response.data.data;
   //       console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
-        
+
   //       setContent(result);
   //       setFilteredContent(result);
   //       setTotalDocuments(totalDocuments);
@@ -679,70 +655,82 @@ const SearchPage = () => {
   // };
 
   // Modified fetchFilteredInstitutes function - return the promise
-const fetchFilteredInstitutes = async (filters, page, limit) => {
-  setLoading(true);
-  setFetchError(false);
+  const fetchFilteredInstitutes = async (filters, page, limit, sortField = null) => {
+    setLoading(true);
+    setFetchError(false);
 
-  try {
-    // Create a deep copy of filters to avoid modifying the original
-    const apiFilters = JSON.parse(JSON.stringify(filters));
+    try {
+      // Create a deep copy of filters to avoid modifying the original
+      const apiFilters = JSON.parse(JSON.stringify(filters));
 
-    // Ensure we're using "streams" (plural) for the API
-    if (apiFilters.stream && !apiFilters.streams) {
-      apiFilters.streams = apiFilters.stream;
-      delete apiFilters.stream;
-    }
-
-    // Make sure all filter arrays are properly formatted
-    Object.keys(apiFilters).forEach((key) => {
-      // If the value is not already an array, convert it to an array
-      if (!Array.isArray(apiFilters[key])) {
-        apiFilters[key] = [apiFilters[key]];
+      // Ensure we're using "streams" (plural) for the API
+      if (apiFilters.stream && !apiFilters.streams) {
+        apiFilters.streams = apiFilters.stream;
+        delete apiFilters.stream;
       }
-    });
 
-    console.log("Sending filters to API:", apiFilters);
+      // Make sure all filter arrays are properly formatted
+      Object.keys(apiFilters).forEach((key) => {
+        // If the value is not already an array, convert it to an array
+        if (!Array.isArray(apiFilters[key])) {
+          apiFilters[key] = [apiFilters[key]];
+        }
+      });
 
-    const queryString = `filters=${encodeURIComponent(
-      JSON.stringify(apiFilters)
-    )}&page=${page}&limit=${limit}`;
-    
-    console.log(`Fetching data with query: ${queryString}`);
-    const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+      console.log("Sending filters to API:", apiFilters);
 
-    if (response.data) {
-      const { result, currentPage, totalPages, totalDocuments } = response.data.data;
-      console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
-      
-      setContent(result);
-      setFilteredContent(result);
-      setTotalDocuments(totalDocuments);
-      setCurrentPage(currentPage || 1); // Update current page from API response
+      // Build query string with sort parameter if provided
+      let queryString = `filters=${encodeURIComponent(
+        JSON.stringify(apiFilters)
+      )}&page=${page}&limit=${limit}`;
 
-      if (result && result.length > 0) {
-        updateIdMapping(result);
+      // Add sort parameter if provided (e.g., sort=rating for top colleges)
+      if (sortField) {
+        const sortObj = { [sortField]: "desc" }; // Sort descending for rating (highest first)
+        queryString += `&sort=${encodeURIComponent(JSON.stringify(sortObj))}`;
+      }
+
+      console.log(`Fetching data with query: ${queryString}`);
+      const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+
+      if (response.data) {
+        const { result = [], currentPage, totalPages, totalDocuments } = response?.data?.data || {};
+        console.log(`Received page ${currentPage} of ${totalPages}, with ${result?.length || 0} results out of ${totalDocuments} total`);
+
+        const safeResult = Array.isArray(result) ? result : [];
+        setContent(safeResult);
+        setFilteredContent(safeResult);
+        setTotalDocuments(totalDocuments);
+        setCurrentPage(currentPage || 1); // Update current page from API response
+
+        if (result && result.length > 0) {
+          updateIdMapping(result);
+        }
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching filtered institutes:", error);
+      setFetchError(true);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Modified useEffect for filter changes
+  useEffect(() => {
+    // Only run this effect if:
+    // 1. Initial loading is complete
+    // 2. Filters have been applied (either from URL or user selection)
+    // 3. This handles pagination changes after filters are applied
+    if (initialLoadComplete && filtersApplied && Object.keys(selectedFilters).length > 0) {
+      // Only fetch if page changed (not on initial filter application, which is handled in handleFiltersChanged)
+      if (currentPage > 1) {
+        console.log("Fetching data for page change:", selectedFilters, "Page:", currentPage);
+        fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage, sortFromUrl || null);
       }
     }
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching filtered institutes:", error);
-    setFetchError(true);
-    throw error;
-  } finally {
-    setLoading(false);
-  }
-};
-
-// Modified useEffect for filter changes
-useEffect(() => {
-  // Only run this effect if:
-  // 1. Initial loading is complete
-  // 2. Either filters have been explicitly applied OR we're changing pages with existing filters
-  if (initialLoadComplete && (filtersApplied || (Object.keys(selectedFilters).length > 0 && currentPage > 1))) {
-    console.log("Fetching data based on filters/pagination:", selectedFilters, "Page:", currentPage);
-    fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage);
-  }
-}, [selectedFilters, currentPage, initialLoadComplete, filtersApplied]);
+  }, [currentPage]); // Only depend on currentPage - filter changes are handled in handleFiltersChanged
 
 
 
@@ -751,23 +739,24 @@ useEffect(() => {
     console.log(`Changing to page ${newPage}`);
     // Save current scroll position
     const scrollPosition = window.scrollY;
-    
+
     // Update current page state
     setCurrentPage(newPage);
-    
+
     // Explicitly fetch new page data to ensure it happens
     // This is a backup to the useEffect, providing redundancy
-    fetchFilteredInstitutes(selectedFilters, newPage, itemsPerPage);
-    
+    fetchFilteredInstitutes(selectedFilters, newPage, itemsPerPage, sortFromUrl || null);
+
     // Scroll to top after page change
     window.scrollTo(0, 0);
   };
 
   useEffect(() => {
-    if (searchQuery.length > 0) {
-      const filtered = content.filter((item) =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    if (searchQuery.length > 0 && Array.isArray(content)) {
+      const filtered = content.filter((item) => {
+        const name = item.instituteName || item.name || "";
+        return name.toLowerCase().includes(searchQuery.toLowerCase());
+      });
       setFilteredContent(filtered);
     } else {
       setFilteredContent(content);
@@ -782,14 +771,14 @@ useEffect(() => {
     const maxButtonsToShow = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
     let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-    
+
     // Adjust if we're near the end
     if (endPage - startPage + 1 < maxButtonsToShow) {
       startPage = Math.max(1, endPage - maxButtonsToShow + 1);
     }
 
     const pageButtons = [];
-    
+
     // Previous button
     if (currentPage > 1) {
       pageButtons.push(
@@ -802,7 +791,7 @@ useEffect(() => {
         </button>
       );
     }
-    
+
     // First page button if not starting from page 1
     if (startPage > 1) {
       pageButtons.push(
@@ -814,7 +803,7 @@ useEffect(() => {
           1
         </button>
       );
-      
+
       // Show ellipsis if there's a gap
       if (startPage > 2) {
         pageButtons.push(
@@ -822,31 +811,30 @@ useEffect(() => {
         );
       }
     }
-    
+
     // Page number buttons
     for (let i = startPage; i <= endPage; i++) {
       pageButtons.push(
         <button
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`px-4 py-2 mx-1 ${
-            currentPage === i
-              ? "bg-[#b82025] text-white"
-              : "bg-gray-200"
-          }`}
+          className={`px-4 py-2 mx-1 ${currentPage === i
+            ? "bg-[#b82025] text-white"
+            : "bg-gray-200"
+            }`}
         >
           {i}
         </button>
       );
     }
-    
+
     // Show ellipsis if there's a gap before the last page
     if (endPage < totalPages - 1) {
       pageButtons.push(
         <span key="endEllipsis" className="px-2">...</span>
       );
     }
-    
+
     // Last page button if not ending at the last page
     if (endPage < totalPages) {
       pageButtons.push(
@@ -859,7 +847,7 @@ useEffect(() => {
         </button>
       );
     }
-    
+
     // Next button
     if (currentPage < totalPages) {
       pageButtons.push(
@@ -882,27 +870,72 @@ useEffect(() => {
 
   const handleFiltersChanged = (filters) => {
     console.log("Filters changed in Filter component:", filters);
-    
+
     // Save current scroll position
     const scrollPosition = window.scrollY;
-    
+
     // Reset page to 1 when filters change
     setCurrentPage(1);
     setSelectedFilters(filters);
     setFiltersApplied(true);
-    
+
+    // Immediately fetch filtered data - don't wait for useEffect
+    // This ensures data is fetched right away when filters change
+    // Always fetch if filters are provided, regardless of initialLoadComplete
+    // (initialLoadComplete might not be set yet during initial mount from URL)
+    if (Object.keys(filters).length > 0 || sortFromUrl) {
+      setLoading(true);
+      setFetchError(false);
+      fetchFilteredInstitutes(filters, 1, itemsPerPage, sortFromUrl || null)
+        .then(() => {
+          // Mark initial load as complete if it wasn't already
+          if (!initialLoadComplete) {
+            setInitialLoadComplete(true);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching filtered institutes:", error);
+          setFetchError(true);
+          setLoading(false);
+        });
+    } else {
+      // No filters - load default data
+      if (initialLoadComplete) {
+        setLoading(true);
+        getInstitutes("", "", "", "", 1, itemsPerPage)
+          .then((data) => {
+            const { result = [], totalDocuments, currentPage, totalPages } = data?.data || {};
+            const safeResult = Array.isArray(result) ? result : [];
+            setContent(safeResult);
+            setFilteredContent(safeResult);
+            setTotalDocuments(totalDocuments);
+            setCurrentPage(currentPage || 1);
+
+            if (result && result.length > 0) {
+              updateIdMapping(result);
+            }
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error("Error fetching institutes:", error);
+            setFetchError(true);
+            setLoading(false);
+          });
+      }
+    }
+
     // Restore scroll position
     setTimeout(() => {
       window.scrollTo(0, scrollPosition);
     }, 0);
   };
-  
+
   // const handlePageChange = (newPage) => {
   //   console.log(`Changing to page ${newPage}`);
-    
+
   //   // Update current page state
   //   setCurrentPage(newPage);
-    
+
   //   // Scroll to top after page change
   //   window.scrollTo(0, 0);
   // };
@@ -932,8 +965,29 @@ useEffect(() => {
           </div>
 
           <div className="filterResult w-full">
+            {/* Display search query if available */}
+            {(inputField || searchQuery) && (
+              <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-gray-600 font-medium">Search Results for:</span>
+                  <span className="text-red-600 font-bold text-lg">
+                    "{inputField || searchQuery}"
+                  </span>
+                </div>
+              </div>
+            )}
+
             {loading ? (
-              <div className="text-center py-8">Loading results...</div>
+              <div className="space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="bg-white rounded-lg shadow p-4 animate-pulse">
+                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                ))}
+              </div>
             ) : fetchError ? (
               <div className="text-center py-8 text-red-500">
                 Error fetching results

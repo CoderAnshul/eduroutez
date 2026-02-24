@@ -1,5 +1,5 @@
-import { useParams,useNavigate } from "react-router-dom";
-import React, { useState, useMemo } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useMemo, useEffect } from "react";
 import { useMutation, useQuery } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 
@@ -8,10 +8,10 @@ const QuestionandAnswer = () => {
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [expandedQuestion, setExpandedQuestion] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const { email } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const options = [
     "Computer Science",
@@ -119,6 +119,39 @@ const QuestionandAnswer = () => {
 
   const [form, setForm] = useState({});
 
+  // Check for pending question after login redirect
+  useEffect(() => {
+    const pendingQuestion = sessionStorage.getItem("pendingQuestion");
+    const accessToken = localStorage.getItem("accessToken");
+    
+    // Only auto-submit if we have both pending question AND valid access token
+    if (pendingQuestion && accessToken && accessToken !== "null" && accessToken !== "undefined" && accessToken !== "") {
+      try {
+        const questionData = JSON.parse(pendingQuestion);
+        // Pre-fill the form
+        setForm(questionData);
+        
+        // Clear session storage
+        sessionStorage.removeItem("pendingQuestion");
+        
+        // Auto-submit after a short delay to ensure form is ready
+        setTimeout(() => {
+          if (questionData.question && questionData.label && questionData.grade) {
+            const updatedForm = {
+              ...questionData,
+              instituteEmail: email || "",
+              askedBy: localStorage.getItem("email")?.replace(/^"|"$/g, "") || "Anonymous",
+            };
+            mutate(updatedForm);
+          }
+        }, 500);
+      } catch (error) {
+        console.error("Error parsing pending question:", error);
+        sessionStorage.removeItem("pendingQuestion");
+      }
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -126,18 +159,23 @@ const QuestionandAnswer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
 
-    // Check for access token before submission
+    // Check for access token before submission (check for token existence and validity)
     const accessToken = localStorage.getItem("accessToken");
-    
-    if (!accessToken) {
-      setShowLoginPrompt(true);
-      return;
+
+    if (!accessToken || accessToken === "null" || accessToken === "undefined" || accessToken === "") {
+      // Store current page URL and form data for redirect after login
+      sessionStorage.setItem("redirectAfterLogin", location.pathname);
+      sessionStorage.setItem("pendingQuestion", JSON.stringify(form));
+      // Redirect to login immediately without any delay or alerts
+      navigate("/login", { replace: true });
+      return false;
     }
 
     if (!form.question || !form.label || !form.grade) {
       alert("Please fill all required fields");
-      return;
+      return false;
     }
 
     try {
@@ -153,6 +191,7 @@ const QuestionandAnswer = () => {
       console.error("Submission error:", error);
       alert("Failed to submit question");
     }
+    return false;
   };
 
   const { mutate, isPending: isSubmitting } = useMutation({
@@ -178,7 +217,16 @@ const QuestionandAnswer = () => {
     },
     onError: (error) => {
       console.error("Submission error:", error);
-      alert("Failed to submit question");
+      // Check if it's an authentication error (401 Unauthorized)
+      if (error.response?.status === 401 || error.response?.data?.message?.includes("Unauthorized") || error.response?.data?.message?.includes("token")) {
+        // Store form data and redirect to login immediately without alert or delay
+        sessionStorage.setItem("redirectAfterLogin", location.pathname);
+        sessionStorage.setItem("pendingQuestion", JSON.stringify(form));
+        // Redirect immediately without alert or delay to prevent page blink
+        navigate("/login", { replace: true });
+      } else {
+        alert("Failed to submit question. Please try again.");
+      }
     },
   });
 
@@ -206,44 +254,8 @@ const QuestionandAnswer = () => {
   }
 
 
-  const LoginPromptModal = () => {
-    const handleLogin = () => {
-      // Store the current page's email to redirect back after login
-      localStorage.setItem('redirectAfterLogin', `/questionandAnswer/${email}`);
-      navigate('/login');
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-8 rounded-lg shadow-xl text-center max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-4">Login Required</h2>
-          <p className="mb-6 text-gray-600">
-            Please log in to ask questions and get expert advice.
-          </p>
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={handleLogin}
-              className="bg-[#b82025] text-white px-6 py-2 rounded-lg hover:bg-red-600 transition"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => setShowLoginPrompt(false)}
-              className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-  
-
   return (
-
     <div className="flex flex-col lg:flex-row gap-4 p-4 relative">
-        {showLoginPrompt && <LoginPromptModal />}
       {/* Toggle Button for Sidebar (Small Screens) */}
       <div className="block lg:hidden mb-4">
         <button
@@ -335,9 +347,8 @@ const QuestionandAnswer = () => {
 
       {/* Dropdown for smaller screens with filters */}
       <div
-        className={`lg:hidden w-full bg-white shadow-lg rounded-lg p-4 ${
-          isSidebarOpen ? "block" : "hidden"
-        }`}
+        className={`lg:hidden w-full bg-white shadow-lg rounded-lg p-4 ${isSidebarOpen ? "block" : "hidden"
+          }`}
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Filters</h2>

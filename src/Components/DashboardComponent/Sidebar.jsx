@@ -19,28 +19,21 @@ const Sidebar = () => {
     { name: "Logout", path: "/dashboard/logout", icon: "🚪" },
   ];
 
-  const handleLogout = async () => {
+  const handleLogout = async (name) => {
     if (name === "Logout") {
       try {
-        const response = await axiosInstance(
-          `${import.meta.env.VITE_BASE_URL}/logout`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-access-token": localStorage.getItem("accessToken"),
-              "x-refresh-token": localStorage.getItem("refreshToken"),
-            },
-            credentials: "true",
+        await axiosInstance.post(`${import.meta.env.VITE_BASE_URL}/logout`, {}, {
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
           }
-        );
-
-        if (response) {
-          localStorage.clear();
-          window.location.reload();
-        }
+        });
       } catch (error) {
-        console.error("Error during logout:", error);
+        console.error("Error during logout API call:", error);
+      } finally {
+        localStorage.clear();
+        window.location.href = "/";
       }
     }
   };
@@ -62,8 +55,7 @@ const Sidebar = () => {
                   to={item.path}
                   end={item.path === "/dashboard"} // Add 'end' only for the Dashboard route
                   className={({ isActive }) =>
-                    `flex items-center gap-3 p-2 rounded-md ${
-                      isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
+                    `flex items-center gap-3 p-2 rounded-md ${isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
                     }`
                   }
                   onClick={() => handleLogout(item.name)}
@@ -90,8 +82,7 @@ const Sidebar = () => {
                 to={item.path}
                 end={item.path === "/dashboard"} // Add 'end' only for the Dashboard route
                 className={({ isActive }) =>
-                  `flex items-center gap-2 p-2 rounded-md ${
-                    isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
+                  `flex items-center gap-2 p-2 rounded-md ${isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
                   }`
                 }
               >
