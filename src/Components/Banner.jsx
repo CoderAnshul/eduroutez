@@ -191,6 +191,11 @@ const handleBtnClick = () => {
                     ? "Search for courses..."
                     : "Search for institutes..."
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleBtnClick();
+                  }
+                }}
               />
             </div>
 

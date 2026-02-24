@@ -102,7 +102,7 @@ const Faqs = ({ instituteData }) => {
         <button
           className="bg-[#b82025] text-sm font-medium px-4 py-3 rounded-lg text-white"
           onClick={() =>
-            (window.location.href = `/questionandAnswer/${instituteData?.data?.email}`)
+            (window.location.href = `/questionandAnswer/${encodeURIComponent(instituteData?.data?.instituteName)}`)
           }
         >
           Ask our experts
