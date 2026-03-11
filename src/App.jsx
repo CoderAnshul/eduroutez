@@ -9,8 +9,8 @@ import AuthRoute from './AuthRoute';
 
 import Counselling from './Pages/counselling';
 
-import DashboardLayout from './Layout/DashboardLayout'; 
-import Dashboard from './Pages/Dashboard'; 
+import DashboardLayout from './Layout/DashboardLayout';
+import Dashboard from './Pages/Dashboard';
 import ProfilePage from './Pages/ProfilePage';
 import StudentDocument from './Pages/StudentDocument';
 import CounselorListPage from './Pages/CounselorListPage';
@@ -43,21 +43,25 @@ const QuestionandAnswer = React.lazy(() => import('./Pages/QuestionandAnswer'));
 const Careerspage = React.lazy(() => import('./Pages/Careerspage'));
 const Policy = React.lazy(() => import('./Pages/Policy'));
 const Detailpage = React.lazy(() => import('./Pages/Detailpage'));
-const BlogDetailPage= React.lazy(() => import('./Pages/BlogDetailPage'));
+const BlogDetailPage = React.lazy(() => import('./Pages/BlogDetailPage'));
 const Writereview = React.lazy(() => import('./Pages/Writereview'));
 const Login = React.lazy(() => import('./Pages/Login'));
 const Signup = React.lazy(() => import('./Pages/Signup'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
 // const counselling = React.lazy(() => import('./Pages/counselling'));
 const Wishlist = React.lazy(() => import('./Pages/Wishlist'));
-const Question=React.lazy(()=>import('./Pages/Question-Answer'))
-const Redeem = React.lazy(()=> import('./Pages/Redeem'))
-const Logout = React.lazy(()=> import('./Pages/Logout'))
+const Question = React.lazy(() => import('./Pages/Question-Answer'))
+const Redeem = React.lazy(() => import('./Pages/Redeem'))
+const Logout = React.lazy(() => import('./Pages/Logout'))
+
+const CounselorTestPayment = React.lazy(() => import('./Pages/CounselorTest/Payment'));
+const CounselorTestExam = React.lazy(() => import('./Pages/CounselorTest/TestExam'));
+const CounselorTestResult = React.lazy(() => import('./Pages/CounselorTest/TestResult'));
 
 const App = () => {
   return (
     <BrowserRouter>
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -78,18 +82,18 @@ const App = () => {
           <Route path="*" element={<PageNotFound />} />
           <Route path="/institute/:id" element={<Instituepage />} />
           <Route path="/institute/:slug" element={<Instituepage />} />
-<Route path='/trendingCourses' element={<TrendingCourses></TrendingCourses>}></Route>
+          <Route path='/trendingCourses' element={<TrendingCourses></TrendingCourses>}></Route>
           <Route path="/searchpage" element={<SearchPage />} />
           <Route path="/coursesinfopage/:id" element={<Coursesinfopage />} />
           <Route path="/coursesinfopage/:slug" element={<Coursesinfopage />} />
-<Route path='/trending-stream' element={<TrendingStreams/>}></Route>
+          <Route path='/trending-stream' element={<TrendingStreams />}></Route>
           <Route path="/blogpage" element={<Blogpage />} />
           <Route path="/contactuspage" element={<Contactuspage />} />
           <Route path="/popularcourses" element={<PopularCourses />} />
           <Route path="/aboutus" element={<Aboutus />} />
           <Route path="/counselingpage" element={<Counselingpage />} />
           <Route path="/questionandAnswer/:email" element={<QuestionandAnswer />} />
-          <Route path='/question-&-answers' element={<Question/>}></Route>
+          <Route path='/question-&-answers' element={<Question />}></Route>
           <Route path="/counselling/:email" element={<Counselling />} />
           <Route path="/careerspage" element={<Careerspage />} />
           <Route path="/blogdetailpage/:id" element={<BlogDetailPage />} />
@@ -98,24 +102,24 @@ const App = () => {
           <Route path="/detailpage/:slug" element={<Detailpage />} />
 
           <Route path="/writereview" element={<Writereview />} />
-          <Route path="/policy" element={<Policy/>} />
-          <Route path="/terms-&-conditions" element={<TermsAndConditions/>} />
+          <Route path="/policy" element={<Policy />} />
+          <Route path="/terms-&-conditions" element={<TermsAndConditions />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<Forgotpassword />} />
           <Route path="/become-couseller" element={<BecomeCouseller />} />
-          <Route path="/institute" element={<BestRatedInstitute/>} />
-          <Route path="/institute:slug" element={<BestRatedInstitute/>} />
+          <Route path="/institute" element={<BestRatedInstitute />} />
+          <Route path="/institute:slug" element={<BestRatedInstitute />} />
 
-          <Route path="/trending-institute" element={<TrendingInstitute/>} />
+          <Route path="/trending-institute" element={<TrendingInstitute />} />
           <Route path='/counselor' element={<Counselor />}></Route>
-            <Route path="/news/:id" element={<NewsDetail />} />
-            <Route path="/news/:slug" element={<NewsDetail />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="/news/:slug" element={<NewsDetail />} />
 
           <Route path="/news" element={<NewsPage />} />
-          <Route path='/blog/:slug' element={<BlogDetailPage/>}></Route>
+          <Route path='/blog/:slug' element={<BlogDetailPage />}></Route>
 
-           {/* Protected Dashboard Routes */}
+          {/* Protected Dashboard Routes */}
           <Route
             path="/dashboard/*"
             element={
@@ -130,15 +134,18 @@ const App = () => {
             <Route path="counselor" element={<CounselorListPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="slots" element={<ScheduledSlots />} />
-            <Route path="wishlist" element={<Wishlist/>} />
-            <Route path='reviews' element={<ReviewActivity/>}></Route>
-            <Route path="redeem" element={<Redeem/>} />
-          <Route path='payout' element={<Payout/>}/>
+            <Route path="wishlist" element={<Wishlist />} />
+            <Route path='reviews' element={<ReviewActivity />}></Route>
+            <Route path="redeem" element={<Redeem />} />
+            <Route path='payout' element={<Payout />} />
 
             < Route path='refer&earn' element={<ReferAndEarn></ReferAndEarn>}></Route>
-            <Route path="logout" element={<Logout/>} />
+            <Route path="logout" element={<Logout />} />
 
           </Route>
+          <Route path="/counselor-test/payment" element={<CounselorTestPayment />} />
+          <Route path="/counselor-test/exam" element={<CounselorTestExam />} />
+          <Route path="/counselor-test/result" element={<CounselorTestResult />} />
         </Routes>
       </Suspense>
       <Footer />

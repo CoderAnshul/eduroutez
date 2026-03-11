@@ -10,6 +10,9 @@ import {
   UserPlus,
   MessageSquare,
   HelpCircle,
+  FileDown,
+  Clock,
+  CheckCircle,
 } from "lucide-react";
 import axios from "axios";
 
@@ -185,6 +188,42 @@ const WelcomeBanner = () => {
     },
   ];
 
+  // For counselors, update the "Become Counselor" action
+  if (user.role === "counselor") {
+    const becomeIdx = actions.findIndex(a => a.title === "Become Counselor");
+    if (becomeIdx !== -1) {
+      if (user.isVerified) {
+        actions[becomeIdx] = {
+          icon: Award,
+          title: "Verified Counselor",
+          color: "bg-green-600",
+          route: "#",
+        };
+      } else if (user.status === "test_pending") {
+        actions[becomeIdx] = {
+          icon: Zap,
+          title: "Take Certification",
+          color: "bg-orange-500",
+          route: "/counselor-test/exam",
+        };
+      } else if (user.status === "verification_in_progress") {
+        actions[becomeIdx] = {
+          icon: Clock,
+          title: "Verification Pending",
+          color: "bg-yellow-500",
+          route: "/counselor-test/result",
+        };
+      } else {
+        actions[becomeIdx] = {
+          icon: Award,
+          title: "Get Verified",
+          color: "bg-[#b82025]",
+          route: "/counselor-test/payment",
+        };
+      }
+    }
+  }
+
   const handleActionClick = (route) => {
     navigate(route);
   };
@@ -195,8 +234,15 @@ const WelcomeBanner = () => {
         <div className="bg-gradient-to-r from-red-600 to-red-500 p-8">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
                 Welcome back, {user.name}! 👋
+                {user.isVerified && (
+                  <div className="bg-white/20 p-1.5 rounded-full backdrop-blur-sm border border-white/30" title="Verified Counselor">
+                    <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 20 20">
+                      <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" />
+                    </svg>
+                  </div>
+                )}
               </h1>
               <p className="text-red-100">
                 You've earned {user.points || 0} points on your journey
@@ -253,6 +299,65 @@ const WelcomeBanner = () => {
             ))}
           </div>
         </div>
+
+        {user.role === "counselor" && user.isVerified && user.certificateUrl && (
+          <div className="mx-6 mb-6">
+            <div className="bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-600 rounded-[2rem] shadow-xl overflow-hidden relative group">
+              {/* Decorative background blobs */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-400/20 rounded-full -ml-12 -mb-12 blur-xl group-hover:translate-x-4 transition-transform duration-700"></div>
+
+              <div className="relative z-10 p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="flex items-center gap-6">
+                  <div className="relative">
+                    <div className="bg-white/10 p-4 rounded-3xl backdrop-blur-md border border-white/20">
+                      <Award className="h-10 w-10 text-yellow-300" />
+                    </div>
+                    <div className="absolute -top-2 -right-2 bg-green-500 p-1 rounded-full border-2 border-indigo-900">
+                      <svg className="w-3 h-3 text-white fill-current" viewBox="0 0 20 20">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="text-center md:text-left">
+                    <h3 className="text-2xl font-black text-white mb-2">Verified Professional!</h3>
+                    <p className="text-blue-100/80 font-medium max-w-xs transition-colors group-hover:text-blue-50">
+                      Your expertise is certified. Showcase your achievement with the official certificate.
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href={user.certificateUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 bg-white text-indigo-900 px-8 py-4 rounded-2xl font-black shadow-lg hover:bg-yellow-50 hover:scale-105 transition-all active:scale-95 group/btn"
+                  download
+                >
+                  <FileDown className="h-6 w-6 text-indigo-800 group-hover/btn:animate-bounce" />
+                  Download Certificate
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {user.role === "counselor" && user.status === "verification_in_progress" && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-amber-100 p-3 rounded-full">
+                <Clock className="h-8 w-8 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-amber-900">Verification in Progress</h3>
+                <p className="text-amber-800 opacity-80 text-sm">Our team is reviewing your test results and profile. You'll be notified soon.</p>
+              </div>
+            </div>
+            <div className="px-4 py-2 bg-amber-200 text-amber-900 rounded-full text-xs font-black">
+              PENDING
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

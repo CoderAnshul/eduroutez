@@ -108,21 +108,21 @@ const CounselorListPage = () => {
 
   // Sync category from URL with selectedStreams when coming from homepage
   const [urlCategorySynced, setUrlCategorySynced] = useState(false);
-  
+
   useEffect(() => {
     if (category && streams.length > 0 && !urlCategorySynced) {
       // Decode URL-encoded category (e.g., "Hospitality%20&%20Tourism" -> "Hospitality & Tourism")
       const decodedCategory = decodeURIComponent(category);
-      
+
       // Find matching stream by name (case-insensitive)
       const normalizedCategory = decodedCategory.trim().toLowerCase();
       const matchingStream = streams.find((stream) => {
         const streamName = stream.name.trim().toLowerCase();
-        return streamName === normalizedCategory || 
-               streamName.includes(normalizedCategory) || 
-               normalizedCategory.includes(streamName);
+        return streamName === normalizedCategory ||
+          streamName.includes(normalizedCategory) ||
+          normalizedCategory.includes(streamName);
       });
-      
+
       if (matchingStream) {
         // Set the filter from URL, making it clickable
         setSelectedStreams([matchingStream.name]);
@@ -161,14 +161,14 @@ const CounselorListPage = () => {
           `${VITE_BASE_URL}/streams?&page=0&sort={"createdAt":"asc"}`
         );
         const streamsData = response.data.data.result || [];
-        
+
         // Filter only active streams (status === true)
         const activeStreams = streamsData.filter(stream => stream.status === true);
-        
+
         // Debug: Log all streams to see what's available
         console.log("All streams from API:", streamsData.map(s => ({ name: s.name, status: s.status })));
         console.log("Active streams:", activeStreams.map(s => s.name));
-        
+
         setStreams(activeStreams);
       } catch (error) {
         console.error("Error fetching streams:", error.message);
@@ -187,35 +187,35 @@ const CounselorListPage = () => {
         'it': ['information technology', 'it', 'information tech'],
         'information technology': ['information technology', 'it', 'information tech'],
       };
-      
+
       // Case-insensitive filtering - normalize both stream names and counselor categories
       filtered = filtered.filter((counselor) => {
         if (!counselor || !counselor.category) return false;
-        
+
         const counselorCategory = counselor.category.trim().toLowerCase();
-        
+
         return selectedStreams.some((stream) => {
           const streamLower = stream.trim().toLowerCase();
-          
+
           // Direct match
           if (streamLower === counselorCategory) return true;
-          
+
           // Check if stream has known aliases
           const aliases = streamNameMap[streamLower] || [];
           if (aliases.includes(counselorCategory)) return true;
-          
+
           // Check if counselor category has known aliases
           const categoryAliases = streamNameMap[counselorCategory] || [];
           if (categoryAliases.includes(streamLower)) return true;
-          
+
           return false;
         });
       });
-      
+
       // Debug log to help identify mismatches
       if (filtered.length === 0 && counselors.length > 0 && selectedStreams.length > 0) {
         console.log("Selected streams:", selectedStreams);
-        console.log("Available counselor categories:", 
+        console.log("Available counselor categories:",
           [...new Set(counselors.map(c => c.category).filter(Boolean))]
         );
         console.log("No matches found - check if stream names match counselor categories");
@@ -278,7 +278,7 @@ const CounselorListPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-8xl mx-auto">
         {/* Existing content */}
-         <div className="mb-12 text-center">
+        <div className="mb-12 text-center">
           <div className="animate-fade-in-out">
             <blockquote className="text-2xl md:text-3xl font-light text-gray-700 italic mb-4">
               "{currentQuote.quote}"
@@ -327,9 +327,8 @@ const CounselorListPage = () => {
 
           {/* Sidebar - Shown/hidden on mobile, always visible on larger screens */}
           <div
-            className={`${
-              showSidebar ? "block" : "hidden"
-            } md:block w-full md:w-1/4 transition-all duration-300`}
+            className={`${showSidebar ? "block" : "hidden"
+              } md:block w-full md:w-1/4 transition-all duration-300`}
           >
             <div className="md:sticky md:top-20 md:h-fit md:max-h-[calc(100vh-2rem)] md:overflow-y-auto">
               <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
@@ -343,11 +342,10 @@ const CounselorListPage = () => {
                       return (
                         <label
                           key={stream._id}
-                          className={`flex items-center gap-2 hover:ml-1 transition-all cursor-pointer ${
-                            isChecked 
-                              ? "text-red-600 font-semibold bg-red-50 px-2 py-1 rounded" 
-                              : "hover:text-red-500"
-                          }`}
+                          className={`flex items-center gap-2 hover:ml-1 transition-all cursor-pointer ${isChecked
+                            ? "text-red-600 font-semibold bg-red-50 px-2 py-1 rounded"
+                            : "hover:text-red-500"
+                            }`}
                         >
                           <input
                             type="checkbox"
@@ -389,54 +387,75 @@ const CounselorListPage = () => {
                       >
                         <div className="p-2 md:p-6">
                           <div className="flex gap-6 flex-col sm:flex-row">
-                            {counselor.profilePhoto ? (
-                              <img
-                                src={`${Images}/${counselor.profilePhoto.replace(
-                                  "uploads/",
-                                  ""
-                                )}`}
-                                alt={`${counselor.firstname} ${counselor.lastname}`}
-                                className="h-32 w-32 object-cover shadow-sm"
-                              />
-                            ) : (
-                              <div className="h-32 w-32 bg-gray-50 flex items-center justify-center">
-                                <svg
-                                  className="h-12 w-12 text-gray-300"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="1.5"
-                                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                                  />
-                                </svg>
-                              </div>
-                            )}
+                            <div className="relative group">
+                              {counselor.profilePhoto ? (
+                                <img
+                                  src={`${Images}/${counselor.profilePhoto.replace(
+                                    "uploads/",
+                                    ""
+                                  )}`}
+                                  alt={`${counselor.firstname} ${counselor.lastname}`}
+                                  className="h-32 w-32 object-cover shadow-sm rounded-lg"
+                                />
+                              ) : (
+                                <div className="h-32 w-32 bg-gray-50 flex items-center justify-center rounded-lg">
+                                  <svg
+                                    className="h-12 w-12 text-gray-300"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="1.5"
+                                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                                    />
+                                  </svg>
+                                </div>
+                              )}
+
+                              {counselor.isVerified && (
+                                <div className="absolute -bottom-2 -right-2 bg-white p-1 rounded-full shadow-md border border-blue-50">
+                                  <div className="bg-blue-600 p-1 rounded-full">
+                                    <svg className="w-3 h-3 text-white fill-current" viewBox="0 0 20 20">
+                                      <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" />
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
 
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-2">
-                                <h2 className="text-lg font-semibold text-gray-900">
+                                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                   {counselor.firstname + " "}
                                   {counselor.lastname}
+                                  {counselor.isVerified && (
+                                    <div className="group relative">
+                                      <svg className="w-5 h-5 text-blue-500 fill-current" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" clipRule="evenodd" />
+                                      </svg>
+                                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                        Verified Expert
+                                      </span>
+                                    </div>
+                                  )}
                                 </h2>
                                 <div className="flex items-center gap-1.5">
                                   <div className="flex">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                       <svg
                                         key={star}
-                                        className={`w-4 h-4 ${
-                                          star <=
+                                        className={`w-4 h-4 ${star <=
                                           Math.floor(
                                             calculateAverageRating(
                                               counselor.reviews
                                             )
                                           )
-                                            ? "text-yellow-400"
-                                            : "text-gray-200"
-                                        }`}
+                                          ? "text-yellow-400"
+                                          : "text-gray-200"
+                                          }`}
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                       >
@@ -479,37 +498,37 @@ const CounselorListPage = () => {
                                   counselor?.state?.name,
                                   counselor?.city?.name,
                                 ].some(Boolean) && (
-                                  <div className="flex items-center text-sm text-gray-600">
-                                    <svg
-                                      className="w-4 h-4 text-red-500 mr-2"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                      />
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                      />
-                                    </svg>
-                                    <span>
-                                      {[
-                                        counselor?.country?.name,
-                                        counselor?.state?.name,
-                                        counselor?.city?.name,
-                                      ]
-                                        .filter(Boolean)
-                                        .join(" | ")}
-                                    </span>
-                                  </div>
-                                )}
+                                    <div className="flex items-center text-sm text-gray-600">
+                                      <svg
+                                        className="w-4 h-4 text-red-500 mr-2"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth="2"
+                                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                        />
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth="2"
+                                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                      </svg>
+                                      <span>
+                                        {[
+                                          counselor?.country?.name,
+                                          counselor?.state?.name,
+                                          counselor?.city?.name,
+                                        ]
+                                          .filter(Boolean)
+                                          .join(" | ")}
+                                      </span>
+                                    </div>
+                                  )}
 
                                 <div className="flex items-center text-sm text-gray-600">
                                   <svg

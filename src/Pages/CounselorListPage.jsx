@@ -105,25 +105,47 @@ const CounselorListPage = () => {
               >
                 <div className="flex items-start space-x-4">
                   {/* Profile Image */}
-                  {counselor.profilePhoto ? (
-                    <img
-                      src={`${Images}/${counselor.profilePhoto.replace(
-                        "uploads/",
-                        ""
-                      )}`}
-                      alt={counselor.firstname}
-                      className="h-24 w-24 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <div className="h-24 w-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <i className="fa fa-user text-gray-400 text-3xl"></i>
-                    </div>
-                  )}
+                  <div className="relative group">
+                    {counselor.profilePhoto ? (
+                      <img
+                        src={`${Images}/${counselor.profilePhoto.replace(
+                          "uploads/",
+                          ""
+                        )}`}
+                        alt={counselor.firstname}
+                        className="h-24 w-24 rounded-lg object-cover shadow-sm"
+                      />
+                    ) : (
+                      <div className="h-24 w-24 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100">
+                        <i className="fa fa-user text-gray-300 text-3xl"></i>
+                      </div>
+                    )}
+                    
+                    {counselor.isVerified && (
+                      <div className="absolute -bottom-2 -right-2 bg-white p-1 rounded-full shadow-md border border-blue-50">
+                        <div className="bg-blue-600 p-0.5 rounded-full">
+                          <svg className="w-3 h-3 text-white fill-current" viewBox="0 0 20 20">
+                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" />
+                          </svg>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Counselor Info */}
                   <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-gray-800">
+                    <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                       {counselor.firstname} {counselor.lastname}
+                      {counselor.isVerified && (
+                        <div className="group/badge relative">
+                          <svg className="w-5 h-5 text-blue-500 fill-current" viewBox="0 0 20 20">
+                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" clipRule="evenodd" />
+                          </svg>
+                          <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover/badge:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                            Verified Expert
+                          </span>
+                        </div>
+                      )}
                     </h2>
                     <div className="flex items-center mt-1">
                       <i className="fa fa-star text-yellow-500 mr-1"></i>
