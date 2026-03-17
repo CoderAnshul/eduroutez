@@ -446,3 +446,40 @@ export const category = async () => {
     throw error;
   }
 };
+
+// Streams filtered by type
+export const getCounsellorStreams = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/streams?limit=15&sort={"createdAt":"asc"}&filters={"isCounsellorStream":true}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching counsellor streams `, error);
+    throw error;
+  }
+};
+
+export const getCourseStreams = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/streams?limit=15&sort={"createdAt":"asc"}&filters={"isCourseStream":true}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching course streams `, error);
+    throw error;
+  }
+};
+
+export const getAccStreams = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/streams?limit=15&sort={"createdAt":"asc"}&filters={"isAccStream":true}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching acc streams `, error);
+    throw error;
+  }
+};

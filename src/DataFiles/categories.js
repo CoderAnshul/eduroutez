@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../ApiFunctions/axios';
+import { getCourseStreams } from '../ApiFunctions/api';
 
 const useCategories = () => {
   const [categoriesData, setCategoriesData] = useState([]);
@@ -10,19 +11,20 @@ const useCategories = () => {
     const fetchData = async () => {
       try {
         const [collegeResponse, examResponse, coursesResponse] = await Promise.all([
-          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams?limit=15&sort={"createdAt":"asc"}`),
-          axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/streams?limit=15&sort={"createdAt":"asc"}`),
+          // Streams for navbar (course-related streams)
+          getCourseStreams(),
+          getCourseStreams(),
           axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/courses?filters={"isCoursePopular":true}&limit=15&sort={"createdAt":"asc"}`),
         ]);
         console.log('coursesResponse', coursesResponse)
 
         // Transform API data to match required format and filter out inactive items
-        const collegeItems = collegeResponse.data?.data?.result?.filter(item => item.status == true).map((item, index) => ({
+        const collegeItems = collegeResponse?.data?.result?.filter(item => item.status == true).map((item, index) => ({
           id: index + 1,
           name: item.name,
         }));
 
-        const examItems = examResponse.data?.data?.result.map((item, index) => ({
+        const examItems = examResponse?.data?.result.map((item, index) => ({
           id: index + 1,
           name: item.name,
         }));

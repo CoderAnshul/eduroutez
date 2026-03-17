@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import axios from "axios";
+import { getCounsellorStreams } from "../ApiFunctions/api";
 import { useSearchParams, Link } from "react-router-dom";
 
 // Lazy load components
@@ -157,17 +158,11 @@ const CounselorListPage = () => {
   useEffect(() => {
     const fetchStreams = async () => {
       try {
-        const response = await axios.get(
-          `${VITE_BASE_URL}/streams?&page=0&sort={"createdAt":"asc"}`
-        );
-        const streamsData = response.data.data.result || [];
+        const response = await getCounsellorStreams();
+        const streamsData = response?.data?.result || [];
 
         // Filter only active streams (status === true)
-        const activeStreams = streamsData.filter(stream => stream.status === true);
-
-        // Debug: Log all streams to see what's available
-        console.log("All streams from API:", streamsData.map(s => ({ name: s.name, status: s.status })));
-        console.log("Active streams:", activeStreams.map(s => s.name));
+        const activeStreams = streamsData.filter((stream) => stream.status === true);
 
         setStreams(activeStreams);
       } catch (error) {

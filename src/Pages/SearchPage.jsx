@@ -256,7 +256,7 @@ const SearchPage = () => {
     ["streams"],
     async () => {
       const response = await axios.get(
-        `${baseURL}/streams?&page=0&sort={"createdAt":"asc"}`
+        `${baseURL}/streams?limit=15&sort={"createdAt":"asc"}&filters={"isCounsellorStream":true}`
       );
       return response.data;
     },
