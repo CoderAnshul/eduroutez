@@ -12,9 +12,64 @@ const Banner = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [banners, setBanners] = useState([]);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const [isBannerLoading, setIsBannerLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const baseURL = import.meta.env.VITE_BASE_URL;
+  const imageUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+
+  // Fetch homepage banners from /banners API
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        setIsBannerLoading(true);
+        const accessToken = localStorage.getItem("accessToken");
+
+        const response = await axios.get(`${baseURL}/banners`, {
+          headers: {
+            "Content-Type": "application/json",
+            ...(accessToken
+              ? { Authorization: `Bearer ${accessToken}` }
+              : {}),
+          },
+        });
+
+        // According to the latest sample response, banners are in response.data.data.result
+        const rawData = response?.data?.data?.result;
+
+        if (Array.isArray(rawData) && rawData.length > 0) {
+          const validBanners = rawData.filter(
+            (item) => item && Array.isArray(item.images) && item.images.length > 0
+          );
+
+          setBanners(validBanners);
+          setCurrentBannerIndex(0);
+        } else {
+          setBanners([]);
+        }
+      } catch (error) {
+        console.error("Error fetching banner:", error);
+        setBanners([]);
+      } finally {
+        setIsBannerLoading(false);
+      }
+    };
+
+    fetchBanners();
+  }, [baseURL]);
+
+  // Auto-slide banners if more than one is available
+  useEffect(() => {
+    if (!banners || banners.length <= 1) return;
+
+    const intervalId = setInterval(() => {
+      setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+    }, 5000); // 5 seconds per slide
+
+    return () => clearInterval(intervalId);
+  }, [banners]);
 
   // Fetch suggestions based on input
   useEffect(() => {
@@ -147,17 +202,26 @@ const Banner = () => {
     }
   };
 
+  const currentBanner =
+    banners && banners.length > 0 ? banners[currentBannerIndex] : null;
+
   return (
     // <div className="h-[480px] w-full relative">
     <div className="h-fit min-h-56 max-h-96 w-full relative mb-8">
-      {/* Dynamic Promotions component instead of static banners */}
-      <Promotions location="HOME_MAIN_PAGE" className="!h-full min-h-56 !mt-0" />
+      {/* Background banner slider from /banners API, fallback to Promotions */}
+      {banners.length > 0 && !isBannerLoading ? (
+        <img
+          src={`${imageUrl}/${banners[currentBannerIndex].images[0]}`}
+          alt={banners[currentBannerIndex].title || "Banner"}
+          className="w-full min-h-56 max-h-96 h-full object-cover transition-opacity duration-700"
+        />
+      ) : (
+        <Promotions location="HOME_MAIN_PAGE" className="!h-full min-h-56 !mt-0" />
+      )}
 
       <div className="h-full w-full bg-[#00000049] p-2 absolute top-0  z-10 flex flex-col items-center justify-center">
         <h1 className="text-4xl text-white text-center font-semibold mb-5">
-          {searchType === "counsellor"
-            ? "Find Expert Education Counsellors"
-            : "Find Over 5000+ Colleges in India"}
+          {currentBanner?.title || "Find Over 5000+ Colleges in India"}
         </h1>
 
         <div className="relative max-w-[800px] w-full">
