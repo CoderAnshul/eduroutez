@@ -41,6 +41,7 @@ const SearchPage = () => {
   const examFromUrl = searchParams.get("Exam");
   const feesFromUrl = searchParams.get("Fees");
   const ratingsFromUrl = searchParams.get("Ratings");
+  const organizationFromUrl = searchParams.get("organization");
   const organizationTypeFromUrl = searchParams.get("organisationType");
   const specializationFromUrl = searchParams.get("specialization");
   const sortFromUrl = searchParams.get("sort"); // For sorting by rating (top colleges)
@@ -61,9 +62,18 @@ const SearchPage = () => {
     }
 
     function checkForUrlFilters() {
-      return !!(streamFromUrl || stateFromUrl || cityFromUrl ||
-        examFromUrl || feesFromUrl || ratingsFromUrl ||
-        organizationTypeFromUrl || specializationFromUrl || sortFromUrl);
+      return !!(
+        streamFromUrl ||
+        stateFromUrl ||
+        cityFromUrl ||
+        examFromUrl ||
+        feesFromUrl ||
+        ratingsFromUrl ||
+        organizationFromUrl ||
+        organizationTypeFromUrl ||
+        specializationFromUrl ||
+        sortFromUrl
+      );
     }
   }, [inputField]);
 
@@ -200,6 +210,7 @@ const SearchPage = () => {
     if (examFromUrl) initialFilters.Exam = [examFromUrl];
     if (feesFromUrl) initialFilters.Fees = [feesFromUrl];
     if (ratingsFromUrl) initialFilters.Ratings = [ratingsFromUrl];
+    if (organizationFromUrl) initialFilters.organization = [organizationFromUrl];
     if (organizationTypeFromUrl) initialFilters.organisationType = [organizationTypeFromUrl];
     if (specializationFromUrl) initialFilters.specialization = [specializationFromUrl];
 
@@ -571,8 +582,22 @@ const SearchPage = () => {
       ],
     },
     {
+      title: "organization",
+      items: ["University", "College", "Institute"],
+    },
+    {
       title: "organisationType",
-      items: ["Private", "Public"],
+      items: [
+        "Central",
+        "State",
+        "Local Body",
+        "Private",
+        "Aided",
+        "Autonomous",
+        "Affiliated",
+        "Deemed",
+        "Distance / Open",
+      ],
     },
     {
       title: "Ratings",

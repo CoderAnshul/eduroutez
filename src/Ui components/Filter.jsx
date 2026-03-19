@@ -13,6 +13,7 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
   const [selectedStreams, setSelectedStreams] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
   const [selectedStates, setSelectedStates] = useState([]);
+  const [selectedOrganizations, setSelectedOrganizations] = useState([]);
   const [selectedOrganisationTypes, setSelectedOrganisationTypes] = useState([]);
   const [selectedSpecializations, setSelectedSpecializations] = useState([]);
   const [selectedFees, setSelectedFees] = useState([]);
@@ -48,6 +49,10 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     const states = stateParam ? stateParam.split(",").map(s => s.trim()).filter(Boolean) : [];
     setSelectedStates(states);
 
+    const orgParam = params.get("organization");
+    const organizations = orgParam ? orgParam.split(",").map(o => o.trim()).filter(Boolean) : [];
+    setSelectedOrganizations(organizations);
+
     const orgTypeParam = params.get("organisationType");
     const orgTypes = orgTypeParam ? orgTypeParam.split(",").map(o => o.trim()).filter(Boolean) : [];
     setSelectedOrganisationTypes(orgTypes);
@@ -73,6 +78,7 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
       streams,
       cities,
       states,
+      organizations,
       orgTypes,
       specializations,
       fees,
@@ -90,6 +96,7 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     if (streams.length > 0) apiFilters.streams = streams;
     if (cities.length > 0) apiFilters.city = cities;
     if (states.length > 0) apiFilters.state = states;
+    if (organizations.length > 0) apiFilters.organization = organizations;
     if (orgTypes.length > 0) apiFilters.organisationType = orgTypes;
     if (specializations.length > 0) apiFilters.specialization = specializations;
     if (fees.length > 0) apiFilters.Fees = fees;
@@ -123,6 +130,7 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     if (selectedStreams.length > 0) queryParams.set("stream", selectedStreams.join(","));
     if (selectedCities.length > 0) queryParams.set("city", selectedCities.join(","));
     if (selectedStates.length > 0) queryParams.set("state", selectedStates.join(","));
+    if (selectedOrganizations.length > 0) queryParams.set("organization", selectedOrganizations.join(","));
     if (selectedOrganisationTypes.length > 0) queryParams.set("organisationType", selectedOrganisationTypes.join(","));
     if (selectedSpecializations.length > 0) queryParams.set("specialization", selectedSpecializations.join(","));
     if (selectedFees.length > 0) queryParams.set("Fees", selectedFees.join(","));
@@ -141,6 +149,7 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     if (selectedStreams.length > 0) apiFilters.streams = selectedStreams;
     if (selectedCities.length > 0) apiFilters.city = selectedCities;
     if (selectedStates.length > 0) apiFilters.state = selectedStates;
+    if (selectedOrganizations.length > 0) apiFilters.organization = selectedOrganizations;
     if (selectedOrganisationTypes.length > 0) apiFilters.organisationType = selectedOrganisationTypes;
     if (selectedSpecializations.length > 0) apiFilters.specialization = selectedSpecializations;
     if (selectedFees.length > 0) apiFilters.Fees = selectedFees;
@@ -155,6 +164,7 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     selectedStreams,
     selectedCities,
     selectedStates,
+    selectedOrganizations,
     selectedOrganisationTypes,
     selectedSpecializations,
     selectedFees,
@@ -186,6 +196,9 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     }
     else if (sectionLower === "state") {
       toggleArrayItem(selectedStates, setSelectedStates, item);
+    }
+    else if (sectionLower === "organization") {
+      toggleArrayItem(selectedOrganizations, setSelectedOrganizations, item);
     }
     else if (sectionLower === "organisationtype") {
       toggleArrayItem(selectedOrganisationTypes, setSelectedOrganisationTypes, item);
@@ -278,6 +291,8 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
                     isChecked = itemMatches(selectedCities, item);
                   } else if (sectionLower === "state") {
                     isChecked = itemMatches(selectedStates, item);
+                  } else if (sectionLower === "organization") {
+                    isChecked = itemMatches(selectedOrganizations, item);
                   } else if (sectionLower === "organisationtype") {
                     isChecked = itemMatches(selectedOrganisationTypes, item);
                   } else if (sectionLower === "specialization") {

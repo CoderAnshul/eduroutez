@@ -3,14 +3,25 @@ import axios from "axios";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
-export const getInstitutes = async (state, city,instituteName,courseTitle, page = 1, limit = 20) => {
+export const getInstitutes = async (
+  state,
+  city,
+  instituteName,
+  courseTitle,
+  page = 1,
+  limit = 20,
+  organization,
+  organisationType
+) => {
   try {
     // Construct the filters object dynamically based on the input
     const searchFields = {
       ...(state && { state }),
       ...(city && { city }),
       ...(instituteName && { instituteName }),
-      ...courseTitle && { courseTitle },
+      ...(courseTitle && { courseTitle }),
+      ...(organization && { organization }),
+      ...(organisationType && { organisationType }),
     };
     // console.log("Search Fields:", searchFields);
 
