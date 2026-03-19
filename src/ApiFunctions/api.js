@@ -366,11 +366,31 @@ export const bestRatedInstitute = async () => {
       `${baseURL}/best-rated-institute?filters={"limit":3}&sort={"createdAt":"desc"}`
     );
     return response.data;
-
-    // return response.data;
   } catch (error) {
     console.error(`Error fetching best-rated-institute `, error);
+    throw error;
+  }
+};
 
+export const bestRatedUniversityInstitutes = async () => {
+  try {
+    const filters = {
+      isBestRatedUniversity: true,
+      organization: "University",
+    };
+
+    const response = await axios.get(`${baseURL}/institutes`, {
+      params: {
+        filters: JSON.stringify(filters),
+        page: 1,
+        limit: 20,
+      },
+    });
+
+    const institutes = response?.data?.data?.result || [];
+    return { data: institutes };
+  } catch (error) {
+    console.error(`Error fetching best-rated university institutes `, error);
     throw error;
   }
 };

@@ -3,6 +3,7 @@ import Banner from '../Components/Banner'
 import Counselling from '../Components/Counselling'
 import TrendingInstitute from '../Components/TrendingInstitute'
 import BestRated from '../Components/BestRated'
+import BestRatedUniversity from '../Components/BestRatedUniversity'
 import PopularCourses from '../Components/PopularCourses'
 import HighRatedCareers from '../Components/HighRatedCareers'
 import PopularCategories from '../Components/PopularCategories'
@@ -57,9 +58,9 @@ const Homepage = () => {
       <PopularCategories />
       <div className='p-[4vw] flex flex-col items-center' >
         <BestRated />
-        <TrendingInstitute />
-
+        <BestRatedUniversity />
         <HighRatedCareers />
+        <TrendingInstitute />
       </div>
       <Instructor />
       <BecomeCounselorBanner />
