@@ -29,6 +29,7 @@ import NewsPage from './Pages/NewsPage';
 import TrendingStreams from './Components/trendingStreampage';
 import TrendingCourses from './Pages/TrendingCoursespage';
 import TermsAndConditions from './Pages/TermsAndConditions ';
+const WebinarsPage = React.lazy(() => import('./Pages/WebinarsPage'));
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
 const PageNotFound = React.lazy(() => import('./Pages/PageNotFound'));
@@ -101,6 +102,8 @@ const App = () => {
           <Route path="/detailpage/:id" element={<Detailpage />} />
           <Route path="/detailpage/:slug" element={<Detailpage />} />
 
+          <Route path="/webinars" element={<WebinarsPage />} />
+
           <Route path="/writereview" element={<Writereview />} />
           <Route path="/policy" element={<Policy />} />
           <Route path="/terms-&-conditions" element={<TermsAndConditions />} />
@@ -138,6 +141,9 @@ const App = () => {
             <Route path='reviews' element={<ReviewActivity />}></Route>
             <Route path="redeem" element={<Redeem />} />
             <Route path='payout' element={<Payout />} />
+
+            {/* Dashboard webinars list */}
+            <Route path="webinar" element={<WebinarsPage />} />
 
             < Route path='refer&earn' element={<ReferAndEarn></ReferAndEarn>}></Route>
             <Route path="logout" element={<Logout />} />

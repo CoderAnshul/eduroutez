@@ -172,6 +172,22 @@ export const getCoursesById = async (idOrSlug) => {
   }
 };
 
+export const getWebinars = async ({ search = "", page = 1, limit = 10 } = {}) => {
+  try {
+    const params = {
+      search,
+      page,
+      limit,
+    };
+
+    const response = await axios.get(`${baseURL}/webinars`, { params });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching webinars:", error);
+    throw error;
+  }
+};
+
 export const createReview = async (formData) => {
   try {
     const response = await axios.post(`${baseURL}/review`, formData, {
