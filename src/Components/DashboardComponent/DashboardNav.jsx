@@ -71,14 +71,13 @@ const DashboardNav = () => {
         >
           <img src={visitwebiste} alt="Back" className="h-10 w-10" />
         </button>
-        <button
+        {/* <button
           onClick={handleBecomeCounselor}
           className="lg:flex hidden items-center gap-2 px-4 py-2 bg-[#b82025] text-white rounded-md hover:bg-red-700 transition-colors"
         >
           Become a Counselor
-          {/* <span className="hidden md:flex">Become a Counselor</span> */}
           <ArrowRight className="h-4 w-4 hidden md:flex" />
-        </button>
+        </button> */}
         <button
           onClick={handleQuestion}
           className="md:flex hidden items-center gap-2 px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-700 transition-colors"
