@@ -12,6 +12,7 @@ const CounselorTestExam = () => {
     const [isExamStarted, setIsExamStarted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isTimedOut, setIsTimedOut] = useState(false);
+    const [showGuidance, setShowGuidance] = useState(true);
 
     const navigate = useNavigate();
     const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -76,9 +77,13 @@ const CounselorTestExam = () => {
         }
     }, [answers, timeLeft, testData, VITE_BASE_URL, navigate, isSubmitting]);
 
+
+    // Only fetch questions after guidance is dismissed
     useEffect(() => {
-        fetchQuestions();
-    }, []);
+        if (!showGuidance && !testData && !isExamStarted) {
+            fetchQuestions();
+        }
+    }, [showGuidance]);
 
     useEffect(() => {
         if (!isExamStarted || isTimedOut) return;
@@ -107,6 +112,38 @@ const CounselorTestExam = () => {
             [questionId]: optionId,
         }));
     };
+
+
+    // Show guidance page first
+    if (showGuidance) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-neutral-100 p-6">
+                <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-10 border border-neutral-200">
+                    <h1 className="text-4xl font-extrabold text-black mb-6 text-center tracking-tight">Test Guidelines</h1>
+                    <p className="text-lg text-neutral-700 mb-8 text-center">
+                        Please read these important instructions before starting your test. Following these will help you perform your best!
+                    </p>
+                    <ul className="space-y-5 text-base text-black/90">
+                        <li><span className="font-semibold text-black">1. Read Each Question Carefully:</span> Take your time to understand what is being asked before answering.</li>
+                        <li><span className="font-semibold text-black">2. Manage Your Time:</span> You have 25 minutes for 50 questions. Don’t spend too long on any one question.</li>
+                        <li><span className="font-semibold text-black">3. Stay Calm and Focused:</span> If you don’t know an answer, move on and return to it later if time allows.</li>
+                        <li><span className="font-semibold text-black">4. Review Your Answers:</span> If you finish early, use the remaining time to check your answers.</li>
+                        <li><span className="font-semibold text-black">5. Ensure a Stable Internet Connection:</span> A reliable connection is required to avoid interruptions and submit your test successfully.</li>
+                        <li><span className="font-semibold text-black">6. Device Readiness:</span> Make sure your device is charged and notifications are silenced to avoid distractions.</li>
+                        <li><span className="font-semibold text-black">7. Technical Help:</span> If you face any technical issues, contact support immediately.</li>
+                    </ul>
+                    <div className="mt-10 text-center">
+                        <button
+                            className="inline-block bg-black hover:bg-neutral-800 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300"
+                            onClick={() => setShowGuidance(false)}
+                        >
+                            Start Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (!testData || !testData.questions || testData.questions.length === 0) return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50">
