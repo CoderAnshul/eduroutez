@@ -10,6 +10,7 @@ import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
+  const [showRolePopup, setShowRolePopup] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -71,9 +72,14 @@ const Login = () => {
 
       toast.success("Logged in successfully!");
 
-      if (data?.data?.user?.role !== 'student') {
-        // Redirect to admin portal for non-student roles
-        window.location.href = "https://admin.eduroutez.com/";
+      const role = data?.data?.user?.role;
+      if (role !== 'student') {
+        // Only redirect to admin for true admin roles
+        if (role === 'admin' || role === 'superadmin') {
+          window.location.href = "https://admin.eduroutez.com/";
+        } else {
+          setShowRolePopup(true);
+        }
         return;
       }
 
@@ -241,6 +247,35 @@ const Login = () => {
             Sign up
           </Link>
         </p>
+
+        {/* Role popup for institute/counsellor */}
+        {showRolePopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
+            <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform transition-all">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-black text-slate-800">Login Info</h2>
+                <button onClick={() => setShowRolePopup(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <p className="text-slate-600 mb-8 font-medium leading-relaxed">
+                Please log in to the correct portal for your role (Institute or Counsellor). You cannot access the admin dashboard from here.<br/>
+                <span className="block mt-4">Go to: <a href="https://admin.eduroutez.com/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">Admin/Counsellor Portal</a> </span>
+              </p>
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={() => setShowRolePopup(false)}
+                  className="w-full bg-[#b82025] text-white font-black py-4 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div >
     </div >
   );
