@@ -209,7 +209,7 @@ const Navbar = () => {
                     className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-xs font-bold mr-2 transition-all"
                     onClick={() => navigate("/counselor-test/payment")}
                   >
-                    Pay Now
+                    Become a Counselor
                   </button>
                 )}
                 <div
