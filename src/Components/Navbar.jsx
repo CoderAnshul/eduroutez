@@ -99,7 +99,11 @@ const Navbar = () => {
     setShowLoginPopup(false);
   };
 
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const handleLogout = async () => {
+    setShowLogoutPopup(true);
+  };
+  const confirmLogout = async () => {
     try {
       await axiosInstance.post(`${import.meta.env.VITE_BASE_URL}/logout`, {}, {
         headers: {
@@ -252,12 +256,34 @@ const Navbar = () => {
                       >
                         Dashboard
                       </Link>
-                      {/* <button
+                      <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
                       >
                         Logout
-                      </button> */}
+                      </button>
+                          {/* Logout confirmation popup */}
+                          {showLogoutPopup && (
+                            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[2000]">
+                              <div className="bg-white rounded-xl p-8 shadow-2xl w-full max-w-xs text-center">
+                                <h2 className="text-xl font-bold mb-4">Are you sure you want to logout?</h2>
+                                <div className="flex justify-center gap-4 mt-6">
+                                  <button
+                                    onClick={() => setShowLogoutPopup(false)}
+                                    className="px-6 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    onClick={confirmLogout}
+                                    className="px-6 py-2 rounded bg-[#b82025] text-white font-semibold hover:bg-red-700"
+                                  >
+                                    Logout
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                     </div>
                   )}
                 </div>
