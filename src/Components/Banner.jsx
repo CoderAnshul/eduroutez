@@ -210,11 +210,64 @@ const Banner = () => {
     <div className="h-fit min-h-56 max-h-96 w-full relative mb-8">
       {/* Background banner slider from /banners API, fallback to Promotions */}
       {banners.length > 0 && !isBannerLoading ? (
-        <img
-          src={`${imageUrl}/${banners[currentBannerIndex].images[0]}`}
-          alt={banners[currentBannerIndex].title || "Banner"}
-          className="w-full min-h-56 max-h-96 h-full object-cover transition-opacity duration-700"
-        />
+        <div className="relative w-full h-full group">
+          {banners[currentBannerIndex]?.destinationLink ? (
+            <a
+              href={banners[currentBannerIndex].destinationLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full h-full"
+              tabIndex={0}
+              aria-label={banners[currentBannerIndex]?.title || 'Banner'}
+            >
+              <img
+                src={`${imageUrl}/${banners[currentBannerIndex].images[0]}`}
+                alt={banners[currentBannerIndex].title || "Banner"}
+                className="w-full min-h-56 max-h-96 h-full object-cover transition-opacity duration-700 select-none cursor-pointer"
+                draggable="false"
+              />
+            </a>
+          ) : (
+            <img
+              src={`${imageUrl}/${banners[currentBannerIndex].images[0]}`}
+              alt={banners[currentBannerIndex].title || "Banner"}
+              className="w-full min-h-56 max-h-96 h-full object-cover transition-opacity duration-700 select-none"
+              draggable="false"
+            />
+          )}
+          {/* Left Chevron */}
+          {banners.length > 1 && (
+            <button
+              className="banner-chevron absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-70 text-white rounded-full p-2 z-20 pointer-events-auto"
+              onClick={e => {
+                e.stopPropagation();
+                setCurrentBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
+              }}
+              aria-label="Previous banner"
+              tabIndex={0}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+          )}
+          {/* Right Chevron */}
+          {banners.length > 1 && (
+            <button
+              className="banner-chevron absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-70 text-white rounded-full p-2 z-20 pointer-events-auto"
+              onClick={e => {
+                e.stopPropagation();
+                setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+              }}
+              aria-label="Next banner"
+              tabIndex={0}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+          )}
+        </div>
       ) : (
         <Promotions location="HOME_MAIN_PAGE" className="!h-full min-h-56 !mt-0" />
       )}
