@@ -103,7 +103,7 @@ const Counselling = () => {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className='w-full h-full flex flex-col items-center justify-center justify-col'>
+    <div className='universal-container flex flex-col items-center justify-center'>
       <h2 className='text-2xl font-bold mb-4 text-gray-800'>Select the Date of Counselling</h2>
       <input
         className='w-[10rem] bg-slate-200 rounded-lg p-2 text-center'

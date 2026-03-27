@@ -296,7 +296,7 @@ const Careerspage = () => {
       </div>
 
       <div
-        className={`flex px-[4vw] pt-5 mb-14 ${
+        className={`universal-container flex pt-5 mb-14 ${
           isFilterOpen ? "pointer-events-none" : ""
         }`}
       >

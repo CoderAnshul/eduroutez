@@ -112,7 +112,7 @@ const GalleryInfo = ({ instituteData }) => {
       )}
 
       {isGalleryOpen && (
-        <div className="fixed inset-0 z-40 mt-20 flex items-center justify-center overflow-hidden bg-black/60">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden bg-black/60">
           <div className="relative bg-white rounded-xl w-[95%] h-[90%] max-w-6xl m-4 overflow-hidden">
             {/* Close button */}
             <button

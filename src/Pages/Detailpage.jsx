@@ -241,7 +241,7 @@ const DetailPage = () => {
     <>
       <div className="min-h-screen bg-gray-50">
         {/* Banner Section */}
-        <div className="container max-w-[1300px] mx-auto px-6 py-8">
+        <div className="universal-container py-8">
           <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg mb-8">
             <img
               className="h-full w-full object-cover"

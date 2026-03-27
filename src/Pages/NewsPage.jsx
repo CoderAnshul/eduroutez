@@ -87,7 +87,7 @@ export default function NewsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="universal-container py-8">
       <div className="mb-8 space-y-4">
         <h1 className="text-3xl font-bold">Latest News</h1>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

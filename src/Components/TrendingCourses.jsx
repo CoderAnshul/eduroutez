@@ -277,7 +277,7 @@ const TrendingCourses = () => {
                   <div className="p-6">
                     <div className="space-y-4 px-2 pt-3">
                       {/* Short description */}
-                      <div className="text-gray-600 line-clamp-3 h-18">
+                      <div className="text-black line-clamp-3 h-18">
                         {stripHtml(course.shortDescription || "")}
                       </div>
 

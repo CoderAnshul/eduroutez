@@ -255,7 +255,7 @@ const BecomeCounselor = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-auto">
+    <div className="flex flex-col md:flex-row h-screen universal-max-width">
       <ToastContainer />
 
       {/* OTP Modal */}

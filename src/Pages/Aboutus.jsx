@@ -11,7 +11,7 @@ const Aboutus = () => {
     <>
       <PageBanner pageName="About us" currectPage="about us" />
       <section className="py-16 bg-gradient-to-r from-[#f3f4f6] via-[#f9f9fa] to-[#fef7f3]">
-        <div className="text-center mb-12">
+        <div className="universal-container text-center py-12">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
             Start your journey With us
           </h2>
@@ -21,7 +21,7 @@ const Aboutus = () => {
             Our school is known.
           </p>
         </div>
-        <div className="flex flex-wrap justify-center gap-8 px-4 md:px-8 lg:px-12">
+        <div className="universal-max-width flex flex-wrap justify-center gap-8">
           {[
             {
               id: 1,
@@ -82,8 +82,8 @@ const Aboutus = () => {
       </section>
 
       {/* ------------- aboutimg---------------- */}
-      <section className="py-16 px-4 md:px-8 lg:px-16">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
+      <section className="py-16">
+        <div className="universal-container flex flex-col lg:flex-row items-center gap-12">
           {/* Left Image Section */}
           <div className="relative flex-1">
             <img

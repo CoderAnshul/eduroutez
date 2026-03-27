@@ -323,7 +323,7 @@ const CombinedQuestionsPage = () => {
   };
 
   return (
-    <div className="max-w-8xl mx-auto p-4 md:p-6 min-h-screen h-fit">
+    <div className="universal-container min-h-screen h-fit">
       <ToastContainer />
       <div className="mb-4">
         <button
