@@ -237,7 +237,7 @@ const StreamLevelPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="universal-container py-12">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Featured Image */}
           {/* {console.log('dfghjkl;',pageData?.image) }
@@ -281,7 +281,7 @@ const StreamLevelPage = () => {
 
       {/* Stream Related Blogs */}
       {streamBlogs.length > 0 && (
-        <div className="container mx-auto px-4 py-12">
+        <div className="universal-container py-12">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
               <Sparkles className="text-red-500 w-6 h-6" />
@@ -439,7 +439,7 @@ const StreamLevelPage = () => {
 
       {/* Related Institutes */}
       {streamInstitutes.length > 0 && (
-        <div className="container mx-auto px-4 py-12">
+        <div className="universal-container py-12">
           <div className="flex items-center gap-2 mb-8">
             <Sparkles className="text-red-500 w-6 h-6" />
             <h2 className="text-3xl font-bold text-gray-900">Stream Related Institutes</h2>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/Images/logo.png";
 import explore from "../assets/Images/explore.png";
@@ -15,6 +16,7 @@ import useCategories from "../DataFiles/categories";
 import { toast } from "react-toastify";
 
 const Navbar = () => {
+  console.log('Navbar component rendered');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // For hover menu
   const location = useLocation();
@@ -22,14 +24,59 @@ const Navbar = () => {
   const { categoriesData, loading, error } = useCategories();
   console.log("categoriesData", categoriesData);
   useEffect(() => {
+    console.log('Eligibility useEffect running. accessToken:', accessToken);
     if (error) {
       console.log("Navbar Error:", error?.message);
     }
   }, [error]);
 
   const accessToken = localStorage.getItem("accessToken");
-  console.log("accessToken", accessToken);
+  const [canGiveTest, setCanGiveTest] = useState(false);
+  const [checkingTest, setCheckingTest] = useState(false);
+  const [needToPay, setNeedToPay] = useState(false);
   const navigate = useNavigate();
+  // Check can-give-test on mount if logged in
+  useEffect(() => {
+    const checkCanGiveTest = async () => {
+      if (!accessToken) return;
+      setCheckingTest(true);
+      try {
+        // Use axiosInstance and hardcode port 5173 as in the request
+        console.log('Calling eligibility API...');
+        const response = await axiosInstance.get(
+          `/api/v1/counselor-test/can-give`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        console.log('Eligibility API response:', response.data); // Debug log
+        // Use the new API response structure: response.data.data.eligible
+        if (response.data && response.data.data) {
+          if (response.data.data.eligible === true) {
+            setCanGiveTest(true);
+            setNeedToPay(false);
+          } else if (response.data.data.eligible === false && response.data.data.reason === 'need to pay') {
+            setCanGiveTest(false);
+            setNeedToPay(true);
+          } else {
+            setCanGiveTest(false);
+            setNeedToPay(false);
+          }
+        } else {
+          setCanGiveTest(false);
+          setNeedToPay(false);
+        }
+      } catch (err) {
+        console.error('Eligibility API error:', err);
+        setCanGiveTest(false);
+      } finally {
+        setCheckingTest(false);
+      }
+    };
+    checkCanGiveTest();
+  }, [accessToken]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -52,7 +99,11 @@ const Navbar = () => {
     setShowLoginPopup(false);
   };
 
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const handleLogout = async () => {
+    setShowLogoutPopup(true);
+  };
+  const confirmLogout = async () => {
     try {
       await axiosInstance.post(`${import.meta.env.VITE_BASE_URL}/logout`, {}, {
         headers: {
@@ -89,7 +140,7 @@ const Navbar = () => {
     <>
       {/* Main Navbar - Fixed */}
       <nav className="fixed top-0 left-0 right-0 z-[999] bg-white ">
-        <div className="h-16 w-full p-5 flex items-center justify-between">
+        <div className="universal-max-width h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button onClick={toggleMenu} className="lg:hidden">
               <img className="h-6" src={menubar} alt="open menu" />
@@ -146,55 +197,97 @@ const Navbar = () => {
 
             {/* Menu with hover functionality */}
             {accessToken && (
-              <div
-                className="relative"
-                onClick={() => {
-                  if (isDropdownOpen) {
-                    setIsDropdownOpen(false);
-                  } else {
-                    setIsDropdownOpen(true);
-                  }
-                }}
-              >
-                <div className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer">
-                  <img className="h-3 opacity-75" src={menu} alt="menu" />
-
-                  <Link
-                    to="/"
-                    className="secondMenu bg-gray-500 hover:scale-105 transition-all h-5 w-5 rounded-full"
-                  ></Link>
-                </div>
-
-                {/* Dropdown menu */}
-                {isDropdownOpen && (
-                  <div className="absolute z-[1000] right-0 top-[34px] w-50 bg-white border transition-all border-gray-300 rounded-lg shadow-lg">
-                    <Link
-                      to="/dashboard/profile-page"
-                      className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      to="/dashboard/settings"
-                      className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
-                    >
-                      Settings
-                    </Link>
-                    <Link
-                      to="/dashboard/"
-                      className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
-                    >
-                      Dashboard
-                    </Link>
-                    {/* <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
-                    >
-                      Logout
-                    </button> */}
-                  </div>
+              <>
+                {/* Start Test button if eligible */}
+                {canGiveTest && !checkingTest && (
+                  <button
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-xs font-bold mr-2 transition-all"
+                    onClick={() => navigate("/counselor-test/exam")}
+                  >
+                    Start Test
+                  </button>
                 )}
-              </div>
+                {/* Pay Now button if not eligible and need to pay */}
+                {needToPay && !checkingTest && (
+                  <button
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-xs font-bold mr-2 transition-all"
+                    onClick={() => navigate("/counselor-test/payment")}
+                  >
+                    Become a Counselor
+                  </button>
+                )}
+                <div
+                  className="relative"
+                  onClick={() => {
+                    if (isDropdownOpen) {
+                      setIsDropdownOpen(false);
+                    } else {
+                      setIsDropdownOpen(true);
+                    }
+                  }}
+                >
+                  <div className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer">
+                    <img className="h-3 opacity-75" src={menu} alt="menu" />
+
+                    <Link
+                      to="/"
+                      className="secondMenu bg-gray-500 hover:scale-105 transition-all h-5 w-5 rounded-full"
+                    ></Link>
+                  </div>
+
+                  {/* Dropdown menu */}
+                  {isDropdownOpen && (
+                    <div className="absolute z-[1000] right-0 top-[34px] w-50 bg-white border transition-all border-gray-300 rounded-lg shadow-lg">
+                      <Link
+                        to="/dashboard/profile-page"
+                        className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        to="/dashboard/settings"
+                        className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                      >
+                        Settings
+                      </Link>
+                      <Link
+                        to="/dashboard/"
+                        className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                      >
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                      >
+                        Logout
+                      </button>
+                          {/* Logout confirmation popup */}
+                          {showLogoutPopup && (
+                            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[2000]">
+                              <div className="bg-white rounded-xl p-8 shadow-2xl w-full max-w-xs text-center">
+                                <h2 className="text-xl font-bold mb-4">Are you sure you want to logout?</h2>
+                                <div className="flex justify-center gap-4 mt-6">
+                                  <button
+                                    onClick={() => setShowLogoutPopup(false)}
+                                    className="px-6 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    onClick={confirmLogout}
+                                    className="px-6 py-2 rounded bg-[#b82025] text-white font-semibold hover:bg-red-700"
+                                  >
+                                    Logout
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>

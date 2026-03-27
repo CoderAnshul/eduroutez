@@ -123,7 +123,7 @@ const TrendingStreams = () => {
 
   return (
     <>
-      <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
+      <div className="universal-container">
         <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
           <h1 className="text-4xl font-bold mb-4">Trending Streams</h1>
           <p className="text-xl">

@@ -3,6 +3,7 @@ import Banner from '../Components/Banner'
 import Counselling from '../Components/Counselling'
 import TrendingInstitute from '../Components/TrendingInstitute'
 import BestRated from '../Components/BestRated'
+import BestRatedUniversity from '../Components/BestRatedUniversity'
 import PopularCourses from '../Components/PopularCourses'
 import HighRatedCareers from '../Components/HighRatedCareers'
 import PopularCategories from '../Components/PopularCategories'
@@ -16,6 +17,7 @@ import { useParams } from 'react-router-dom'
 import ConsellingBanner from '../Components/ConsellingBanner'
 import Promotions from './CoursePromotions'
 import TrendingCourses from '../Components/TrendingCourses'
+import BecomeCounselorBanner from '../Components/BecomeCounselorBanner'
 
 const Homepage = () => {
 
@@ -28,7 +30,7 @@ const Homepage = () => {
   // if (isLoading) return <p>Loading...</p>;
   // if (isError) return <p>Error: {error.message}</p>;
 
-  
+
 
 
 
@@ -37,39 +39,40 @@ const Homepage = () => {
 
   return (
     <>
-      <Banner/>
-   
-      <div className="p-4 flex flex-col items-center">
-  
-      <Counselling />
+      <Banner />
+
+      <div className="universal-container flex flex-col items-center">
+
+        <Counselling />
       </div>
       {/* Using standard Tailwind classes for width and height instead of arbitrary values */}
-      <div className="w-full max-w-fit h-fit mx-auto">
+      <div className="universal-max-width h-fit py-4">
         <Promotions location="HOME_PAGE" className="h-[90px]" />
       </div>
-      <div className="p-4 flex flex-col items-center">
-      <PopularCourses />
+      <div className="universal-container flex flex-col items-center">
+        <PopularCourses />
       </div>
-  <div className="p-4 flex flex-col items-center">
-      <TrendingCourses/>
+      <div className="universal-container flex flex-col items-center">
+        <TrendingCourses />
       </div>
-      <PopularCategories/>
-      <div className='p-[4vw] flex flex-col items-center' >
-         <BestRated/>
-         <TrendingInstitute/>
-        
-         <HighRatedCareers/>
+      <PopularCategories />
+      <div className='universal-container flex flex-col items-center' >
+        <BestRated />
+        <BestRatedUniversity />
+        <HighRatedCareers />
+        <TrendingInstitute />
       </div>
-      <Instructor/>
-      <div className='p-[4vw] flex flex-col items-center' >
-         <BlogComponent/>
+      <Instructor />
+      <BecomeCounselorBanner />
+      <div className='universal-container flex flex-col items-center' >
+        <BlogComponent />
       </div>
-         <Reviews/>
-         {/* <Events className = "!w-full"/> */}
-         <div className="flex gap-2 flex-col sm:flex-row items-center">
-          <Events />
-          <ConsellingBanner />
-          </div>
+      <Reviews />
+      {/* <Events className = "!w-full"/> */}
+      <div className="flex gap-2 flex-col sm:flex-row items-center">
+        <Events />
+        <ConsellingBanner />
+      </div>
     </>
   )
 }

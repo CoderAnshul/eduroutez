@@ -133,7 +133,7 @@ const NewsDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="container max-w-[1300px] mx-auto w-full h-screen flex items-center justify-center bg-gray-50">
+      <div className="universal-container h-screen flex items-center justify-center bg-gray-50">
         <div className="p-8 bg-white rounded-xl shadow-lg">
           <div className="animate-pulse space-y-4">
             <div className="h-64 bg-gray-200 rounded-lg w-full"/>
@@ -150,7 +150,7 @@ const NewsDetailPage = () => {
 
   if (error) {
     return (
-      <div className="container max-w-[1300px] mx-auto w-full h-screen flex items-center justify-center bg-gray-50">
+      <div className="universal-container h-screen flex items-center justify-center bg-gray-50">
         <div className="p-8 bg-white rounded-xl shadow-lg text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4"/>
           <div className="text-xl text-red-600 font-medium">Error</div>
@@ -162,7 +162,7 @@ const NewsDetailPage = () => {
 
   if (!newsDetail) {
     return (
-      <div className="container max-w-[1300px] mx-auto w-full h-screen flex items-center justify-center bg-gray-50">
+      <div className="universal-container h-screen flex items-center justify-center bg-gray-50">
         <div className="p-8 bg-white rounded-xl shadow-lg text-center">
           <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4"/>
           <div className="text-xl text-gray-800 font-medium">No Content Available</div>
@@ -173,7 +173,7 @@ const NewsDetailPage = () => {
   }
 
   return (
-    <div className="container max-w-[1300px] mx-auto w-full min-h-screen bg-gray-50 py-8 px-4">
+    <div className="universal-container min-h-screen bg-gray-50 py-8">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* News Header */}
         <div className="flex max-sm:flex-col max-sm:gap-4 justify-between items-center p-6">

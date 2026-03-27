@@ -142,12 +142,9 @@ const BlogComponent = () => {
                       ? `${blog.title.slice(0, 35)}...`
                       : blog.title}
                   </h3>
-                  <p
-                    className="text-sm min-h-[3em]  text-gray-600 mt-3 line-clamp-3"
-                    dangerouslySetInnerHTML={{
-                      __html: blog.description.slice(0, 100),
-                    }}
-                  ></p>
+                  <p className="text-sm min-h-[3em] text-gray-600 mt-3 line-clamp-3">
+                    {blog.description && blog.description.replace(/<[^>]*>?/gm, "").replace(/&nbsp;/g, " ")}
+                  </p>
                   <div className="mt-4"></div>
                   <div className="mt-4">
                     <div className="flex justify-between items-center text-gray-600">

@@ -31,6 +31,7 @@ const SearchPage = () => {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const [searchSource, setSearchSource] = useState(null);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -41,6 +42,7 @@ const SearchPage = () => {
   const examFromUrl = searchParams.get("Exam");
   const feesFromUrl = searchParams.get("Fees");
   const ratingsFromUrl = searchParams.get("Ratings");
+  const organizationFromUrl = searchParams.get("organization");
   const organizationTypeFromUrl = searchParams.get("organisationType");
   const specializationFromUrl = searchParams.get("specialization");
   const sortFromUrl = searchParams.get("sort"); // For sorting by rating (top colleges)
@@ -61,9 +63,18 @@ const SearchPage = () => {
     }
 
     function checkForUrlFilters() {
-      return !!(streamFromUrl || stateFromUrl || cityFromUrl ||
-        examFromUrl || feesFromUrl || ratingsFromUrl ||
-        organizationTypeFromUrl || specializationFromUrl || sortFromUrl);
+      return !!(
+        streamFromUrl ||
+        stateFromUrl ||
+        cityFromUrl ||
+        examFromUrl ||
+        feesFromUrl ||
+        ratingsFromUrl ||
+        organizationFromUrl ||
+        organizationTypeFromUrl ||
+        specializationFromUrl ||
+        sortFromUrl
+      );
     }
   }, [inputField]);
 
@@ -200,6 +211,7 @@ const SearchPage = () => {
     if (examFromUrl) initialFilters.Exam = [examFromUrl];
     if (feesFromUrl) initialFilters.Fees = [feesFromUrl];
     if (ratingsFromUrl) initialFilters.Ratings = [ratingsFromUrl];
+    if (organizationFromUrl) initialFilters.organization = [organizationFromUrl];
     if (organizationTypeFromUrl) initialFilters.organisationType = [organizationTypeFromUrl];
     if (specializationFromUrl) initialFilters.specialization = [specializationFromUrl];
 
@@ -256,7 +268,7 @@ const SearchPage = () => {
     ["streams"],
     async () => {
       const response = await axios.get(
-        `${baseURL}/streams?&page=0&sort={"createdAt":"asc"}`
+        `${baseURL}/streams?limit=15&sort={"createdAt":"asc"}&filters={"isCounsellorStream":true}`
       );
       return response.data;
     },
@@ -571,8 +583,22 @@ const SearchPage = () => {
       ],
     },
     {
+      title: "organization",
+      items: ["University", "College", "Institute"],
+    },
+    {
       title: "organisationType",
-      items: ["Private", "Public"],
+      items: [
+        "Central",
+        "State",
+        "Local Body",
+        "Private",
+        "Aided",
+        "Autonomous",
+        "Affiliated",
+        "Deemed",
+        "Distance / Open",
+      ],
     },
     {
       title: "Ratings",
@@ -953,8 +979,56 @@ const SearchPage = () => {
       <Promotions location="SEARCH_PAGE" className="!h-fit"></Promotions>
       {/* <Promotions location="SEARCH_PAGE" className="!h-[320px]"></Promotions> */}
 
-      <div className="px-[4vw] pb-[2vw] max-sm:overflow-x-hidden flex flex-col items-start">
-        <div className="flex gap-4 w-full mt-6">
+      <div className="universal-container max-sm:overflow-x-hidden flex flex-col items-start">
+        {/* Mobile Filter Drawer */}
+        <div className={`fixed inset-0 z-[999] flex pointer-events-none ${isMobileFilterOpen ? "pointer-events-auto" : ""}`}>
+          <div
+            className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isMobileFilterOpen ? "opacity-100" : "opacity-0"}`}
+            onClick={() => setIsMobileFilterOpen(false)}
+          ></div>
+          <div className={`relative ml-auto flex flex-col w-full max-w-sm bg-white h-full shadow-2xl transition-transform duration-300 transform ${isMobileFilterOpen ? "translate-x-0" : "translate-x-full"}`}>
+            <div className="p-4 flex items-center justify-between border-b sticky top-0 bg-white z-10">
+              <h2 className="text-xl font-bold text-gray-800">Filters</h2>
+              <button
+                onClick={() => setIsMobileFilterOpen(false)}
+                className="p-2 text-gray-500 hover:text-red-600 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 bg-gray-50 uppercase">
+              <Filter
+                filterSections={filterSections}
+                handleFilterChange={handleFilterChangeWithoutScroll}
+                selectedFilters={selectedFilters}
+                onFiltersChanged={handleFiltersChanged}
+              />
+            </div>
+            <div className="p-4 border-t bg-white sticky bottom-0 text-center">
+              <button
+                onClick={() => setIsMobileFilterOpen(false)}
+                className="w-full bg-[#b82025] text-white py-3 rounded-lg font-bold shadow-md active:scale-95 transition-all"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="universal-container flex gap-4 py-8">
           <div className="filters w-[25%] hidden lg:block">
             <Filter
               filterSections={filterSections}
@@ -964,7 +1038,7 @@ const SearchPage = () => {
             />
           </div>
 
-          <div className="filterResult w-full">
+          <div className="filterResult w-full lg:w-[75%] w-full">
             {/* Display search query if available */}
             {(inputField || searchQuery) && (
               <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -994,11 +1068,32 @@ const SearchPage = () => {
               </div>
             ) : filteredContent.length > 0 ? (
               <>
-                <div className="text-sm text-gray-700 mb-2">
-                  <span className="font-semibold text-red-500">
-                    {totalDocuments || "0"}
-                  </span>{" "}
-                  Institutes Found
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm text-gray-700">
+                    <span className="font-semibold text-red-500">
+                      {totalDocuments || "0"}
+                    </span>{" "}
+                    Institutes Found
+                  </div>
+                  <button
+                    onClick={() => setIsMobileFilterOpen(true)}
+                    className="lg:hidden flex items-center gap-2 bg-[#b82025] text-white px-4 py-2 rounded-lg shadow-md text-sm font-semibold active:scale-95 transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    Filters
+                  </button>
                 </div>
                 {/* <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}> */}
                 <div style={{ width: "fit-content" }}>

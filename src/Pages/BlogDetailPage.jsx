@@ -224,9 +224,71 @@ const BlogDetailPage = () => {
     return `/blogdetailpage/${blog?._id}`;
   };
 
-  // Helper function to get actual blog ID for internal use
-  const getBlogId = (blog) => {
-    return blog?._id;
+  // Helper function to transform CKEditor oembed tags into actual media elements
+  const transformDescription = (html) => {
+    if (!html) return "";
+    
+    // Replace <oembed url="..."> with actual video player or iframe
+    return html.replace(/<oembed\s+url="([^"]+)"><\/oembed>/g, (match, url) => {
+      // Handle YouTube
+      if (url.includes("youtube.com") || url.includes("youtu.be")) {
+        let videoId = "";
+        if (url.includes("v=")) {
+          videoId = url.split("v=")[1].split("&")[0];
+        } else {
+          videoId = url.split("/").pop();
+        }
+        return `
+          <div class="relative pb-[56.25%] h-0 overflow-hidden max-w-full rounded-xl my-6 shadow-md bg-black">
+            <iframe 
+              class="absolute top-0 left-0 w-full h-full"
+              src="https://www.youtube.com/embed/${videoId}" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen
+            ></iframe>
+          </div>`;
+      }
+      
+      // Handle Vimeo
+      if (url.includes("vimeo.com")) {
+        const videoId = url.split("/").pop();
+        return `
+          <div class="relative pb-[56.25%] h-0 overflow-hidden max-w-full rounded-xl my-6 shadow-md bg-black">
+            <iframe 
+              class="absolute top-0 left-0 w-full h-full"
+              src="https://player.vimeo.com/video/${videoId}" 
+              frameborder="0" 
+              allow="autoplay; fullscreen; picture-in-picture" 
+              allowfullscreen
+            ></iframe>
+          </div>`;
+      }
+
+      // Direct video link (mp4, webm, etc.)
+      const videoUrl = url.includes("#t=") ? url : `${url}#t=0.1`;
+      return `
+        <div class="my-6 rounded-xl overflow-hidden shadow-md bg-black">
+          <video 
+            src="${videoUrl}" 
+            controls 
+            class="w-full"
+            preload="metadata"
+            playsinline
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>`;
+    });
+  };
+
+  // Helper to strip HTML tags for preview and remove media tags
+  const stripHtmlForPreview = (html) => {
+    if (!html) return "";
+    // First remove oembed markers entirely for preview
+    const noOembed = html.replace(/<figure class="media"><oembed.*?<\/oembed><\/figure>/g, "");
+    const doc = new DOMParser().parseFromString(noOembed, "text/html");
+    return doc.body.textContent || "";
   };
 
   if (error) {
@@ -247,15 +309,15 @@ const BlogDetailPage = () => {
 
   return (
     <>
-      <div className="container max-w-[1300px] mx-auto mt-10 p-4">
+      <div className="universal-container mt-10">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
           {/* Blog Header - Only one instance */}
           <div className="flex max-sm:flex-col max-sm:gap-4 justify-between items-center p-6">
-            <h1 className="text-3xl font-bold">{data.title || "Blog Post"}</h1>
+            <h1 className="text-3xl font-bold text-black">{data.title || "Blog Post"}</h1>
 
             <div className="flex items-center gap-4 ">
               {/* Views Counter */}
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2 text-black">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="22"
@@ -270,7 +332,7 @@ const BlogDetailPage = () => {
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
-                <span className="font-medium">{data.views || 0}</span>
+                <span className="font-medium text-black">{data.views || 0}</span>
               </div>
 
               {/* Social Share Component - Use the current URL to maintain consistency */}
@@ -290,7 +352,7 @@ const BlogDetailPage = () => {
                   ${
                     isLiked
                       ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
-                      : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                      : "bg-gray-100 text-black border-gray-300 hover:bg-gray-200"
                   } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
               >
                 {/* Thumb SVG */}
@@ -313,7 +375,7 @@ const BlogDetailPage = () => {
                 </svg>
 
                 {/* Like Count */}
-                <span className="font-medium text-sm">
+                <span className="font-medium text-sm text-black">
                   {likesCount > 0 ? likesCount : "Like"}
                 </span>
               </button>
@@ -328,13 +390,6 @@ const BlogDetailPage = () => {
                 src={imageUrl}
                 alt={data.title || "Blog Image"}
               />
-              {data.title && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <h1 className="text-4xl font-bold text-white text-center">
-                    {data.title}
-                  </h1>
-                </div>
-              )}
             </div>
           )}
 
@@ -347,9 +402,9 @@ const BlogDetailPage = () => {
                   alt="Meta"
                 />
                 <div>
-                  <h2 className="text-2xl font-semibold">{data.metaTitle}</h2>
+                  <h2 className="text-2xl font-semibold text-black">{data.metaTitle}</h2>
                   {data.createdAt && (
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       {new Date(data.createdAt).toLocaleDateString()}
                     </p>
                   )}
@@ -359,7 +414,7 @@ const BlogDetailPage = () => {
 
             <div className="space-y-4 ">
               {data.metaDescription && (
-                <p className="text-gray-700">{data.metaDescription}</p>
+                <p className="text-black">{data.metaDescription}</p>
               )}
 
               {data.metaKeywords && (
@@ -383,18 +438,18 @@ const BlogDetailPage = () => {
               <div ref={overviewRef} className=" space-y-4">
                 <div className="flex flex-col lg:flex-row lg:space-x-6 mt-6 ">
                   <div className="lg:w-4/5 ">
-                    <h3 className="text-lg font-semibold border-b pb-2">
+                    <h3 className="text-lg font-semibold border-b pb-2 text-black">
                       Overview
                     </h3>
                     <div
-                      className="text-gray-700"
-                      dangerouslySetInnerHTML={{ __html: data.description }}
+                      className="text-black blog-content-wrapper"
+                      dangerouslySetInnerHTML={{ __html: transformDescription(data.description) }}
                     />
                   </div>
 
                   <div className="lg:w-1/5 md:w-full h-full min-w-[200px] mt-8 lg:mt-0">
                     <div className="sticky top-20">
-                      <h3 className="text-lg font-semibold mb-4">
+                      <h3 className="text-lg font-semibold mb-4 text-black">
                         Recently Uploaded Blogs
                       </h3>
                       <div className="space-y-4">
@@ -409,18 +464,15 @@ const BlogDetailPage = () => {
                                 />
                               </div>
                               <div className="w-2/3 ml-3">
-                                <h4 className="text-md font-medium text-gray-800 truncate">
+                                <h4 className="text-md font-medium text-black truncate">
                                   {blog.title.length > 30
                                     ? `${blog.title.slice(0, 30)}...`
                                     : blog.title}
                                 </h4>
-                                <p
-                                  className="text-sm text-gray-600 line-clamp-2"
-                                  dangerouslySetInnerHTML={{
-                                    __html: blog.description,
-                                  }}
-                                ></p>
-                                <span className="text-xs text-gray-500">
+                                <p className="text-sm text-black line-clamp-2">
+                                  {stripHtmlForPreview(blog.description)}
+                                </p>
+                                <span className="text-xs text-black">
                                   {new Date(
                                     blog.createdAt
                                   ).toLocaleDateString()}
@@ -461,12 +513,12 @@ const BlogDetailPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-black">
                 Login Required
               </h2>
               <button
                 onClick={handleClosePopup}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-black hover:text-black"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -485,7 +537,7 @@ const BlogDetailPage = () => {
               </button>
             </div>
 
-            <div className="text-gray-600 mb-6">
+            <div className="text-black mb-6">
               <p>
                 You need to be logged in to like this blog. Would you like to
                 log in now?
@@ -495,7 +547,7 @@ const BlogDetailPage = () => {
             <div className="flex justify-end space-x-3">
               <button
                 onClick={handleClosePopup}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+                className="px-4 py-2 border border-gray-300 rounded-md text-black hover:bg-gray-100 transition-colors"
               >
                 Cancel
               </button>

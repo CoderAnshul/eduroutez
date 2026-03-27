@@ -260,10 +260,9 @@ const Blogpage = () => {
                     <h3 className="text-lg  h-[4rem] font-semibold text-gray-800 line-clamp-2">
                       {blog.title}
                     </h3>
-                    <p
-                      className="text-sm h-[4rem] text-gray-600 mt-2  overflow-hidden  line-clamp-3"
-                      dangerouslySetInnerHTML={{ __html: blog.description }}
-                    ></p>
+                    <p className="text-sm h-[4rem] text-gray-600 mt-2 overflow-hidden line-clamp-3">
+                      {blog.description && blog.description.replace(/<[^>]*>?/gm, "").replace(/&nbsp;/g, " ")}
+                    </p>
                   </div>
                   <div className="px-4 pb-4 mt-2 flex flex-col  gap-4 justify-between items-start h-full ">
                     {blog.category && (
@@ -442,7 +441,7 @@ const Blogpage = () => {
 
       {/* Main Content */}
       <div
-        className={`flex px-[4vw] pb-[2vw] mt-10 ${
+        className={`universal-container flex mt-10 ${
           isFilterOpen ? "pointer-events-none" : ""
         }`}
       >

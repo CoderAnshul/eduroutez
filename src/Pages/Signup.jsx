@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 import { useNavigate } from "react-router-dom";
@@ -62,6 +62,18 @@ const Signup = () => {
   const navigate = useNavigate();
   const apiUrl =
     import.meta.env.VITE_BASE_URL || "http://localhost:4001/api/v1";
+  const [searchParams] = useSearchParams();
+
+  // Prefill referral code from ?ref= query param (e.g. /signup?ref=ABC123)
+  useEffect(() => {
+    const refFromUrl = searchParams.get("ref");
+    if (refFromUrl) {
+      setFormData((prev) => ({
+        ...prev,
+        referal_Code: prev.referal_Code || refFromUrl,
+      }));
+    }
+  }, [searchParams]);
 
   // Fetch all countries on component mount
   useEffect(() => {

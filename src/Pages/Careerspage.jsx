@@ -28,6 +28,7 @@ const fetchImage = async (imagePath) => {
 };
 
 const Careerspage = () => {
+  const currentUserId = localStorage.getItem("userId");
   const [imageUrls, setImageUrls] = useState({});
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -295,7 +296,7 @@ const Careerspage = () => {
       </div>
 
       <div
-        className={`flex px-[4vw] pt-5 mb-14 ${
+        className={`universal-container flex pt-5 mb-14 ${
           isFilterOpen ? "pointer-events-none" : ""
         }`}
       >
@@ -352,25 +353,21 @@ const Careerspage = () => {
                 >
                   <div>
                     <div className="relative group h-48">
-                      {career.views !== "0" && (
-                        <div className="absolute h-fit p-1 w-fit px-2 rounded-full bg-white hidden top-2 right-2 group-hover:flex items-center justify-center gap-2 text-gray-600">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="black"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
+                      <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                        <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg shadow-sm flex items-center gap-1.5 text-slate-700">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                           </svg>
-                          <span className="text-black">{career.views}</span>
+                          <span className="text-[10px] font-black">{career.views || 0}</span>
                         </div>
-                      )}
+                        <div className={`bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg shadow-sm flex items-center gap-1.5 ${career.likes?.includes(currentUserId) ? 'text-red-500' : 'text-slate-700'}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={career.likes?.includes(currentUserId) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                          </svg>
+                          <span className="text-[10px] font-black">{career.likes?.length || 0}</span>
+                        </div>
+                      </div>
                       {!imageUrls[career.thumbnail] ? (
                         <div className="w-full h-full flex items-center justify-center bg-gray-100">
                           <p>Loading image...</p>

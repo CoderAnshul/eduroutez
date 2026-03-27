@@ -210,7 +210,20 @@ const Webinars = ({ instituteData }) => {
   return (
     <div className="w-full p-6 border border-gray-200 rounded-lg">
       <LoginDialog />
-      <h3 className="text-xl font-bold mb-8">Upcoming Webinars</h3>
+      <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
+        <h3 className="text-xl font-bold">Upcoming Webinars</h3>
+        <div className="bg-red-50 border border-red-100 rounded-lg px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:gap-3">
+          <p className="text-sm text-red-800 font-medium">
+            Refer friends to join our webinars and earn rewards.
+          </p>
+          <button
+            className="mt-2 sm:mt-0 inline-flex items-center justify-center px-3 py-2 text-xs font-semibold text-white bg-[#b82025] rounded hover:bg-[#971a1f]"
+            onClick={() => navigate("/dashboard/refer&earn")}
+          >
+            Refer for Webinar
+          </button>
+        </div>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
         {displayedWebinars.map((webinar) => (
           <WebinarCard key={webinar?._id || Math.random()} webinar={webinar} />

@@ -44,19 +44,12 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
             </div>
             <div className="p-4 flex flex-col justify-between h-[215px]">
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 truncate">
+                <h3 className="text-lg font-semibold text-black truncate">
                   {blog.title}
                 </h3>
-                <p
-                  className="text-sm h text-gray-600 mt-2 line-clamp-3"
-                  dangerouslySetInnerHTML={{
-                    __html: blog.description
-                      ? blog.description.split(" ").slice(0, 30).join(" ")
-                      : "",
-                  }}
-                ></p>
-                {blog.description &&
-                  blog.description.split(" ").length > 30 && <span>....</span>}
+                <p className="text-sm h text-black mt-2 line-clamp-3">
+                  {blog.description && blog.description.replace(/<[^>]*>?/gm, "").replace(/&nbsp;/g, " ")}
+                </p>
                 <p className="text-sm text-gray-600 mt-2 bg-blue-100 p-1 rounded-lg inline-block">
                   <badge>{blog.category}</badge>
                 </p>

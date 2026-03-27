@@ -15,7 +15,7 @@ const DashboardLayout = () => {
         <DashboardNav />
 
         {/* Main Content */}
-        <main className="p-3 flex-1 overflow-y-auto">
+        <main className="p-4 flex-1 overflow-y-auto universal-max-width !max-w-none">
           <Outlet />
         </main>
       </div>

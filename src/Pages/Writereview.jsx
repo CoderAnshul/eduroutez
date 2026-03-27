@@ -176,7 +176,7 @@ const Writereview = () => {
   return (
     <>
       <ToastContainer />
-      <div className="w-full  max-w-4xl  overflow-hidden mx-auto">
+      <div className="universal-max-width max-w-4xl overflow-hidden shadow-none">
         <Promotions location="REVIEW_PAGE" className="h-[90px]" />
       </div>
       <h2 className=" font-bold mt-6 text-center w-full text-[#b82025] z-30 text-3xl">

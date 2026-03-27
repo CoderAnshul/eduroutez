@@ -3,14 +3,25 @@ import axios from "axios";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
-export const getInstitutes = async (state, city,instituteName,courseTitle, page = 1, limit = 20) => {
+export const getInstitutes = async (
+  state,
+  city,
+  instituteName,
+  courseTitle,
+  page = 1,
+  limit = 20,
+  organization,
+  organisationType
+) => {
   try {
     // Construct the filters object dynamically based on the input
     const searchFields = {
       ...(state && { state }),
       ...(city && { city }),
       ...(instituteName && { instituteName }),
-      ...courseTitle && { courseTitle },
+      ...(courseTitle && { courseTitle }),
+      ...(organization && { organization }),
+      ...(organisationType && { organisationType }),
     };
     // console.log("Search Fields:", searchFields);
 
@@ -157,6 +168,22 @@ export const getCoursesById = async (idOrSlug) => {
     return response.data;
   } catch (error) {
     console.error(`Error fetching course detail:`, error);
+    throw error;
+  }
+};
+
+export const getWebinars = async ({ search = "", page = 1, limit = 10 } = {}) => {
+  try {
+    const params = {
+      search,
+      page,
+      limit,
+    };
+
+    const response = await axios.get(`${baseURL}/webinars`, { params });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching webinars:", error);
     throw error;
   }
 };
@@ -355,11 +382,31 @@ export const bestRatedInstitute = async () => {
       `${baseURL}/best-rated-institute?filters={"limit":3}&sort={"createdAt":"desc"}`
     );
     return response.data;
-
-    // return response.data;
   } catch (error) {
     console.error(`Error fetching best-rated-institute `, error);
+    throw error;
+  }
+};
 
+export const bestRatedUniversityInstitutes = async () => {
+  try {
+    const filters = {
+      isBestRatedUniversity: true,
+      organization: "University",
+    };
+
+    const response = await axios.get(`${baseURL}/institutes`, {
+      params: {
+        filters: JSON.stringify(filters),
+        page: 1,
+        limit: 20,
+      },
+    });
+
+    const institutes = response?.data?.data?.result || [];
+    return { data: institutes };
+  } catch (error) {
+    console.error(`Error fetching best-rated university institutes `, error);
     throw error;
   }
 };
@@ -443,6 +490,43 @@ export const category = async () => {
   } catch (error) {
     console.error(`Error fetching category `, error);
 
+    throw error;
+  }
+};
+
+// Streams filtered by type
+export const getCounsellorStreams = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/streams?limit=15&sort={"createdAt":"asc"}&filters={"isCounsellorStream":true}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching counsellor streams `, error);
+    throw error;
+  }
+};
+
+export const getCourseStreams = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/streams?limit=15&sort={"createdAt":"asc"}&filters={"isCourseStream":true}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching course streams `, error);
+    throw error;
+  }
+};
+
+export const getAccStreams = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/streams?limit=15&sort={"createdAt":"asc"}&filters={"isAccStream":true}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching acc streams `, error);
     throw error;
   }
 };

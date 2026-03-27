@@ -280,7 +280,7 @@ const TrendingCourses = () => {
 
   return (
     <>
-      <div className="w-full max-w-[1420px] mx-auto p-6">
+      <div className="universal-container">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
           <h1 className="text-4xl font-bold mb-4">Trending Courses</h1>
@@ -458,7 +458,7 @@ const TrendingCourses = () => {
                           <div className="p-6">
                             <div className="space-y-4">
                               {/* Short description */}
-                              <div className="text-gray-600 line-clamp-3 h-18">
+                              <div className="text-black line-clamp-3 h-18">
                                 {stripHtml(course.shortDescription || "")}
                               </div>
 

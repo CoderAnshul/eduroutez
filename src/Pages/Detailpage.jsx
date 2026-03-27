@@ -7,13 +7,19 @@ import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import BlogComponent from "../Components/BlogComponent";
 import axiosInstance from "../ApiFunctions/axios";
+import SocialShare from "../Components/SocialShare";
+import { Award, Timer, Share2, Eye, ThumbsUp } from "lucide-react";
 
 const DetailPage = () => {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
+  const [isLiked, setIsLiked] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
+  const baseURL = import.meta.env.VITE_BASE_URL;
   const { id } = useParams(); // This can be either ID or slug
   const navigate = useNavigate();
+  const currentUserId = localStorage.getItem("userId");
 
   const tabConfig = [
     { id: "overview", name: "Overview", titleRef: useRef(null) },
@@ -107,13 +113,72 @@ const DetailPage = () => {
         }
 
         setData(response.data);
+
+        // Check if user has already liked this career
+        if (response.data.likes && currentUserId) {
+          const userHasLiked = response.data.likes.includes(currentUserId);
+          setIsLiked(userHasLiked);
+        }
       } catch (error) {
         console.error("Error fetching career:", error);
       }
     };
 
     fetchCareer();
-  }, [id]);
+  }, [id, currentUserId]);
+
+  // Handle like/dislike functionality
+  const handleLike = async () => {
+    if (!currentUserId) {
+      setShowLoginPopup(true);
+      return;
+    }
+
+    try {
+      const likeValue = isLiked ? "0" : "1";
+      const careerId = data._id;
+
+      await axiosInstance.post(
+        `${baseURL}/like-dislike`,
+        {
+          id: careerId,
+          type: "career",
+          like: likeValue,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
+        }
+      );
+
+      setIsLiked(!isLiked);
+      setData((prevData) => {
+        const updatedLikes = isLiked
+          ? prevData.likes.filter((userId) => userId !== currentUserId)
+          : [...prevData.likes, currentUserId];
+
+        return {
+          ...prevData,
+          likes: updatedLikes,
+        };
+      });
+    } catch (error) {
+      console.error("Error updating like status:", error);
+    }
+  };
+
+  const handleShareClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleRedirectToLogin = () => {
+    setShowLoginPopup(false);
+    navigate("/login", { state: { returnUrl: window.location.pathname } });
+  };
 
   const scrollToSection = (tabItem) => {
     setActiveTab(tabItem.name);
@@ -176,7 +241,7 @@ const DetailPage = () => {
     <>
       <div className="min-h-screen bg-gray-50">
         {/* Banner Section */}
-        <div className="container max-w-[1300px] mx-auto px-6 py-8">
+        <div className="universal-container py-8">
           <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg mb-8">
             <img
               className="h-full w-full object-cover"
@@ -186,10 +251,43 @@ const DetailPage = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)]  rounded-xl p-4 sticky top-0 z-50">
-            <h1 className="text-2xl font-bold mb-6 px-4">
-              {data.title || "Career Details"}
-            </h1>
+          <div className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-4 sticky top-0 z-50">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6 px-4 gap-4">
+              <h1 className="text-2xl font-bold text-gray-900">
+                {data.title || "Career Details"}
+              </h1>
+              
+              <div className="flex items-center gap-4">
+                {/* Views Counter */}
+                <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 text-slate-600">
+                  <Eye className="h-5 w-5" />
+                  <span className="font-bold text-sm tracking-tight">{data.views || 0}</span>
+                </div>
+
+                {/* Like Button */}
+                <button
+                  onClick={handleLike}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all duration-300 border ${
+                    isLiked 
+                      ? "bg-red-50 text-red-600 border-red-200" 
+                      : "bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100"
+                  }`}
+                >
+                  <ThumbsUp className={`h-5 w-5 ${isLiked ? "fill-current" : ""}`} />
+                  {data.likes?.length || 0}
+                </button>
+
+                {/* Share Button */}
+                <div onClick={handleShareClick}>
+                  <SocialShare
+                    title={data.title}
+                    url={window.location.href}
+                    contentType="career"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="w-full overflow-x-auto">
               <div className="border rounded-xl border-gray-200">
                 <ul className="flex justify-evenly items-center whitespace-nowrap">
@@ -257,6 +355,39 @@ const DetailPage = () => {
         <Events />
         <ConsellingBanner />
       </div>
+      {/* Login Popup Modal */}
+      {showLoginPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform transition-all">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-black text-slate-800">Login Required</h2>
+              <button onClick={() => setShowLoginPopup(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <p className="text-slate-600 mb-8 font-medium leading-relaxed">
+              Join the Eduroutez community to like and track your favorite career paths.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={handleRedirectToLogin}
+                className="w-full bg-[#b82025] text-white font-black py-4 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100"
+              >
+                Log In Now
+              </button>
+              <button 
+                onClick={() => setShowLoginPopup(false)}
+                className="w-full bg-slate-100 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-200 transition-all"
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

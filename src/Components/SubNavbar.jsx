@@ -636,7 +636,7 @@ const SubNavbar = ({ categories }) => {
   return (
     <div>
       <div className="w-full h-auto bg-white">
-        <div className="w-full px-5 pt-2 h-full mx-auto flex justify-between">
+        <div className="universal-max-width pt-2 h-full flex justify-between">
           <div className="h-full flex flex-col justify-between">
             <div className="h-1/2 w-fit px-1 flex relative items-center justify-start gap-7">
               {categories?.map((category, index) => (

@@ -3,7 +3,7 @@ import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 
 const Forgotpassword = () => {
   return (
-    <div className="flex  h-auto">
+    <div className="flex h-screen universal-max-width">
       {/* Left Section */}
       <div className="w-1/2 bg-red-700 hidden  text-white sm:flex flex-col justify-center items-center py-10 px-10">
         <h1 className="text-4xl lg:text-[45px] lg:font-semibold font-bold mb-4 w-11/12 text-start">Welcome Back</h1>
@@ -19,7 +19,7 @@ const Forgotpassword = () => {
       </div>
 
       {/* Right Section */}
-      <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-start items-center px-10">
+      <div className='universal-container flex flex-col items-center justify-center'>
         <h1 className="text-[50px] font-bold text-start opacity-80 mb-2">Forgot password</h1>
         <p className="text-gray-500 mb-8">
           Welcome back! Please enter your details

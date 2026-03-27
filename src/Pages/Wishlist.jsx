@@ -69,7 +69,7 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="p-6 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div className="universal-container py-8 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold text-center mb-8 text-gray-800 relative">
         My Wishlist
         <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-[#b82025] rounded-full"></div>
@@ -97,7 +97,7 @@ const Wishlist = () => {
         </div>
       ) : (
         <>
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {displayedItems.map((college) => (
               <div
                 key={college._id}
