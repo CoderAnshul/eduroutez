@@ -103,11 +103,13 @@ const HighRatedCareers = ({ title = "High Rated careers", streamId, categoryId }
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
+    {/* <div className="container mx-auto px-4 py-12"> */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-2">
           <Sparkles className="text-red-500 w-6 h-6" />
-          <h2 className="text-3xl font-bold text-gray-900">{title}</h2>
+          <h2 className="text-2xl font-bold">{title}</h2>
+          {/* <h2 className="text-3xl font-bold text-gray-900">{title}</h2> */}
         </div>
         <Link to="/careerspage">
           <button className="bg-[#b82025] text-white py-2 px-4 rounded">
