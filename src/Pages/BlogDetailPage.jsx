@@ -283,9 +283,71 @@ const BlogDetailPage = () => {
     return `/blogdetailpage/${blog?._id}`;
   };
 
-  // Helper function to get actual blog ID for internal use
-  const getBlogId = (blog) => {
-    return blog?._id;
+  // Helper function to transform CKEditor oembed tags into actual media elements
+  const transformDescription = (html) => {
+    if (!html) return "";
+    
+    // Replace <oembed url="..."> with actual video player or iframe
+    return html.replace(/<oembed\s+url="([^"]+)"><\/oembed>/g, (match, url) => {
+      // Handle YouTube
+      if (url.includes("youtube.com") || url.includes("youtu.be")) {
+        let videoId = "";
+        if (url.includes("v=")) {
+          videoId = url.split("v=")[1].split("&")[0];
+        } else {
+          videoId = url.split("/").pop();
+        }
+        return `
+          <div class="relative pb-[56.25%] h-0 overflow-hidden max-w-full rounded-xl my-6 shadow-md bg-black">
+            <iframe 
+              class="absolute top-0 left-0 w-full h-full"
+              src="https://www.youtube.com/embed/${videoId}" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen
+            ></iframe>
+          </div>`;
+      }
+      
+      // Handle Vimeo
+      if (url.includes("vimeo.com")) {
+        const videoId = url.split("/").pop();
+        return `
+          <div class="relative pb-[56.25%] h-0 overflow-hidden max-w-full rounded-xl my-6 shadow-md bg-black">
+            <iframe 
+              class="absolute top-0 left-0 w-full h-full"
+              src="https://player.vimeo.com/video/${videoId}" 
+              frameborder="0" 
+              allow="autoplay; fullscreen; picture-in-picture" 
+              allowfullscreen
+            ></iframe>
+          </div>`;
+      }
+
+      // Direct video link (mp4, webm, etc.)
+      const videoUrl = url.includes("#t=") ? url : `${url}#t=0.1`;
+      return `
+        <div class="my-6 rounded-xl overflow-hidden shadow-md bg-black">
+          <video 
+            src="${videoUrl}" 
+            controls 
+            class="w-full"
+            preload="metadata"
+            playsinline
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>`;
+    });
+  };
+
+  // Helper to strip HTML tags for preview and remove media tags
+  const stripHtmlForPreview = (html) => {
+    if (!html) return "";
+    // First remove oembed markers entirely for preview
+    const noOembed = html.replace(/<figure class="media"><oembed.*?<\/oembed><\/figure>/g, "");
+    const doc = new DOMParser().parseFromString(noOembed, "text/html");
+    return doc.body.textContent || "";
   };
 
   if (error) {
@@ -306,7 +368,7 @@ const BlogDetailPage = () => {
 
   return (
     <>
-      <div className="container max-w-[1300px] mx-auto mt-10 p-4">
+      <div className="universal-container mt-10">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
           {/* Blog Header - Only one instance */}
           <div className="flex max-sm:flex-col max-sm:gap-4 justify-between items-center p-6">
@@ -441,8 +503,8 @@ const BlogDetailPage = () => {
                       Overview
                     </h3>
                     <div
-                      className="text-black"
-                      dangerouslySetInnerHTML={{ __html: data.description }}
+                      className="text-black blog-content-wrapper"
+                      dangerouslySetInnerHTML={{ __html: transformDescription(data.description) }}
                     />
                   </div>
 
@@ -468,12 +530,9 @@ const BlogDetailPage = () => {
                                     ? `${blog.title.slice(0, 30)}...`
                                     : blog.title}
                                 </h4>
-                                <p
-                                  className="text-sm text-black line-clamp-2"
-                                  dangerouslySetInnerHTML={{
-                                    __html: blog.description,
-                                  }}
-                                ></p>
+                                <p className="text-sm text-black line-clamp-2">
+                                  {stripHtmlForPreview(blog.description)}
+                                </p>
                                 <span className="text-xs text-black">
                                   {new Date(
                                     blog.createdAt

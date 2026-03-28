@@ -119,7 +119,7 @@ const Login = () => {
 
   // Rest of the component remains the same...
   return (
-    <div className="flex h-auto">
+    <div className="flex h-screen ">
       <ToastContainer />
       {/* Left Section */}
       <div className="w-1/2 bg-red-700 hidden text-white sm:flex flex-col justify-center items-center px-10">

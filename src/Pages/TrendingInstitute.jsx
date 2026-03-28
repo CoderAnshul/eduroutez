@@ -10,6 +10,7 @@ import BlogComponent from "../Components/BlogComponent";
 import HighRatedCareers from "../Components/HighRatedCareers";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
+import Pagination from "../Components/Pagination";
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -133,7 +134,7 @@ const TrendingInstitute = () => {
           </p>
         </div>
 
-        <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
+        <div className="universal-container">
           <div className="flex items-center justify-between mb-10">
             <h3 className="text-xl font-bold">Trending Institutes</h3>
             <p className="text-gray-600">
@@ -186,58 +187,11 @@ const TrendingInstitute = () => {
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="pagination flex justify-center mt-10">
-              <ul className="flex space-x-2">
-                <li>
-                  <button
-                    onClick={() =>
-                      paginate(currentPage > 1 ? currentPage - 1 : 1)
-                    }
-                    disabled={currentPage === 1}
-                    className={`px-4 py-2 rounded ${
-                      currentPage === 1
-                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-[#b82025] text-white hover:bg-red-700"
-                    }`}
-                  >
-                    Previous
-                  </button>
-                </li>
-                {[...Array(totalPages).keys()].map((number) => (
-                  <li key={number + 1}>
-                    <button
-                      onClick={() => paginate(number + 1)}
-                      className={`px-4 py-2 rounded ${
-                        currentPage === number + 1
-                          ? "bg-[#b82025] text-white"
-                          : "bg-gray-200 hover:bg-gray-300"
-                      }`}
-                    >
-                      {number + 1}
-                    </button>
-                  </li>
-                ))}
-                <li>
-                  <button
-                    onClick={() =>
-                      paginate(
-                        currentPage < totalPages ? currentPage + 1 : totalPages
-                      )
-                    }
-                    disabled={currentPage === totalPages}
-                    className={`px-4 py-2 rounded ${
-                      currentPage === totalPages
-                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-[#b82025] text-white hover:bg-red-700"
-                    }`}
-                  >
-                    Next
-                  </button>
-                </li>
-              </ul>
-            </div>
-          )}
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={paginate}
+          />
         </div>
 
         <BlogComponent />

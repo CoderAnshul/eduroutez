@@ -369,7 +369,7 @@ const Coursesinfopage = () => {
 
   return (
     <>
-      <div className="container max-w-[1300px] mx-auto px-8 py-6 flex flex-col items-start bg-gray-50">
+      <div className="universal-container py-6 bg-gray-50 flex flex-col items-start">
         {/* Course Title */}
         <div className="flex justify-between items-center w-full">
           <CoursesName content={content.courseTitle || "Untitled Course"} />

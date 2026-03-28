@@ -140,7 +140,7 @@ const Navbar = () => {
     <>
       {/* Main Navbar - Fixed */}
       <nav className="fixed top-0 left-0 right-0 z-[999] bg-white ">
-        <div className="h-16 w-full p-5 flex items-center justify-between">
+        <div className="universal-max-width h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button onClick={toggleMenu} className="lg:hidden">
               <img className="h-6" src={menubar} alt="open menu" />

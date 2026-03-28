@@ -9,6 +9,7 @@ import ConsellingBanner from "../Components/ConsellingBanner";
 import PopularCourses from "../Components/PopularCourses";
 import HighRatedCareers from "../Components/HighRatedCareers";
 import SocialShare from "../Components/SocialShare";
+import Pagination from "../Components/Pagination";
 
 // Create a module-level object to store the blog ID mapping
 const blogIdMapStore = {};
@@ -260,10 +261,9 @@ const Blogpage = () => {
                     <h3 className="text-lg  h-[4rem] font-semibold text-gray-800 line-clamp-2">
                       {blog.title}
                     </h3>
-                    <p
-                      className="text-sm h-[4rem] text-gray-600 mt-2  overflow-hidden  line-clamp-3"
-                      dangerouslySetInnerHTML={{ __html: blog.description }}
-                    ></p>
+                    <p className="text-sm h-[4rem] text-gray-600 mt-2 overflow-hidden line-clamp-3">
+                      {blog.description && blog.description.replace(/<[^>]*>?/gm, "").replace(/&nbsp;/g, " ")}
+                    </p>
                   </div>
                   <div className="px-4 pb-4 mt-2 flex flex-col  gap-4 justify-between items-start h-full ">
                     {blog.category && (
@@ -301,85 +301,6 @@ const Blogpage = () => {
     );
   };
 
-  const Pagination = () => {
-    const pageNumbers = [];
-    const maxVisiblePages = 5;
-
-    let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i);
-    }
-
-    return (
-      <div className="flex items-center justify-center space-x-2 mt-8">
-        <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1}
-          className={`px-3 py-1 rounded-md ${
-            page === 1
-              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-[#b82025] text-white hover:bg-red-700"
-          }`}
-        >
-          Previous
-        </button>
-
-        {startPage > 1 && (
-          <>
-            <button
-              onClick={() => handlePageChange(1)}
-              className="px-3 py-1 rounded-md hover:bg-gray-200"
-            >
-              1
-            </button>
-            {startPage > 2 && <span>...</span>}
-          </>
-        )}
-
-        {pageNumbers.slice(0,3).map((number) => (
-          <button
-            key={number}
-            onClick={() => handlePageChange(number)}
-            className={`px-3 py-1 rounded-md ${
-              page === number ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
-            }`}
-          >
-            {number}
-          </button>
-        ))}
-
-        {endPage < totalPages && (
-          <>
-            {endPage < totalPages - 1 && <span>...</span>}
-            <button
-              onClick={() => handlePageChange(totalPages)}
-              className="px-3 py-1 rounded-md hover:bg-gray-200"
-            >
-              {totalPages}
-            </button>
-          </>
-        )}
-
-        <button
-          onClick={() => handlePageChange(page + 1)}
-          disabled={page === totalPages}
-          className={`px-3 py-1 rounded-md ${
-            page === totalPages
-              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-[#b82025] text-white hover:bg-red-700"
-          }`}
-        >
-          Next
-        </button>
-      </div>
-    );
-  };
 
   return (
     <>
@@ -442,7 +363,7 @@ const Blogpage = () => {
 
       {/* Main Content */}
       <div
-        className={`flex px-[4vw] pb-[2vw] mt-10 ${
+        className={`universal-container flex mt-10 ${
           isFilterOpen ? "pointer-events-none" : ""
         }`}
       >
@@ -493,7 +414,11 @@ const Blogpage = () => {
             ))}
           </div>
           <BlogandCareerBoxWithSlugs blogData={currentItems || []} />
-          <Pagination />
+          <Pagination 
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
 

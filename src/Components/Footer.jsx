@@ -31,7 +31,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-black lg:whitespace-nowrap text-white py-8 px-4">
-      <div className="px-[4vw] mx-auto w-full max-w-[1300px]">
+      <div className="universal-max-width">
         {/* Using grid for consistent column layout */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Trending Careers */}

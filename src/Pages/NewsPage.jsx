@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
 import { Link } from "react-router-dom";
+import Pagination from "../Components/Pagination";
 
 export default function NewsPage() {
   const [latestNews, setLatestNews] = useState([]);
@@ -87,7 +88,7 @@ export default function NewsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="universal-container py-8">
       <div className="mb-8 space-y-4">
         <h1 className="text-3xl font-bold">Latest News</h1>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -155,48 +156,11 @@ export default function NewsPage() {
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="mt-8 flex justify-center space-x-2">
-              <button
-                className={`rounded-lg border px-4 py-2 text-sm transition-colors
-                  ${
-                    page === 1
-                      ? "cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400"
-                      : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-                  }`}
-                disabled={page === 1}
-                onClick={() => setPage(page - 1)}
-              >
-                Previous
-              </button>
-              {Array.from({ length: totalPages }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setPage(index + 1)}
-                  className={`rounded-lg px-4 py-2 text-sm transition-colors
-                    ${
-                      page === index + 1
-                        ? "bg-[#b82025] text-white"
-                        : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-                    }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
-              <button
-                className={`rounded-lg border px-4 py-2 text-sm transition-colors
-                  ${
-                    page === totalPages
-                      ? "cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400"
-                      : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-                  }`}
-                disabled={page === totalPages}
-                onClick={() => setPage(page + 1)}
-              >
-                Next
-              </button>
-            </div>
-          )}
+          <Pagination 
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
         </>
       )}
     </div>

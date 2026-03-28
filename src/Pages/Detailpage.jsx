@@ -299,7 +299,7 @@ const DetailPage = () => {
     <>
       <div className="min-h-screen bg-gray-50">
         {/* Banner Section */}
-        <div className="container max-w-[1300px] mx-auto px-6 py-8">
+        <div className="universal-container py-8">
           <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg mb-8">
             {/* Cover image slider if available, else fallback to single image */}
             {Array.isArray(data.coverImages) && data.coverImages.length > 0 ? (

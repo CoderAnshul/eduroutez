@@ -118,7 +118,7 @@ const TrendingStreams = () => {
       <div className="flex items-center justify-between mb-10">
         <div className="flex items-center gap-2">
           <Sparkles className="text-red-500 w-6 h-6" />
-          <h3 className="text-xl font-bold">Popular Courses</h3>
+          <h3 className="text-2xl font-bold">Popular Courses</h3>
         </div>
         <Link to="/trending-stream">
           <button className="bg-[#b82025] hover:bg-[#b82025] text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2 transform hover:scale-105 shadow-md">

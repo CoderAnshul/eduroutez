@@ -126,7 +126,7 @@ const Counselingpage = () => {
   return (
     <>
       <PageBanner pageName="Counseling" currectPage="Counseling" />
-      <div className="px-[4vw] py-[2vw] flex flex-col items-center w-full">
+      <div className="universal-container py-[2vw] flex flex-col items-center">
         <div className="md:p-6 w-full">
           {/* Search Bar */}
           <div className="mb-6">

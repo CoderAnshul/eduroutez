@@ -7,7 +7,7 @@ const Contactuspage = () => {
   return (
     <>
       <PageBanner pageName="Get In Touch" currectPage="Contact us" />
-      <div className="px-[4vw] py-[2vw] flex flex-col items-start">
+      <div className="universal-container py-[2vw] flex flex-col items-start">
         <div className="flex justify-center w-full items-center flex-wrap py-10 bg-white">
           {/* Our Location */}
           <div className="flex flex-1 flex-col items-center justify-center bg-[#FFEFEE] w-1/3 p-6 h-44  min-w-[300px] rounded-md">

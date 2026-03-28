@@ -373,8 +373,8 @@ const ProfilePage = () => {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="p-2 md:p-2 rounded-lg">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-8">
+    <div className="universal-container py-8">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
         <h1 className="text-2xl font-semibold mb-6">My Profile</h1>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

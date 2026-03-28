@@ -41,22 +41,22 @@ const Homepage = () => {
     <>
       <Banner />
 
-      <div className="p-4 flex flex-col items-center">
+      <div className="universal-container flex flex-col items-center">
 
         <Counselling />
       </div>
       {/* Using standard Tailwind classes for width and height instead of arbitrary values */}
-      <div className="w-full max-w-fit h-fit mx-auto">
+      <div className="universal-max-width h-fit py-4">
         <Promotions location="HOME_PAGE" className="h-[90px]" />
       </div>
-      <div className="p-4 flex flex-col items-center">
+      <div className="universal-container flex flex-col items-center">
         <PopularCourses />
       </div>
-      <div className="p-4 flex flex-col items-center">
+      <div className="universal-container flex flex-col items-center">
         <TrendingCourses />
       </div>
       <PopularCategories />
-      <div className='p-[4vw] flex flex-col items-center' >
+      <div className='universal-container flex flex-col items-center' >
         <BestRated />
         <BestRatedUniversity />
         <HighRatedCareers />
@@ -64,7 +64,7 @@ const Homepage = () => {
       </div>
       <Instructor />
       <BecomeCounselorBanner />
-      <div className='p-[4vw] flex flex-col items-center' >
+      <div className='universal-container flex flex-col items-center' >
         <BlogComponent />
       </div>
       <Reviews />

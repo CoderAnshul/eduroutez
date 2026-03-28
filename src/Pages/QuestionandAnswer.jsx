@@ -255,7 +255,7 @@ const QuestionandAnswer = () => {
 
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 p-4 relative">
+    <div className="universal-container flex flex-col lg:flex-row gap-4 relative">
       {/* Toggle Button for Sidebar (Small Screens) */}
       <div className="block lg:hidden mb-4">
         <button

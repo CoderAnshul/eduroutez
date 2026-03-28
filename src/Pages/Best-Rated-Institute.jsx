@@ -99,7 +99,7 @@ const BestRatedInstitute = () => {
   // Loading state with skeleton
   if (isLoading) {
     return (
-      <div className="container mx-auto px-2 sm:px-4 py-8">
+      <div className="universal-container py-8">
         <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
           <h1 className="text-4xl font-bold mb-4">Best Rated Institutes</h1>
           <p className="text-xl">Discover top-rated educational institutions</p>
@@ -133,7 +133,7 @@ const BestRatedInstitute = () => {
   }
 
   return (
-    <div className="container mx-auto px-2 sm:px-4 py-8">
+    <div className="universal-container py-8">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
         <h1 className="text-4xl font-bold mb-4">Best Rated Institutes</h1>
