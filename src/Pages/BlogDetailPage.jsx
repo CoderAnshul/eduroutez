@@ -1,4 +1,63 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useRef as useSliderRef } from "react";
+// Simple slider for cover images
+const CoverImageSlider = ({ images, baseUrl }) => {
+  const [current, setCurrent] = useState(0);
+  const sliderInterval = useRef(null);
+  const numImages = images.length;
+
+  useEffect(() => {
+    // Autoplay every 3 seconds
+    sliderInterval.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % numImages);
+    }, 3000);
+    return () => clearInterval(sliderInterval.current);
+  }, [numImages]);
+
+  const goTo = (idx) => setCurrent(idx);
+  const prev = () => setCurrent((prev) => (prev - 1 + numImages) % numImages);
+  const next = () => setCurrent((prev) => (prev + 1) % numImages);
+
+  if (!images || images.length === 0) return null;
+
+  return (
+    <div className="relative w-full h-80 flex items-center justify-center bg-gray-100">
+      <button
+        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white rounded-full p-2 shadow"
+        onClick={prev}
+        aria-label="Previous image"
+        type="button"
+      >
+        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <img
+        src={`${baseUrl}/${images[current]}`}
+        alt={`Cover ${current + 1}`}
+        className="w-full h-80 object-cover rounded"
+        style={{ transition: 'opacity 0.5s' }}
+      />
+      <button
+        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white rounded-full p-2 shadow"
+        onClick={next}
+        aria-label="Next image"
+        type="button"
+      >
+        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+        {images.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => goTo(idx)}
+            className={`w-2.5 h-2.5 rounded-full ${idx === current ? 'bg-[#b82025]' : 'bg-gray-300'} border border-white`}
+            aria-label={`Go to image ${idx + 1}`}
+            type="button"
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 import { blogById, getRecentBlogs } from "../ApiFunctions/api";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import HighRatedCareers from "../Components/HighRatedCareers";
@@ -320,8 +379,10 @@ const BlogDetailPage = () => {
             </div>
           </div>
 
-          {/* Image display with title overlay */}
-          {imageUrl && (
+          {/* Cover image slider if available, else fallback to single image */}
+          {Array.isArray(data.coverImages) && data.coverImages.length > 0 ? (
+            <CoverImageSlider images={data.coverImages} baseUrl={Images} />
+          ) : imageUrl ? (
             <div className="relative">
               <img
                 className="w-full h-80 object-cover"
@@ -329,7 +390,7 @@ const BlogDetailPage = () => {
                 alt={data.title || "Blog Image"}
               />
             </div>
-          )}
+          ) : null}
 
           <div className="p-6 space-y-6 ">
             {data.metaImage && data.metaTitle && (
