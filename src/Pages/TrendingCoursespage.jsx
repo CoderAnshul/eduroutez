@@ -20,6 +20,7 @@ import BlogComponent from "../Components/BlogComponent";
 import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
+import Pagination from "../Components/Pagination";
 
 // Function to fetch trending courses
 const baseURL = import.meta.env.VITE_BASE_URL;
@@ -521,55 +522,14 @@ const TrendingCourses = () => {
                 </div>
 
                 {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="mt-12 flex justify-center">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={goToPrevPage}
-                        disabled={currentPage === 1}
-                        className={`p-2 rounded-md ${
-                          currentPage === 1
-                            ? "text-gray-400 cursor-not-allowed"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        <ChevronLeft size={20} />
-                      </button>
-
-                      {/* Page numbers */}
-                      <div className="flex space-x-1">
-                        {[...Array(totalPages)].map((_, index) => (
-                          <button
-                            key={index}
-                            onClick={() => paginate(index + 1)}
-                            className={`w-8 h-8 rounded-md text-sm ${
-                              currentPage === index + 1
-                                ? "bg-[#b82025] text-white"
-                                : "text-gray-700 hover:bg-gray-100"
-                            }`}
-                          >
-                            {index + 1}
-                          </button>
-                        ))}
-                      </div>
-
-                      <button
-                        onClick={goToNextPage}
-                        disabled={currentPage === totalPages}
-                        className={`p-2 rounded-md ${
-                          currentPage === totalPages
-                            ? "text-gray-400 cursor-not-allowed"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        <ChevronRight size={20} />
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={paginate}
+                />
 
                 {/* Pagination info */}
-                <div className="mt-4 text-center text-sm text-gray-500">
+                <div className="mt-4 text-center text-sm text-gray-500 mb-10">
                   {totalPages > 0
                     ? `Page ${currentPage} of ${totalPages} (${totalCourses} courses)`
                     : `${totalCourses} courses`}

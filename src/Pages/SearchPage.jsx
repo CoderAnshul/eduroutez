@@ -4,6 +4,7 @@ import ExpandedBox from "../Ui components/ExpandedBox";
 import SearchResultBox from "../Ui components/SearchResultBox";
 import Filter from "../Ui components/Filter";
 import BestRated from "../Components/BestRated";
+import Pagination from "../Components/Pagination";
 import Events from "../Components/Events";
 import axios from "axios";
 import BlogComponent from "../Components/BlogComponent";
@@ -13,6 +14,7 @@ import { getInstitutes } from "../ApiFunctions/api";
 import { useSelector } from "react-redux";
 import { useSearchParams, useLocation } from "react-router-dom";
 import Promotions from "./CoursePromotions";
+import ConsellingBanner from "../Components/ConsellingBanner";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -793,104 +795,12 @@ const SearchPage = () => {
     const totalPages = Math.ceil(totalDocuments / itemsPerPage);
     if (totalPages <= 1) return null;
 
-    // Logic to show a reasonable number of page buttons
-    const maxButtonsToShow = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
-    let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-
-    // Adjust if we're near the end
-    if (endPage - startPage + 1 < maxButtonsToShow) {
-      startPage = Math.max(1, endPage - maxButtonsToShow + 1);
-    }
-
-    const pageButtons = [];
-
-    // Previous button
-    if (currentPage > 1) {
-      pageButtons.push(
-        <button
-          key="prev"
-          onClick={() => handlePageChange(currentPage - 1)}
-          className="px-4 py-2 bg-gray-200 mx-1"
-        >
-          &laquo;
-        </button>
-      );
-    }
-
-    // First page button if not starting from page 1
-    if (startPage > 1) {
-      pageButtons.push(
-        <button
-          key="1"
-          onClick={() => handlePageChange(1)}
-          className="px-4 py-2 bg-gray-200 mx-1"
-        >
-          1
-        </button>
-      );
-
-      // Show ellipsis if there's a gap
-      if (startPage > 2) {
-        pageButtons.push(
-          <span key="startEllipsis" className="px-2">...</span>
-        );
-      }
-    }
-
-    // Page number buttons
-    for (let i = startPage; i <= endPage; i++) {
-      pageButtons.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`px-4 py-2 mx-1 ${currentPage === i
-            ? "bg-[#b82025] text-white"
-            : "bg-gray-200"
-            }`}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    // Show ellipsis if there's a gap before the last page
-    if (endPage < totalPages - 1) {
-      pageButtons.push(
-        <span key="endEllipsis" className="px-2">...</span>
-      );
-    }
-
-    // Last page button if not ending at the last page
-    if (endPage < totalPages) {
-      pageButtons.push(
-        <button
-          key={totalPages}
-          onClick={() => handlePageChange(totalPages)}
-          className="px-4 py-2 bg-gray-200 mx-1"
-        >
-          {totalPages}
-        </button>
-      );
-    }
-
-    // Next button
-    if (currentPage < totalPages) {
-      pageButtons.push(
-        <button
-          key="next"
-          onClick={() => handlePageChange(currentPage + 1)}
-          className="px-4 py-2 bg-gray-200 mx-1"
-        >
-          &raquo;
-        </button>
-      );
-    }
-
     return (
-      <div className="pagination flex flex-wrap justify-center my-6">
-        {pageButtons}
-      </div>
+      <Pagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     );
   };
 
@@ -1124,7 +1034,11 @@ const SearchPage = () => {
       <BlogComponent />
       <HighRatedCareers />
       <BestRated />
-      <Events />
+      {/* <Events /> */}
+      <div className="flex gap-2 flex-col sm:flex-row items-center">
+        <Events />
+        <ConsellingBanner />
+      </div>
     </>
   );
 };
