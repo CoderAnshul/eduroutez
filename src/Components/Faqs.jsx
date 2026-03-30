@@ -101,9 +101,14 @@ const Faqs = ({ instituteData }) => {
         </div>
         <button
           className="bg-[#b82025] text-sm font-medium px-4 py-3 rounded-lg text-white"
-          onClick={() =>
-            (window.location.href = `/questionandAnswer/${encodeURIComponent(instituteData?.data?.instituteName)}`)
-          }
+          onClick={() => {
+            const slug = instituteData?.data?.slug;
+            if (slug) {
+              window.location.href = `/questionandAnswer/${encodeURIComponent(slug)}`;
+            } else {
+              window.location.href = `/questionandAnswer/${encodeURIComponent(instituteData?.data?.instituteName)}`;
+            }
+          }}
         >
           Ask our experts
         </button>

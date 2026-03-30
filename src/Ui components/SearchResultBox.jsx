@@ -184,7 +184,7 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
         <div className="w-full md:w-3/4 flex flex-col">
           <div className="flex justify-between items-center">
             {/* Make title clickable */}
-            <Link to={instituteUrl} className="text-xl font-medium hover:underline" style={{ cursor: 'pointer' }}>
+            <Link to={instituteUrl} className="text-xl font-medium hover:no-underline hover:text-red-600" style={{ cursor: 'pointer' }}>
               {institute.instituteName}
             </Link>
           </div>
@@ -284,13 +284,13 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
       <div className="flex space-x-4 justify-center md:justify-between gap-4 items-center flex-wrap">
         <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
           <div className="space-x-4">
-            <Link to={`${instituteUrl}`} className="hover:underline">
+            <Link to={`${instituteUrl}`} className="hover:no-underline hover:text-red-600">
               Fees and Courses
             </Link>
-            <Link to={`${instituteUrl}`} className="hover:underline">
+            <Link to={`${instituteUrl}`} className="hover:no-underline hover:text-red-600">
               Admission
             </Link>
-            <Link to={`${instituteUrl}`} className="hover:underline">
+            <Link to={`${instituteUrl}`} className="hover:no-underline hover:text-red-600">
               Placement
             </Link>
           </div>
