@@ -587,7 +587,7 @@ const MobileNavbar = ({ categories }) => {
 
   return (
     <div className="w-full bg-gray-100 h-[450px] overflow-y-auto">
-      <ul className="space-y-1 ml-0">
+      <ul className="space-y-1 ml-0 list-none">
         {categories?.map((category, index) => (
           <li key={index} className="border-b border-gray-200">
             <div
@@ -617,7 +617,7 @@ const MobileNavbar = ({ categories }) => {
                   category.label !== "Latest Updates" && 
                   category.label !== "Top Colleges" && 
                   category.label !== "More" && (
-                  <ul className="bg-gray-50">
+                  <ul className="bg-gray-50 list-none">
                     {category.sidebarItems.map((item) => (
                       <li key={item.id}>
                         <div

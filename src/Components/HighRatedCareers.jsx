@@ -118,13 +118,13 @@ const HighRatedCareers = ({ title = "High Rated careers", streamId, categoryId }
         </Link>
       </div>
 
-      <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-center gap-6">
+      <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-stretch gap-6">
         {memoizedContent && memoizedContent.length > 0 ? (
           memoizedContent.map((box, index) => (
             <Link
               to={`/detailpage/${box.slug}`}
               key={index}
-              className="box lg:max-w-[450px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg relative"
+              className="box w-full lg:max-w-[450px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg relative"
             >
               <div className="imageContainer">
                 <img

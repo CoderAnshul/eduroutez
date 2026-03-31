@@ -106,13 +106,16 @@ a {
   align-items: center;
 }
 .box {
+  display: flex;
+  flex-direction: column;
   min-height: 450px;
-  max-height: 540px;
-  flex: 1;
-  min-width: 240px;
+  /* Removed max-height to allow stretching */
+  flex: 1 1 340px;
+  min-width: 280px;
   max-width: 500px;
   border-radius: 10px;
   overflow: hidden;
+  background: white;
 }
 
 .imageContainer {
@@ -126,11 +129,12 @@ a {
 }
 .textContainer {
   display: flex;
-  padding: 10px;
+  padding: 15px;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
   text-align: center;
+  flex-grow: 1;
 }
 
 /* .gradient-background {

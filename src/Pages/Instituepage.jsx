@@ -492,7 +492,7 @@ const Instituepage = () => {
               )}
             </div>
           </div>
-          <div className="w-[300px] flex-shrink-0 pt-4">
+          <div className="hidden lg:block w-[300px] flex-shrink-0 pt-4">
             <div className="sticky top-32 z-10 space-y-4">
               {/* Career Guidance Webinar Button */}
               <Link to="/counselor" className="block group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
@@ -504,7 +504,7 @@ const Instituepage = () => {
                 <div className="absolute -left-12 -bottom-12 h-32 w-32 rounded-full bg-black/10 blur-2xl" />
 
                 {/* Content Container */}
-                <div className="relative p-7 flex flex-col h-full justify-between z-10">
+                <div className=" hidden lg:block relative p-7 flex flex-col h-full justify-between z-10">
                   <div className="flex justify-between items-start mb-8">
                     {/* Glass Icon Container */}
                     <div className="h-12 w-12 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-inner group-hover:bg-white/20 transition-colors duration-300">

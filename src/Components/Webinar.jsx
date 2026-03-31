@@ -56,7 +56,7 @@ const Webinars = ({ instituteData }) => {
   // If loading, error, or no webinars, return early
   if (loading) {
     return (
-      <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
+      <div className="w-full p-0 md:p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
         <p className="text-gray-600">Loading webinars...</p>
       </div>
     );
@@ -64,7 +64,7 @@ const Webinars = ({ instituteData }) => {
 
   if (error) {
     return (
-      <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
+      <div className="w-full p-0 md:p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
         <p className="text-red-500">Error: {error}</p>
       </div>
     );
@@ -208,7 +208,7 @@ const Webinars = ({ instituteData }) => {
   };
 
   return (
-    <div className="w-full p-6 border border-gray-200 rounded-lg">
+    <div className=" w-full p-0 md:p-6 border border-gray-200 rounded-lg">
       <LoginDialog />
       <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-xl font-bold">Upcoming Webinars</h3>

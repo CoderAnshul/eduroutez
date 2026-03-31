@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import PasswordStrength from "../Components/PasswordStrength";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -256,7 +256,6 @@ const BecomeCounselor = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen universal-max-width">
-      <ToastContainer />
 
       {/* OTP Modal */}
       {showOtpModal && (

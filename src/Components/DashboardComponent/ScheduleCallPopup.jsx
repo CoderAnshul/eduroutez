@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
 const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
@@ -349,7 +349,6 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
         </div>
       )}
 
-      <ToastContainer position="top-right" autoClose={5000} />
     </>
   );
 };

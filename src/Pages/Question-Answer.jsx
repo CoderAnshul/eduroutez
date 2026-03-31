@@ -14,7 +14,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import Promotions from "./CoursePromotions";
 
 const Card = ({ children, className = "" }) => (
@@ -324,7 +324,6 @@ const CombinedQuestionsPage = () => {
 
   return (
     <div className="universal-container min-h-screen h-fit">
-      <ToastContainer />
       <div className="mb-4">
         <button
           onClick={() => window.history.back()}

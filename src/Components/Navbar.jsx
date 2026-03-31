@@ -325,7 +325,7 @@ const Navbar = () => {
           </button>
         </div>
 
-        <ul className="mt-12 ml-0 space-y-4">
+        <ul className="mt-12 ml-0 space-y-4 list-none">
           <li>
             <Link className="text-black" to="/" onClick={toggleMenu}>
               Home
