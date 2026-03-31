@@ -419,10 +419,7 @@ const Signup = () => {
     }
     if (
       !formData.name ||
-      !formData.role ||
-      !formData.country ||
-      !formData.state ||
-      !formData.city
+      !formData.role
     ) {
       toast.error("Please fill all required fields");
       return false;
@@ -564,13 +561,12 @@ const Signup = () => {
 
           {/* Country Selection */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Country *</label>
+            <label className="block text-sm font-medium mb-1">Country</label>
             <select
               id="country"
               className="w-full px-4 py-2 border rounded-lg"
               value={formData.country}
               onChange={handleChange}
-              required
             >
               <option value="">Select a Country</option>
               {countries.map((country) => (
@@ -583,13 +579,12 @@ const Signup = () => {
 
           {/* State Selection */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">State *</label>
+            <label className="block text-sm font-medium mb-1">State</label>
             <select
               id="state"
               className="w-full px-4 py-2 border rounded-lg"
               value={formData.state}
               onChange={handleChange}
-              required
               disabled={!formData.country}
             >
               <option value="">Select a State</option>
@@ -603,13 +598,12 @@ const Signup = () => {
 
           {/* City Selection */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">City *</label>
+            <label className="block text-sm font-medium mb-1">City</label>
             <select
               id="city"
               className="w-full px-4 py-2 border rounded-lg"
               value={formData.city}
               onChange={handleChange}
-              required
               disabled={!formData.state}
             >
               <option value="">Select a City</option>

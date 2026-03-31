@@ -180,7 +180,7 @@ const News = ({ instituteData, showNews = true }) => {
 
   if (loading) {
     return (
-      <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
+      <div className="w-full p-0 md:p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
         <p className="text-gray-600">Loading news...</p>
       </div>
     );
@@ -188,7 +188,7 @@ const News = ({ instituteData, showNews = true }) => {
 
   if (error) {
     return (
-      <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
+      <div className="w-full p-0 md:p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
         <p className="text-red-500">Error: {error}</p>
       </div>
     );
@@ -196,14 +196,14 @@ const News = ({ instituteData, showNews = true }) => {
 
   if (!displayedNews.length) {
     return (
-      <div className="w-full p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
+      <div className="w-full p-0 md:p-6 bg-gray-50 flex justify-center items-center min-h-[200px]">
         <p className="text-gray-600">No news articles available.</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full p-6 bg-gray-50">
+    <div className="w-full p-0 md:p-6 bg-gray-50">
       <h3 className="text-xl font-bold mb-3">Latest News</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {displayedNews.map((news) => (

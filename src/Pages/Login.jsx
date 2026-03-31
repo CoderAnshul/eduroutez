@@ -4,7 +4,7 @@ import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
@@ -120,7 +120,6 @@ const Login = () => {
   // Rest of the component remains the same...
   return (
     <div className="flex h-screen ">
-      <ToastContainer />
       {/* Left Section */}
       <div className="w-1/2 bg-red-700 hidden text-white sm:flex flex-col justify-center items-center px-10">
         <h1 className="text-4xl lg:text-[45px] lg:font-semibold font-bold mb-4 w-11/12 text-start">
