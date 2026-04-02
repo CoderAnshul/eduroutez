@@ -9,9 +9,16 @@ import google from "../assets/Images/google.png";
 import { toast } from "react-toastify";
 import PasswordStrength from "../Components/PasswordStrength";
 import { Eye, EyeOff } from "lucide-react";
+import GuidanceTestPopup from "../Components/GuidanceTestPopup";
+import ScheduleTestPopup from "../Components/ScheduleTestPopup";
+import ScheduleConfirmationPopup from "../Components/ScheduleConfirmationPopup";
 
 const Signup = () => {
   const [showOtpDialog, setShowOtpDialog] = useState(false);
+  // Popups for counsellor flow
+  const [showGuidancePopup, setShowGuidancePopup] = useState(false);
+  const [showSchedulePopup, setShowSchedulePopup] = useState(false);
+  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const otpInputRefs = useRef([]);
   const [timer, setTimer] = useState(90); // 90-second countdown
@@ -316,6 +323,7 @@ const Signup = () => {
     onSuccess: (data) => {
       setIsLoading(false);
       toast.success("Registered successfully");
+      setShowOtpDialog(false); // Close OTP dialog after successful verification
       localStorage.setItem("accessToken", data.data.accessToken);
       localStorage.setItem("userId", data?.data?.user?._id);
       localStorage.setItem("role", data?.data?.user?.role);
@@ -323,6 +331,8 @@ const Signup = () => {
 
       if (data?.data?.user?.role === "student") {
         navigate("/");
+      } else if (data?.data?.user?.role === "counsellor") {
+        setShowGuidancePopup(true);
       } else {
         window.location.href = "https://admin.eduroutez.com/";
       }
@@ -494,6 +504,43 @@ const Signup = () => {
       : role === "counsellor"
         ? "Counsellor Name"
         : "Name";
+
+  // Handler for schedule later button in GuidanceTestPopup
+  const handleScheduleLater = () => {
+    setShowGuidancePopup(false);
+    setShowSchedulePopup(true);
+  };
+
+  // Handler for payment button in GuidanceTestPopup
+  const handleGuidancePay = () => {
+    // Redirect to the correct payment page for counselor test
+    window.location.href = "/counselor-test/payment";
+  };
+
+  // Handler for scheduling test
+  const handleScheduleTest = async (date, time) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      await axiosInstance.post(
+        "/counselor/schedule-test",
+        {
+          date: date,
+          slot: time,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      toast.success("Test scheduled successfully!");
+    } catch (err) {
+      toast.error("Failed to schedule test");
+    }
+    setShowSchedulePopup(false);
+    setShowConfirmationPopup(true);
+  };
 
   return (
     <div className="flex h-screen">
@@ -848,8 +895,25 @@ const Signup = () => {
           </div>
         </div>
       )}
-    </div>
+    {/* Guidance Test and Scheduling Popups for Counsellor */}
+    <GuidanceTestPopup
+      open={showGuidancePopup}
+      onClose={handleScheduleLater}
+      onPay={handleGuidancePay}
+    />
+    <ScheduleTestPopup
+      open={showSchedulePopup}
+      onClose={() => setShowSchedulePopup(false)}
+      onSchedule={handleScheduleTest}
+    />
+    <ScheduleConfirmationPopup
+      open={showConfirmationPopup}
+      onClose={() => setShowConfirmationPopup(false)}
+    />
+  </div>
   );
+  // Handler for schedule later button in GuidanceTestPopup
+  // (already defined above the return statement)
 };
 
 export default Signup;

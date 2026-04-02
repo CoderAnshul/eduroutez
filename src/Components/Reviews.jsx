@@ -6,7 +6,6 @@ import counsellor3 from "../assets/Images/Counsellor3.jpg";
 import counsellor4 from "../assets/Images/Counsellor4.jpg";
 import counsellor5 from "../assets/Images/Counsellor5.jpg";
 import aditi from "../assets/Images/AditiJoshi.png";
-import DurviKaskar from "../assets/Images/DurviKaskar.png";
 import RohanPatil from "../assets/Images/RohanPatil.png";
 import PrinceMishra from "../assets/Images/PrinceMishra.jpeg";
 import Natasha from "../assets/Images/NatashaSawant.jpeg";
@@ -129,7 +128,7 @@ const Reviews = () => {
 
   // Map of images to use for different review types
   const imageMap = {
-    student: [aditi, RohanPatil, PrinceMishra, DurviKaskar, Natasha],
+    student: [aditi, RohanPatil, PrinceMishra, Natasha, Natasha],
     counselor: [
       counsellor1,
       counsellor2,

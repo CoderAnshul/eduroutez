@@ -1,8 +1,22 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+const getBaseUrl = () => {
+  // For Vite dev server, use import.meta.env; for browser, use window. Fallback to localhost if not set.
+  if (typeof window !== 'undefined' && window.VITE_BASE_URL) {
+    return window.VITE_BASE_URL;
+  }
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_BASE_URL) {
+    return import.meta.env.VITE_BASE_URL;
+  }
+  if (typeof process !== 'undefined' && process.env && process.env.VITE_BASE_URL) {
+    return process.env.VITE_BASE_URL;
+  }
+  return 'http://localhost:4001/api/v1';
+};
+
 const axiosInstance = axios.create({
-  baseURL: typeof window !== 'undefined' ? window.VITE_BASE_URL : import.meta.env.VITE_BASE_URL
+  baseURL: getBaseUrl()
 });
 
 // Request interceptor

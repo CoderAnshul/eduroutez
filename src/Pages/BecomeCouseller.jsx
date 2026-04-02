@@ -4,6 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import PasswordStrength from "../Components/PasswordStrength";
+import GuidanceTestPopup from "../Components/GuidanceTestPopup";
+import ScheduleTestPopup from "../Components/ScheduleTestPopup";
+import ScheduleConfirmationPopup from "../Components/ScheduleConfirmationPopup";
 import { Eye, EyeOff } from "lucide-react";
 
 const BecomeCounselor = () => {
@@ -29,6 +32,11 @@ const BecomeCounselor = () => {
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  // Popup state
+  const [showGuidancePopup, setShowGuidancePopup] = useState(false);
+  const [showSchedulePopup, setShowSchedulePopup] = useState(false);
+  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -247,15 +255,50 @@ const BecomeCounselor = () => {
       toast.success("Your application has been submitted successfully!");
       setSuccess("Your application has been submitted successfully!");
       setError("");
-      window.location.href = "https://admin.eduroutez.com/";
+      setShowGuidancePopup(true); // Show guidance test popup instead of redirect
     } catch (err) {
       setError("There was an error with your submission. Please try again.");
       setSuccess("");
     }
   };
 
+
+  // Handler for payment button in popup
+  const handleGuidancePay = () => {
+    // TODO: Integrate payment logic here (e.g., open Razorpay)
+    toast.info("Redirecting to payment...");
+    // Example: window.location.href = "/guidance-test-payment";
+  };
+
+  // Handler for schedule later
+  const handleScheduleLater = () => {
+    setShowGuidancePopup(false);
+    setShowSchedulePopup(true);
+  };
+
+  // Handler for scheduling test
+  const handleScheduleTest = (date, time) => {
+    // TODO: Save scheduled date/time to backend if needed
+    setShowSchedulePopup(false);
+    setShowConfirmationPopup(true);
+  };
+
   return (
     <div className="flex flex-col md:flex-row h-screen universal-max-width">
+      <GuidanceTestPopup
+        open={showGuidancePopup}
+        onClose={handleScheduleLater}
+        onPay={handleGuidancePay}
+      />
+      <ScheduleTestPopup
+        open={showSchedulePopup}
+        onClose={() => setShowSchedulePopup(false)}
+        onSchedule={handleScheduleTest}
+      />
+      <ScheduleConfirmationPopup
+        open={showConfirmationPopup}
+        onClose={() => setShowConfirmationPopup(false)}
+      />
 
       {/* OTP Modal */}
       {showOtpModal && (
