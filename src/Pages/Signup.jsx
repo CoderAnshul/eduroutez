@@ -13,7 +13,7 @@ import GuidanceTestPopup from "../Components/GuidanceTestPopup";
 import ScheduleTestPopup from "../Components/ScheduleTestPopup";
 import ScheduleConfirmationPopup from "../Components/ScheduleConfirmationPopup";
 
-const Signup = () => {
+const Signup = ({ isMode, onSwitch, onClose }) => {
   const [showOtpDialog, setShowOtpDialog] = useState(false);
   // Popups for counsellor flow
   const [showGuidancePopup, setShowGuidancePopup] = useState(false);
@@ -330,7 +330,11 @@ const Signup = () => {
       localStorage.setItem("email", data?.data?.user?.email);
 
       if (data?.data?.user?.role === "student") {
-        navigate("/");
+        if (isMode === 'popup' && onClose) {
+           onClose();
+        } else {
+           navigate("/");
+        }
       } else if (data?.data?.user?.role === "counsellor") {
         setShowGuidancePopup(true);
       } else {
@@ -543,7 +547,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className={`flex ${isMode === 'popup' ? 'h-full' : 'h-screen'}`}>
       {/* Left Section */}
       <div className="w-1/2 bg-red-700 hidden text-white sm:flex flex-col justify-center items-center px-10">
         <h1 className="text-4xl lg:text-[45px] lg:font-semibold font-bold mb-4 w-11/12 text-start">
@@ -560,7 +564,7 @@ const Signup = () => {
       </div>
 
       {/* Right Section */}
-      <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-start overflow-y-scroll items-center px-10">
+      <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-start overflow-y-auto items-center px-10">
         <h1 className="text-[50px] font-bold text-start opacity-80 leading-[50px]">
           Register Now
         </h1>
@@ -806,12 +810,22 @@ const Signup = () => {
 
         <p className="text-sm text-gray-500 mt-6">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-red-500 font-medium hover:underline"
-          >
-            Log in
-          </Link>
+          {isMode === 'popup' ? (
+            <button
+              onClick={onSwitch}
+              type="button"
+              className="text-red-500 font-medium hover:underline"
+            >
+              Log in
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="text-red-500 font-medium hover:underline"
+            >
+              Log in
+            </Link>
+          )}
         </p>
       </div>
 

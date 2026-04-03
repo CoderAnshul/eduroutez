@@ -14,6 +14,7 @@ import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useCategories from "../DataFiles/categories";
 import { toast } from "react-toastify";
+import AuthPopup from "./AuthPopup";
 
 const Navbar = () => {
   console.log('Navbar component rendered');
@@ -120,9 +121,9 @@ const Navbar = () => {
     }
   };
 
-  // Prevent scrolling on background when menu is open
+  // Prevent scrolling on background when menu or login popup is open
   useEffect(() => {
-    if (isMenuOpen) {
+    if (isMenuOpen || showLoginPopup) {
       document.body.classList.add("overflow-hidden");
     } else {
       document.body.classList.remove("overflow-hidden");
@@ -130,7 +131,7 @@ const Navbar = () => {
     return () => {
       document.body.classList.remove("overflow-hidden");
     };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, showLoginPopup]);
 
   if (location.pathname.startsWith("/dashboard")) {
     return null;
@@ -262,28 +263,28 @@ const Navbar = () => {
                       >
                         Logout
                       </button>
-                          {/* Logout confirmation popup */}
-                          {showLogoutPopup && (
-                            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[2000]">
-                              <div className="bg-white rounded-xl p-8 shadow-2xl w-full max-w-xs text-center">
-                                <h2 className="text-xl font-bold mb-4">Are you sure you want to logout?</h2>
-                                <div className="flex justify-center gap-4 mt-6">
-                                  <button
-                                    onClick={() => setShowLogoutPopup(false)}
-                                    className="px-6 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300"
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    onClick={confirmLogout}
-                                    className="px-6 py-2 rounded bg-[#b82025] text-white font-semibold hover:bg-red-700"
-                                  >
-                                    Logout
-                                  </button>
-                                </div>
-                              </div>
+                      {/* Logout confirmation popup */}
+                      {showLogoutPopup && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[2000]">
+                          <div className="bg-white rounded-xl p-8 shadow-2xl w-full max-w-xs text-center">
+                            <h2 className="text-xl font-bold mb-4">Are you sure you want to logout?</h2>
+                            <div className="flex justify-center gap-4 mt-6">
+                              <button
+                                onClick={() => setShowLogoutPopup(false)}
+                                className="px-6 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={confirmLogout}
+                                className="px-6 py-2 rounded bg-[#b82025] text-white font-semibold hover:bg-red-700"
+                              >
+                                Logout
+                              </button>
                             </div>
-                          )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -351,31 +352,7 @@ const Navbar = () => {
         </ul>
       </div>
 
-      {showLoginPopup && (
-        <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
-          <div className="popup bg-white min-w-[290px] p-12 m-20s rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
-            <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
-              Hey there! We'd love to hear your thoughts. Please log in to share
-              your review with us and help others make informed decisions.
-            </h3>
-            <div className="flex justify-center space-x-6">
-              <button
-                onClick={handleLoginPopupClose}
-                className="bg-gray-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-gray-700 focus:outline-none"
-              >
-                Close
-              </button>
-              <Link
-                to="/login"
-                onClick={handleLoginPopupClose}
-                className="bg-[#b82025] whitespace-nowrap text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
-              >
-                Log In
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      <AuthPopup isOpen={showLoginPopup} onClose={handleLoginPopupClose} />
     </>
   );
 };

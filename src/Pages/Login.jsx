@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 
-const Login = () => {
+const Login = ({ isMode, onSwitch, onClose }) => {
   const [showRolePopup, setShowRolePopup] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -95,16 +95,25 @@ const Login = () => {
         sessionStorage.removeItem('pendingWebinarLink');
         // Open the webinar in a new tab
         window.open(pendingWebinarLink, '_blank');
-        // Navigate to home page
-        navigate("/");
+        // Navigate or close
+        if (isMode === 'popup' && onClose) {
+          onClose();
+        } else {
+          navigate("/");
+        }
       } else if (redirectAfterLogin) {
         // Clear the stored redirect URL
         sessionStorage.removeItem('redirectAfterLogin');
         // Navigate back to the institute page
         navigate(redirectAfterLogin);
+        if (isMode === 'popup' && onClose) onClose();
       } else {
         // Default navigation for students
-        navigate("/");
+        if (isMode === 'popup' && onClose) {
+          onClose();
+        } else {
+          navigate("/");
+        }
       }
     },
     onError: (error) => {
@@ -119,7 +128,7 @@ const Login = () => {
 
   // Rest of the component remains the same...
   return (
-    <div className="flex h-screen ">
+    <div className={`flex ${isMode === 'popup' ? 'h-full' : 'h-screen'}`}>
       {/* Left Section */}
       <div className="w-1/2 bg-red-700 hidden text-white sm:flex flex-col justify-center items-center px-10">
         <h1 className="text-4xl lg:text-[45px] lg:font-semibold font-bold mb-4 w-11/12 text-start">
@@ -137,7 +146,7 @@ const Login = () => {
       </div>
 
       {/* Right Section */}
-      <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-center items-center px-10">
+      <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-center items-center px-10 overflow-y-auto">
         <h1 className="text-[50px] font-bold text-start opacity-80 mb-2">
           Log in
         </h1>
@@ -239,12 +248,22 @@ const Login = () => {
         </div>
         <p className="text-sm text-gray-500 mt-6">
           Don't have an account?{" "}
-          <Link
-            to="/signup"
-            className="text-red-500 font-medium hover:underline"
-          >
-            Sign up
-          </Link>
+          {isMode === 'popup' ? (
+            <button
+              onClick={onSwitch}
+              type="button"
+              className="text-red-500 font-medium hover:underline"
+            >
+              Sign up
+            </button>
+          ) : (
+            <Link
+              to="/signup"
+              className="text-red-500 font-medium hover:underline"
+            >
+              Sign up
+            </Link>
+          )}
         </p>
 
         {/* Role popup for institute/counsellor */}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from "react";
 import axios from "axios";
 import { getCounsellorStreams } from "../ApiFunctions/api";
 import { useSearchParams, Link } from "react-router-dom";
+import AuthPopup from "../Components/AuthPopup";
 
 // Lazy load components
 const ScheduleCallPopup = lazy(() =>
@@ -708,31 +709,7 @@ const CounselorListPage = () => {
         </Suspense>
       </div>
 
-      {showLoginPopup && (
-        <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
-          <div className="popup bg-white p-12 m-20s rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
-            <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
-              Hey there! We'd love to hear your thoughts. Please log in to share
-              your review with us and help others make informed decisions.
-            </h3>
-            <div className="flex justify-center space-x-6">
-              <button
-                onClick={handleLoginPopupClose}
-                className="bg-gray-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-gray-700 focus:outline-none"
-              >
-                Close
-              </button>
-              <Link
-                to="/login"
-                onClick={handleLoginPopupClose}
-                className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
-              >
-                Log In
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      <AuthPopup isOpen={showLoginPopup} onClose={handleLoginPopupClose} />
 
       <Suspense fallback={<div>Loading...</div>}>
         <ScheduleCallPopup

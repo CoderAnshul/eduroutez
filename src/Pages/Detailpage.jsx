@@ -58,6 +58,7 @@ const CoverImageSlider = ({ images, baseUrl }) => {
   );
 };
 import { useParams, useNavigate } from "react-router-dom";
+import AuthPopup from "../Components/AuthPopup";
 import DOMPurify from "dompurify";
 import { CarrerDetail } from "../ApiFunctions/api";
 import BestRated from "../Components/BestRated";
@@ -419,38 +420,7 @@ const DetailPage = () => {
         <ConsellingBanner />
       </div>
       {/* Login Popup Modal */}
-      {showLoginPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
-          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform transition-all">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-black text-slate-800">Login Required</h2>
-              <button onClick={() => setShowLoginPopup(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-            <p className="text-slate-600 mb-8 font-medium leading-relaxed">
-              Join the Eduroutez community to like and track your favorite career paths.
-            </p>
-            <div className="flex flex-col gap-3">
-              <button 
-                onClick={handleRedirectToLogin}
-                className="w-full bg-[#b82025] text-white font-black py-4 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100"
-              >
-                Log In Now
-              </button>
-              <button 
-                onClick={() => setShowLoginPopup(false)}
-                className="w-full bg-slate-100 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-200 transition-all"
-              >
-                Maybe Later
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
     </>
   );
 };

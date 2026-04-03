@@ -6,6 +6,7 @@ import Rating from "@mui/material/Rating";
 import InstituteReviewBox from "../Ui components/InstituteReviewBox";
 import CustomButton from "../Ui components/CustomButton";
 import axios from "axios";
+import AuthPopup from "./AuthPopup";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -90,32 +91,7 @@ const ReviewandRating = ({ instituteData }) => {
           className="!bg-[#b82025] !text-sm font-medium !px-[2.5vw] !py-3 !w-auto !h-auto !rounded-lg mt-4"
           onClick={handleReviewClick}
         />
-        {showLoginPopup && (
-          <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
-            <div className="popup bg-white p-12 rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
-              <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
-                Hey there! We'd love to hear your thoughts. Please log in to
-                share your review with us and help others make informed
-                decisions.
-              </h3>
-              <div className="flex justify-center space-x-6">
-                <button
-                  onClick={handleLoginPopupClose}
-                  className="bg-gray-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-gray-700 focus:outline-none"
-                >
-                  Close
-                </button>
-                <Link
-                  to="/login"
-                  onClick={handleLoginPopupClose}
-                  className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
-                >
-                  Log In
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
+        <AuthPopup isOpen={showLoginPopup} onClose={handleLoginPopupClose} />
       </div>
     );
   }
@@ -249,31 +225,7 @@ const ReviewandRating = ({ instituteData }) => {
         </div>
       </div>
 
-      {showLoginPopup && (
-        <div className="popup-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]">
-          <div className="popup bg-white p-12 rounded-lg shadow-2xl transform transition-all duration-300 scale-95 hover:scale-100 w-1/3">
-            <h3 className="text-2xl font-semibold mb-8 text-center text-gray-800">
-              Hey there! We'd love to hear your thoughts. Please log in to share
-              your review with us and help others make informed decisions.
-            </h3>
-            <div className="flex justify-center space-x-6">
-              <button
-                onClick={handleLoginPopupClose}
-                className="bg-gray-600 text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-gray-700 focus:outline-none"
-              >
-                Close
-              </button>
-              <Link
-                to="/login"
-                onClick={handleLoginPopupClose}
-                className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
-              >
-                Log In
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      <AuthPopup isOpen={showLoginPopup} onClose={handleLoginPopupClose} />
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[1000] h-dvh flex items-center justify-center bg-black bg-opacity-50 p-3">
