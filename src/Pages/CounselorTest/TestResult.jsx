@@ -72,13 +72,23 @@ const CounselorTestResult = () => {
                             </div>
                         </div>
 
-                        <button
-                            onClick={() => navigate("/dashboard")}
-                            className="group flex items-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all transform hover:-translate-y-1 active:scale-95 shadow-xl shadow-slate-200"
-                        >
-                            Go to Dashboard
-                            <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                        </button>
+                        {localStorage.getItem("role") == "counsellor" ? (
+                            <button
+                                onClick={() => window.location.href = "https://admin.eduroutez.com/"}
+                                className="group flex items-center gap-3 bg-[#b82025] text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-black transition-all transform hover:-translate-y-1 active:scale-95 shadow-xl shadow-red-100"
+                            >
+                                Go to Counselor Portal
+                                <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => navigate("/dashboard")}
+                                className="group flex items-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all transform hover:-translate-y-1 active:scale-95 shadow-xl shadow-slate-200"
+                            >
+                                Go to Student Dashboard
+                                <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        )}
                     </div>
                 </div>
 
