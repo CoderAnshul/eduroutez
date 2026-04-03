@@ -7,7 +7,8 @@ import PasswordStrength from "../Components/PasswordStrength";
 import GuidanceTestPopup from "../Components/GuidanceTestPopup";
 import ScheduleTestPopup from "../Components/ScheduleTestPopup";
 import ScheduleConfirmationPopup from "../Components/ScheduleConfirmationPopup";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Zap } from "lucide-react";
+import loadRazorpayScript from "../loadRazorpayScript";
 
 const BecomeCounselor = () => {
   const [formData, setFormData] = useState({
@@ -252,6 +253,12 @@ const BecomeCounselor = () => {
 
     try {
       const response = await axios.post(`${VITE_BASE_URL}/counselor`, formData);
+      if (response.data?.data?.accessToken) {
+        localStorage.setItem("accessToken", response.data.data.accessToken);
+        localStorage.setItem("userId", response.data?.data?.user?._id);
+        localStorage.setItem("role", response.data?.data?.user?.role);
+        localStorage.setItem("email", response.data?.data?.user?.email);
+      }
       toast.success("Your application has been submitted successfully!");
       setSuccess("Your application has been submitted successfully!");
       setError("");
@@ -262,18 +269,87 @@ const BecomeCounselor = () => {
     }
   };
 
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
-  // Handler for payment button in popup
+  // Combined payment handler for both immediate test and schedule later
+  const handleGuidancePayment = async (onSuccess) => {
+    setIsPaymentLoading(true);
+    const res = await loadRazorpayScript();
+
+    if (!res) {
+      toast.error("Razorpay SDK failed to load. Are you online?");
+      setIsPaymentLoading(false);
+      return;
+    }
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SPTvNCnEWS87X0",
+      amount: 99 * 100, // Amount in paise
+      currency: "INR",
+      name: "Eduroutez",
+      description: "Counselor Certification Test Fee",
+      image: "/logo.png",
+      handler: async function (response) {
+        try {
+          const paymentData = {
+            amount: 99,
+            transactionId: response.razorpay_payment_id,
+            status: "success",
+          };
+
+          const apiResponse = await axios.post(
+            `${VITE_BASE_URL}/counselor-test/record-payment`,
+            paymentData,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            }
+          );
+
+          if (apiResponse.data.success || apiResponse.status === 200) {
+            toast.success("Payment successful!");
+            onSuccess();
+          }
+        } catch (error) {
+          console.error("Error recording payment:", error);
+          toast.error("Failed to record payment. Please contact support.");
+        }
+      },
+      prefill: {
+        name: `${formData.firstname} ${formData.lastname}` || localStorage.getItem("userName") || "",
+        email: formData.email || localStorage.getItem("email")?.replace(/^"|"$/g, "") || "",
+      },
+      theme: {
+        color: "#b82025",
+      },
+      modal: {
+        ondismiss: function () {
+          setIsPaymentLoading(false);
+        }
+      }
+    };
+
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+    setIsPaymentLoading(false);
+  };
+
+
+  // Handler for payment button in popup (Pay & Give Test Now)
   const handleGuidancePay = () => {
-    // TODO: Integrate payment logic here (e.g., open Razorpay)
-    toast.info("Redirecting to payment...");
-    // Example: window.location.href = "/guidance-test-payment";
+    handleGuidancePayment(() => {
+      setShowGuidancePopup(false);
+      navigate("/counselor-test/exam");
+    });
   };
 
   // Handler for schedule later
   const handleScheduleLater = () => {
-    setShowGuidancePopup(false);
-    setShowSchedulePopup(true);
+    handleGuidancePayment(() => {
+      setShowGuidancePopup(false);
+      setShowSchedulePopup(true);
+    });
   };
 
   // Handler for scheduling test
@@ -287,7 +363,8 @@ const BecomeCounselor = () => {
     <div className="flex flex-col md:flex-row h-screen universal-max-width">
       <GuidanceTestPopup
         open={showGuidancePopup}
-        onClose={handleScheduleLater}
+        onClose={() => setShowGuidancePopup(false)}
+        onScheduleLater={handleScheduleLater}
         onPay={handleGuidancePay}
       />
       <ScheduleTestPopup

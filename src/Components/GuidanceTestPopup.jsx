@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const GuidanceTestPopup = ({ open, onClose, onPay }) => {
+const GuidanceTestPopup = ({ open, onClose, onPay, onScheduleLater }) => {
   if (!open) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -27,7 +27,7 @@ const GuidanceTestPopup = ({ open, onClose, onPay }) => {
             Pay & Give Test
           </button>
           <button
-            onClick={onClose}
+            onClick={onScheduleLater}
             className="w-full border border-red-700 text-red-700 py-3 rounded-lg font-semibold hover:bg-red-50"
           >
             Schedule Later

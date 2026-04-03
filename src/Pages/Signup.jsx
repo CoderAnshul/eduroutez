@@ -8,10 +8,11 @@ import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 import { toast } from "react-toastify";
 import PasswordStrength from "../Components/PasswordStrength";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Zap } from "lucide-react";
 import GuidanceTestPopup from "../Components/GuidanceTestPopup";
 import ScheduleTestPopup from "../Components/ScheduleTestPopup";
 import ScheduleConfirmationPopup from "../Components/ScheduleConfirmationPopup";
+import loadRazorpayScript from "../loadRazorpayScript";
 
 const Signup = ({ isMode, onSwitch, onClose }) => {
   const [showOtpDialog, setShowOtpDialog] = useState(false);
@@ -509,16 +510,84 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
         ? "Counsellor Name"
         : "Name";
 
-  // Handler for schedule later button in GuidanceTestPopup
-  const handleScheduleLater = () => {
-    setShowGuidancePopup(false);
-    setShowSchedulePopup(true);
+  // Combined payment handler for both immediate test and schedule later
+  const handleGuidancePayment = async (onSuccess) => {
+    setIsLoading(true);
+    const res = await loadRazorpayScript();
+
+    if (!res) {
+      toast.error("Razorpay SDK failed to load. Are you online?");
+      setIsLoading(false);
+      return;
+    }
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SPTvNCnEWS87X0",
+      amount: 99 * 100, // Amount in paise
+      currency: "INR",
+      name: "Eduroutez",
+      description: "Counselor Certification Test Fee",
+      image: "/logo.png",
+      handler: async function (response) {
+        try {
+          const paymentData = {
+            amount: 99,
+            transactionId: response.razorpay_payment_id,
+            status: "success",
+          };
+
+          const apiResponse = await axiosInstance.post(
+            `${apiUrl}/counselor-test/record-payment`,
+            paymentData,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            }
+          );
+
+          if (apiResponse.data.success || apiResponse.status === 200) {
+            toast.success("Payment successful!");
+            onSuccess();
+          }
+        } catch (error) {
+          console.error("Error recording payment:", error);
+          toast.error("Failed to record payment. Please contact support.");
+        }
+      },
+      prefill: {
+        name: formData.name || localStorage.getItem("userName") || "",
+        email: formData.email || localStorage.getItem("email")?.replace(/^"|"$/g, "") || "",
+      },
+      theme: {
+        color: "#b82025",
+      },
+      modal: {
+        ondismiss: function () {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+    setIsLoading(false);
   };
 
-  // Handler for payment button in GuidanceTestPopup
+  // Handler for schedule later button in GuidanceTestPopup
+  const handleScheduleLater = () => {
+    handleGuidancePayment(() => {
+      setShowGuidancePopup(false);
+      setShowSchedulePopup(true);
+    });
+  };
+
+  // Handler for payment button in GuidanceTestPopup (Pay & Give Test Now)
   const handleGuidancePay = () => {
-    // Redirect to the correct payment page for counselor test
-    window.location.href = "/counselor-test/payment";
+    handleGuidancePayment(() => {
+      setShowGuidancePopup(false);
+      navigate("/counselor-test/exam");
+    });
   };
 
   // Handler for scheduling test
@@ -912,7 +981,8 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     {/* Guidance Test and Scheduling Popups for Counsellor */}
     <GuidanceTestPopup
       open={showGuidancePopup}
-      onClose={handleScheduleLater}
+      onClose={() => setShowGuidancePopup(false)}
+      onScheduleLater={handleScheduleLater}
       onPay={handleGuidancePay}
     />
     <ScheduleTestPopup
