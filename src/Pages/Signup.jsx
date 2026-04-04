@@ -900,7 +900,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
 
       {/* OTP Dialog */}
       {showOtpDialog && (
-        <div className="fixed inset-0 flex p-12 items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex p-12 items-center justify-center bg-black bg-opacity-50 z-[1000]">
           <div className="bg-white p-6 rounded-xl shadow-lg w-96">
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
