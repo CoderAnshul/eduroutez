@@ -34,7 +34,7 @@ export const getInstitutes = async (
       },
     });
 
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error fetching institutes:", error);
     throw error;
@@ -52,7 +52,7 @@ export const addToWishlist = async (userId, instituteId) => {
           'x-access-token': localStorage.getItem('accessToken'),
           'x-refresh-token': localStorage.getItem('refreshToken')  }
         }    );
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error adding to wishlist:", error);
     throw error;
@@ -78,7 +78,7 @@ export const blogById = async (idOrSlug) => {
       response = await cachedGet(`${baseURL}/blog/${idOrSlug}`);
     }
     
-    return response.data;
+    return response;
   } catch (error) {
     console.error(`Error fetching blog:`, error);
     throw error;
@@ -88,7 +88,7 @@ export const blogById = async (idOrSlug) => {
 export const getRecentBlogs = async () => {
   try {
     const response = await cachedGet(`${baseURL}/blogs?limit=5&sort={"createdAt":"desc"}`);
-    return response.data;
+    return response;
   } catch (error) {
     console.error(`Error fetching recent blogs:`, error);
     throw error;
@@ -115,7 +115,7 @@ export const CarrerDetail = async (idOrSlug) => {
       response = await cachedGet(`${baseURL}/career/${idOrSlug}`);
     }
     
-    return response.data;
+    return response;
   } catch (error) {
     console.error(`Error fetching career detail:`, error);
     throw error;
@@ -141,7 +141,7 @@ export const getInstituteById = async (idOrSlug) => {
       response = await axios.get(`${baseURL}/institute/${idOrSlug}`);
     }
     
-    return response.data;
+    return response;
   } catch (error) {
     console.error(`Error fetching institute detail:`, error);
     throw error;
@@ -157,16 +157,17 @@ export const getCoursesById = async (idOrSlug) => {
     let response;
 
     if (isSlug) {
-      // If it's a slug, pass field="slug" in the body
-      response = await axios.get(`${baseURL}/course/${idOrSlug}`, {
+      response = await cachedGet(`${baseURL}/course/${idOrSlug}`, {
         params: { field: "slug" }
       });
     } else {
-      // It's an ID, use the original endpoint
-      response = await axios.get(`${baseURL}/course/${idOrSlug}`);
+      response = await cachedGet(`${baseURL}/course/${idOrSlug}`);
     }
-    
-    return response.data;
+
+    // Normalize and return the inner payload (server uses { data: { ... } })
+    const payload = response?.data?.data ?? response?.data ?? response;
+    try { console.debug('getCoursesById: payload', payload); } catch (e) {}
+    return payload;
   } catch (error) {
     console.error(`Error fetching course detail:`, error);
     throw error;
@@ -182,7 +183,7 @@ export const getWebinars = async ({ search = "", page = 1, limit = 10 } = {}) =>
     };
 
     const response = await axios.get(`${baseURL}/webinars`, { params });
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error fetching webinars:", error);
     throw error;
@@ -196,7 +197,7 @@ export const createReview = async (formData) => {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data;
+    return response;
   } catch (error) {
     console.error(`Error creating review:`, error.message);
     throw error;
@@ -206,7 +207,7 @@ export const createReview = async (formData) => {
 export const getReviews = async () => {
   try {
     const response = await axios.get(`${baseURL}/review`);
-    return response.data;
+    return response;
   } catch (error) {
     console.error(error);
   }

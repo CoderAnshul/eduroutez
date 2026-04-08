@@ -30,9 +30,12 @@ export const cachedGet = (url, config = {}, ttl = 30000) => {
 
   const cache = typeof window !== 'undefined' ? window.__axiosGetCache : null;
   if (cache && cache.has(key)) {
+    // debug log for dedupe/cached hits
+    try { console.debug("cachedGet: cache hit", key); } catch (e) {}
     return cache.get(key);
   }
 
+  try { console.debug("cachedGet: fetching", key); } catch (e) {}
   const promise = axiosInstance.get(url, config).then((res) => {
     // keep the resolved promise in cache for `ttl` ms
     if (cache) {

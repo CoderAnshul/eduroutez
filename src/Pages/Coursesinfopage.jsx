@@ -49,6 +49,7 @@ const Coursesinfopage = () => {
   const currentUserId = localStorage.getItem("userId");
   const baseURL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
+  const fetchLockRef = useRef(null);
 
   // Initialize courseIdMap from localStorage
   useEffect(() => {
@@ -89,13 +90,16 @@ const Coursesinfopage = () => {
             // We found the ID in the map, use it
             courseId = mappedId;
             const result = await getCoursesById(courseId);
-            response = result;
+            // normalize response shape (cachedGet may return axios response)
+            const payload = result?.data?.data ?? result?.data ?? result;
+            response = { data: payload };
           } else {
             // If courseIdMap doesn't exist or doesn't have the slug,
             // we need to get the course directly by its slug through a custom API call
             try {
               const result = await getCoursesById(courseId);
-              response = result;
+              const payload = result?.data?.data ?? result?.data ?? result;
+              response = { data: payload };
 
               // If we got a response, grab the ID for future use
               if (response && response.data) {
@@ -114,13 +118,15 @@ const Coursesinfopage = () => {
 
               // As a final fallback, try using the course ID API
               const result = await getCoursesById(id);
-              response = result;
+              const payload = result?.data?.data ?? result?.data ?? result;
+              response = { data: payload };
             }
           }
         } else {
           // It's an ID, use it directly
           const result = await getCoursesById(courseId);
-          response = result;
+          const payload = result?.data?.data ?? result?.data ?? result;
+          response = { data: payload };
 
           // If the course has a slug, we should save that mapping too
           if (response && response.data && response.data.slug) {
@@ -142,7 +148,8 @@ const Coursesinfopage = () => {
           return;
         }
 
-        if (isMounted) {
+          if (isMounted) {
+          console.debug('Coursesinfopage: fetched response', response);
           setCourseData(response);
           // Check if user has already liked this course
           if (response.data.likes && currentUserId) {
@@ -161,7 +168,6 @@ const Coursesinfopage = () => {
     };
 
     fetchCourseData();
-
     return () => {
       isMounted = false;
     };
@@ -355,10 +361,17 @@ const Coursesinfopage = () => {
     );
   }
 
+  // Debugging: log render-time state
+  try { console.debug('Coursesinfopage render', { isLoading, isError, courseData }); } catch (e) {}
+
   if (isError || !courseData?.data) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Error loading course data.
+      <div className="flex flex-col justify-center items-start h-screen p-6">
+        <div className="mb-4 text-red-600 font-semibold">Error loading course data.</div>
+        <div className="mb-2 font-medium">Debug info:</div>
+        <pre className="bg-gray-100 p-4 rounded max-w-full overflow-auto text-sm">
+          {JSON.stringify({ isLoading, isError, courseData }, null, 2)}
+        </pre>
       </div>
     );
   }
