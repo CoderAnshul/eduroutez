@@ -634,7 +634,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
 
       {/* Right Section */}
       <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-start overflow-y-auto items-center px-10">
-        <h1 className="text-[50px] font-bold text-start opacity-80 leading-[50px]">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-bold text-left opacity-90 leading-tight mb-3">
           Register Now
         </h1>
         <p className="text-gray-500 mb-8">

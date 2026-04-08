@@ -10,10 +10,10 @@
     @apply !text-white transition-all hover:!text-[#B82025];
   }
   .universal-max-width {
-    @apply w-full max-w-[1420px] px-[10px] mx-auto;
+    @apply w-full max-w-[1420px] px-4 sm:px-6 lg:px-8 mx-auto;
   }
   .universal-container {
-    @apply universal-max-width min-h-44 pb-10;
+    @apply universal-max-width py-8;
   }
 }
 
@@ -122,10 +122,11 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 58%;
-  height: 290px;
   width: 100%;
   overflow: hidden;
+  /* Responsive height for images */
+  height: 180px;
+  max-height: 320px;
 }
 .textContainer {
   display: flex;
