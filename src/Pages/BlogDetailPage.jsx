@@ -67,6 +67,7 @@ import Promotions from "../Pages/CoursePromotions";
 import BlogReviewForm from "../Components/BlogReviewForm";
 import axiosInstance from "../ApiFunctions/axios";
 import SocialShare from "../Components/SocialShare";
+import AuthPopup from "../Components/AuthPopup";
 
 const BlogDetailPage = () => {
   const [data, setData] = useState(null);
@@ -210,7 +211,15 @@ const BlogDetailPage = () => {
   // Handle like/dislike functionality
   const handleLike = async () => {
     if (!currentUserId) {
-      // Show login popup instead of alert
+      // Save pending like intent and show the shared AuthPopup
+      try {
+        sessionStorage.setItem(
+          "pendingLike",
+          JSON.stringify({ blogId: data._id, like: "1" })
+        );
+      } catch (err) {
+        console.error("Error saving pendingLike:", err);
+      }
       setShowLoginPopup(true);
       return;
     }
@@ -258,15 +267,56 @@ const BlogDetailPage = () => {
 
   // Handle redirect to login page
   const handleRedirectToLogin = () => {
-    setShowLoginPopup(false);
-    // Navigate to login page
-    navigate("/login", { state: { returnUrl: window.location.pathname } });
+    // Open the shared AuthPopup instead of redirecting
+    setShowLoginPopup(true);
   };
 
   // Close the login popup
   const handleClosePopup = () => {
     setShowLoginPopup(false);
   };
+
+  // Auto-submit pending like after successful login
+  useEffect(() => {
+    const submitPendingLike = async () => {
+      const pendingRaw = sessionStorage.getItem("pendingLike");
+      const accessToken = localStorage.getItem("accessToken");
+      if (!pendingRaw || !accessToken) return;
+
+      try {
+        const pending = JSON.parse(pendingRaw);
+        if (!pending || pending.blogId !== data._id) return;
+
+        // Call like-dislike API
+        await axiosInstance.post(
+          `${baseURL}/like-dislike`,
+          { id: pending.blogId, type: "blog", like: pending.like },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-access-token": localStorage.getItem("accessToken"),
+              "x-refresh-token": localStorage.getItem("refreshToken"),
+            },
+          }
+        );
+
+        // Update UI state
+        const currentUserId = localStorage.getItem("userId");
+        setIsLiked(true);
+        setData((prevData) => ({
+          ...prevData,
+          likes: prevData.likes ? [...prevData.likes, currentUserId] : [currentUserId],
+        }));
+
+        sessionStorage.removeItem("pendingLike");
+        setShowLoginPopup(false);
+      } catch (err) {
+        console.error("Error auto-submitting pending like:", err);
+      }
+    };
+
+    submitPendingLike();
+  }, [data?._id]);
 
   // Calculate number of likes
   const likesCount = data?.likes?.length || 0;
@@ -569,59 +619,8 @@ const BlogDetailPage = () => {
         <ConsellingBanner />
       </div>
 
-      {/* Login Popup Modal */}
-      {showLoginPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-black">
-                Login Required
-              </h2>
-              <button
-                onClick={handleClosePopup}
-                className="text-black hover:text-black"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-
-            <div className="text-black mb-6">
-              <p>
-                You need to be logged in to like this blog. Would you like to
-                log in now?
-              </p>
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={handleClosePopup}
-                className="px-4 py-2 border border-gray-300 rounded-md text-black hover:bg-gray-100 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRedirectToLogin}
-                className="px-4 py-2 bg-[#b82025] text-white rounded-md hover:bg-[#b82025] transition-colors"
-              >
-                Login
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Use shared AuthPopup for login */}
+      <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
     </>
   );
 };

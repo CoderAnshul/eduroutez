@@ -416,7 +416,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       toast.error("Please make your password strong first by fulfilling all requirements");
       return false;
     }
-    if (formData.password !== formData.confirmPassword) {
+    if (isMode !== "popup" && formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return false;
     }
@@ -645,7 +645,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
           {/* Role Selection */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="role">
-              Role *
+              Who you are *
             </label>
             <select
               id="role"
@@ -654,7 +654,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
               onChange={handleChange}
               required
             >
-              <option value="">Select Your Role</option>
+              <option value="">Select Who you are</option>
               {roleTypes.map((roleType) => (
                 <option key={roleType.value} value={roleType.value}>
                   {roleType.label}
@@ -666,7 +666,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
           {/* Name Field */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="name">
-              {roleSpecificLabel} *
+              Name *
             </label>
             <input
               type="text"
@@ -679,61 +679,66 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
             />
           </div>
 
-          {/* Country Selection */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Country</label>
-            <select
-              id="country"
-              className="w-full px-4 py-2 border rounded-lg"
-              value={formData.country}
-              onChange={handleChange}
-            >
-              <option value="">Select a Country</option>
-              {countries.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Location Selection */}
+          {isMode !== "popup" && (
+            <>
+              {/* Country Selection */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Country</label>
+                <select
+                  id="country"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  value={formData.country}
+                  onChange={handleChange}
+                >
+                  <option value="">Select a Country</option>
+                  {countries.map((country) => (
+                    <option key={country.id} value={country.id}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          {/* State Selection */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">State</label>
-            <select
-              id="state"
-              className="w-full px-4 py-2 border rounded-lg"
-              value={formData.state}
-              onChange={handleChange}
-              disabled={!formData.country}
-            >
-              <option value="">Select a State</option>
-              {states.map((state) => (
-                <option key={state.id} value={state.id}>
-                  {state.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              {/* State Selection */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">State</label>
+                <select
+                  id="state"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  value={formData.state}
+                  onChange={handleChange}
+                  disabled={!formData.country}
+                >
+                  <option value="">Select a State</option>
+                  {states.map((state) => (
+                    <option key={state.id} value={state.id}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          {/* City Selection */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">City</label>
-            <select
-              id="city"
-              className="w-full px-4 py-2 border rounded-lg"
-              value={formData.city}
-              onChange={handleChange}
-              disabled={!formData.state}
-            >
-              <option value="">Select a City</option>
-              {cities.map((city) => (
-                <option key={city.id} value={city.id}>
-                  {city.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              {/* City Selection */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">City</label>
+                <select
+                  id="city"
+                  className="w-full px-4 py-2 border rounded-lg"
+                  value={formData.city}
+                  onChange={handleChange}
+                  disabled={!formData.state}
+                >
+                  <option value="">Select a City</option>
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.id}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
 
           {/* Email Field */}
           <div className="mb-4">
@@ -753,10 +758,10 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
             )}
           </div>
 
-          {/* Phone Number Field */}
+          {/* Contact Field */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">
-              Phone Number *
+              Contact *
             </label>
             <input
               type="tel"
@@ -805,35 +810,37 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
           </div>
 
           {/* Confirm Password Field */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Confirm Password *
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                id="confirmPassword"
-                placeholder="Confirm your password"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
+          {isMode !== "popup" && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">
+                Confirm Password *
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  placeholder="Confirm your password"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
-          {role === "student" && (
+          {isMode !== "popup" && role === "student" && (
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">
                 Referral Code

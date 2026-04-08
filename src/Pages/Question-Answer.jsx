@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
 import { toast } from "react-toastify";
+import AuthPopup from "../Components/AuthPopup";
 import Promotions from "./CoursePromotions";
 
 const Card = ({ children, className = "" }) => (
@@ -148,6 +149,7 @@ const CombinedQuestionsPage = () => {
     label: "",
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilters, setActiveFilters] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc"); // Default to newest first
@@ -280,15 +282,11 @@ const CombinedQuestionsPage = () => {
     // Check if user is logged in (check for token existence and validity)
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken || accessToken === "null" || accessToken === "undefined" || accessToken === "") {
-      // Show error message first
-      toast.error("Please login first");
-      // Store current page URL and form data for redirect after login
+      // Store current page URL and form data for redirect/auto-submit after login
       sessionStorage.setItem("redirectAfterLogin", location.pathname);
       sessionStorage.setItem("pendingQuestion", JSON.stringify(formData));
-      // Redirect to login after showing error
-      setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 1500);
+      // Open the login popup instead of redirecting
+      setShowLoginPopup(true);
       return false;
     }
 
@@ -557,6 +555,7 @@ const CombinedQuestionsPage = () => {
           </div>
         </div>
       </div>
+        <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
     </div>
   );
 };
