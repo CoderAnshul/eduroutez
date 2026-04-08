@@ -4,6 +4,7 @@ import location from "../assets/Images/location.png";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import axiosInstance from "../ApiFunctions/axios";
 import { toast } from "react-toastify";
+import AuthPopup from "../Components/AuthPopup";
 import { Building, Calendar } from "lucide-react";
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
@@ -12,6 +13,7 @@ const baseURL = import.meta.env.VITE_BASE_URL;
 const InstitueName = ({ instituteData }) => {
   const navigate = useNavigate();
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [streams, setStreams] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -218,10 +220,7 @@ const InstitueName = ({ instituteData }) => {
 
     // Check if user is logged in
     if (!isLoggedIn()) {
-      // Show error message first
-      toast.error("Please login first");
-
-      // Store form data in sessionStorage
+      // Store form data in sessionStorage for later auto-submit
       const applicationData = {
         name: formData.name,
         email: formData.email,
@@ -234,18 +233,17 @@ const InstitueName = ({ instituteData }) => {
         level: formData.level,
       };
 
-      sessionStorage.setItem('pendingApplication', JSON.stringify(applicationData));
+      try {
+        sessionStorage.setItem('pendingApplication', JSON.stringify(applicationData));
+        sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+        sessionStorage.setItem('pendingInstituteId', instituteData?.data?._id);
+      } catch (err) {
+        console.error('Error saving pending application', err);
+      }
 
-      // Store the current page URL to redirect back after login
-      sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-      // Store institute ID for reference
-      sessionStorage.setItem('pendingInstituteId', instituteData?.data?._id);
-
-      // Close popup and redirect to login after showing error
+      // Close local popup and open shared AuthPopup instead of redirecting
       setIsPopupVisible(false);
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
+      setShowLoginPopup(true);
       return;
     }
 
@@ -703,6 +701,7 @@ const InstitueName = ({ instituteData }) => {
           </div>
         </div>
       )}
+      <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
     </div>
   );
 };

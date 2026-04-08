@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { createQuery } from "../ApiFunctions/api";
+import AuthPopup from "../Components/AuthPopup";
 
 const QueryForm = ({ instituteData }) => {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   // Helper function to check if user is logged in
   const isLoggedIn = () => {
@@ -42,20 +44,27 @@ const QueryForm = ({ instituteData }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submission initiated");
+    const formData = new FormData(e.target);
 
     // Check if user is logged in
     if (!isLoggedIn()) {
-      toast.error("Please login first");
-      // Store the current page URL to redirect back after login
-      sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-      // Redirect to login after showing the error message
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
+      // Save pending query so we can auto-submit after login
+      const pending = {
+        name: formData.get("name") || "",
+        email: formData.get("email") || "",
+        phoneNo: formData.get("number") || "",
+        query: formData.get("query") || "",
+        instituteId: instituteData?.data?._id || null,
+      };
+      try {
+        sessionStorage.setItem('pendingQuery', JSON.stringify(pending));
+        sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+      } catch (err) {
+        console.error('Error saving pendingQuery', err);
+      }
+      setShowLoginPopup(true);
       return;
     }
-
-    const formData = new FormData(e.target);
     
     // Validate the form
     if (!validateForm(formData)) {
@@ -84,6 +93,34 @@ const QueryForm = ({ instituteData }) => {
         toast.error("An error occurred while submitting your query");
       });
   };
+
+  // Auto-submit pending query after login
+  useEffect(() => {
+    const trySubmitPending = async () => {
+      const pendingRaw = sessionStorage.getItem('pendingQuery');
+      const accessToken = localStorage.getItem('accessToken');
+      if (!pendingRaw || !accessToken) return;
+
+      try {
+        const pending = JSON.parse(pendingRaw);
+        // Submit pending query
+        await createQuery({
+          name: pending.name,
+          email: pending.email,
+          phoneNo: pending.phoneNo,
+          query: pending.query,
+          instituteId: pending.instituteId,
+        });
+        toast.success('Query Submitted Successfully');
+        sessionStorage.removeItem('pendingQuery');
+        setShowLoginPopup(false);
+      } catch (err) {
+        console.error('Error auto-submitting pending query', err);
+      }
+    };
+
+    trySubmitPending();
+  }, []);
 
   return (
     <div className="sticky top-28 hidden lg:block w-full">
@@ -161,6 +198,7 @@ const QueryForm = ({ instituteData }) => {
           </button>
         </div>
       </form>
+      <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
     </div>
   );
 };
