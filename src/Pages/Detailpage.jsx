@@ -79,6 +79,15 @@ const DetailPage = () => {
   const { id } = useParams(); // This can be either ID or slug
   const navigate = useNavigate();
   const currentUserId = localStorage.getItem("userId");
+  const fetchLockRef = useRef(null);
+
+  // Ensure a global fetch-key set exists to avoid duplicate requests across
+  // StrictMode double-mounts (development). This lives on `window` and
+  // prevents multiple component instances from repeating the same fetch.
+  if (typeof window !== 'undefined' && !window.__fetchedCareerKeys) {
+    // Use a Set for quick membership checks
+    window.__fetchedCareerKeys = new Set();
+  }
 
   const tabConfig = [
     { id: "overview", name: "Overview", titleRef: useRef(null) },
@@ -183,7 +192,20 @@ const DetailPage = () => {
       }
     };
 
-    fetchCareer();
+    const fetchKey = `${id}|${currentUserId || ''}`;
+    // Skip if this fetchKey has already completed (global across mounts)
+    if (window.__fetchedCareerKeys && window.__fetchedCareerKeys.has(fetchKey)) return;
+    if (fetchLockRef.current === fetchKey) return; // already requested by this instance
+    fetchLockRef.current = fetchKey;
+
+    // Call the fetch and add the key to the global set after success
+    fetchCareer().then(() => {
+      try {
+        window.__fetchedCareerKeys && window.__fetchedCareerKeys.add(fetchKey);
+      } catch (e) {
+        /* ignore */
+      }
+    });
   }, [id, currentUserId]);
 
   // Handle like/dislike functionality

@@ -86,6 +86,11 @@ const BlogDetailPage = () => {
 
   // Get current user ID from localStorage
   const currentUserId = localStorage.getItem("userId");
+  const fetchLockRef = useRef(null);
+
+  if (typeof window !== 'undefined' && !window.__fetchedBlogKeys) {
+    window.__fetchedBlogKeys = new Set();
+  }
 
   useEffect(() => {
     if (!window.blogIdMap) {
@@ -205,7 +210,16 @@ const BlogDetailPage = () => {
       }
     };
 
-    fetchData();
+    const fetchKey = `${id}|${currentUserId || ''}`;
+    if (window.__fetchedBlogKeys && window.__fetchedBlogKeys.has(fetchKey)) return;
+    if (fetchLockRef.current === fetchKey) return;
+    fetchLockRef.current = fetchKey;
+
+    fetchData().then(() => {
+      try {
+        window.__fetchedBlogKeys && window.__fetchedBlogKeys.add(fetchKey);
+      } catch (e) {}
+    });
   }, [id, currentUserId]);
 
   // Handle like/dislike functionality

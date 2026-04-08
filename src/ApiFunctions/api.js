@@ -1,5 +1,6 @@
 import { Sort } from "@mui/icons-material";
 import axios from "axios";
+import axiosInstance, { cachedGet } from './axios';
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -69,12 +70,12 @@ export const blogById = async (idOrSlug) => {
 
     if (isSlug) {
       // If it's a slug, pass field="slug" in the body
-      response = await axios.get(`${baseURL}/blog/${idOrSlug}`, {
+      response = await cachedGet(`${baseURL}/blog/${idOrSlug}`, {
         params: { field: "slug" }
       });
     } else {
       // It's an ID, use the original endpoint
-      response = await axios.get(`${baseURL}/blog/${idOrSlug}`);
+      response = await cachedGet(`${baseURL}/blog/${idOrSlug}`);
     }
     
     return response.data;
@@ -86,7 +87,7 @@ export const blogById = async (idOrSlug) => {
 //getRecentBlogs
 export const getRecentBlogs = async () => {
   try {
-    const response = await axios.get(`${baseURL}/blogs?limit=5&sort={"createdAt":"desc"}`);
+    const response = await cachedGet(`${baseURL}/blogs?limit=5&sort={"createdAt":"desc"}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching recent blogs:`, error);
@@ -106,12 +107,12 @@ export const CarrerDetail = async (idOrSlug) => {
 
     if (isSlug) {
       // If it's a slug, pass field="slug" in the body
-      response = await axios.get(`${baseURL}/career/${idOrSlug}`, {
+      response = await cachedGet(`${baseURL}/career/${idOrSlug}`, {
         params: { field: "slug" }
       });
     } else {
       // It's an ID, use the original endpoint
-      response = await axios.get(`${baseURL}/career/${idOrSlug}`);
+      response = await cachedGet(`${baseURL}/career/${idOrSlug}`);
     }
     
     return response.data;
