@@ -319,7 +319,7 @@ const SubNavbar = ({ categories }) => {
   const handleLinkClick = (url) => { navigate(url); setHoveredCategory(null); };
 
   const renderCoursesContent = () => (
-    <div className="p-8 bg-white min-w-[1500px] max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-bold text-xl text-gray-800 flex items-center">
           <span className="w-1.5 h-6 bg-[#b82025] rounded-full mr-3"></span> Popular Courses
@@ -346,7 +346,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderCareersContent = () => (
-    <div className="p-6 bg-white min-w-[1500px]">
+    <div className="p-6 bg-white w-full">
       <div className="space-y-8">
         <h3 className="font-semibold text-red-500 text-base">Latest Careers</h3>
         <div className="space-y-6">
@@ -368,7 +368,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderTopCollegesContent = () => (
-    <div className="p-6 bg-white min-w-[1500px]">
+    <div className="p-6 bg-white w-full">
       <div className="grid grid-cols-3 gap-6">
         {/* Popular Colleges */}
         <div className="space-y-6">
@@ -442,7 +442,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="bg-white rounded-xl min-w-[1500px] shadow-lg">
+    <div className="bg-white rounded-xl w-full shadow-lg">
       <div className="p-4 border-b">
         <h3 className="text-lg font-bold text-black">Latest Updates</h3>
       </div>
@@ -476,7 +476,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderMoreContent = () => (
-    <div className="bg-pink rounded-lg shadow-lg p-6 min-w-[1500px]">
+    <div className="bg-pink rounded-lg shadow-lg p-6 w-full">
       <div className="grid grid-cols-3 gap-8">
         <div className="space-y-4">
           <h3 className="font-semibold text-red-500 text-base border-b pb-2">Resources</h3>
@@ -551,7 +551,7 @@ const SubNavbar = ({ categories }) => {
     const streamName = activeItem?.name;
 
     return (
-      <div className="flex min-w-[1500px]">
+      <div className="flex w-full">
         <div className="w-[440px] overflow-y-auto">
           <ul className="min-w-40 whitespace-nowrap md:w-fit ml-0 mb-0 pb-0 space-y-0">
             {category?.sidebarItems?.map((item) => (
@@ -635,10 +635,10 @@ const SubNavbar = ({ categories }) => {
 
   return (
     <div>
-      <div className="w-full h-auto bg-white">
+      <div className="w-full h-auto bg-white relative">
         <div className="universal-max-width pt-2 h-full flex justify-between">
           <div className="h-full flex flex-col justify-between">
-            <div className="h-1/2 w-fit px-1 flex relative items-center justify-start gap-7">
+            <div className="h-1/2 w-fit px-1 flex items-center justify-start gap-7">
               {categories?.map((category, index) => (
                 <div key={index} className="group" onMouseEnter={(e) => handleMouseEnter(category, e)} onMouseLeave={handleMouseLeave}>
                   <h5 className="text-xs gap-2 font-[500] pb-2 mt-0 group-hover:text-red-500 group-hover:scale-95 transform transition-all text-[#00000096] flex items-center cursor-pointer whitespace-nowrap">
@@ -646,18 +646,20 @@ const SubNavbar = ({ categories }) => {
                     <img className="h-3 group-hover:rotate-180 transition-all" src={downArrow} alt="" />
                   </h5>
                   {hoveredCategory === category.label && (
-                    <div className={`absolute top-6 z-[1000] bg-white shadow-lg ${dropdownAlignment}`}>
-                      {category.label === "Courses"
-                        ? renderCoursesContent()
-                        : category.label === "Careers"
-                          ? renderCareersContent()
-                          : category.label === "Latest Updates"
-                            ? renderNewsContent()
-                            : category.label === "Top Colleges"
-                              ? renderTopCollegesContent()
-                              : category.label === "More"
-                                ? renderMoreContent()
-                                : renderRegularContent(category)}
+                    <div className="absolute top-full left-0 right-0 z-[1000] bg-white overflow-hidden">
+                      <div className="universal-max-width">
+                        {category.label === "Courses"
+                          ? renderCoursesContent()
+                          : category.label === "Careers"
+                            ? renderCareersContent()
+                            : category.label === "Latest Updates"
+                              ? renderNewsContent()
+                              : category.label === "Top Colleges"
+                                ? renderTopCollegesContent()
+                                : category.label === "More"
+                                  ? renderMoreContent()
+                                  : renderRegularContent(category)}
+                      </div>
                     </div>
                   )}
                 </div>

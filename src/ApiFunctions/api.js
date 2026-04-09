@@ -4,6 +4,15 @@ import axiosInstance, { cachedGet } from './axios';
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
+// Helper to normalize different server response shapes
+const normalize = (res) => {
+  try {
+    return res?.data?.data ?? res?.data ?? res;
+  } catch (e) {
+    return res;
+  }
+};
+
 export const getInstitutes = async (
   state,
   city,
@@ -26,7 +35,7 @@ export const getInstitutes = async (
     };
     // console.log("Search Fields:", searchFields);
 
-    const response = await axios.get(`${baseURL}/institutes`, {
+    const response = await axiosInstance.get(`/institutes`, {
       params: {
         searchFields: JSON.stringify(searchFields),
         page: page,
@@ -34,7 +43,7 @@ export const getInstitutes = async (
       },
     });
 
-    return response;
+    return normalize(response);
   } catch (error) {
     console.error("Error fetching institutes:", error);
     throw error;
@@ -52,7 +61,7 @@ export const addToWishlist = async (userId, instituteId) => {
           'x-access-token': localStorage.getItem('accessToken'),
           'x-refresh-token': localStorage.getItem('refreshToken')  }
         }    );
-    return response;
+    return normalize(response);
   } catch (error) {
     console.error("Error adding to wishlist:", error);
     throw error;
@@ -69,16 +78,14 @@ export const blogById = async (idOrSlug) => {
     let response;
 
     if (isSlug) {
-      // If it's a slug, pass field="slug" in the body
       response = await cachedGet(`${baseURL}/blog/${idOrSlug}`, {
         params: { field: "slug" }
       });
     } else {
-      // It's an ID, use the original endpoint
       response = await cachedGet(`${baseURL}/blog/${idOrSlug}`);
     }
-    
-    return response;
+
+    return { data: normalize(response) };
   } catch (error) {
     console.error(`Error fetching blog:`, error);
     throw error;
@@ -88,7 +95,7 @@ export const blogById = async (idOrSlug) => {
 export const getRecentBlogs = async () => {
   try {
     const response = await cachedGet(`${baseURL}/blogs?limit=5&sort={"createdAt":"desc"}`);
-    return response;
+    return { data: normalize(response) };
   } catch (error) {
     console.error(`Error fetching recent blogs:`, error);
     throw error;
@@ -106,16 +113,14 @@ export const CarrerDetail = async (idOrSlug) => {
     let response;
 
     if (isSlug) {
-      // If it's a slug, pass field="slug" in the body
-      response = await cachedGet(`${baseURL}/career/${idOrSlug}`, {
+      response = await cachedGet(`${baseURL}/course/${idOrSlug}`, {
         params: { field: "slug" }
       });
     } else {
-      // It's an ID, use the original endpoint
-      response = await cachedGet(`${baseURL}/career/${idOrSlug}`);
+      response = await cachedGet(`${baseURL}/course/${idOrSlug}`);
     }
-    
-    return response;
+
+    return normalize(response);
   } catch (error) {
     console.error(`Error fetching career detail:`, error);
     throw error;
@@ -132,16 +137,15 @@ export const getInstituteById = async (idOrSlug) => {
     let response;
 
     if (isSlug) {
-      // If it's a slug, pass field="slug" in the body
-      response = await axios.get(`${baseURL}/institute/${idOrSlug}`, {
+      response = await axiosInstance.get(`/institute/${idOrSlug}`, {
         params: { field: "slug" }
       });
     } else {
-      // It's an ID, use the original endpoint
-      response = await axios.get(`${baseURL}/institute/${idOrSlug}`);
+      response = await axiosInstance.get(`/institute/${idOrSlug}`);
     }
-    
-    return response;
+
+    // Return wrapped shape so callers expecting `response.data` stay compatible
+    return { data: normalize(response) };
   } catch (error) {
     console.error(`Error fetching institute detail:`, error);
     throw error;
@@ -165,7 +169,7 @@ export const getCoursesById = async (idOrSlug) => {
     }
 
     // Normalize and return the inner payload (server uses { data: { ... } })
-    const payload = response?.data?.data ?? response?.data ?? response;
+    const payload = normalize(response);
     try { console.debug('getCoursesById: payload', payload); } catch (e) {}
     return payload;
   } catch (error) {
@@ -182,8 +186,8 @@ export const getWebinars = async ({ search = "", page = 1, limit = 10 } = {}) =>
       limit,
     };
 
-    const response = await axios.get(`${baseURL}/webinars`, { params });
-    return response;
+    const response = await axiosInstance.get(`/webinars`, { params });
+    return normalize(response);
   } catch (error) {
     console.error("Error fetching webinars:", error);
     throw error;
@@ -192,12 +196,12 @@ export const getWebinars = async ({ search = "", page = 1, limit = 10 } = {}) =>
 
 export const createReview = async (formData) => {
   try {
-    const response = await axios.post(`${baseURL}/review`, formData, {
+      const response = await axiosInstance.post(`/review`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response;
+    return normalize(response);
   } catch (error) {
     console.error(`Error creating review:`, error.message);
     throw error;
@@ -206,8 +210,8 @@ export const createReview = async (formData) => {
 
 export const getReviews = async () => {
   try {
-    const response = await axios.get(`${baseURL}/review`);
-    return response;
+    const response = await axiosInstance.get(`/review`);
+    return normalize(response);
   } catch (error) {
     console.error(error);
   }

@@ -7,6 +7,7 @@ import BestRated from "../Components/BestRated";
 import Pagination from "../Components/Pagination";
 import Events from "../Components/Events";
 import axios from "axios";
+import axiosInstance from "../ApiFunctions/axios";
 import BlogComponent from "../Components/BlogComponent";
 import HighRatedCareers from "../Components/HighRatedCareers";
 import { useQuery } from "react-query";
@@ -34,6 +35,7 @@ const SearchPage = () => {
   const [filtersApplied, setFiltersApplied] = useState(false);
   const [searchSource, setSearchSource] = useState(null);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [lastPayload, setLastPayload] = useState(null);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -78,7 +80,8 @@ const SearchPage = () => {
         sortFromUrl
       );
     }
-  }, [inputField]);
+    // Re-run if input changes OR URL search params change
+  }, [inputField, location.search]);
 
   // This effect handles the initial data loading based on search source
   useEffect(() => {
@@ -86,28 +89,35 @@ const SearchPage = () => {
 
     setLoading(true);
     setFetchError(false);
+    ////console.debug('SearchPage: baseURL=', baseURL, 'searchSource=', searchSource);
 
-    if (searchSource === "input" && inputField) {
-      console.log("Loading data from Redux input:", inputField);
+      if (searchSource === "input" && inputField) {
+      //console.log("Loading data from Redux input:", inputField);
       // Load data based on the inputField from Redux with pagination
+      //console.debug('Calling getInstitutes for input search...');
       getInstitutes(inputField, inputField, inputField, inputField, 1, itemsPerPage)
         .then((data) => {
-          const { result = [], totalDocuments, currentPage, totalPages } = data?.data || {};
-          const safeResult = Array.isArray(result) ? result : [];
-          setContent(safeResult);
-          setFilteredContent(safeResult);
+          //console.debug('getInstitutes (input) response:', data);
+          // Normalize response shape: server may return response.data or response.data.data
+          const payload = data?.data?.data ?? data?.data ?? data;
+          setLastPayload(payload);
+          //console.debug('Normalized payload (input):', payload);
+          const result = Array.isArray(payload?.result) ? payload.result : (Array.isArray(payload) ? payload : []);
+          const totalDocuments = payload?.totalDocuments ?? payload?.total_documents ?? 0;
+          const currentPage = payload?.currentPage ?? payload?.page ?? 1;
+
+          setContent(result);
+          setFilteredContent(result);
           setTotalDocuments(totalDocuments);
           setCurrentPage(currentPage || 1);
 
-          if (result && result.length > 0) {
-            updateIdMapping(result);
-          }
-          // Set loading to false as soon as data is received
+          if (result && result.length > 0) updateIdMapping(result);
+
           setLoading(false);
           setInitialLoadComplete(true);
         })
         .catch((error) => {
-          console.error("Error fetching institutes:", error);
+          //console.error("Error fetching institutes:", error);
           setFetchError(true);
           setLoading(false);
           setInitialLoadComplete(true);
@@ -117,7 +127,7 @@ const SearchPage = () => {
       // Build filters from URL parameters for state management
       // But let Filter component handle the actual fetch via onFiltersChanged
       const initialFilters = buildInitialFiltersFromUrl();
-      console.log("URL filters detected, waiting for Filter component to initialize:", initialFilters);
+      //console.log("URL filters detected, waiting for Filter component to initialize:", initialFilters);
 
       setSelectedFilters(initialFilters);
       // Don't set filtersApplied yet - let Filter component trigger it via onFiltersChanged
@@ -125,22 +135,29 @@ const SearchPage = () => {
 
       // If no filters in URL, load default data
       if (Object.keys(initialFilters).length === 0 && !sortFromUrl) {
-        getInstitutes("", "", "", "", 1, itemsPerPage)
+          //console.debug('Calling getInstitutes for default load...');
+          getInstitutes("", "", "", "", 1, itemsPerPage)
           .then((data) => {
-            const { result, totalDocuments, currentPage, totalPages } = data.data;
+            //console.debug('getInstitutes (default) response:', data);
+            const payload = data?.data?.data ?? data?.data ?? data;
+            setLastPayload(payload);
+            //console.debug('Normalized payload (default):', payload);
+            const result = Array.isArray(payload?.result) ? payload.result : (Array.isArray(payload) ? payload : []);
+            const totalDocuments = payload?.totalDocuments ?? payload?.total_documents ?? 0;
+            const currentPage = payload?.currentPage ?? payload?.page ?? 1;
+
             setContent(result);
             setFilteredContent(result);
             setTotalDocuments(totalDocuments);
             setCurrentPage(currentPage || 1);
 
-            if (result && result.length > 0) {
-              updateIdMapping(result);
-            }
+            if (result && result.length > 0) updateIdMapping(result);
+
             setLoading(false);
             setInitialLoadComplete(true);
           })
           .catch((error) => {
-            console.error("Error fetching institutes:", error);
+            //console.error("Error fetching institutes:", error);
             setFetchError(true);
             setLoading(false);
             setInitialLoadComplete(true);
@@ -150,15 +167,16 @@ const SearchPage = () => {
         // But if only sort is present, fetch immediately
         if (sortFromUrl && Object.keys(initialFilters).length === 0) {
           fetchFilteredInstitutes({}, 1, itemsPerPage, sortFromUrl)
-            .then(() => {
-              setInitialLoadComplete(true);
-            })
-            .catch((error) => {
-              console.error("Error fetching sorted institutes:", error);
-              setFetchError(true);
-              setLoading(false);
-              setInitialLoadComplete(true);
-            });
+              .then((data) => {
+                //console.debug('fetchFilteredInstitutes (sort) response:', data);
+                setInitialLoadComplete(true);
+              })
+              .catch((error) => {
+                //console.error("Error fetching sorted institutes:", error);
+                setFetchError(true);
+                setLoading(false);
+                setInitialLoadComplete(true);
+              });
         } else {
           setInitialLoadComplete(true);
           setLoading(false);
@@ -167,15 +185,20 @@ const SearchPage = () => {
     }
     else {
       // Default data loading with pagination limit
-      console.log("Loading default data");
+      //console.log("Loading default data");
       setSelectedFilters({});
 
       getInstitutes("", "", "", "", 1, itemsPerPage)
         .then((data) => {
-          const { result = [], totalDocuments, currentPage, totalPages } = data?.data || {};
-          const safeResult = Array.isArray(result) ? result : [];
-          setContent(safeResult);
-          setFilteredContent(safeResult);
+          //console.debug('getInstitutes (final default) response:', data);
+          const payload = data?.data?.data ?? data?.data ?? data;
+          setLastPayload(payload);
+          const result = Array.isArray(payload?.result) ? payload.result : (Array.isArray(payload) ? payload : []);
+          const totalDocuments = payload?.totalDocuments ?? payload?.total_documents ?? 0;
+          const currentPage = payload?.currentPage ?? payload?.page ?? 1;
+
+          setContent(result);
+          setFilteredContent(result);
           setTotalDocuments(totalDocuments);
           setCurrentPage(currentPage || 1);
 
@@ -184,7 +207,7 @@ const SearchPage = () => {
           }
         })
         .catch((error) => {
-          console.error("Error fetching institutes:", error);
+          //console.error("Error fetching institutes:", error);
           setFetchError(true);
         })
         .finally(() => {
@@ -228,7 +251,7 @@ const SearchPage = () => {
         );
         window.instituteIdMap = storedInstituteIdMap;
       } catch (error) {
-        console.error("Error loading instituteIdMap from localStorage:", error);
+        //console.error("Error loading instituteIdMap from localStorage:", error);
         window.instituteIdMap = {};
       }
     }
@@ -269,8 +292,8 @@ const SearchPage = () => {
   const { data: streamsData } = useQuery(
     ["streams"],
     async () => {
-      const response = await axios.get(
-        `${baseURL}/streams?limit=15&sort={"createdAt":"asc"}&filters={"isCounsellorStream":true}`
+      const response = await axiosInstance.get(
+        `/streams?limit=15&sort={"createdAt":"asc"}&filters={"isCounsellorStream":true}`
       );
       return response.data;
     },
@@ -625,7 +648,7 @@ const SearchPage = () => {
   const handleFilterChange = (filterCategory, filterValue) => {
     // This function should do nothing or be removed entirely
     // Let Filter component handle all filter state
-    console.log("Filter changed:", filterCategory, filterValue);
+    //console.log("Filter changed:", filterCategory, filterValue);
     // Do not update selectedFilters here - it will be updated via onFiltersChanged
   };
 
@@ -652,18 +675,18 @@ const SearchPage = () => {
   //       }
   //     });
 
-  //     console.log("Sending filters to API:", apiFilters);
+  //     //console.log("Sending filters to API:", apiFilters);
 
   //     const queryString = `filters=${encodeURIComponent(
   //       JSON.stringify(apiFilters)
   //     )}&page=${page}&limit=${limit}`;
 
-  //     console.log(`Fetching data with query: ${queryString}`);
+  //     //console.log(`Fetching data with query: ${queryString}`);
   //     const response = await axios.get(`${baseURL}/institutes?${queryString}`);
 
   //     if (response.data) {
   //       const { result, currentPage, totalPages, totalDocuments } = response.data.data;
-  //       console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
+  //       //console.log(`Received page ${currentPage} of ${totalPages}, with ${result.length} results out of ${totalDocuments} total`);
 
   //       setContent(result);
   //       setFilteredContent(result);
@@ -675,7 +698,7 @@ const SearchPage = () => {
   //       }
   //     }
   //   } catch (error) {
-  //     console.error("Error fetching filtered institutes:", error);
+  //     //console.error("Error fetching filtered institutes:", error);
   //     setFetchError(true);
   //   } finally {
   //     setLoading(false);
@@ -705,7 +728,7 @@ const SearchPage = () => {
         }
       });
 
-      console.log("Sending filters to API:", apiFilters);
+      //console.log("Sending filters to API:", apiFilters);
 
       // Build query string with sort parameter if provided
       let queryString = `filters=${encodeURIComponent(
@@ -718,12 +741,12 @@ const SearchPage = () => {
         queryString += `&sort=${encodeURIComponent(JSON.stringify(sortObj))}`;
       }
 
-      console.log(`Fetching data with query: ${queryString}`);
-      const response = await axios.get(`${baseURL}/institutes?${queryString}`);
+      //console.log(`Fetching data with query: ${queryString}`);
+      const response = await axiosInstance.get(`/institutes?${queryString}`);
 
       if (response.data) {
         const { result = [], currentPage, totalPages, totalDocuments } = response?.data?.data || {};
-        console.log(`Received page ${currentPage} of ${totalPages}, with ${result?.length || 0} results out of ${totalDocuments} total`);
+        //console.log(`Received page ${currentPage} of ${totalPages}, with ${result?.length || 0} results out of ${totalDocuments} total`);
 
         const safeResult = Array.isArray(result) ? result : [];
         setContent(safeResult);
@@ -737,7 +760,7 @@ const SearchPage = () => {
       }
       return response.data;
     } catch (error) {
-      console.error("Error fetching filtered institutes:", error);
+      //console.error("Error fetching filtered institutes:", error);
       setFetchError(true);
       throw error;
     } finally {
@@ -754,7 +777,7 @@ const SearchPage = () => {
     if (initialLoadComplete && filtersApplied && Object.keys(selectedFilters).length > 0) {
       // Only fetch if page changed (not on initial filter application, which is handled in handleFiltersChanged)
       if (currentPage > 1) {
-        console.log("Fetching data for page change:", selectedFilters, "Page:", currentPage);
+        //console.log("Fetching data for page change:", selectedFilters, "Page:", currentPage);
         fetchFilteredInstitutes(selectedFilters, currentPage, itemsPerPage, sortFromUrl || null);
       }
     }
@@ -764,7 +787,7 @@ const SearchPage = () => {
 
   // Modified handlePageChange to ensure API is called
   const handlePageChange = (newPage) => {
-    console.log(`Changing to page ${newPage}`);
+    //console.log(`Changing to page ${newPage}`);
     // Save current scroll position
     const scrollPosition = window.scrollY;
 
@@ -805,7 +828,7 @@ const SearchPage = () => {
   };
 
   const handleFiltersChanged = (filters) => {
-    console.log("Filters changed in Filter component:", filters);
+    //console.log("Filters changed in Filter component:", filters);
 
     // Save current scroll position
     const scrollPosition = window.scrollY;
@@ -830,7 +853,7 @@ const SearchPage = () => {
           }
         })
         .catch((error) => {
-          console.error("Error fetching filtered institutes:", error);
+          //console.error("Error fetching filtered institutes:", error);
           setFetchError(true);
           setLoading(false);
         });
@@ -853,7 +876,7 @@ const SearchPage = () => {
             setLoading(false);
           })
           .catch((error) => {
-            console.error("Error fetching institutes:", error);
+            //console.error("Error fetching institutes:", error);
             setFetchError(true);
             setLoading(false);
           });
@@ -867,7 +890,7 @@ const SearchPage = () => {
   };
 
   // const handlePageChange = (newPage) => {
-  //   console.log(`Changing to page ${newPage}`);
+  //   //console.log(`Changing to page ${newPage}`);
 
   //   // Update current page state
   //   setCurrentPage(newPage);
@@ -877,7 +900,7 @@ const SearchPage = () => {
   // };
 
   // const handleFiltersChanged = (filters) => {
-  //   console.log("Filters changed in Filter component:", filters);
+  //   //console.log("Filters changed in Filter component:", filters);
   //   setSelectedFilters(filters);
   //   setFiltersApplied(true);
   //   setCurrentPage(1); // Reset to first page when filters change
@@ -960,6 +983,16 @@ const SearchPage = () => {
                 </div>
               </div>
             )}
+
+            {/* {import.meta.env.DEV && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-gray-800">
+                <div><strong>Debug:</strong></div>
+                <div>totalDocuments: <strong>{totalDocuments}</strong></div>
+                <div>content.length: <strong>{Array.isArray(content) ? content.length : 0}</strong></div>
+                <div>filteredContent.length: <strong>{Array.isArray(filteredContent) ? filteredContent.length : 0}</strong></div>
+                <div className="mt-2">First results: {filteredContent.slice(0,5).map((i)=>i.instituteName || i.name).join(', ') || '—'}</div>
+              </div>
+            )} */}
 
             {loading ? (
               <div className="space-y-4">

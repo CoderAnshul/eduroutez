@@ -492,7 +492,7 @@ const Instituepage = () => {
               )}
             </div>
           </div>
-          <div className="hidden lg:block w-[300px] flex-shrink-0 pt-4">
+          <div className="hidden lg:block min-w-[300px] flex-shrink-0 pt-4">
             <div className="sticky top-32 z-10 space-y-4">
               {/* Career Guidance Webinar Button */}
               <Link to="/counselor" className="block group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
