@@ -346,7 +346,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderCareersContent = () => (
-    <div className="p-6 bg-white w-full">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
       <div className="space-y-8">
         <h3 className="font-semibold text-red-500 text-base">Latest Careers</h3>
         <div className="space-y-6">
@@ -368,7 +368,8 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderTopCollegesContent = () => (
-    <div className="p-6 bg-white w-full">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    {/* <div className="p-6 bg-white w-full"> */}
       <div className="grid grid-cols-3 gap-6">
         {/* Popular Colleges */}
         <div className="space-y-6">
@@ -442,7 +443,8 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="bg-white rounded-xl w-full shadow-lg">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    {/* <div className="bg-white rounded-xl w-full shadow-lg"> */}
       <div className="p-4 border-b">
         <h3 className="text-lg font-bold text-black">Latest Updates</h3>
       </div>
@@ -476,7 +478,8 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderMoreContent = () => (
-    <div className="bg-pink rounded-lg shadow-lg p-6 w-full">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    {/* <div className="bg-pink rounded-lg shadow-lg p-6 w-full"> */}
       <div className="grid grid-cols-3 gap-8">
         <div className="space-y-4">
           <h3 className="font-semibold text-red-500 text-base border-b pb-2">Resources</h3>
@@ -514,6 +517,7 @@ const SubNavbar = ({ categories }) => {
 
     return (
       <div className="p-4 flex gap-6">
+      {/* <div className="p-4 flex gap-6"> */}
         <div className="min-w-48">
           <h3 className="font-semibold text-red-500 text-base mb-3">Popular Colleges</h3>
           {popular.length === 0 ? (
@@ -551,13 +555,13 @@ const SubNavbar = ({ categories }) => {
     const streamName = activeItem?.name;
 
     return (
-      <div className="flex w-full">
-        <div className="w-[440px] overflow-y-auto">
-          <ul className="min-w-40 whitespace-nowrap md:w-fit ml-0 mb-0 pb-0 space-y-0">
+      <div className="bg-white w-full max-h-[500px] rounded-xl shadow-lg border border-gray-100 flex overflow-hidden">
+        <div className="w-[300px] bg-[#b82025] flex-shrink-0">
+          <ul className="w-full ml-0 mb-0 pb-0 space-y-0">
             {category?.sidebarItems?.map((item) => (
               <li
                 key={item.id}
-                className={`px-2 py-2 group mb-0 text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${activeContent[category.label] === item.id ? "bg-black border-l-2 border-black text-white" : "bg-[#b82025] text-white"
+                className={`px-4 py-1.5 group mb-0 text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${activeContent[category.label] === item.id ? "bg-black text-white" : "bg-[#b82025] text-white"
                   }`}
                 onMouseEnter={() => {
                   setActiveContent((prev) => ({ ...prev, [category.label]: item.id }));
@@ -569,18 +573,16 @@ const SubNavbar = ({ categories }) => {
                 onClick={() => handleSidebarItemClick(category, item.id, item.name, item.id)}
               >
                 {item.name}
-                <IoIosArrowForward className={`text-lg ${activeContent[category.label] === item.id ? "text-white rotate-90" : "text-black"}`} />
+                <IoIosArrowForward className={`text-lg transition-transform ${activeContent[category.label] === item.id ? "text-white rotate-90" : "text-white/50 group-hover:text-white"}`} />
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex-1 p-8 overflow-y-auto flex flex-row flex-wrap gap-x-10 gap-y-12 items-start">
           {(category.label === "Colleges" || category.label === "Exams") && streamName && renderStreamInstitutes(streamName)}
           {category.label === "Exams" && activeItem && renderExamBlogs(activeItem.id)}
-        </div>
 
-        <div className="ml-4 mt-4 flex gap-10 mr-10 w-full">
           <div className="space-y-6">
             <h3 className="font-semibold text-red-500 text-base">{activeStream ? `${activeStream} Colleges by City` : "Colleges by City"}</h3>
             <div className="space-y-4">
@@ -635,7 +637,7 @@ const SubNavbar = ({ categories }) => {
 
   return (
     <div>
-      <div className="w-full h-auto bg-white relative">
+      <div className="w-full h-auto bg-white relative ">
         <div className="universal-max-width pt-2 h-full flex justify-between">
           <div className="h-full flex flex-col justify-between">
             <div className="h-1/2 w-fit px-1 flex items-center justify-start gap-7">
@@ -646,7 +648,7 @@ const SubNavbar = ({ categories }) => {
                     <img className="h-3 group-hover:rotate-180 transition-all" src={downArrow} alt="" />
                   </h5>
                   {hoveredCategory === category.label && (
-                    <div className="absolute top-full left-0 right-0 z-[1000] bg-white overflow-hidden">
+                    <div className="absolute top-full left-0 right-0 z-[1000] bg-transparent overflow-hidden ">
                       <div className="universal-max-width">
                         {category.label === "Courses"
                           ? renderCoursesContent()
