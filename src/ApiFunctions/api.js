@@ -1,4 +1,3 @@
-import { Sort } from "@mui/icons-material";
 import axios from "axios";
 import axiosInstance, { cachedGet } from './axios';
 
@@ -8,7 +7,7 @@ const baseURL = import.meta.env.VITE_BASE_URL;
 const normalize = (res) => {
   try {
     return res?.data?.data ?? res?.data ?? res;
-  } catch (e) {
+  } catch {
     return res;
   }
 };
@@ -109,20 +108,66 @@ export const CarrerDetail = async (idOrSlug) => {
     
     // Determine if we're dealing with an ID or a slug
     const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
+    console.log("[CarrerDetail] route type", { idOrSlug, isSlug });
     
     let response;
 
+    const extractPayload = (res) => {
+      const normalized = normalize(res);
+
+      if (normalized?.result && Array.isArray(normalized.result)) {
+        return normalized.result[0] || null;
+      }
+
+      if (normalized?.data?.result && Array.isArray(normalized.data.result)) {
+        return normalized.data.result[0] || null;
+      }
+
+      return normalized;
+    };
+
     if (isSlug) {
-      response = await cachedGet(`${baseURL}/course/${idOrSlug}`, {
-        params: { field: "slug" }
-      });
+      console.log("[CarrerDetail] requesting slug endpoint", `${baseURL}/careers/${idOrSlug}`);
+
+      let payload = null;
+      try {
+        response = await cachedGet(`${baseURL}/careers/${idOrSlug}`, {
+          params: { field: "slug" }
+        });
+        payload = extractPayload(response);
+        console.log("[CarrerDetail] slug endpoint payload", payload);
+      } catch (slugError) {
+        console.warn("[CarrerDetail] slug endpoint failed, will fallback", slugError?.message || slugError);
+      }
+
+      if (!payload) {
+        console.warn("[CarrerDetail] trying careers collection filter", {
+          slug: idOrSlug,
+        });
+        response = await axios.get(`${baseURL}/careers`, {
+          params: {
+            filters: JSON.stringify({ slug: idOrSlug }),
+            limit: 1,
+          },
+        });
+        payload = extractPayload(response);
+        console.log("[CarrerDetail] careers collection fallback payload", payload);
+      }
+
+      return payload;
     } else {
-      response = await cachedGet(`${baseURL}/course/${idOrSlug}`);
+      console.log("[CarrerDetail] requesting id endpoint", `${baseURL}/careers/${idOrSlug}`);
+      response = await cachedGet(`${baseURL}/careers/${idOrSlug}`);
     }
 
-    return normalize(response);
+    console.log("[CarrerDetail] raw response", response);
+    const payload = extractPayload(response);
+    console.log("[CarrerDetail] normalized payload", payload);
+    console.log("[CarrerDetail] response status", response?.status, response?.statusText);
+    return payload;
   } catch (error) {
     console.error(`Error fetching career detail:`, error);
+    console.error("[CarrerDetail] error response", error?.response?.status, error?.response?.statusText, error?.response?.data);
     throw error;
   }
 };
@@ -169,9 +214,7 @@ export const getCoursesById = async (idOrSlug) => {
     }
 
     // Normalize and return the inner payload (server uses { data: { ... } })
-    const payload = normalize(response);
-    try { console.debug('getCoursesById: payload', payload); } catch (e) {}
-    return payload;
+    return normalize(response);
   } catch (error) {
     console.error(`Error fetching course detail:`, error);
     throw error;

@@ -187,15 +187,7 @@ const MobileNavbar = ({ categories }) => {
       .trim();
   };
 
-  const getCareerSlug = (career) => {
-    if (!career?.title) return career?._id;
-    return career.title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim();
-  };
+  const getCareerId = (career) => career?._id;
 
   const getNewsSlug = (news) => {
     if (!news?.title) return news?._id;
@@ -214,8 +206,8 @@ const MobileNavbar = ({ categories }) => {
   };
 
   const handleCareerClick = (career) => {
-    const careerSlug = getCareerSlug(career);
-    navigate(`/detailpage/${careerSlug}`);
+    const careerId = getCareerId(career);
+    navigate(`/detailpage/${careerId}`);
     closeMenu();
   };
 

@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import { useState, useRef, useEffect } from "react";
 
 // Simple slider for cover images (copied from BlogDetailPage)
-const CoverImageSlider = ({ images, baseUrl }) => {
+const CoverImageSlider = ({ images = [], baseUrl = "" }) => {
   const [current, setCurrent] = useState(0);
   const sliderInterval = useRef(null);
   const numImages = images.length;
@@ -57,37 +58,41 @@ const CoverImageSlider = ({ images, baseUrl }) => {
     </div>
   );
 };
-import { useParams, useNavigate } from "react-router-dom";
+
+const getCareerSlug = (career) => {
+  if (career?.title) {
+    return career.title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+  }
+
+  return career?.slug || career?._id;
+};
+
+import { useParams } from "react-router-dom";
 import AuthPopup from "../Components/AuthPopup";
 import DOMPurify from "dompurify";
 import { CarrerDetail } from "../ApiFunctions/api";
-import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import BlogComponent from "../Components/BlogComponent";
 import axiosInstance from "../ApiFunctions/axios";
 import SocialShare from "../Components/SocialShare";
-import { Award, Timer, Share2, Eye, ThumbsUp } from "lucide-react";
+import { Eye, ThumbsUp } from "lucide-react";
 
 const DetailPage = () => {
   const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Overview");
   const [isLiked, setIsLiked] = useState(false);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
   const baseURL = import.meta.env.VITE_BASE_URL;
   const { id } = useParams(); // This can be either ID or slug
-  const navigate = useNavigate();
   const currentUserId = localStorage.getItem("userId");
-  const fetchLockRef = useRef(null);
-
-  // Ensure a global fetch-key set exists to avoid duplicate requests across
-  // StrictMode double-mounts (development). This lives on `window` and
-  // prevents multiple component instances from repeating the same fetch.
-  if (typeof window !== 'undefined' && !window.__fetchedCareerKeys) {
-    // Use a Set for quick membership checks
-    window.__fetchedCareerKeys = new Set();
-  }
 
   const tabConfig = [
     { id: "overview", name: "Overview", titleRef: useRef(null) },
@@ -114,9 +119,14 @@ const DetailPage = () => {
 
   useEffect(() => {
     const fetchCareer = async () => {
+      setIsLoading(true);
+      setData(null);
       try {
+        console.log("[DetailPage] fetchCareer start", { id, currentUserId });
+
         // Determine if we're dealing with an ID or a slug
         const isSlug = isNaN(parseInt(id)) || id.includes("-");
+        console.log("[DetailPage] route type", { id, isSlug });
 
         // Initialize variables for API response and career ID
         let response;
@@ -125,46 +135,58 @@ const DetailPage = () => {
         if (isSlug) {
           // Try to get the ID from careerIdMap
           const mappedId = window.careerIdMap?.[id];
+          console.log("[DetailPage] slug lookup", {
+            slug: id,
+            mappedId,
+            cachedKeys: window.careerIdMap ? Object.keys(window.careerIdMap) : [],
+          });
 
           if (mappedId) {
             // We found the ID in the map, use it
             careerId = mappedId;
+            console.log("[DetailPage] using mapped career ID", { careerId });
             response = await CarrerDetail(careerId);
           } else {
-            // If careerIdMap doesn't have the slug, get the career by slug through a custom API call
-            try {
-              response = await CarrerDetail(careerId);
-              // If we got a response, grab the ID for future use
-              if (response && response.data) {
-                careerId = response.data._id;
+            // First visit or stale local cache: fetch directly by slug,
+            // then cache the resolved ID for future visits.
+            console.log("[DetailPage] no mapped ID, fetching by slug directly", { slug: id });
+            response = await CarrerDetail(id);
+            const payload = response?.data ?? response;
+            console.log("[DetailPage] slug fetch payload", payload);
 
-                // Save this slug -> ID mapping to both window and localStorage
-                window.careerIdMap = window.careerIdMap || {};
-                window.careerIdMap[id] = careerId;
-                localStorage.setItem(
-                  "careerIdMap",
-                  JSON.stringify(window.careerIdMap)
-                );
-                console.log(
-                  `Saved mapping: ${id} -> ${careerId} in localStorage`
-                );
-              }
-            } catch (slugError) {
-              console.error("Error fetching career by slug:", slugError);
-
-              // As a final fallback, try using the career ID API
-              response = await CarrerDetail(id);
+            if (payload && payload._id) {
+              careerId = payload._id;
+              window.careerIdMap = window.careerIdMap || {};
+              window.careerIdMap[id] = careerId;
+                const generatedSlug = getCareerSlug(payload);
+                if (generatedSlug) {
+                  window.careerIdMap[generatedSlug] = careerId;
+                }
+              localStorage.setItem(
+                "careerIdMap",
+                JSON.stringify(window.careerIdMap)
+              );
+              console.log(`Saved mapping: ${id} -> ${careerId} in localStorage`);
+            } else {
+              console.warn("[DetailPage] slug fetch returned no _id", { slug: id, payload });
             }
           }
         } else {
           // It's an ID, use it directly
+          console.log("[DetailPage] fetching by direct ID", { careerId });
           response = await CarrerDetail(careerId);
 
           // If the career has a slug, we should save that mapping too
-          if (response && response.data && response.data.slug) {
-            const slug = response.data.slug;
+          const payload = response?.data ?? response;
+          console.log("[DetailPage] direct ID payload", payload);
+          if (payload && payload.slug) {
+            const slug = payload.slug;
             window.careerIdMap = window.careerIdMap || {};
             window.careerIdMap[slug] = careerId;
+            const generatedSlug = getCareerSlug(payload);
+            if (generatedSlug) {
+              window.careerIdMap[generatedSlug] = careerId;
+            }
             localStorage.setItem(
               "careerIdMap",
               JSON.stringify(window.careerIdMap)
@@ -175,37 +197,29 @@ const DetailPage = () => {
           }
         }
 
-        if (!response || !response.data) {
+        const payload = response?.data ?? response;
+        console.log("[DetailPage] normalized payload", payload);
+
+        if (!payload) {
           console.error("No career data found");
           return;
         }
 
-        setData(response.data);
+        setData(payload);
 
         // Check if user has already liked this career
-        if (response.data.likes && currentUserId) {
-          const userHasLiked = response.data.likes.includes(currentUserId);
+        if (payload.likes && currentUserId) {
+          const userHasLiked = payload.likes.includes(currentUserId);
           setIsLiked(userHasLiked);
         }
       } catch (error) {
         console.error("Error fetching career:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    const fetchKey = `${id}|${currentUserId || ''}`;
-    // Skip if this fetchKey has already completed (global across mounts)
-    if (window.__fetchedCareerKeys && window.__fetchedCareerKeys.has(fetchKey)) return;
-    if (fetchLockRef.current === fetchKey) return; // already requested by this instance
-    fetchLockRef.current = fetchKey;
-
-    // Call the fetch and add the key to the global set after success
-    fetchCareer().then(() => {
-      try {
-        window.__fetchedCareerKeys && window.__fetchedCareerKeys.add(fetchKey);
-      } catch (e) {
-        /* ignore */
-      }
-    });
+    fetchCareer();
   }, [id, currentUserId]);
 
   // Handle like/dislike functionality
@@ -256,11 +270,6 @@ const DetailPage = () => {
     e.stopPropagation();
   };
 
-  const handleRedirectToLogin = () => {
-    setShowLoginPopup(false);
-    navigate("/login", { state: { returnUrl: window.location.pathname } });
-  };
-
   const scrollToSection = (tabItem) => {
     setActiveTab(tabItem.name);
     const yOffset = -170;
@@ -272,10 +281,18 @@ const DetailPage = () => {
     }
   };
 
-  if (!data) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-600">
+        Career details not found.
       </div>
     );
   }

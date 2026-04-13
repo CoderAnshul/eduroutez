@@ -14,6 +14,19 @@ import SocialShare from "../Components/SocialShare";
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
+const getCareerSlug = (career) => {
+  if (career?.title) {
+    return career.title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+  }
+
+  return career?.slug || career?._id;
+};
+
 const fetchImage = async (imagePath) => {
   try {
     const response = await axios.get(`${Images}/${imagePath}`, {
@@ -75,8 +88,12 @@ const Careerspage = () => {
       // Update careerIdMap with first page data
       const updatedCareerIdMap = { ...careerIdMap };
       firstPageData.forEach((career) => {
+        const generatedSlug = getCareerSlug(career);
         if (career.slug) {
           updatedCareerIdMap[career.slug] = career._id;
+        }
+        if (generatedSlug) {
+          updatedCareerIdMap[generatedSlug] = career._id;
         }
       });
       setCareerIdMap(updatedCareerIdMap);
@@ -110,8 +127,12 @@ const Careerspage = () => {
       // Update careerIdMap with all new data
       const updatedCareerIdMap = { ...careerIdMap };
       newData.forEach((career) => {
+        const generatedSlug = getCareerSlug(career);
         if (career.slug) {
           updatedCareerIdMap[career.slug] = career._id;
+        }
+        if (generatedSlug) {
+          updatedCareerIdMap[generatedSlug] = career._id;
         }
       });
 
@@ -347,7 +368,7 @@ const Careerspage = () => {
               {visibleData.map((career) => (
                 <Link
                   key={career._id}
-                  to={`/detailpage/${career.slug || career._id}`}
+                  to={`/detailpage/${career._id}`}
                   className="group bg-white min-h-[440px] rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer
                                 relative  max-w-sm flex-1 flex flex-col justify-between min-w-[300px] bg-white/50 rounded-lg shadow-lg overflow-hidden"
                 >
@@ -405,15 +426,13 @@ const Careerspage = () => {
                     <div className="inline-block">
                       <CustomButton
                         text="View More"
-                        to={`/detailpage/${career.slug || career._id}`}
+                        to={`/detailpage/${career._id}`}
                       />
                     </div>
                     <div onClick={(e) => handleShareClick(e, career)}>
                       <SocialShare
                         title={career.title}
-                        url={`${window.location.origin}/detailpage/${
-                          career.slug || career._id
-                        }`}
+                        url={`${window.location.origin}/detailpage/${career._id}`}
                         contentType="career"
                       />
                     </div>

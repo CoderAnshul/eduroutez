@@ -158,10 +158,7 @@ const SubNavbar = ({ categories }) => {
       ? course.courseTitle.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim()
       : course?._id;
 
-  const getCareerSlug = (career) =>
-    career?.title
-      ? career.title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim()
-      : career?._id;
+  const getCareerId = (career) => career?._id;
 
   const getNewsSlug = (news) =>
     news?.title
@@ -313,7 +310,7 @@ const SubNavbar = ({ categories }) => {
   const handleViewAllNews = () => { navigate("/news"); setHoveredCategory(null); };
 
   const handleCourseClick = (course) => { navigate(`/coursesinfopage/${getCourseSlug(course)}`); setHoveredCategory(null); };
-  const handleCareerClick = (career) => { navigate(`/detailpage/${getCareerSlug(career)}`); setHoveredCategory(null); };
+  const handleCareerClick = (career) => { navigate(`/detailpage/${getCareerId(career)}`); setHoveredCategory(null); };
   const handleNewsClick = (news) => { navigate(`/news/${getNewsSlug(news)}`); setHoveredCategory(null); };
   const handleInstituteClick = (institute) => { navigate(`/institute/${institute.slug || institute._id}`); setHoveredCategory(null); };
   const handleLinkClick = (url) => { navigate(url); setHoveredCategory(null); };
