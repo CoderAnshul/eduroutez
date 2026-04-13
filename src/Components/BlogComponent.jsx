@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback } from "react";
 import agricultureImg from "../assets/Images/agriculture.jpg";
 import BlogCard from "../Ui components/BlogCard";
 import CustomButton from "../Ui components/CustomButton";
@@ -13,12 +13,12 @@ const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 const blogIdMap = {};
 
 const BlogComponent = () => {
-  const [content, setContent] = useState([]);
-
-  const { data, isLoading, isError } = useQuery(
+  const { data, isLoading, isFetching, isError } = useQuery(
     ["blog"],
     () => getBlogs(),
     {
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
       onSuccess: (data) => {
         const blogs = data?.data?.result || [];
 
@@ -31,18 +31,18 @@ const BlogComponent = () => {
 
         // Make the mapping available globally
         window.blogIdMap = blogIdMap;
-
-        setContent(blogs);
       },
     }
   );
+
+  const content = Array.isArray(data?.data?.result) ? data.data.result : [];
 
   const handleShareClick = useCallback((e, blog) => {
     e.preventDefault();
     e.stopPropagation();
   }, []);
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
       <div className="flex justify-center items-center h-screen">
         Loading...
@@ -72,7 +72,7 @@ const BlogComponent = () => {
 
       {/* Blog Cards Container */}
       <div className="blogCont grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {Array.isArray(content) && content.length > 0 ? (
+        {content.length > 0 ? (
           content.slice(0, 3).map((blog, index) => (
             <div
               key={index}

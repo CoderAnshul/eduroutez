@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 
 const GalleryInfo = ({ instituteData }) => {
   const [previewUrls, setPreviewUrls] = useState([]);
@@ -9,37 +8,24 @@ const GalleryInfo = ({ instituteData }) => {
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
   useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        if (!instituteData?.data?.gallery || instituteData.data.gallery.length === 0) {
-          console.warn('No gallery images available');
-          return;
-        }
+    const gallery = instituteData?.data?.gallery;
+    if (!Array.isArray(gallery) || gallery.length === 0) {
+      setPreviewUrls([]);
+      return;
+    }
 
-        const imageUrls = await Promise.all(
-          instituteData.data.gallery.map(async (imageFilename) => {
-            try {
-              const imageResponse = await axios.get(
-                `${Images}/${imageFilename}`,
-                { responseType: 'blob' }
-              );
-              return URL.createObjectURL(imageResponse.data);
-            } catch (error) {
-              console.error(`Error fetching image ${imageFilename}:`, error);
-              return null; // Return null for failed images
-            }
-          })
-        );
+    const normalizedBase = (Images || '').replace(/\/$/, '');
+    const imageUrls = gallery
+      .map((imagePath) => {
+        if (!imagePath || typeof imagePath !== 'string') return null;
+        if (/^https?:\/\//i.test(imagePath)) return imagePath;
+        const cleanPath = imagePath.replace(/^\/+/, '');
+        return normalizedBase ? `${normalizedBase}/${cleanPath}` : null;
+      })
+      .filter(Boolean);
 
-        // Filter out any null values from failed image fetches
-        setPreviewUrls(imageUrls.filter(url => url !== null));
-      } catch (error) {
-        console.error('Error fetching images:', error);
-      }
-    };
-
-    fetchImages();
-  }, [instituteData]);
+    setPreviewUrls(imageUrls);
+  }, [instituteData, Images]);
 
   // If no gallery data or no images were successfully loaded, don't render the component
   if (!instituteData?.data?.gallery || instituteData.data.gallery.length === 0 || previewUrls.length === 0) {
