@@ -1,5 +1,5 @@
-import React, { Suspense } from 'react';
-import { Route, Routes, BrowserRouter } from 'react-router-dom';
+import React, { Suspense, useEffect, useMemo } from 'react';
+import { Route, Routes, BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import ScrollToTop from './Utilities/ScrollToTop';
@@ -29,6 +29,8 @@ import NewsPage from './Pages/NewsPage';
 import TrendingStreams from './Components/trendingStreampage';
 import TrendingCourses from './Pages/TrendingCoursespage';
 import TermsAndConditions from './Pages/TermsAndConditions ';
+import Login from './Pages/Login';
+import Signup from './Pages/Signup';
 const WebinarsPage = React.lazy(() => import('./Pages/WebinarsPage'));
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
@@ -46,8 +48,6 @@ const Policy = React.lazy(() => import('./Pages/Policy'));
 const Detailpage = React.lazy(() => import('./Pages/Detailpage'));
 const BlogDetailPage = React.lazy(() => import('./Pages/BlogDetailPage'));
 const Writereview = React.lazy(() => import('./Pages/Writereview'));
-const Login = React.lazy(() => import('./Pages/Login'));
-const Signup = React.lazy(() => import('./Pages/Signup'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
 // const counselling = React.lazy(() => import('./Pages/counselling'));
 const Wishlist = React.lazy(() => import('./Pages/Wishlist'));
@@ -59,25 +59,74 @@ const CounselorTestPayment = React.lazy(() => import('./Pages/CounselorTest/Paym
 const CounselorTestExam = React.lazy(() => import('./Pages/CounselorTest/TestExam'));
 const CounselorTestResult = React.lazy(() => import('./Pages/CounselorTest/TestResult'));
 
-const App = () => {
+const AppShell = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const authPopupRoutes = ['/login', '/signup'];
+  const isAuthPopupRoute = authPopupRoutes.includes(location.pathname);
+  const stateBackgroundLocation = location.state?.backgroundLocation;
+
+  useEffect(() => {
+    if (!isAuthPopupRoute) {
+      sessionStorage.setItem(
+        'authBackgroundPath',
+        `${location.pathname}${location.search}${location.hash}`
+      );
+    }
+  }, [isAuthPopupRoute, location.pathname, location.search, location.hash]);
+
+  const storedBackgroundLocation = useMemo(() => {
+    const storedPath = sessionStorage.getItem('authBackgroundPath');
+    if (!storedPath) return null;
+
+    const hashIndex = storedPath.indexOf('#');
+    const queryIndex = storedPath.indexOf('?');
+
+    const pathnameEndIndex =
+      queryIndex === -1
+        ? hashIndex === -1
+          ? storedPath.length
+          : hashIndex
+        : hashIndex === -1
+          ? queryIndex
+          : Math.min(queryIndex, hashIndex);
+
+    const pathname = storedPath.slice(0, pathnameEndIndex) || '/';
+    const search = queryIndex === -1 ? '' : storedPath.slice(queryIndex, hashIndex === -1 ? undefined : hashIndex);
+    const hash = hashIndex === -1 ? '' : storedPath.slice(hashIndex);
+
+    return { pathname, search, hash };
+  }, [isAuthPopupRoute]);
+
+  const fallbackBackgroundLocation = isAuthPopupRoute ? { pathname: '/' } : null;
+  const backgroundLocation =
+    stateBackgroundLocation || storedBackgroundLocation || fallbackBackgroundLocation;
+  const shouldRenderAuthModal = isAuthPopupRoute && Boolean(backgroundLocation);
+  const displayLocation = shouldRenderAuthModal ? backgroundLocation : location;
+  const isDisplayAuthRoute = authPopupRoutes.includes(displayLocation.pathname);
+
+  const handleCloseAuthModal = () => {
+    if (stateBackgroundLocation) {
+      navigate(-1);
+      return;
+    }
+
+    const storedPath = sessionStorage.getItem('authBackgroundPath');
+    navigate(storedPath || '/', { replace: true });
+  };
+
+  const handleSwitchAuthModal = (targetRoute) => {
+    navigate(targetRoute, {
+      replace: true,
+      state: { backgroundLocation: backgroundLocation || displayLocation },
+    });
+  };
+
   return (
-    <BrowserRouter>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        style={{ zIndex: 9999 }}
-      />
-      <ScrollToTop />
-      <Navbar />
+    <>
+      {!isDisplayAuthRoute && <Navbar />}
       <Suspense fallback={<Loader />}>
-        <Routes>
+        <Routes location={displayLocation}>
           {/* Existing Routes */}
           <Route path="/" element={<Homepage />} />
           <Route path="*" element={<PageNotFound />} />
@@ -154,7 +203,49 @@ const App = () => {
           <Route path="/counselor-test/result" element={<CounselorTestResult />} />
         </Routes>
       </Suspense>
-      <Footer />
+
+      {shouldRenderAuthModal && (
+        <div className="fixed inset-0 z-[10000] bg-black/45 p-3 sm:p-6 flex items-start sm:items-center justify-center overflow-y-auto">
+          <div className="w-full max-w-md my-6 sm:my-10">
+            {location.pathname === '/login' ? (
+              <Login
+                isMode="popup"
+                onClose={handleCloseAuthModal}
+                onSwitch={() => handleSwitchAuthModal('/signup')}
+              />
+            ) : (
+              <Signup
+                isMode="popup"
+                onClose={handleCloseAuthModal}
+                onSwitch={() => handleSwitchAuthModal('/login')}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {!isDisplayAuthRoute && <Footer />}
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ zIndex: 9999 }}
+      />
+      <ScrollToTop />
+      <AppShell />
     </BrowserRouter>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import PasswordStrength from "../Components/PasswordStrength";
@@ -49,6 +49,7 @@ const BecomeCounselor = () => {
   };
 
   const navigate = useNavigate();
+  const location = useLocation();
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
@@ -614,7 +615,11 @@ const BecomeCounselor = () => {
 
         <p className="text-sm text-gray-500 mt-6">
           Already have an account?{" "}
-          <Link to="/login" className="text-red-500 font-medium hover:underline">
+          <Link
+            to="/login"
+            state={{ backgroundLocation: location }}
+            className="text-red-500 font-medium hover:underline"
+          >
             Log in
           </Link>
         </p>

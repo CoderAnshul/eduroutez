@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
+  const location = useLocation();
   const [formData, setFormData] = useState({
     date: "",
     timeSlot: "",
@@ -339,6 +340,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
               </button>
               <Link
                 to="/login"
+                state={{ backgroundLocation: location }}
                 onClick={() => setShowLoginDialog(false)}
                 className="bg-[#b82025] text-white px-8 py-4 rounded-lg shadow-lg transition-all duration-300 hover:bg-red-700 focus:outline-none"
               >

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Webinars = ({ instituteData }) => {
   const [webinarData, setWebinarData] = useState([]);
@@ -12,6 +12,7 @@ const Webinars = ({ instituteData }) => {
   const [selectedWebinarLink, setSelectedWebinarLink] = useState(null);
   const itemsPerPage = 4;
   const navigate = useNavigate();
+  const location = useLocation();
 
   const Images = import.meta.env.VITE_IMAGE_BASE_URL || "";
   const baseURL = import.meta.env.VITE_BASE_URL || "";
@@ -99,7 +100,7 @@ const Webinars = ({ instituteData }) => {
       sessionStorage.setItem("pendingWebinarLink", selectedWebinarLink);
     }
     setShowLoginDialog(false);
-    navigate("/login");
+    navigate("/login", { state: { backgroundLocation: location } });
   };
 
   const LoginDialog = () =>

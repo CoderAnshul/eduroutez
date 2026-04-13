@@ -73,7 +73,7 @@ const getCareerSlug = (career) => {
 };
 
 import { useParams } from "react-router-dom";
-import AuthPopup from "../Components/AuthPopup";
+import { useLocation, useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { CarrerDetail } from "../ApiFunctions/api";
 import Events from "../Components/Events";
@@ -88,10 +88,11 @@ const DetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Overview");
   const [isLiked, setIsLiked] = useState(false);
-  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
   const baseURL = import.meta.env.VITE_BASE_URL;
   const { id } = useParams(); // This can be either ID or slug
+  const navigate = useNavigate();
+  const location = useLocation();
   const currentUserId = localStorage.getItem("userId");
 
   const tabConfig = [
@@ -225,7 +226,7 @@ const DetailPage = () => {
   // Handle like/dislike functionality
   const handleLike = async () => {
     if (!currentUserId) {
-      setShowLoginPopup(true);
+      navigate("/login", { state: { backgroundLocation: location } });
       return;
     }
 
@@ -458,8 +459,6 @@ const DetailPage = () => {
         <Events />
         <ConsellingBanner />
       </div>
-      {/* Login Popup Modal */}
-      <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
     </>
   );
 };

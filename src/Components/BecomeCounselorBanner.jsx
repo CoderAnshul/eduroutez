@@ -1,15 +1,16 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Award, ShieldCheck, TrendingUp, ChevronRight } from "lucide-react";
 
 const BecomeCounselorBanner = () => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleStart = () => {
         // Check if logged in
         const token = localStorage.getItem("accessToken");
         if (!token) {
-            navigate("/login");
+            navigate("/login", { state: { backgroundLocation: location } });
         } else {
             navigate("/counselor-test/payment");
         }

@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
+import logo from "../assets/Images/logo.png";
 
 const Login = ({ isMode, onSwitch, onClose }) => {
+  const isPopupMode = isMode === "popup";
   const [showRolePopup, setShowRolePopup] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -17,6 +18,7 @@ const Login = ({ isMode, onSwitch, onClose }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const location = useLocation();
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -128,26 +130,22 @@ const Login = ({ isMode, onSwitch, onClose }) => {
 
   // Rest of the component remains the same...
   return (
-    <div className={`flex ${isMode === 'popup' ? 'h-full' : 'h-screen'}`}>
-      {/* Left Section */}
-      <div className="w-1/2 bg-red-700 hidden text-white sm:flex flex-col justify-center items-center px-10">
-        <h1 className="text-4xl lg:text-[45px] lg:font-semibold font-bold mb-4 w-11/12 text-start">
-          Welcome Back
-        </h1>
-        <p className="text-lg mb-6 w-11/12">
-          We're excited to have you here again—let's get you ready for your next
-          shopping experience!
-        </p>
-        <img
-          src={loginandSignupbg}
-          alt="Shopping Illustration"
-          className="w-4/5 max-w-[350px]"
-        />
-      </div>
-
-      {/* Right Section */}
-      <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-center items-center px-10 overflow-y-auto">
-        <h1 className="text-[50px] font-bold text-start opacity-80 mb-2">
+    <div
+      className={isPopupMode ? "w-full" : "w-full flex min-h-screen items-center justify-center bg-gray-100 px-4 py-8"}
+    >
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex py-6 sm:py-8 flex-col justify-center items-center px-5 sm:px-8 overflow-y-auto max-h-[92vh]">
+        <div className="w-full flex items-center justify-between mb-5">
+          <img src={logo} alt="Eduroutez" className="h-10 w-auto" />
+          <button
+            type="button"
+            onClick={() => (isMode === "popup" && onClose ? onClose() : navigate("/"))}
+            className="text-gray-500 hover:text-gray-700"
+            aria-label="Close login"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-bold text-start opacity-80 mb-2">
           Log in
         </h1>
         <p className="text-gray-500 mb-8">
@@ -259,6 +257,7 @@ const Login = ({ isMode, onSwitch, onClose }) => {
           ) : (
             <Link
               to="/signup"
+              state={{ backgroundLocation: location.state?.backgroundLocation || location }}
               className="text-red-500 font-medium hover:underline"
             >
               Sign up
@@ -294,8 +293,8 @@ const Login = ({ isMode, onSwitch, onClose }) => {
             </div>
           </div>
         )}
-      </div >
-    </div >
+      </div>
+    </div>
   );
 };
 

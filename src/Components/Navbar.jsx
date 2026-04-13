@@ -14,14 +14,12 @@ import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useCategories from "../DataFiles/categories";
 import { toast } from "react-toastify";
-import AuthPopup from "./AuthPopup";
 
 const Navbar = () => {
   console.log('Navbar component rendered');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // For hover menu
   const location = useLocation();
-  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const { categoriesData, loading, error } = useCategories();
   console.log("categoriesData", categoriesData);
   useEffect(() => {
@@ -86,7 +84,7 @@ const Navbar = () => {
   const handleReviewClick = (e) => {
     if (!accessToken) {
       e.preventDefault();
-      setShowLoginPopup(true);
+      navigate("/login", { state: { backgroundLocation: location } });
     }
   };
 
@@ -94,10 +92,6 @@ const Navbar = () => {
     // Always navigate to question-answer page
     // The page will handle login check on form submission
     navigate("/question-&-answers");
-  };
-
-  const handleLoginPopupClose = () => {
-    setShowLoginPopup(false);
   };
 
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
@@ -121,9 +115,9 @@ const Navbar = () => {
     }
   };
 
-  // Prevent scrolling on background when menu or login popup is open
+  // Prevent scrolling on background when menu is open
   useEffect(() => {
-    if (isMenuOpen || showLoginPopup) {
+    if (isMenuOpen) {
       document.body.classList.add("overflow-hidden");
     } else {
       document.body.classList.remove("overflow-hidden");
@@ -131,7 +125,7 @@ const Navbar = () => {
     return () => {
       document.body.classList.remove("overflow-hidden");
     };
-  }, [isMenuOpen, showLoginPopup]);
+  }, [isMenuOpen]);
 
   if (location.pathname.startsWith("/dashboard")) {
     return null;
@@ -190,6 +184,7 @@ const Navbar = () => {
             {!accessToken && (
               <Link
                 to="/login"
+                state={{ backgroundLocation: location }}
                 className="CustomFlex gap-1 bg-[#b82025] px-4 py-2 rounded-md text-white text-xs  hover:scale-95 group transform transition-all font-medium cursor-pointer"
               >
                 <span>LOGIN</span>
@@ -351,8 +346,6 @@ const Navbar = () => {
           </div>
         </ul>
       </div>
-
-      <AuthPopup isOpen={showLoginPopup} onClose={handleLoginPopupClose} />
     </>
   );
 };

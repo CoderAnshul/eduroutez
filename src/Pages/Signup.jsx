@@ -3,18 +3,20 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useMutation } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
 import { useNavigate } from "react-router-dom";
-import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 import { toast } from "react-toastify";
 import PasswordStrength from "../Components/PasswordStrength";
-import { Eye, EyeOff, Zap } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 import GuidanceTestPopup from "../Components/GuidanceTestPopup";
 import ScheduleTestPopup from "../Components/ScheduleTestPopup";
 import ScheduleConfirmationPopup from "../Components/ScheduleConfirmationPopup";
 import loadRazorpayScript from "../loadRazorpayScript";
+import logo from "../assets/Images/logo.png";
+import { useLocation } from "react-router-dom";
 
 const Signup = ({ isMode, onSwitch, onClose }) => {
+  const isPopupMode = isMode === "popup";
   const [showOtpDialog, setShowOtpDialog] = useState(false);
   // Popups for counsellor flow
   const [showGuidancePopup, setShowGuidancePopup] = useState(false);
@@ -68,6 +70,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
   const apiUrl =
     import.meta.env.VITE_BASE_URL || "http://localhost:4001/api/v1";
   const [searchParams] = useSearchParams();
@@ -616,25 +619,22 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
   };
 
   return (
-    <div className={`flex ${isMode === 'popup' ? 'h-full' : 'h-screen'}`}>
-      {/* Left Section */}
-      <div className="w-1/2 bg-red-700 hidden text-white sm:flex flex-col justify-center items-center px-10">
-        <h1 className="text-4xl lg:text-[45px] lg:font-semibold font-bold mb-4 w-11/12 text-start">
-          Join Us
-        </h1>
-        <p className="text-lg mb-6 w-11/12">
-          We're excited to have you here—start your journey with us today!
-        </p>
-        <img
-          src={loginandSignupbg}
-          alt="Signup Illustration"
-          className="w-4/5 max-w-[350px]"
-        />
-      </div>
-
-      {/* Right Section */}
-      <div className="w-full sm:w-1/2 flex py-10 md:py-4 flex-col justify-start overflow-y-auto items-center px-10">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-bold text-left opacity-90 leading-tight mb-3">
+    <div
+      className={isPopupMode ? "w-full" : "w-full flex min-h-screen items-center justify-center bg-gray-100 px-4 py-8"}
+    >
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex py-6 sm:py-8 flex-col justify-start overflow-y-auto items-center px-5 sm:px-8 max-h-[92vh]">
+        <div className="w-full flex items-center justify-between mb-5">
+          <img src={logo} alt="Eduroutez" className="h-10 w-auto" />
+          <button
+            type="button"
+            onClick={() => (isMode === "popup" && onClose ? onClose() : navigate("/"))}
+            className="text-gray-500 hover:text-gray-700"
+            aria-label="Close signup"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-bold text-left opacity-90 leading-tight mb-3">
           Register Now
         </h1>
         <p className="text-gray-500 mb-8">
@@ -897,6 +897,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
           ) : (
             <Link
               to="/login"
+              state={{ backgroundLocation: location.state?.backgroundLocation || location }}
               className="text-red-500 font-medium hover:underline"
             >
               Log in

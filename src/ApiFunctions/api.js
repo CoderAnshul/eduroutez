@@ -105,11 +105,10 @@ export const getRecentBlogs = async () => {
 export const CarrerDetail = async (idOrSlug) => {
   try {
     console.log("Processing request for:", idOrSlug);
-    
-    // Determine if we're dealing with an ID or a slug
-    const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
-    console.log("[CarrerDetail] route type", { idOrSlug, isSlug });
-    
+
+    const isObjectId = /^[a-fA-F0-9]{24}$/.test(String(idOrSlug));
+    console.log("[CarrerDetail] route type", { idOrSlug, isObjectId });
+
     let response;
 
     const extractPayload = (res) => {
@@ -126,39 +125,17 @@ export const CarrerDetail = async (idOrSlug) => {
       return normalized;
     };
 
-    if (isSlug) {
-      console.log("[CarrerDetail] requesting slug endpoint", `${baseURL}/careers/${idOrSlug}`);
+    // Use collection filter endpoint for both ID and slug to avoid /careers/:id calls.
+    const filters = isObjectId
+      ? { _id: String(idOrSlug) }
+      : { slug: String(idOrSlug) };
 
-      let payload = null;
-      try {
-        response = await cachedGet(`${baseURL}/careers/${idOrSlug}`, {
-          params: { field: "slug" }
-        });
-        payload = extractPayload(response);
-        console.log("[CarrerDetail] slug endpoint payload", payload);
-      } catch (slugError) {
-        console.warn("[CarrerDetail] slug endpoint failed, will fallback", slugError?.message || slugError);
-      }
-
-      if (!payload) {
-        console.warn("[CarrerDetail] trying careers collection filter", {
-          slug: idOrSlug,
-        });
-        response = await axios.get(`${baseURL}/careers`, {
-          params: {
-            filters: JSON.stringify({ slug: idOrSlug }),
-            limit: 1,
-          },
-        });
-        payload = extractPayload(response);
-        console.log("[CarrerDetail] careers collection fallback payload", payload);
-      }
-
-      return payload;
-    } else {
-      console.log("[CarrerDetail] requesting id endpoint", `${baseURL}/careers/${idOrSlug}`);
-      response = await cachedGet(`${baseURL}/careers/${idOrSlug}`);
-    }
+    response = await cachedGet(`${baseURL}/careers`, {
+      params: {
+        filters: JSON.stringify(filters),
+        limit: 1,
+      },
+    });
 
     console.log("[CarrerDetail] raw response", response);
     const payload = extractPayload(response);
