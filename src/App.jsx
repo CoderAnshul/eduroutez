@@ -242,7 +242,7 @@ const App = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        style={{ zIndex: 9999 }}
+        style={{ zIndex: 99999 }}
       />
       <ScrollToTop />
       <AppShell />

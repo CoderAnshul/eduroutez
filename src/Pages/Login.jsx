@@ -133,22 +133,22 @@ const Login = ({ isMode, onSwitch, onClose }) => {
     <div
       className={isPopupMode ? "w-full" : "w-full flex min-h-screen items-center justify-center bg-gray-100 px-4 py-8"}
     >
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex py-6 sm:py-8 flex-col justify-center items-center px-5 sm:px-8 overflow-y-auto max-h-[92vh]">
-        <div className="w-full flex items-center justify-between mb-5">
-          <img src={logo} alt="Eduroutez" className="h-10 w-auto" />
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex pt-10 pb-6 sm:pt-14 sm:pb-8 flex-col justify-center items-center px-5 sm:px-8 hidescrollbar max-h-[92vh]">
+        <div className="w-full relative flex items-center justify-center mb-5">
+          <img src={logo} alt="Eduroutez" className="h-8 mb-8 w-auto" />
           <button
             type="button"
             onClick={() => (isMode === "popup" && onClose ? onClose() : navigate("/"))}
-            className="text-gray-500 hover:text-gray-700"
+            className="absolute right-0 text-gray-500 hover:text-gray-700"
             aria-label="Close login"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-start opacity-80 mb-2">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center opacity-80 mb-2">
           Log in
         </h1>
-        <p className="text-gray-500 mb-8">
+        <p className="text-gray-500 mb-8 text-center">
           Welcome back! Please enter your details
         </p>
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
