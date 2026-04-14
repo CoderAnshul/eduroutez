@@ -42,6 +42,22 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     return /^\d{10}$/.test(phone);
   };
 
+  const closeAllFlowPopups = () => {
+    setShowOtpDialog(false);
+    setShowGuidancePopup(false);
+    setShowSchedulePopup(false);
+    setShowConfirmationPopup(false);
+  };
+
+  const openExclusivePopup = (popupName) => {
+    closeAllFlowPopups();
+
+    if (popupName === "otp") setShowOtpDialog(true);
+    if (popupName === "guidance") setShowGuidancePopup(true);
+    if (popupName === "schedule") setShowSchedulePopup(true);
+    if (popupName === "confirmation") setShowConfirmationPopup(true);
+  };
+
   const roleTypes = [
     { value: "institute", label: "University/College/Institute" },
     { value: "counsellor", label: "Counsellor" },
@@ -203,7 +219,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     onSuccess: () => {
       setIsLoading(false);
       toast.success("OTP sent successfully");
-      setShowOtpDialog(true);
+      openExclusivePopup("otp");
     },
     onError: (error) => {
       setIsLoading(false);
@@ -327,7 +343,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     onSuccess: (data) => {
       setIsLoading(false);
       toast.success("Registered successfully");
-      setShowOtpDialog(false); // Close OTP dialog after successful verification
+      closeAllFlowPopups();
       localStorage.setItem("accessToken", data.data.accessToken);
       localStorage.setItem("userId", data?.data?.user?._id);
       localStorage.setItem("role", data?.data?.user?.role);
@@ -340,7 +356,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
            navigate("/");
         }
       } else if (data?.data?.user?.role === "counsellor") {
-        setShowGuidancePopup(true);
+        openExclusivePopup("guidance");
       } else {
         window.location.href = "https://admin.eduroutez.com/";
       }
@@ -452,8 +468,9 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
   };
 
   const handleVerifyOtp = () => {
-    if (!otp) {
-      toast.error("Please enter OTP");
+    const joinedOtp = otp.join("").trim();
+    if (joinedOtp.length !== 6) {
+      toast.error("Please enter a valid 6-digit OTP");
       return;
     }
 
@@ -580,15 +597,14 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
   // Handler for schedule later button in GuidanceTestPopup
   const handleScheduleLater = () => {
     handleGuidancePayment(() => {
-      setShowGuidancePopup(false);
-      setShowSchedulePopup(true);
+      openExclusivePopup("schedule");
     });
   };
 
   // Handler for payment button in GuidanceTestPopup (Pay & Give Test Now)
   const handleGuidancePay = () => {
     handleGuidancePayment(() => {
-      setShowGuidancePopup(false);
+      closeAllFlowPopups();
       navigate("/counselor-test/exam");
     });
   };
@@ -614,14 +630,17 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     } catch (err) {
       toast.error("Failed to schedule test");
     }
-    setShowSchedulePopup(false);
-    setShowConfirmationPopup(true);
+    openExclusivePopup("confirmation");
   };
+
+  const isFlowPopupOpen =
+    showOtpDialog || showGuidancePopup || showSchedulePopup || showConfirmationPopup;
 
   return (
     <div
       className={isPopupMode ? "w-full" : "w-full flex min-h-screen items-center justify-center bg-gray-100 px-4 py-8"}
     >
+      {!isFlowPopupOpen && (
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex py-6 sm:py-8 flex-col justify-start overflow-y-auto items-center px-5 sm:px-8 max-h-[92vh]">
         <div className="w-full flex items-center justify-between mb-5">
           <img src={logo} alt="Eduroutez" className="h-10 w-auto" />
@@ -905,28 +924,33 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
           )}
         </p>
       </div>
+      )}
 
       {/* OTP Dialog */}
       {showOtpDialog && (
-        <div className="fixed inset-0 flex p-12 items-center justify-center bg-black bg-opacity-50 z-[1000]">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+        <div className="fixed inset-0 z-[11000] flex items-center justify-center bg-slate-950/65 backdrop-blur-[2px] px-4 py-6 sm:px-6">
+          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_30px_90px_rgba(15,23,42,0.35)] sm:p-6">
             {/* Header */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Verify OTP</h2>
+            <div className="mb-5 flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900">Verify OTP</h2>
+                <p className="mt-1 text-sm text-slate-500">Secure verification for your signup</p>
+              </div>
               <button
                 onClick={() => setShowOtpDialog(false)}
-                className="text-gray-500 hover:text-gray-700 text-xl"
+                className="h-9 w-9 rounded-full text-gray-500 transition hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Close OTP popup"
               >
-                ×
+                <X className="mx-auto h-4 w-4" />
               </button>
             </div>
 
-            <p className="text-gray-600 text-sm mb-4">
+            <p className="mb-6 text-sm leading-relaxed text-slate-600">
               Please enter the OTP sent to your email and phone number.
             </p>
 
             {/* OTP Inputs */}
-            <div className="flex justify-center gap-3 mb-4">
+            <div className="mb-6 flex justify-center gap-2 sm:gap-3">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -943,7 +967,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
                   onKeyDown={(e) => handleOtpKeyDown(index, e)}
                   onPaste={handleOtpPaste}
                   onFocus={(e) => e.target.select()}
-                  className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+                  className="h-12 w-12 rounded-xl border border-slate-300 bg-slate-50 text-center text-xl font-bold text-slate-800 transition focus:border-[#b82025] focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/40 sm:h-14 sm:w-14"
                   autoComplete="off"
                   autoFocus={index === 0}
                 />
@@ -951,7 +975,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
             </div>
 
             {/* Countdown Timer & Resend OTP */}
-            <div className="text-center text-sm text-gray-600 mb-4">
+            <div className="mb-6 text-center text-sm text-slate-600">
               {canResend ? (
                 <button
                   onClick={() => {
@@ -959,7 +983,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
                     setTimer(90);
                     setCanResend(false);
                   }}
-                  className="text-red-600 hover:underline"
+                  className="font-semibold text-[#b82025] hover:underline"
                 >
                   Resend OTP
                 </button>
@@ -969,16 +993,16 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
             </div>
 
             {/* Buttons */}
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-3">
               <button
                 onClick={() => setShowOtpDialog(false)}
-                className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 transition"
+                className="w-1/2 rounded-xl border border-slate-300 bg-slate-100 px-4 py-2.5 font-medium text-slate-700 transition hover:bg-slate-200"
               >
                 Cancel
               </button>
               <button
                 onClick={handleVerifyOtp}
-                className="px-6 py-2 bg-[#b82025] text-white font-semibold rounded-md hover:bg-red-700 transition"
+                className="w-1/2 rounded-xl bg-[#b82025] px-4 py-2.5 font-semibold text-white shadow-lg shadow-red-900/20 transition hover:bg-[#a11d21]"
               >
                 Verify OTP
               </button>
