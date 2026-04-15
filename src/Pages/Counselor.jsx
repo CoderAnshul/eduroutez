@@ -385,14 +385,11 @@ const CounselorListPage = () => {
                           <div className="flex gap-6 flex-col sm:flex-row">
                             <div className="relative group">
                               {counselor.profilePhoto ? (
-                                <img
-                                  src={`${Images}/${counselor.profilePhoto.replace(
-                                    "uploads/",
-                                    ""
-                                  )}`}
-                                  alt={`${counselor.firstname} ${counselor.lastname}`}
-                                  className="h-32 w-32 object-cover shadow-sm rounded-lg"
-                                />
+                               <img
+  src={`${Images}/${counselor.profilePhoto.replace(/uploads[\\/]/g, "")}`}
+  alt={`${counselor.firstname} ${counselor.lastname}`}
+  className="h-32 w-32 object-cover shadow-sm rounded-lg"
+/>
                               ) : (
                                 <div className="h-32 w-32 bg-gray-50 flex items-center justify-center rounded-lg">
                                   <svg

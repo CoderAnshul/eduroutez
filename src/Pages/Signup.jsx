@@ -653,8 +653,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
             <X className="h-5 w-5" />
           </button>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-center opacity-90 leading-tight mb-3">
-        <h1 className="text-3xl sm:text-4xl font-bold text-center opacity-80 mb-2">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center opacity-90 leading-tight mb-3">
           Register Now
         </h1>
         <p className="text-gray-500 mb-8 text-center">
