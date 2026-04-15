@@ -134,7 +134,7 @@ const Navbar = () => {
   return (
     <>
       {/* Main Navbar - Fixed */}
-      <nav className="fixed top-0 left-0 right-0 z-[999] bg-white ">
+      <nav className="fixed top-0 left-0 right-0 z-[999] bg-white border-b border-gray-200">
         <div className="universal-max-width h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button onClick={toggleMenu} className="lg:hidden">
@@ -233,7 +233,7 @@ const Navbar = () => {
 
                   {/* Dropdown menu */}
                   {isDropdownOpen && (
-                    <div className="absolute z-[1000] right-0 top-[34px] w-50 bg-white border transition-all border-gray-300 rounded-lg shadow-lg">
+                    <div className="absolute z-[1000] right-0 top-[34px] w-50 bg-white border transition-shadow border-gray-200 rounded-md shadow-lg">
                       <Link
                         to="/dashboard/profile-page"
                         className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
