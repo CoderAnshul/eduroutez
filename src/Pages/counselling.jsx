@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../ApiFunctions/axios';
+import useModal from '../Components/Modal/useModal';
 import { useQuery } from 'react-query';
 
 const Counselling = () => {
@@ -92,13 +93,15 @@ const Counselling = () => {
       })
       .then((response) => {
         console.log('Slot booked successfully:', response.data);
-        alert('Slot booked successfully!');
+        showAlert('Slot booked successfully!');
       })
       .catch((error) => {
         console.error('Error booking slot:', error.message);
-        alert('Failed to book slot. Please try again.');
+        showAlert('Failed to book slot. Please try again.');
       });
   };
+
+  const { showAlert } = useModal();
 
   if (isLoading) return <div>Loading...</div>;
 

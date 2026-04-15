@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import useModal from "../Modal/useModal";
 import axios from "axios";
 import { useMutation } from "react-query";
 
@@ -15,6 +16,7 @@ const EditProfile = () => {
   });
   const [message, setMessage] = useState("");
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
+  const { showAlert } = useModal();
 
   // Fetch user points and initial profile data
   useEffect(() => {
@@ -74,10 +76,10 @@ const EditProfile = () => {
       return response.data;
     },
     onSuccess: () => {
-      alert("Profile Updated successfully!");
+      showAlert("Profile Updated successfully!");
     },
     onError: () => {
-      alert("Something went wrong");
+      showAlert("Something went wrong");
     },
   });
 

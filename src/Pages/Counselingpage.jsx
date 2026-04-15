@@ -4,6 +4,7 @@ import ConsellingBanner from "../Components/ConsellingBanner";
 import { useQuery } from "react-query";
 import { counsellers } from "../ApiFunctions/api";
 import { Link } from "react-router-dom";
+import useModal from "../Components/Modal/useModal";
 
 const counselors = [
   {
@@ -101,6 +102,7 @@ const tabs = [
 
 const Counselingpage = () => {
   const [selectedTab, setSelectedTab] = useState(0); // Default to the first tab
+  const { showAlert } = useModal();
 
   const {
     data: counselingData,
@@ -119,7 +121,7 @@ const Counselingpage = () => {
     if (userEmail) {
       window.location.href = `/counselling/${email}`;
     } else {
-      alert("Please log in first.");
+      showAlert("Please log in first.");
     }
   };
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useModal from "./Modal/useModal";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setInput } from "../config/inputSlice";
@@ -17,6 +18,7 @@ const Banner = () => {
   const [isBannerLoading, setIsBannerLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { showAlert } = useModal();
   const baseURL = import.meta.env.VITE_BASE_URL;
   const imageUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -184,7 +186,7 @@ const Banner = () => {
 
   const handleBtnClick = async () => {
     if (inputField === "") {
-      alert("Please enter something");
+      showAlert("Please enter something");
       return;
     }
 

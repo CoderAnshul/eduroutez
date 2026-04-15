@@ -2,6 +2,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useMemo, useEffect } from "react";
 import { useMutation, useQuery } from "react-query";
 import axiosInstance from "../ApiFunctions/axios";
+import useModal from "../Components/Modal/useModal";
 
 const QuestionandAnswer = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -12,6 +13,7 @@ const QuestionandAnswer = () => {
   const { email } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { showAlert } = useModal();
 
   const options = [
     "Computer Science",
@@ -174,7 +176,7 @@ const QuestionandAnswer = () => {
     }
 
     if (!form.question || !form.label || !form.grade) {
-      alert("Please fill all required fields");
+      showAlert("Please fill all required fields");
       return false;
     }
 
@@ -189,7 +191,7 @@ const QuestionandAnswer = () => {
       mutate(updatedForm);
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Failed to submit question");
+      showAlert("Failed to submit question");
     }
     return false;
   };
@@ -210,7 +212,7 @@ const QuestionandAnswer = () => {
       return response.data;
     },
     onSuccess: () => {
-      alert("Question submitted successfully!");
+      showAlert("Question submitted successfully!");
       document.getElementById("questionForm").reset();
       setForm({});
       refetch();
@@ -225,7 +227,7 @@ const QuestionandAnswer = () => {
         // Redirect immediately without alert or delay to prevent page blink
         navigate("/login", { replace: true });
       } else {
-        alert("Failed to submit question. Please try again.");
+        showAlert("Failed to submit question. Please try again.");
       }
     },
   });

@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
+import { ModalProvider } from './Components/Modal/ModalProvider'
 import {
   QueryClient,
   QueryClientProvider,
@@ -25,7 +26,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={appStore}>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <ModalProvider>
+          <App />
+        </ModalProvider>
       </QueryClientProvider>
     </Provider>
   </StrictMode>,

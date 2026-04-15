@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
+import useModal from "../Components/Modal/useModal";
 import axiosInstance from "../ApiFunctions/axios";
 
 const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -43,6 +44,7 @@ const ProfilePage = () => {
   });
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
+  const { showAlert } = useModal();
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
@@ -87,7 +89,7 @@ const ProfilePage = () => {
       }
     },
     onError: (error) => {
-      alert("Error fetching user data: " + error.message);
+      showAlert("Error fetching user data: " + error.message);
     },
   });
 
@@ -301,11 +303,11 @@ const ProfilePage = () => {
       return response.data;
     },
     onSuccess: () => {
-      alert("Profile updated successfully!");
+      showAlert("Profile updated successfully!");
     },
     onError: (error) => {
       console.error("Update error:", error);
-      alert("Failed to update profile. Please try again.");
+      showAlert("Failed to update profile. Please try again.");
     },
   });
 
@@ -366,7 +368,7 @@ const ProfilePage = () => {
       updateProfileMutation.mutate(updatedForm);
     } catch (error) {
       console.error("Submit error:", error);
-      alert("An error occurred while submitting the form.");
+      showAlert("An error occurred while submitting the form.");
     }
   };
 

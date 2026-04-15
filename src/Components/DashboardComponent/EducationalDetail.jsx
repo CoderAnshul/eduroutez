@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import useModal from "../Modal/useModal";
 import axios from "axios";
 import { useMutation } from "react-query";
 
@@ -15,6 +16,7 @@ const EducationalDetail = () => {
   });
   const [message, setMessage] = useState("");
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
+  const { showAlert } = useModal();
 
   useEffect(() => {
     const fetchEducationData = async () => {
@@ -65,10 +67,10 @@ const EducationalDetail = () => {
       return response.data;
     },
     onSuccess: () => {
-      alert("Educational details updated successfully!");
+      showAlert("Educational details updated successfully!");
     },
     onError: () => {
-      alert("Something went wrong");
+      showAlert("Something went wrong");
     },
   });
 

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import useModal from './Modal/useModal';
 
 // Reusable social sharing component for any content type
 const SocialShare = ({ 
@@ -39,6 +40,8 @@ const SocialShare = ({
       setTimeout(() => setCopySuccess(false), 2000);
     });
   };
+
+  const { showAlert } = useModal();
 
   // Function to get deep link for platforms that don't have direct web sharing
   const getDeepLink = (platform) => {
@@ -155,7 +158,7 @@ const SocialShare = ({
       // Set a fallback timer to copy link if deep link fails
       setTimeout(() => {
         copyToClipboard();
-        alert(`If ${platform.name} didn't open, we've copied the link to your clipboard. You can now paste it in ${platform.name} manually.`);
+        showAlert(`If ${platform.name} didn't open, we've copied the link to your clipboard. You can now paste it in ${platform.name} manually.`);
       }, 2000);
       
       setIsOpen(false);

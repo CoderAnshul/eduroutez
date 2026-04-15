@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useMutation, useQuery } from "react-query";
+import useModal from "../Components/Modal/useModal";
 import axiosInstance from "../ApiFunctions/axios";
 
 const StudentDocument = () => {
@@ -84,12 +85,14 @@ const StudentDocument = () => {
       return response.data;
     },
     onSuccess: () => {
-      alert("Documents uploaded successfully!");
+      showAlert("Documents uploaded successfully!");
     },
     onError: () => {
-      alert("Upload failed");
+      showAlert("Upload failed");
     },
   });
+
+  const { showAlert } = useModal();
 
   const handleSubmit = (e) => {
     e.preventDefault();
