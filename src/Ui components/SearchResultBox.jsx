@@ -8,13 +8,15 @@ import checklist from "../assets/Images/checklist.png";
 import { addToWishlist } from "../ApiFunctions/api";
 import axiosInstance from "../ApiFunctions/axios";
 import { MapPin, Building } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
 const SearchResultBox = ({ institute, url, className = "" }) => {
   console.log("Institute:", institute);
   const userId = localStorage.getItem("userId");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [isWishlisted, setIsWishlisted] = useState(
     institute.wishlist && institute.wishlist.includes(userId)
@@ -35,29 +37,48 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
 
   const instituteUrl = getInstituteUrl();
 
-  const handleAddToWishlist = async () => {
+  const handleAddToWishlist = async (event) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    const userId = localStorage.getItem("userId");
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!userId || !accessToken || !refreshToken) {
+      navigate("/login", { state: { backgroundLocation: location } });
+      return;
+    }
+
     try {
-      const userId = localStorage.getItem("userId");
       const response = await addToWishlist(userId, institute._id, null, {
         headers: {
           "Content-Type": "application/json",
-          "x-access-token": localStorage.getItem("accessToken"),
-          "x-refresh-token": localStorage.getItem("refreshToken"),
+          "x-access-token": accessToken,
+          "x-refresh-token": refreshToken,
         },
       }); // Assuming courseId is null for now
-      if (response.message.includes("removed")) {
+      const responseMessage = String(
+        response?.message || response?.data?.message || ""
+      ).toLowerCase();
+
+      if (responseMessage.includes("removed")) {
         setIsWishlisted(false);
-      } else if (response.message.includes("added")) {
+        toast.success("Removed from wishlist");
+      } else if (responseMessage.includes("added")) {
         setIsWishlisted(true);
+        toast.success("Added to wishlist");
+      } else {
+        // Fallback for inconsistent API response text.
+        setIsWishlisted((prev) => !prev);
       }
     } catch (error) {
       console.error("Error adding to wishlist:", error);
+      toast.error("Unable to update wishlist right now");
     }
   };
 
-  const hasWishlistFeature = institute.plan?.features?.some(
-    (feature) => feature.key === "WishList" && feature.value === "Yes"
-  );
+  const hasWishlistFeature = true;
 
   const overallRating =
     institute?.reviews?.length > 0
@@ -128,39 +149,50 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
   };
 
   return (
-    <div
-      className={`border rounded-lg shadow-md p-4 flex flex-col space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2 ${className}`}
-    >
-      {/* Left Section - Image */}
-      <div className="flex justify-between flex-col gap-3"></div>
-      <div className="flex justify-between flex-col md:flex-row gap-3">
+    <>
+      <div
+        className={`border rounded-lg shadow-md p-4 flex flex-col space-y-4 md:space-y-0 md:space-x-6 bg-white mb-2 ${className}`}
+      >
+        {/* Left Section - Image */}
+        <div className="flex justify-between flex-col gap-3"></div>
+        <div className="flex justify-between flex-col md:flex-row gap-3">
         {/* Make image clickable */}
-        <Link to={instituteUrl} className="relative w-full md:w-2/6 !ml-0 block group">
-          <img
-            src={
-              institute.thumbnailImage
-                ? `${Image}/${institute.thumbnailImage}`
-                : serachBoximg
-            }
-            alt="Institute Thumbnail"
-            className="rounded-lg object-cover w-full h-44 group-hover:opacity-90 transition-opacity duration-200"
-            style={{ cursor: 'pointer' }}
-            onError={(e) => {
-              e.target.src = serachBoximg;
-              e.target.onerror = null;
-            }}
-          />
+        <div className="relative w-full md:w-2/6 !ml-0 block">
+          <Link to={instituteUrl} className="group block">
+            <img
+              src={
+                institute.thumbnailImage
+                  ? `${Image}/${institute.thumbnailImage}`
+                  : serachBoximg
+              }
+              alt="Institute Thumbnail"
+              className="rounded-lg object-cover w-full h-44 group-hover:opacity-90 transition-opacity duration-200"
+              style={{ cursor: 'pointer' }}
+              onError={(e) => {
+                e.target.src = serachBoximg;
+                e.target.onerror = null;
+              }}
+            />
+          </Link>
+
           {hasWishlistFeature && (
             <button
-              className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md"
+              className="absolute top-2 right-2 z-20 bg-white p-2 rounded-full shadow-md pointer-events-auto"
               aria-label={
                 isWishlisted ? "Remove from wishlist" : "Add to wishlist"
               }
               onClick={handleAddToWishlist}
               type="button"
               tabIndex={-1}
-              onMouseDown={e => e.stopPropagation()}
-              onClickCapture={e => e.stopPropagation()}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+              }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+              }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -178,7 +210,7 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
               </svg>
             </button>
           )}
-        </Link>
+        </div>
 
         {/* Right Section - Details */}
         <div className="w-full md:w-3/4 flex flex-col">
@@ -281,33 +313,34 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
           </div>
         </div>
       </div>
-      <div className="flex space-x-4 justify-center md:justify-between gap-4 items-center flex-wrap">
-        <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
-          <div className="space-x-4">
-            <Link to={`${instituteUrl}`} className="hover:no-underline hover:text-red-600">
-              Fees and Courses
-            </Link>
-            <Link to={`${instituteUrl}`} className="hover:no-underline hover:text-red-600">
-              Admission
-            </Link>
-            <Link to={`${instituteUrl}`} className="hover:no-underline hover:text-red-600">
-              Placement
+        <div className="flex space-x-4 justify-center md:justify-between gap-4 items-center flex-wrap">
+          <div className="flex justify-between items-center flex-wrap gap-3 mt-3 text-sm text-blue-600">
+            <div className="space-x-4">
+              <Link to={`${instituteUrl}`} className="hover:no-underline hover:text-red-600">
+                Fees and Courses
+              </Link>
+              <Link to={`${instituteUrl}`} className="hover:no-underline hover:text-red-600">
+                Admission
+              </Link>
+              <Link to={`${instituteUrl}`} className="hover:no-underline hover:text-red-600">
+                Placement
+              </Link>
+            </div>
+          </div>
+          <div className="flex items-center flex-wrap gap-4 !ml-0">
+            <button
+              className="bg-[#b82025] text-white px-4 py-2 rounded-lg"
+              onClick={handleDownloadBrochure}
+            >
+              Download Brochure
+            </button>
+            <Link to={instituteUrl} className="!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md viewmorebtn bg-[#b82025] text-sm text-white w-32 whitespace-nowrap transition-transform transform active:scale-95 hover:scale-105 flex items-center justify-center" style={{ textDecoration: 'none' }}>
+              View more
             </Link>
           </div>
         </div>
-        <div className="flex items-center flex-wrap gap-4 !ml-0">
-          <button
-            className="bg-[#b82025] text-white px-4 py-2 rounded-lg"
-            onClick={handleDownloadBrochure}
-          >
-            Download Brochure
-          </button>
-          <Link to={instituteUrl} className="!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md viewmorebtn bg-[#b82025] text-sm text-white w-32 whitespace-nowrap transition-transform transform active:scale-95 hover:scale-105 flex items-center justify-center" style={{ textDecoration: 'none' }}>
-            View more
-          </Link>
-        </div>
       </div>
-    </div>
+    </>
   );
 };
 
