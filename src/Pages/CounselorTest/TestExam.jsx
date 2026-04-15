@@ -75,11 +75,16 @@ const CounselorTestExam = () => {
             });
 
             if (response.data.success || response.status === 200) {
+                const submittedResult = response?.data?.data || null;
+                if (submittedResult) {
+                    sessionStorage.setItem("latestCounselorTestResult", JSON.stringify(submittedResult));
+                }
+
                 if (autoSubmit) {
                     setIsTimedOut(true);
                 } else {
                     toast.success("Test submitted successfully!");
-                    navigate("/counselor-test/result", { state: { result: response.data.data } });
+                    navigate("/dashboard/test-result", { state: { result: submittedResult } });
                 }
             }
         } catch (error) {
@@ -206,7 +211,7 @@ const CounselorTestExam = () => {
                         Your progress has been automatically saved and submitted.
                     </p>
                     <button
-                        onClick={() => navigate("/counselor-test/result")}
+                        onClick={() => navigate("/dashboard/test-result")}
                         className="w-full bg-slate-900 text-white font-black py-4 rounded-xl hover:bg-[#b82025] transition-all shadow-xl shadow-slate-200"
                     >
                         See My Score

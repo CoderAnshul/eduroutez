@@ -14,6 +14,7 @@ const Sidebar = () => {
     { name: "Scheduled Slots", path: "/dashboard/slots", icon: "📅" },
     { name: "Payout", path: "/dashboard/payout", icon: "💰" },
     { name: "Webinars", path: "/dashboard/webinar", icon: "🎥" },
+    { name: "Test Result", path: "/dashboard/test-result", icon: "📊" },
     { name: "Refer & Earn", path: "/dashboard/refer&earn", icon: "🏫" },
     { name: "Redeem", path: "/dashboard/redeem", icon: "🎁" },
     { name: "Settings", path: "/dashboard/settings", icon: "⚙️" },

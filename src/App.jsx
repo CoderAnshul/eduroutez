@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useMemo } from 'react';
-import { Route, Routes, BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, BrowserRouter, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import ScrollToTop from './Utilities/ScrollToTop';
@@ -58,6 +58,16 @@ const Logout = React.lazy(() => import('./Pages/Logout'))
 const CounselorTestPayment = React.lazy(() => import('./Pages/CounselorTest/Payment'));
 const CounselorTestExam = React.lazy(() => import('./Pages/CounselorTest/TestExam'));
 const CounselorTestResult = React.lazy(() => import('./Pages/CounselorTest/TestResult'));
+
+const LegacyCounselorResultRedirect = () => {
+  const isAuthenticated = Boolean(localStorage.getItem('accessToken'));
+  return (
+    <Navigate
+      to={isAuthenticated ? '/dashboard/test-result' : '/login'}
+      replace
+    />
+  );
+};
 
 const AppShell = () => {
   const location = useLocation();
@@ -193,6 +203,7 @@ const AppShell = () => {
 
             {/* Dashboard webinars list */}
             <Route path="webinar" element={<WebinarsPage />} />
+            <Route path="test-result" element={<CounselorTestResult />} />
 
             < Route path='refer&earn' element={<ReferAndEarn></ReferAndEarn>}></Route>
             <Route path="logout" element={<Logout />} />
@@ -200,7 +211,7 @@ const AppShell = () => {
           </Route>
           <Route path="/counselor-test/payment" element={<CounselorTestPayment />} />
           <Route path="/counselor-test/exam" element={<CounselorTestExam />} />
-          <Route path="/counselor-test/result" element={<CounselorTestResult />} />
+          <Route path="/counselor-test/result" element={<LegacyCounselorResultRedirect />} />
         </Routes>
       </Suspense>
 

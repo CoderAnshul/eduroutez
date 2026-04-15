@@ -211,7 +211,7 @@ const WelcomeBanner = () => {
           icon: Clock,
           title: "Verification Pending",
           color: "bg-yellow-500",
-          route: "/counselor-test/result",
+          route: "/dashboard/test-result",
         };
       } else {
         actions[becomeIdx] = {
