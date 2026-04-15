@@ -210,6 +210,7 @@ const Banner = () => {
   return (
     // <div className="h-[480px] w-full relative">
     <div className="h-fit min-h-56 max-h-96 w-full relative mb-8">
+    {/* <div className="h-fit min-h-56 max-h-96 w-full relative mb-8"> */}
       {/* Background banner slider from /banners API, fallback to Promotions */}
       {banners.length > 0 && !isBannerLoading ? (
         <div className="relative w-full h-full group">

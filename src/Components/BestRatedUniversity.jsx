@@ -104,7 +104,7 @@ const BestRatedUniversity = React.memo(() => {
             />
           </div>
           <div className="textContainer p-4">
-            <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
+            <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A] antialiased leading-tight">
               {institute.instituteName || "Institute Name Not Available"}
             </h3>
             <p className="text-sm mt-2">

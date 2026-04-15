@@ -654,9 +654,10 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
           </button>
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-center opacity-90 leading-tight mb-3">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center opacity-80 mb-2">
           Register Now
         </h1>
-        <p className="text-gray-500 mb-8">
+        <p className="text-gray-500 mb-8 text-center">
           Please fill in the form to create an account
         </p>
 

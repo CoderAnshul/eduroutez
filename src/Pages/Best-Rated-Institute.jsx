@@ -155,7 +155,8 @@ const BestRatedInstitute = () => {
               <Link
                 key={institute._id || index}
                 to={getInstituteUrl(institute)}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                aria-label={institute.instituteName}
               >
                 {/* Institute Image */}
                 <div className="h-56 overflow-hidden">
@@ -165,6 +166,7 @@ const BestRatedInstitute = () => {
                     }`}
                     alt={institute.instituteName}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                     onError={(e) => {
                       e.target.src = "/fallback-institute.jpg"; // Fallback image
                     }}
@@ -173,7 +175,7 @@ const BestRatedInstitute = () => {
 
                 {/* Institute Details */}
                 <div className="!p-6">
-                  <h2 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
+                  <h2 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A] antialiased leading-tight">
                   {/* <h2 className="text-2xl font-bold mb-2 text-gray-800"> */}
                     {institute.instituteName}
                   </h2>

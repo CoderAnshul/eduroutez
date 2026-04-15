@@ -316,20 +316,20 @@ const SubNavbar = ({ categories }) => {
   const handleLinkClick = (url) => { navigate(url); setHoveredCategory(null); };
 
   const renderCoursesContent = () => (
-    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
         <h3 className="font-bold text-xl text-gray-800 flex items-center">
-          <span className="w-1.5 h-6 bg-[#b82025] rounded-full mr-3"></span> Popular Courses
+          <span className="w-1.5 h-6 bg-[#b82025] mr-3"></span> Popular Courses
         </h3>
-        <span className="text-xs px-3 py-1 bg-red-50 text-red-500 rounded-full font-medium">
+        <span className="text-xs px-3 py-1 bg-red-50 text-red-500 rounded-none font-medium">
           {popularCourses?.result?.length || 0} Courses Available
         </span>
       </div>
       <div className="grid grid-cols-3 gap-x-8">
         {popularCourses?.result?.map((course) => (
           <div key={course._id} className="group">
-            <a onClick={() => handleCourseClick(course)} className="flex items-center space-x-2 px-2 py-1 rounded-lg cursor-pointer transition-all duration-200 hover:text-red-500">
-              <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+            <a onClick={() => handleCourseClick(course)} className="flex items-center space-x-2 px-2 py-1 cursor-pointer transition-all duration-200 hover:text-red-500">
+              <div className="w-8 h-8 bg-red-50 flex items-center justify-center flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
                 </svg>
@@ -343,7 +343,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderCareersContent = () => (
-    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
       <div className="space-y-8">
         <h3 className="font-semibold text-red-500 text-base">Latest Careers</h3>
         <div className="space-y-6">
@@ -365,7 +365,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderTopCollegesContent = () => (
-    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
     {/* <div className="p-6 bg-white w-full"> */}
       <div className="grid grid-cols-3 gap-6">
         {/* Popular Colleges */}
@@ -440,7 +440,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
     {/* <div className="bg-white rounded-xl w-full shadow-lg"> */}
       <div className="p-4 border-b">
         <h3 className="text-lg font-bold text-black">Latest Updates</h3>
@@ -448,14 +448,14 @@ const SubNavbar = ({ categories }) => {
       <div className="p-4">
         <ul className="grid grid-cols-4 gap-8 ml-0 list-none">
           {latestNews.slice(0, 4).map((news) => (
-            <li key={news._id} onClick={() => handleNewsClick(news)} className="group text-black hover:bg-orange-50 rounded-lg p-3 transition-colors duration-200 cursor-pointer shadow-md">
+            <li key={news._id} onClick={() => handleNewsClick(news)} className="group text-black hover:bg-orange-50 p-3 transition-colors duration-200 cursor-pointer shadow-md">
               <div className="space-y-3">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-900 line-clamp-2">{news.title}</p>
                   <p className="text-xs text-orange-600">{new Date(news.createdAt).toDateString()}</p>
                 </div>
                 <div>
-                  <img src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${news.image}`} alt={news.title} className="w-full h-48 object-cover rounded-lg" />
+                  <img src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${news.image}`} alt={news.title} className="w-full h-48 object-cover" />
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-3">{news.description}</p>
               </div>
@@ -475,7 +475,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderMoreContent = () => (
-    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto rounded-xl shadow-lg border border-gray-100">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
     {/* <div className="bg-pink rounded-lg shadow-lg p-6 w-full"> */}
       <div className="grid grid-cols-3 gap-8">
         <div className="space-y-4">
@@ -552,7 +552,7 @@ const SubNavbar = ({ categories }) => {
     const streamName = activeItem?.name;
 
     return (
-      <div className="bg-white w-full max-h-[500px] rounded-xl shadow-lg border border-gray-100 flex overflow-hidden">
+      <div className="bg-white w-full max-h-[500px] shadow-lg border border-gray-100 flex overflow-hidden">
         <div className="w-[300px] bg-[#b82025] flex-shrink-0">
           <ul className="w-full ml-0 mb-0 pb-0 space-y-0">
             {category?.sidebarItems?.map((item) => (

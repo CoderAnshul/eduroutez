@@ -139,7 +139,7 @@ const Login = ({ isMode, onSwitch, onClose }) => {
           <button
             type="button"
             onClick={() => (isMode === "popup" && onClose ? onClose() : navigate("/"))}
-            className="absolute right-0 top-0 text-gray-500 hover:text-gray-700"
+            className="absolute right-0 top-0 absolute right-0 text-gray-500 hover:text-gray-700"
             aria-label="Close login"
           >
             <X className="h-5 w-5" />
@@ -148,7 +148,7 @@ const Login = ({ isMode, onSwitch, onClose }) => {
         <h1 className="text-2xl sm:text-3xl font-bold text-center opacity-80 mb-2">
           Log in
         </h1>
-        <p className="text-gray-500 mb-8">
+        <p className="text-gray-500 mb-8 text-center">
           Welcome back! Please enter your details
         </p>
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
