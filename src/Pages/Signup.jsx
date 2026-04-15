@@ -642,18 +642,18 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     >
       {!isFlowPopupOpen && (
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex py-6 sm:py-8 flex-col justify-start overflow-y-auto items-center px-5 sm:px-8 max-h-[92vh]">
-        <div className="w-full flex items-center justify-between mb-5">
-          <img src={logo} alt="Eduroutez" className="h-10 w-auto" />
+        <div className="w-full flex items-center justify-center mb-5 relative">
+          <img src={logo} alt="Eduroutez" className="h-10 w-auto mx-auto" />
           <button
             type="button"
             onClick={() => (isMode === "popup" && onClose ? onClose() : navigate("/"))}
-            className="text-gray-500 hover:text-gray-700"
+            className="absolute right-0 top-0 text-gray-500 hover:text-gray-700"
             aria-label="Close signup"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-left opacity-90 leading-tight mb-3">
+        <h1 className="text-2xl sm:text-3xl font-bold text-center opacity-90 leading-tight mb-3">
           Register Now
         </h1>
         <p className="text-gray-500 mb-8">
