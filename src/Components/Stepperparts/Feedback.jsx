@@ -135,36 +135,42 @@ const Feedback = ({ formData, setFormData, setIsSubmit }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full overflow-x-hidden">
-      <div className="w-full flex flex-col max-w-4xl items-center md:block p-6 bg-white rounded-lg h-[480px] overflow-y-scroll scrollbar-thumb-red">
+    <div className="flex flex-col items-center justify-start h-full overflow-x-hidden pt-4">
+      <div className="w-full flex-1 flex flex-col max-w-4xl p-6 bg-white rounded-lg overflow-y-auto scrollbar-thumb-red">
         {/* Title */}
-        <h1 className="text-2xl font-semibold text-center text-gray-800">
+        <h1 className="text-3xl font-bold text-center text-[#b82025]">
           Your Experience Survey
         </h1>
-        {/* <p className="mt-1 text-sm text-center text-gray-500">
-          Check twice before you paste your social handle's link
-        </p> */}
 
         {/* Form */}
         <form
-          className="mt-14 space-y-8 mx-auto md:px-10 mb-10"
+          className="mt-8 space-y-6 mx-auto md:px-10 mb-10 w-full"
           onSubmit={handleSubmit}
         >
           {formSections.map((section, index) => (
-            <div key={index}>
-              <h2 className="text-lg font-medium text-gray-700">
+            <div 
+              key={index} 
+              className="bg-gray-50/50 p-6 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md hover:bg-white group"
+            >
+              <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                <span className="w-1.5 h-6 bg-[#b82025] rounded-full inline-block"></span>
                 {section.title}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 mt-4">
                 {section.options.map((option, i) => (
-                  <label key={i} className="flex items-center">
+                  <label 
+                    key={i} 
+                    className="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer group/label"
+                  >
                     <input
                       type="checkbox"
-                      className="mr-2 border-gray-300 focus:ring-blue-500"
+                      className="w-5 h-5 mr-3 accent-[#b82025] cursor-pointer"
                       checked={formData[section.title]?.[option] || false}
                       onChange={() => handleChange(section.title, option)}
                     />
-                    {option}
+                    <span className="text-gray-600 group-hover/label:text-gray-900 font-medium">
+                      {option}
+                    </span>
                   </label>
                 ))}
               </div>
