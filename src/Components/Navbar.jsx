@@ -146,7 +146,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <div className="CustomFlex gap-3 opacity-80">
+          <div className="CustomFlex gap-3">
             <div className="">
               <button
                 onClick={handleQuestion}
@@ -232,42 +232,55 @@ const Navbar = () => {
                     ></Link>
                   </div>
 
-                  {/* Enhanced Dropdown menu */}
-                  {isDropdownOpen && (
-                    <div className="absolute z-[1000] right-0 top-[45px] min-w-[200px] bg-white border border-gray-100 p-2 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] animate-in fade-in slide-in-from-top-2 duration-200">
-                      <Link
-                        to="/dashboard/profile-page"
-                        className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-lg transition-colors group"
-                      >
-                        <User className="w-4 h-4 opacity-70 group-hover:opacity-100" />
-                        Profile
-                      </Link>
-                      <Link
-                        to="/dashboard/settings"
-                        className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-lg transition-colors group"
-                      >
-                        <Settings className="w-4 h-4 opacity-70 group-hover:opacity-100" />
-                        Settings
-                      </Link>
-                      <Link
-                        to="/dashboard/"
-                        className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-lg transition-colors group"
-                      >
-                        <LayoutDashboard className="w-4 h-4 opacity-70 group-hover:opacity-100" />
-                        Dashboard
-                      </Link>
-                      
-                      <div className="h-px bg-gray-100 my-1 mx-2"></div>
-                      
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-lg transition-colors group"
-                      >
-                        <LogOut className="w-4 h-4 opacity-70 group-hover:opacity-100" />
-                        Logout
-                      </button>
-                    </div>
-                  )}
+                  {/* Enhanced Dropdown menu - Animated */}
+                  <div className={`absolute z-[1000] right-0 top-[calc(100%+12px)] min-w-[220px] bg-white border border-gray-100 p-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-300 origin-top-right ${
+                    isDropdownOpen 
+                      ? "opacity-100 translate-y-0 scale-100 pointer-events-auto" 
+                      : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
+                  }`}>
+                    <Link
+                      to="/dashboard/profile-page"
+                      className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                        <User className="w-4 h-4 text-[#b82025] opacity-70 group-hover:opacity-100" />
+                      </div>
+                      Profile
+                    </Link>
+                    <Link
+                      to="/dashboard/settings"
+                      className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                        <Settings className="w-4 h-4 text-blue-600 opacity-70 group-hover:opacity-100" />
+                      </div>
+                      Settings
+                    </Link>
+                    <Link
+                      to="/dashboard/"
+                      className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+                        <LayoutDashboard className="w-4 h-4 text-orange-600 opacity-70 group-hover:opacity-100" />
+                      </div>
+                      Dashboard
+                    </Link>
+                    
+                    <div className="h-px bg-gray-100 my-2 mx-2"></div>
+                    
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                        <LogOut className="w-4 h-4 text-gray-600 group-hover:text-[#b82025] opacity-70 group-hover:opacity-100" />
+                      </div>
+                      Logout
+                    </button>
+                  </div>
                 </div>
               </>
             )}
