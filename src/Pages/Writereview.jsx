@@ -175,18 +175,18 @@ const Writereview = () => {
 
   return (
     <>
-      <div className="universal-max-width max-w-4xl overflow-hidden shadow-none">
+      <div className="universal-max-width  max-w-4xl overflow-hidden shadow-none">
         <Promotions location="REVIEW_PAGE" className="h-[90px]" />
       </div>
       <h2 className=" font-bold mt-6 text-center w-full text-[#b82025] z-30 text-3xl">
         Review
       </h2>
-      <div className="p-3 h-fit pb-14 bg-white relative flex flex-col">
-        <div className=" p-2 md:p-6 rounded h-full relative  shadow flex-1">
+      <div className="p-3 min-h-[60vh] lg:min-h-[85vh] pb-32 bg-white relative flex flex-col">
+        <div className="p-2 md:p-6 rounded h-full relative shadow flex-1 flex flex-col">
           {renderStepContent()}
         </div>
 
-        <div className="absolute bottom-0 left-0 w-full bg-white border-t shadow-md">
+        <div className="fixed bottom-0 left-0 w-full bg-white border-t-2 border-gray-100 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)] z-50">
           <div className="w-full h-2 bg-gray-300 relative">
             <div
               className="h-2 bg-[#b82025] transition-all duration-500 ease-in-out"

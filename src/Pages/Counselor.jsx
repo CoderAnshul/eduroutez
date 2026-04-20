@@ -379,10 +379,10 @@ const CounselorListPage = () => {
                     {displayedCounselors.map((counselor, index) => (
                       <div
                         key={index}
-                        className="bg-white shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300"
+                        className="bg-white shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 h-full flex flex-col"
                       >
-                        <div className="p-2 md:p-6">
-                          <div className="flex gap-6 flex-col sm:flex-row">
+                        <div className="p-2 md:p-6 flex-1 flex flex-col">
+                          <div className="flex gap-6 flex-col sm:flex-row flex-1">
                             <div className="relative group">
                               {counselor.profilePhoto ? (
                                <img
@@ -409,8 +409,8 @@ const CounselorListPage = () => {
                               )}
 
                               {counselor.isVerified && (
-                                <div className="absolute -bottom-2 -right-2 bg-white p-1 rounded-full shadow-md border border-blue-50">
-                                  <div className="bg-blue-600 p-1 rounded-full">
+                                <div className="absolute -bottom-2 -right-2 bg-white p-1 rounded-full shadow-md border border-red-50">
+                                  <div className="bg-[#b82025] p-1 rounded-full">
                                     <svg className="w-3 h-3 text-white fill-current" viewBox="0 0 20 20">
                                       <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" />
                                     </svg>
@@ -419,14 +419,14 @@ const CounselorListPage = () => {
                               )}
                             </div>
 
-                            <div className="flex-1">
+                            <div className="flex-1 flex flex-col">
                               <div className="flex items-center justify-between mb-2">
                                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                   {counselor.firstname + " "}
                                   {counselor.lastname}
                                   {counselor.isVerified && (
                                     <div className="group relative">
-                                      <svg className="w-5 h-5 text-blue-500 fill-current" viewBox="0 0 20 20">
+                                      <svg className="w-5 h-5 text-red-600 fill-current" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" clipRule="evenodd" />
                                       </svg>
                                       <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
@@ -618,10 +618,10 @@ const CounselorListPage = () => {
                                 </div>
                               </div>
 
-                              <div className="flex gap-3 mt-6">
+                              <div className="flex gap-3 mt-auto pt-6">
                                 <button
                                   onClick={() => handleScheduleCall(counselor)}
-                                  className="flex-1 inline-flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-[#b82025] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                                  className="flex-1 inline-flex items-center justify-center px-3 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-[#b82025] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors whitespace-nowrap"
                                 >
                                   <svg
                                     className="w-4 h-4 mr-2"
@@ -642,7 +642,7 @@ const CounselorListPage = () => {
                                   onClick={() =>
                                     handleReviewFeedback(counselor)
                                   }
-                                  className="flex-1 inline-flex items-center justify-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                                  className="flex-1 inline-flex items-center justify-center px-3 py-2.5 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors whitespace-nowrap"
                                 >
                                   <svg
                                     className="w-4 h-4 mr-2"
@@ -656,8 +656,7 @@ const CounselorListPage = () => {
                                       strokeWidth="2"
                                       d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
                                     />
-                                  </svg>
-                                  Review Feedback
+                                  </svg>Feedback
                                 </button>
                               </div>
                             </div>

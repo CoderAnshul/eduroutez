@@ -1,12 +1,19 @@
-import React, { useState, useEffect, useMemo } from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import cardPhoto from "../assets/Images/teacher.jpg";
 import { useQuery } from "react-query";
 import { career } from "../ApiFunctions/api";
+import cardPhoto from "../assets/Images/teacher.jpg";
 import SocialShare from "./SocialShare";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ArrowRight, Eye } from "lucide-react";
+
+// Clean HTML content
+const stripHtml = (html) => {
+  if (!html) return "";
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || "";
+};
 
 const HighRatedCareers = ({ title = "High Rated careers", streamId, categoryId }) => {
   const [content, setContent] = useState([]);
@@ -103,78 +110,89 @@ const HighRatedCareers = ({ title = "High Rated careers", streamId, categoryId }
   }
 
   return (
-    <div className="w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
+    <div className="universal-container py-12 w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
     {/* <div className="container mx-auto px-4 py-12"> */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 px-2">
         <div className="flex items-center gap-2">
-          <Sparkles className="text-red-500 w-6 h-6" />
           <h2 className="text-2xl font-bold">{title}</h2>
-          {/* <h2 className="text-3xl font-bold text-gray-900">{title}</h2> */}
         </div>
         <Link to="/careerspage">
-          <button className="bg-[#b82025] text-white py-2 px-4 rounded">
-            View more
+          <button className="bg-[#b82025] hover:bg-red-700 text-white py-2 px-5 rounded-lg flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md active:scale-95 group">
+            <span className="font-medium text-sm">View more</span>
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </button>
         </Link>
       </div>
 
-      <div className="boxWrapper w-full flex flex-col flex-wrap md:flex-row items-stretch gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {memoizedContent && memoizedContent.length > 0 ? (
           memoizedContent.map((box, index) => (
             <Link
               to={`/detailpage/${box.slug}`}
-              key={index}
-              className="box w-full lg:max-w-[450px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg relative"
+              key={box._id || index}
+              className="group bg-white text-black shadow-md rounded-xl overflow-hidden h-full flex flex-col transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
             >
-              <div className="imageContainer">
+              {/* Image with Overlay */}
+              <div className="relative h-48 overflow-hidden flex-shrink-0">
                 <img
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   src={images[box._id] || cardPhoto}
-                  alt="boxphoto"
+                  alt={box?.title || "Career"}
                   loading="lazy"
                 />
-              </div>
-              <div className="textContainer">
-                <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">
-                  {box?.title || "Untitled"}
-                </h3>
-
-                <p
-                  className="text-sm text-black mt-2"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      box?.description?.slice(0, 80) + "..." ||
-                      "No description available",
-                  }}
-                ></p>
-                <div className="flex items-center justify-between px-4 w-full mt-2">
-                  {box.views > 0 && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="22"
-                        height="22"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                      </svg>
-                      <span className="text-gray-500">{box.views}</span>
+                <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+                
+                <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                  <div className="flex justify-between items-start">
+                    <div className="bg-white/20 backdrop-blur-md text-white border border-white/30 text-[10px] font-medium px-2 py-1 rounded shadow-sm">
+                      Career
                     </div>
-                  )}
-                  <div
-                    className="flex justify-between items-center gap-2 text-gray-600"
-                    onClick={(e) => handleShareClick(e, box)}
-                  >
-                    <SocialShare
-                      title={box.title}
-                      url={`${window.location.origin}/detailpage/${box.slug}`}
-                      contentType="career"
+                  </div>
+
+                  <div>
+                    <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md antialiased leading-tight mb-2">
+                      {box?.title || "Untitled"}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="space-y-4 px-2 pt-1 flex-1">
+                  <div 
+                    className="text-gray-700 text-sm line-clamp-3 h-18"
+                    dangerouslySetInnerHTML={{
+                      __html: stripHtml(box?.description || "No description available")
+                    }}
+                  ></div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-auto">
+                    <div className="flex items-center gap-2 text-gray-500 text-xs">
+                      <Eye size={14} className="text-gray-400" />
+                      <span>{box.views || 0} views</span>
+                    </div>
+
+                    <div 
+                      className="transition-transform hover:scale-110"
+                      onClick={(e) => handleShareClick(e, box)}
+                    >
+                      <SocialShare
+                        title={box.title}
+                        url={`${window.location.origin}/detailpage/${box.slug}`}
+                        contentType="career"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pin Action Button to Bottom */}
+                <div className="mt-6">
+                  <div className="w-full bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-center font-medium text-sm flex items-center justify-center group-hover:bg-[#b82025] group-hover:text-white transition-all duration-300">
+                    <span>View Career</span>
+                    <ArrowRight
+                      size={16}
+                      className="ml-2 transition-transform group-hover:translate-x-1"
                     />
                   </div>
                 </div>

@@ -73,7 +73,9 @@ const AppShell = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const authPopupRoutes = ['/login', '/signup'];
+  const noFooterRoutes = ['/login', '/signup', '/writereview'];
   const isAuthPopupRoute = authPopupRoutes.includes(location.pathname);
+  const shouldHideFooter = noFooterRoutes.includes(location.pathname);
   const stateBackgroundLocation = location.state?.backgroundLocation;
 
   useEffect(() => {
@@ -235,7 +237,7 @@ const AppShell = () => {
         </div>
       )}
 
-      {!isDisplayAuthRoute && <Footer />}
+      {!shouldHideFooter && <Footer />}
     </>
   );
 };
