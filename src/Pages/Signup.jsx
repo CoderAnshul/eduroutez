@@ -22,6 +22,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
   const [showGuidancePopup, setShowGuidancePopup] = useState(false);
   const [showSchedulePopup, setShowSchedulePopup] = useState(false);
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
+  const [showRolePopup, setShowRolePopup] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const otpInputRefs = useRef([]);
   const [timer, setTimer] = useState(90); // 90-second countdown
@@ -73,7 +74,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     state: "",
     password: "",
     confirmPassword: "",
-    referal_Code: "",
+    referralCode: "",
     role: "",
     // Store the name values separately for display purposes
     countryName: "",
@@ -81,7 +82,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     cityName: "",
   });
 
-  const [role, setRole] = useState("");
+  // Remove separate role state, use formData.role directly
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
@@ -97,7 +98,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     if (refFromUrl) {
       setFormData((prev) => ({
         ...prev,
-        referal_Code: prev.referal_Code || refFromUrl,
+        referralCode: prev.referralCode || refFromUrl,
       }));
     }
   }, [searchParams]);
@@ -344,19 +345,24 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       setIsLoading(false);
       toast.success("Registered successfully");
       closeAllFlowPopups();
-      localStorage.setItem("accessToken", data.data.accessToken);
-      localStorage.setItem("userId", data?.data?.user?._id);
-      localStorage.setItem("role", data?.data?.user?.role);
-      localStorage.setItem("email", data?.data?.user?.email);
 
-      if (data?.data?.user?.role === "student") {
+      const role = data?.data?.user?.role;
+      // Only store in localStorage if role is student
+      if (role === "student") {
+        localStorage.setItem("accessToken", data.data.accessToken);
+        localStorage.setItem("userId", data?.data?.user?._id);
+        localStorage.setItem("role", data?.data?.user?.role);
+        localStorage.setItem("email", data?.data?.user?.email);
+      }
+
+      if (role === "student") {
         if (isMode === 'popup' && onClose) {
            onClose();
         } else {
            navigate("/");
         }
-      } else if (data?.data?.user?.role === "counsellor") {
-        openExclusivePopup("guidance");
+      } else if (role === "counsellor" || role === "admin" || role === "superadmin" || role === "institute") {
+        setShowRolePopup(true);
       } else {
         window.location.href = "https://admin.eduroutez.com/";
       }
@@ -410,7 +416,6 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     } else {
       // Normal field update
       setFormData({ ...formData, [id]: value });
-      if (id === "role") setRole(value);
 
       if (id === "email") {
         if (value && !validateEmail(value)) {
@@ -524,9 +529,9 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
   };
 
   const roleSpecificLabel =
-    role === "institute"
+    formData.role === "institute"
       ? "Institute Name"
-      : role === "counsellor"
+      : formData.role === "counsellor"
         ? "Counsellor Name"
         : "Name";
 
@@ -634,7 +639,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
   };
 
   const isFlowPopupOpen =
-    showOtpDialog || showGuidancePopup || showSchedulePopup || showConfirmationPopup;
+    showOtpDialog || showGuidancePopup || showSchedulePopup || showConfirmationPopup || showRolePopup;
 
   return (
     <div
@@ -859,17 +864,17 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
             </div>
           )}
 
-          {isMode !== "popup" && role === "student" && (
+          {formData.role === "student" && (
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">
                 Referral Code
               </label>
               <input
                 type="text"
-                id="referal_Code"
+                id="referralCode"
                 placeholder="Enter your Referral Code"
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                value={formData.referal_Code}
+                value={formData.referralCode}
                 onChange={handleChange}
               />
             </div>
@@ -1026,6 +1031,36 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       open={showConfirmationPopup}
       onClose={() => setShowConfirmationPopup(false)}
     />
+
+    {/* Role popup for counsellor/admin */}
+    {showRolePopup && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
+        <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform transition-all">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-black text-slate-800">Login Info</h2>
+            <button onClick={() => setShowRolePopup(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <p className="text-slate-600 mb-8 font-medium leading-relaxed">
+            Please log in to the correct portal for your role (Admin, Counsellor, or Institute).<br/>
+            You cannot access this panel as a {formData.role} user.<br/>
+            <span className="block mt-4">Go to: <a href="https://admin.eduroutez.com/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">Admin/Counsellor/Institute Portal</a> </span>
+          </p>
+          <div className="flex flex-col gap-3">
+            <button 
+              onClick={() => setShowRolePopup(false)}
+              className="w-full bg-[#b82025] text-white font-black py-4 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   </div>
   );
   // Handler for schedule later button in GuidanceTestPopup

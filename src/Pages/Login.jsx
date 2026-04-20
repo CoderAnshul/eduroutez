@@ -65,16 +65,19 @@ const Login = ({ isMode, onSwitch, onClose }) => {
     onSuccess: (data) => {
       console.log("Data", data);
 
-      // Store auth data
-      localStorage.setItem('accessToken', data.data.accessToken);
-      localStorage.setItem('userId', data?.data?.user?._id);
-      localStorage.setItem('role', data?.data?.user?.role);
-      localStorage.setItem('email', data?.data?.user?.email);
-      localStorage.setItem('refreshToken', data.data.refreshToken);
+
+      const role = data?.data?.user?.role;
+      // Only store in localStorage if role is student
+      if (role === 'student') {
+        localStorage.setItem('accessToken', data.data.accessToken);
+        localStorage.setItem('userId', data?.data?.user?._id);
+        localStorage.setItem('role', data?.data?.user?.role);
+        localStorage.setItem('email', data?.data?.user?.email);
+        localStorage.setItem('refreshToken', data.data.refreshToken);
+      }
 
       toast.success("Logged in successfully!");
 
-      const role = data?.data?.user?.role;
       if (role !== 'student') {
         // Only redirect to admin for true admin roles
         if (role === 'admin' || role === 'superadmin') {
