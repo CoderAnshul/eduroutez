@@ -69,10 +69,10 @@ const CounselorTestPayment = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-            <div className="max-w-4xl w-full grid md:grid-cols-2 bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+        <div className="min-h-fit bg-slate-50 p-4 pt-12 pb-12 flex flex-col items-center">
+            <div className="max-w-5xl w-full h-fit grid md:grid-cols-2 bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
                 {/* Left Side - Visual & Info */}
-                <div className="bg-gradient-to-br from-red-700 via-red-600 to-orange-500 p-12 text-white flex flex-col justify-between relative overflow-hidden">
+                <div className="bg-gradient-to-br from-red-700 via-red-600 to-orange-500 p-6 lg:p-8 text-white flex flex-col justify-between relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
                         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
                             <circle cx="10" cy="10" r="30" fill="white" />
@@ -81,16 +81,16 @@ const CounselorTestPayment = () => {
                     </div>
 
                     <div className="relative z-10">
-                        <div className="bg-white/20 w-fit p-3 rounded-2xl backdrop-blur-md mb-8">
-                            <Award className="h-8 w-8" />
+                        <div className="bg-white/20 w-fit p-2 rounded-xl backdrop-blur-md mb-6">
+                            <Award className="h-6 w-6" />
                         </div>
-                        <h1 className="text-4xl font-bold mb-4 tracking-tight">Become a Verified Counselor</h1>
-                        <p className="text-red-50 text-lg mb-8 leading-relaxed">
+                        <h1 className="text-2xl lg:text-3xl font-bold mb-2 tracking-tight">Become a Verified Counselor</h1>
+                        <p className="text-red-50 text-sm lg:text-base mb-4 leading-relaxed">
                             Unlock your professional potential and earn the Eduroutez Verified Badge to stand out in the community.
                         </p>
 
-                        <ul className="space-y-4">
-                            <li className="flex items-center gap-3 bg-white/10 p-3 rounded-xl backdrop-blur-sm">
+                        <ul className="space-y-3">
+                            <li className="flex items-center gap-3 bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
                                 <CheckCircle2 className="h-5 w-5 text-orange-200" />
                                 <span>Gain Credibility & Trust</span>
                             </li>
@@ -105,34 +105,34 @@ const CounselorTestPayment = () => {
                         </ul>
                     </div>
 
-                    <div className="relative z-10 mt-12 pt-8 border-t border-white/20">
-                        <div className="flex items-center gap-4 text-sm text-red-100">
-                            <ShieldCheck className="h-8 w-8" />
+                    <div className="relative z-10 mt-6 pt-4 border-t border-white/20">
+                        <div className="flex items-center gap-4 text-xs text-red-100">
+                            <ShieldCheck className="h-6 w-6" />
                             <p>Secure payment processed via Razorpay. Encrypted & Protected.</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Right Side - Action */}
-                <div className="p-12 flex flex-col justify-center items-center">
-                    <div className="text-center mb-10">
-                        <h2 className="text-2xl font-bold text-slate-800 mb-2">Certification Test Fee</h2>
+                <div className="p-6 lg:p-8 flex flex-col justify-center items-center">
+                    <div className="text-center mb-6">
+                        <h2 className="text-xl lg:text-2xl font-bold text-slate-800 mb-1">Certification Test Fee</h2>
                         <p className="text-slate-500">One-time payment to unlock your exam</p>
                     </div>
 
-                    <div className="bg-slate-50 w-full rounded-2xl p-8 mb-8 border border-slate-100 text-center relative overflow-hidden">
+                    <div className="bg-slate-50 w-full rounded-2xl p-6 mb-4 border border-slate-100 text-center relative overflow-hidden">
                         <div className="absolute -top-10 -right-10 w-32 h-32 bg-red-500 opacity-5 rounded-full"></div>
-                        <span className="text-slate-400 text-sm block mb-1 uppercase tracking-widest font-semibold">Total Amount</span>
+                        <span className="text-slate-400 text-[10px] block mb-1 uppercase tracking-widest font-semibold">Total Amount</span>
                         <div className="flex items-center justify-center gap-2">
-                            <span className="text-5xl font-black text-slate-900">₹99</span>
-                            <span className="text-slate-400 font-medium">INR</span>
+                            <span className="text-3xl lg:text-4xl font-black text-slate-900">₹99</span>
+                            <span className="text-slate-400 font-medium text-xs">INR</span>
                         </div>
                     </div>
 
                     <button
                         onClick={handlePayment}
                         disabled={loading}
-                        className="w-full bg-[#b82025] hover:bg-red-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-red-200 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-70"
+                        className="w-full bg-[#b82025] hover:bg-red-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-red-200 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70"
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">
@@ -150,7 +150,7 @@ const CounselorTestPayment = () => {
                         )}
                     </button>
 
-                    <p className="mt-8 text-slate-400 text-xs text-center leading-relaxed">
+                    <p className="mt-4 text-slate-400 text-[10px] lg:text-xs text-center leading-relaxed">
                         By proceeding, you agree to our Terms of Service. The test consists of 50 questions to be completed in 25 minutes.
                     </p>
                 </div>

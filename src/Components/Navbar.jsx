@@ -10,7 +10,7 @@ import menubar from "../assets/Images/secondMenu.png";
 import SecondMenu from "./SubNavbar";
 import MobileNavbar from "./MobileNavbar";
 import axiosInstance from "../ApiFunctions/axios";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LogOut, User, Settings, LayoutDashboard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useCategories from "../DataFiles/categories";
 import { toast } from "react-toastify";
@@ -96,6 +96,7 @@ const Navbar = () => {
 
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const handleLogout = async () => {
+    setIsDropdownOpen(false);
     setShowLogoutPopup(true);
   };
   const confirmLogout = async () => {
@@ -231,55 +232,40 @@ const Navbar = () => {
                     ></Link>
                   </div>
 
-                  {/* Dropdown menu */}
+                  {/* Enhanced Dropdown menu */}
                   {isDropdownOpen && (
-                    <div className="absolute z-[1000] right-0 top-[34px] w-50 bg-white border transition-shadow border-gray-200 rounded-md shadow-lg">
+                    <div className="absolute z-[1000] right-0 top-[45px] min-w-[200px] bg-white border border-gray-100 p-2 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] animate-in fade-in slide-in-from-top-2 duration-200">
                       <Link
                         to="/dashboard/profile-page"
-                        className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-lg transition-colors group"
                       >
+                        <User className="w-4 h-4 opacity-70 group-hover:opacity-100" />
                         Profile
                       </Link>
                       <Link
                         to="/dashboard/settings"
-                        className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-lg transition-colors group"
                       >
+                        <Settings className="w-4 h-4 opacity-70 group-hover:opacity-100" />
                         Settings
                       </Link>
                       <Link
                         to="/dashboard/"
-                        className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-lg transition-colors group"
                       >
+                        <LayoutDashboard className="w-4 h-4 opacity-70 group-hover:opacity-100" />
                         Dashboard
                       </Link>
+                      
+                      <div className="h-px bg-gray-100 my-1 mx-2"></div>
+                      
                       <button
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-red-500"
+                        className="flex items-center gap-3 w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-lg transition-colors group"
                       >
+                        <LogOut className="w-4 h-4 opacity-70 group-hover:opacity-100" />
                         Logout
                       </button>
-                      {/* Logout confirmation popup */}
-                      {showLogoutPopup && (
-                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[2000]">
-                          <div className="bg-white rounded-xl p-8 shadow-2xl w-full max-w-xs text-center">
-                            <h2 className="text-xl font-bold mb-4">Are you sure you want to logout?</h2>
-                            <div className="flex justify-center gap-4 mt-6">
-                              <button
-                                onClick={() => setShowLogoutPopup(false)}
-                                className="px-6 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300"
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={confirmLogout}
-                                className="px-6 py-2 rounded bg-[#b82025] text-white font-semibold hover:bg-red-700"
-                              >
-                                Logout
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
@@ -346,6 +332,43 @@ const Navbar = () => {
           </div>
         </ul>
       </div>
+
+      {/* Logout confirmation popup - Global Level to fix state glitch */}
+      {showLogoutPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-[3000]">
+          {/* Animated Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setShowLogoutPopup(false)}
+          ></div>
+
+          {/* Modal Content */}
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-[90%] max-w-sm text-center relative z-[3001] transform transition-all duration-300 scale-100 opacity-100 animate-in zoom-in-95 fade-in">
+            {/* Logout Icon Header */}
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <LogOut className="w-8 h-8 text-[#b82025]" />
+            </div>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Ready to Leave?</h2>
+            <p className="text-gray-500 mb-8">Are you sure you want to logout? You'll need to sign back in to access your profile.</p>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={confirmLogout}
+                className="w-full py-3 rounded-xl bg-[#b82025] text-white font-bold text-lg hover:bg-red-700 transition-all active:scale-[0.98] shadow-lg shadow-red-200"
+              >
+                Logout Now
+              </button>
+              <button
+                onClick={() => setShowLogoutPopup(false)}
+                className="w-full py-3 rounded-xl bg-gray-100 text-gray-600 font-bold text-lg hover:bg-gray-200 transition-all active:scale-[0.98]"
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

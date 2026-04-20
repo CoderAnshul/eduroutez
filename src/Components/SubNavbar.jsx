@@ -513,7 +513,7 @@ const SubNavbar = ({ categories }) => {
     const recent = recentInstitutes[streamName] || [];
 
     return (
-      <div className="p-4 flex gap-6">
+      <div className=" flex gap-6">
       {/* <div className="p-4 flex gap-6"> */}
         <div className="min-w-48">
           <h3 className="font-semibold text-red-500 text-base mb-3">Popular Colleges</h3>

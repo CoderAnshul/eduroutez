@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 
 const GalleryInfo = ({ instituteData }) => {
   const [previewUrls, setPreviewUrls] = useState([]);
@@ -67,20 +68,22 @@ const GalleryInfo = ({ instituteData }) => {
       </div>
       
       {/* Initial 6 images grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {previewUrls.slice(0, 6).map((url, index) => (
           <div
             key={index}
-            className="relative group cursor-pointer aspect-video"
+            className="relative group cursor-pointer aspect-[4/3] overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300"
             onClick={() => openGallery(index)}
           >
             <img
               src={url}
               alt={`Gallery image ${index + 1}`}
-              className="w-full h-full object-cover rounded-lg"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-              <span className="text-white text-lg font-medium">View Image</span>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[2px]">
+              <div className="bg-white/20 p-3 rounded-full backdrop-blur-md">
+                <ImageIcon className="text-white w-6 h-6" />
+              </div>
             </div>
           </div>
         ))}
@@ -103,10 +106,10 @@ const GalleryInfo = ({ instituteData }) => {
             {/* Close button */}
             <button
               onClick={closeGallery}
-              className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors z-50"
+              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-xl hover:bg-white text-gray-800 transition-all z-50 transform hover:rotate-90"
               aria-label="Close gallery"
             >
-              <span className="text-gray-800 text-xl">&times;</span>
+              <X className="w-5 h-5" />
             </button>
 
             {/* Header */}
@@ -114,24 +117,22 @@ const GalleryInfo = ({ instituteData }) => {
               <h2 className="text-lg font-semibold">Gallery</h2>
             </div>
 
-            {/* Scrollable content */}
-            <div className="p-6 overflow-y-auto h-[calc(100%-60px)]">
-              <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+            {/* Content Grid - Structured for better sizing */}
+            <div className="p-6 overflow-y-auto h-[calc(100%-60px)] custom-scrollbar">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-12">
                 {previewUrls.map((url, index) => (
                   <div
                     key={index}
-                    className="break-inside-avoid relative group cursor-pointer overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 mb-4"
+                    className="relative group cursor-pointer aspect-[4/3] overflow-hidden rounded-xl shadow-sm hover:shadow-lg transition-all duration-300"
                     onClick={() => openImagePopup(index)}
                   >
                     <img
                       src={url}
                       alt={`Gallery image ${index + 1}`}
-                      className="w-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <span className="text-white text-sm font-medium">Click to enlarge</span>
-                      </div>
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                       <span className="bg-white/90 text-gray-900 px-4 py-2 rounded-full text-xs font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Expand</span>
                     </div>
                   </div>
                 ))}
@@ -141,44 +142,47 @@ const GalleryInfo = ({ instituteData }) => {
         </div>
       )}
 
-      {/* Compact Image Popup Modal */}
+      {/* Minimalist Lightbox popup */}
       {isImagePopupOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="relative bg-white rounded-xl w-[90%] max-w-3xl">
-            {/* Close button */}
-            <button
-              onClick={closeImagePopup}
-              className="absolute -top-3 -right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors z-10"
-              aria-label="Close image popup"
-            >
-              <span className="text-gray-800 text-xl">&times;</span>
-            </button>
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/90 backdrop-blur-md animate-in fade-in duration-300 px-4">
+          {/* Close Backdrop Click */}
+          <div className="absolute inset-0" onClick={closeImagePopup}></div>
 
-            {/* Image container */}
-            <div className="relative p-4">
-              <div className="relative flex items-center justify-center">
-                <button
-                  onClick={goToPreviousImage}
-                  className="absolute left-2 p-2 bg-white/80 hover:bg-white rounded-full shadow-md transition-colors"
-                  aria-label="Previous image"
-                >
-                  <span className="text-gray-800 text-lg">←</span>
-                </button>
+          {/* Close Button - Top Right of Screen */}
+          <button
+            onClick={closeImagePopup}
+            className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all z-[2001]"
+            aria-label="Close lightbox"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
 
-                <img
+          <div className="relative w-full max-w-5xl z-10 flex flex-col items-center">
+            {/* Navigation & Image */}
+            <div className="relative w-full flex items-center justify-center">
+              <button
+                onClick={goToPreviousImage}
+                className="absolute left-4 md:-left-12 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all group z-[2010]"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+              </button>
+
+              <div className="relative animate-in zoom-in-95 duration-300 z-10">
+                 <img
                   src={previewUrls[currentImage]}
                   alt={`Full view image ${currentImage + 1}`}
-                  className="max-h-[70vh] w-auto object-contain rounded-lg"
+                  className="max-h-[85vh] max-w-full object-contain rounded-sm"
                 />
-
-                <button
-                  onClick={goToNextImage}
-                  className="absolute right-2 p-2 bg-white/80 hover:bg-white rounded-full shadow-md transition-colors"
-                  aria-label="Next image"
-                >
-                  <span className="text-gray-800 text-lg">→</span>
-                </button>
               </div>
+
+              <button
+                onClick={goToNextImage}
+                className="absolute right-4 md:-right-12 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all group z-[2010]"
+                aria-label="Next image"
+              >
+                <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+              </button>
             </div>
           </div>
         </div>
