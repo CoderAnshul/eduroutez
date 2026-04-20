@@ -57,6 +57,7 @@ const HighRatedCareers = ({ title = "High Rated careers", streamId, categoryId }
     },
     {
       enabled: true,
+      refetchOnMount: "always",
       onSuccess: async (data) => {
         const { result } = data?.data || {};
         if (result) {

@@ -31,6 +31,7 @@ import TrendingCourses from './Pages/TrendingCoursespage';
 import TermsAndConditions from './Pages/TermsAndConditions ';
 import Login from './Pages/Login';
 import Signup from './Pages/Signup';
+import UniversityListPage from "./Pages/UniversityListPage";
 const WebinarsPage = React.lazy(() => import('./Pages/WebinarsPage'));
 // Lazy-loaded components
 const Homepage = React.lazy(() => import('./Pages/Homepage'));
@@ -174,6 +175,7 @@ const AppShell = () => {
           <Route path="/become-couseller" element={<BecomeCouseller />} />
           <Route path="/institute" element={<BestRatedInstitute />} />
           <Route path="/institute:slug" element={<BestRatedInstitute />} />
+          <Route path="/university" element={<UniversityListPage />} />
 
           <Route path="/trending-institute" element={<TrendingInstitute />} />
           <Route path='/counselor' element={<Counselor />}></Route>

@@ -29,7 +29,7 @@ const BestRatedUniversity = React.memo(() => {
   const navigate = useNavigate();
 
   const handleViewMore = useCallback(() => {
-    navigate("/institute");
+    navigate("/university");
   }, [navigate]);
 
   useEffect(() => {
@@ -81,6 +81,7 @@ const BestRatedUniversity = React.memo(() => {
     bestRatedUniversityInstitutes,
     {
       enabled: true,
+      refetchOnMount: "always",
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000,
       cacheTime: 10 * 60 * 1000,
