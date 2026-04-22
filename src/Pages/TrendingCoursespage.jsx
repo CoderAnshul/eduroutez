@@ -52,6 +52,7 @@ const fetchCategories = async () => {
     const response = await axios.get(`${baseURL}/course-categories`, {
       params: {
         page: 0,
+        limit:10000,
       },
     });
     return response.data;

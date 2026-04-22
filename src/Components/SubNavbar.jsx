@@ -553,7 +553,7 @@ const SubNavbar = ({ categories }) => {
 
     return (
       <div className="bg-white w-full max-h-[500px] shadow-lg border border-gray-100 flex overflow-hidden">
-        <div className="w-[300px] bg-[#b82025] flex-shrink-0">
+        <div className="w-[300px] bg-[#b82025] flex-shrink-0 self-start max-h-[500px] overflow-y-auto">
           <ul className="w-full ml-0 mb-0 pb-0 space-y-0">
             {category?.sidebarItems?.map((item) => (
               <li
