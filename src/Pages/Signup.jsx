@@ -1038,7 +1038,10 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
         <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform transition-all">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-black text-slate-800">Login Info</h2>
-            <button onClick={() => setShowRolePopup(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onClick={() => {
+              setShowRolePopup(false);
+              if (isMode === "popup" && onClose) onClose();
+            }} className="text-slate-400 hover:text-slate-600 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1052,7 +1055,10 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
           </p>
           <div className="flex flex-col gap-3">
             <button 
-              onClick={() => setShowRolePopup(false)}
+              onClick={() => {
+                setShowRolePopup(false);
+                if (isMode === "popup" && onClose) onClose();
+              }}
               className="w-full bg-[#b82025] text-white font-black py-4 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100"
             >
               Close
