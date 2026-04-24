@@ -408,7 +408,7 @@ const CounselorListPage = () => {
                                 </div>
                               )}
 
-                              {counselor.isVerified && (
+                              {counselor.verifiedBadge && (
                                 <div className="absolute -bottom-2 -right-2 bg-white p-1 rounded-full shadow-md border border-red-50">
                                   <div className="bg-[#b82025] p-1 rounded-full">
                                     <svg className="w-3 h-3 text-white fill-current" viewBox="0 0 20 20">
@@ -424,7 +424,7 @@ const CounselorListPage = () => {
                                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                   {counselor.firstname + " "}
                                   {counselor.lastname}
-                                  {counselor.isVerified && (
+                                  {counselor.verifiedBadge && (
                                     <div className="group relative">
                                       <svg className="w-5 h-5 text-red-600 fill-current" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" clipRule="evenodd" />
@@ -619,25 +619,37 @@ const CounselorListPage = () => {
                               </div>
 
                               <div className="flex gap-3 mt-auto pt-6">
-                                <button
-                                  onClick={() => handleScheduleCall(counselor)}
-                                  className="flex-1 inline-flex items-center justify-center px-3 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-[#b82025] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors whitespace-nowrap"
-                                >
-                                  <svg
-                                    className="w-4 h-4 mr-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
+                                <div className="flex-1 group relative">
+                                  <button
+                                    onClick={() => counselor.verifiedBadge && handleScheduleCall(counselor)}
+                                    disabled={!counselor.verifiedBadge}
+                                    className={`w-full inline-flex items-center justify-center px-3 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white ${
+                                      counselor.verifiedBadge
+                                        ? "bg-[#b82025] hover:bg-red-700"
+                                        : "bg-gray-400 cursor-not-allowed"
+                                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors whitespace-nowrap`}
                                   >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth="2"
-                                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                                    />
-                                  </svg>
-                                  Schedule Call
-                                </button>
+                                    <svg
+                                      className="w-4 h-4 mr-2"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                      />
+                                    </svg>
+                                    Schedule Call
+                                  </button>
+                                  {!counselor.verifiedBadge && (
+                                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                                      not verified eduroutez counsellor
+                                    </span>
+                                  )}
+                                </div>
                                 <button
                                   onClick={() =>
                                     handleReviewFeedback(counselor)
