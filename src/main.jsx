@@ -9,6 +9,7 @@ import {
 } from 'react-query'
 import { Provider } from "react-redux";
 import appStore from './config/appStore.js'
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +28,9 @@ createRoot(document.getElementById('root')).render(
     <Provider store={appStore}>
       <QueryClientProvider client={queryClient}>
         <ModalProvider>
-          <App />
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+            <App />
+          </GoogleOAuthProvider>
         </ModalProvider>
       </QueryClientProvider>
     </Provider>

@@ -8,6 +8,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 import { Eye, EyeOff, X } from "lucide-react";
 import logo from "../assets/Images/logo.png";
+import { useGoogleLogin } from '@react-oauth/google';
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
 
 const Login = ({ isMode, onSwitch, onClose }) => {
   const isPopupMode = isMode === "popup";
@@ -19,25 +21,49 @@ const Login = ({ isMode, onSwitch, onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_BASE_URL;
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
-  const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_BASE_URL;
+  const handleAuthSuccess = (data) => {
+    const role = data?.data?.user?.role;
+    if (role === 'student') {
+      localStorage.setItem('accessToken', data.data.accessToken);
+      localStorage.setItem('userId', data?.data?.user?._id);
+      localStorage.setItem('role', data?.data?.user?.role);
+      localStorage.setItem('email', data?.data?.user?.email);
+      localStorage.setItem('refreshToken', data.data.refreshToken);
+    }
 
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
+    toast.success("Logged in successfully!");
 
-    if (id === "email") {
-      if (value && !validateEmail(value)) {
-        setEmailError("Please enter a valid email address");
+    if (role !== 'student') {
+      if (role === 'admin' || role === 'superadmin') {
+        window.location.href = "https://admin.eduroutez.com/";
       } else {
-        setEmailError("");
+        setShowRolePopup(true);
       }
+      return;
+    }
+
+    const pendingWebinarLink = sessionStorage.getItem('pendingWebinarLink');
+    const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+
+    if (pendingWebinarLink) {
+      sessionStorage.removeItem('pendingWebinarLink');
+      window.open(pendingWebinarLink, '_blank');
+      if (isMode === 'popup' && onClose) onClose();
+      else navigate("/");
+    } else if (redirectAfterLogin) {
+      sessionStorage.removeItem('redirectAfterLogin');
+      navigate(redirectAfterLogin);
+    } else {
+      if (isMode === 'popup' && onClose) onClose();
+      else navigate("/");
     }
   };
 
@@ -50,141 +76,89 @@ const Login = ({ isMode, onSwitch, onClose }) => {
           {
             headers: {
               "Content-Type": "application/json",
-              'x-access-token': localStorage.getItem('accessToken'),
-              'x-refresh-token': localStorage.getItem('refreshToken')
             },
           }
         );
         return response.data;
       } catch (error) {
-        const errorMessage =
-          error.response?.data?.message || "Login failed. Please try again.";
-        throw new Error(errorMessage);
+        throw new Error(error.response?.data?.message || "Login failed");
       }
     },
-    onSuccess: (data) => {
-      console.log("Data", data);
-
-
-      const role = data?.data?.user?.role;
-      // Only store in localStorage if role is student
-      if (role === 'student') {
-        localStorage.setItem('accessToken', data.data.accessToken);
-        localStorage.setItem('userId', data?.data?.user?._id);
-        localStorage.setItem('role', data?.data?.user?.role);
-        localStorage.setItem('email', data?.data?.user?.email);
-        localStorage.setItem('refreshToken', data.data.refreshToken);
-      }
-
-      toast.success("Logged in successfully!");
-
-      if (role !== 'student') {
-        // Only redirect to admin for true admin roles
-        if (role === 'admin' || role === 'superadmin') {
-          window.location.href = "https://admin.eduroutez.com/";
-        } else {
-          setShowRolePopup(true);
-        }
-        return;
-      }
-
-      // Check for pending application
-      const pendingApplication = sessionStorage.getItem('pendingApplication');
-      const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
-
-      // Check for pending webinar link
-      const pendingWebinarLink = sessionStorage.getItem('pendingWebinarLink');
-
-      if (pendingWebinarLink) {
-        // Clear the stored link
-        sessionStorage.removeItem('pendingWebinarLink');
-        // Open the webinar in a new tab
-        window.open(pendingWebinarLink, '_blank');
-        // Navigate or close
-        if (isMode === 'popup' && onClose) {
-          onClose();
-        } else {
-          navigate("/");
-        }
-      } else if (redirectAfterLogin) {
-        // Clear the stored redirect URL
-        sessionStorage.removeItem('redirectAfterLogin');
-        // Navigate back to the institute page
-        navigate(redirectAfterLogin);
-        // If not in popup mode, we've already navigated away.
-        // If in popup mode, navigating away already effectively closes the popup
-        // because the URL is no longer /login. Calling onClose() (which often calls navigate(-1))
-        // would take us back to /login and re-open the popup!
-      } else {
-        // Default navigation for students
-        if (isMode === 'popup' && onClose) {
-          onClose();
-        } else {
-          navigate("/");
-        }
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
+    onSuccess: (data) => handleAuthSuccess(data),
+    onError: (error) => toast.error(error.message),
   });
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await axios.post(`${apiUrl}/google-login`, {
+          idToken: tokenResponse.access_token, // Note: depending on setup, this might be access_token or id_token
+        });
+        if (res.data.success) handleAuthSuccess(res.data);
+      } catch (error) {
+        toast.error("Google login failed");
+      }
+    },
+    onError: () => toast.error("Google login failed"),
+  });
+
+  const responseFacebook = async (response) => {
+    if (response.accessToken) {
+      try {
+        const res = await axios.post(`${apiUrl}/facebook-login`, {
+          accessToken: response.accessToken,
+        });
+        if (res.data.success) handleAuthSuccess(res.data);
+      } catch (error) {
+        toast.error("Facebook login failed");
+      }
+    }
+  };
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+    if (id === "email") {
+      setEmailError(value && !validateEmail(value) ? "Please enter a valid email address" : "");
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     mutation.mutate(formData);
   };
 
-  // Rest of the component remains the same...
   return (
-    <div
-      className={isPopupMode ? "w-full" : "w-full flex min-h-screen items-center justify-center bg-gray-100 px-4 py-8"}
-    >
+    <div className={isPopupMode ? "w-full" : "w-full flex min-h-screen items-center justify-center bg-gray-100 px-4 py-8"}>
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex py-6 sm:py-8 flex-col justify-center items-center px-5 sm:px-8 overflow-y-auto max-h-[92vh]">
         <div className="w-full flex items-center justify-center mb-5 relative">
           <img src={logo} alt="Eduroutez" className="h-10 w-auto mx-auto" />
           <button
             type="button"
             onClick={() => (isMode === "popup" && onClose ? onClose() : navigate("/"))}
-            className="absolute right-0 top-0 absolute right-0 text-gray-500 hover:text-gray-700"
-            aria-label="Close login"
+            className="absolute right-0 top-0 text-gray-500 hover:text-gray-700"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-center opacity-80 mb-2">
-          Log in
-        </h1>
-        <p className="text-gray-500 mb-8 text-center">
-          Welcome back! Please enter your details
-        </p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-center opacity-80 mb-2">Log in</h1>
+        <p className="text-gray-500 mb-8 text-center">Welcome back! Please enter your details</p>
+        
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label
-              className="block text-sm font-medium mb-1"
-              htmlFor="email"
-            >
-              Email
-            </label>
+            <label className="block text-sm font-medium mb-1" htmlFor="email">Email</label>
             <input
               type="text"
               id="email"
-              placeholder="Enter your email "
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
-                }`}
+              placeholder="Enter your email"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"}`}
               value={formData.email}
               onChange={handleChange}
             />
-            {emailError && (
-              <p className="text-red-500 text-xs mt-1">{emailError}</p>
-            )}
+            {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
           </div>
           <div className="mb-4">
-            <label
-              className="block text-sm font-medium mb-1"
-              htmlFor="password"
-            >
-              Password
-            </label>
+            <label className="block text-sm font-medium mb-1" htmlFor="password">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -199,109 +173,77 @@ const Login = ({ isMode, onSwitch, onClose }) => {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
           </div>
           <div className="flex items-center justify-between mb-6">
             <label className="flex items-center">
-              <input
-                type="checkbox"
-                className="form-checkbox text-red-500"
-              />
+              <input type="checkbox" className="form-checkbox text-red-500" />
               <span className="ml-2 text-sm">Remember for 30 days</span>
             </label>
-            <Link
-              to="/forgotpassword"
-              className="text-sm text-yellow-500 hover:underline"
-            >
-              Forgot Password?
-            </Link>
+            <Link to="/forgotpassword" className="text-sm text-yellow-500 hover:underline">Forgot Password?</Link>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-red-700 text-white py-2 rounded-lg font-semibold hover:bg-red-800"
-          >
-            Log in
-          </button>
-          <button
-            type="button"
-            className="w-full bg-black text-white py-2 rounded-lg font-semibold mt-4 hover:bg-gray-800"
-          >
-            Guest
+          <button type="submit" className="w-full bg-red-700 text-white py-2 rounded-lg font-semibold hover:bg-red-800 transition-colors">
+            {mutation.isLoading ? "Logging in..." : "Log in"}
           </button>
         </form>
-        <div className="my-6 flex items-center">
-          <span className="w-1/2 h-px bg-gray-300"></span>
-          <span className="mx-2 text-gray-500 whitespace-nowrap text-sm">
-            Or Login with
-          </span>
-          <span className="w-1/2 h-px bg-gray-300"></span>
+
+        <div className="my-6 flex items-center w-full">
+          <span className="flex-grow h-px bg-gray-300"></span>
+          <span className="mx-4 text-gray-500 whitespace-nowrap text-sm">Or Login with</span>
+          <span className="flex-grow h-px bg-gray-300"></span>
         </div>
-        <div className="flex justify-center gap-4">
-          <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center bg-white rounded-full hover:bg-gray-200">
-            <img src={fb} className="h-7" alt="facebook icon" />
-          </button>
-          <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center rounded-full bg-white hover:bg-gray-200">
-            <img src={google} className="h-6" alt="google icon" />
+
+        <div className="flex justify-center gap-6">
+          <FacebookLogin
+            appId={import.meta.env.VITE_FACEBOOK_APP_ID || "YOUR_FB_APP_ID"}
+            callback={responseFacebook}
+            render={renderProps => (
+              <button 
+                onClick={renderProps.onClick}
+                className="w-12 h-12 flex justify-center border border-gray-200 shadow-sm items-center bg-white rounded-full hover:bg-gray-50 transition-all hover:scale-110"
+              >
+                <img src={fb} className="h-7 w-7" alt="facebook icon" />
+              </button>
+            )}
+          />
+          
+          <button 
+            onClick={() => googleLogin()}
+            className="w-12 h-12 flex justify-center border border-gray-200 shadow-sm items-center rounded-full bg-white hover:bg-gray-50 transition-all hover:scale-110"
+          >
+            <img src={google} className="h-6 w-6" alt="google icon" />
           </button>
         </div>
-        <p className="text-sm text-gray-500 mt-6">
+
+        <p className="text-sm text-gray-500 mt-8">
           Don't have an account?{" "}
           {isMode === 'popup' ? (
-            <button
-              onClick={onSwitch}
-              type="button"
-              className="text-red-500 font-medium hover:underline"
-            >
-              Sign up
-            </button>
+            <button onClick={onSwitch} type="button" className="text-red-500 font-bold hover:underline">Sign up</button>
           ) : (
-            <Link
-              to="/signup"
-              state={{ backgroundLocation: location.state?.backgroundLocation || location }}
-              className="text-red-500 font-medium hover:underline"
-            >
-              Sign up
-            </Link>
+            <Link to="/signup" className="text-red-500 font-bold hover:underline">Sign up</Link>
           )}
         </p>
 
-        {/* Role popup for institute/counsellor */}
         {showRolePopup && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
-            <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform transition-all">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] p-4">
+            <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-black text-slate-800">Login Info</h2>
-                <button onClick={() => {
-                  setShowRolePopup(false);
-                  if (isMode === "popup" && onClose) onClose();
-                }} className="text-slate-400 hover:text-slate-600 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
+                <h2 className="text-2xl font-bold text-gray-800">Login Info</h2>
+                <button onClick={() => { setShowRolePopup(false); if (isMode === "popup" && onClose) onClose(); }} className="text-gray-400 hover:text-gray-600">
+                  <X className="h-6 w-6" />
                 </button>
               </div>
-              <p className="text-slate-600 mb-8 font-medium leading-relaxed">
-                Please log in to the correct portal for your role (Institute or Counsellor). You cannot access the admin dashboard from here.<br/>
-                <span className="block mt-4">Go to: <a href="https://admin.eduroutez.com/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">Admin/Counsellor Portal</a> </span>
+              <p className="text-gray-600 mb-8 font-medium">
+                Please log in to the correct portal for your role. You cannot access the student dashboard as an Institute or Counselor.
               </p>
-              <div className="flex flex-col gap-3">
-                <button 
-                  onClick={() => {
-                    setShowRolePopup(false);
-                    if (isMode === "popup" && onClose) onClose();
-                  }}
-                  className="w-full bg-[#b82025] text-white font-black py-4 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100"
-                >
-                  Close
-                </button>
-              </div>
+              <button 
+                onClick={() => { setShowRolePopup(false); if (isMode === "popup" && onClose) onClose(); }}
+                className="w-full bg-[#b82025] text-white font-bold py-4 rounded-xl hover:bg-red-700 transition-all active:scale-95"
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
