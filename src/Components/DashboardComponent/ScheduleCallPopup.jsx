@@ -8,7 +8,6 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
     date: "",
     timeSlot: "",
     counselorId: counselor?._id ?? "",
-    studentId: localStorage.getItem("userId"),
   });
   const [availableSlots, setAvailableSlots] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
@@ -141,7 +140,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
                 date: formData.date,
                 slot: formData.timeSlot,
                 counselorId: counselor._id,
-                studentId: formData.studentId,
+                studentId: localStorage.getItem("userId"),
                 paymentId: response.razorpay_payment_id,
               }),
             });
