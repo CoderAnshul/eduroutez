@@ -513,7 +513,7 @@ const SubNavbar = ({ categories }) => {
     const recent = recentInstitutes[streamName] || [];
 
     return (
-      <div className="p-4 flex gap-6">
+      <div className=" flex gap-6">
       {/* <div className="p-4 flex gap-6"> */}
         <div className="min-w-48">
           <h3 className="font-semibold text-red-500 text-base mb-3">Popular Colleges</h3>
@@ -553,7 +553,7 @@ const SubNavbar = ({ categories }) => {
 
     return (
       <div className="bg-white w-full max-h-[500px] shadow-lg border border-gray-100 flex overflow-hidden">
-        <div className="w-[300px] bg-[#b82025] flex-shrink-0">
+        <div className="w-[300px] bg-[#b82025] flex-shrink-0 self-start max-h-[500px] overflow-y-auto">
           <ul className="w-full ml-0 mb-0 pb-0 space-y-0">
             {category?.sidebarItems?.map((item) => (
               <li

@@ -386,10 +386,10 @@ export const AllpopularCourses = async (params = {}) => {
 
 export const courseCategoriesList = async (params = {}) => {
   try {
-    const { page = 0 } = params;
+    const { page = 0,limit = 10000 } = params;
 
     const response = await axios.get(`${baseURL}/course-categories`, {
-      params: { page }
+      params: { page,limit }
     });
 
     console.log('courseCategoriesList', response);
