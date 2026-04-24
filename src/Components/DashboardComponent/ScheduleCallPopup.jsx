@@ -123,7 +123,7 @@ const ScheduleCallPopup = ({ isOpen, onClose, counselor }) => {
 
     try {
       const options = {
-        key: "rzp_test_1DP5mmOlF5G5ag",
+        key: "rzp_test_SPTvNCnEWS87X0",
         amount: 50000,
         currency: "INR",
         name: "Your App Name",
