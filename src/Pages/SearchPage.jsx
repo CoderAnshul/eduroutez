@@ -92,10 +92,12 @@ const SearchPage = () => {
     ////console.debug('SearchPage: baseURL=', baseURL, 'searchSource=', searchSource);
 
       if (searchSource === "input" && inputField) {
-      //console.log("Loading data from Redux input:", inputField);
+      const type = searchParams.get("searchType") || "institute";
+      const instName = type === "institute" ? inputField : "";
+      const courseName = type === "course" ? inputField : "";
+
       // Load data based on the inputField from Redux with pagination
-      //console.debug('Calling getInstitutes for input search...');
-      getInstitutes(inputField, inputField, inputField, inputField, 1, itemsPerPage)
+      getInstitutes("", "", instName, courseName, 1, itemsPerPage)
         .then((data) => {
           //console.debug('getInstitutes (input) response:', data);
           // Normalize response shape: server may return response.data or response.data.data
@@ -728,20 +730,32 @@ const SearchPage = () => {
         }
       });
 
-      //console.log("Sending filters to API:", apiFilters);
+      // Include search query if it exists
+      const type = searchParams.get("searchType") || "institute";
+      const searchFields = {};
+      if (inputField) {
+        if (type === "course") {
+          searchFields.courseTitle = inputField;
+        } else {
+          searchFields.instituteName = inputField;
+        }
+      }
 
-      // Build query string with sort parameter if provided
+      // Build query string
       let queryString = `filters=${encodeURIComponent(
         JSON.stringify(apiFilters)
       )}&page=${page}&limit=${limit}`;
 
-      // Add sort parameter if provided (e.g., sort=rating for top colleges)
+      if (Object.keys(searchFields).length > 0) {
+        queryString += `&searchFields=${encodeURIComponent(JSON.stringify(searchFields))}`;
+      }
+
+      // Add sort parameter if provided
       if (sortField) {
-        const sortObj = { [sortField]: "desc" }; // Sort descending for rating (highest first)
+        const sortObj = { [sortField]: "desc" };
         queryString += `&sort=${encodeURIComponent(JSON.stringify(sortObj))}`;
       }
 
-      //console.log(`Fetching data with query: ${queryString}`);
       const response = await axiosInstance.get(`/institutes?${queryString}`);
 
       if (response.data) {
@@ -803,16 +817,11 @@ const SearchPage = () => {
   };
 
   useEffect(() => {
-    if (searchQuery.length > 0 && Array.isArray(content)) {
-      const filtered = content.filter((item) => {
-        const name = item.instituteName || item.name || "";
-        return name.toLowerCase().includes(searchQuery.toLowerCase());
-      });
-      setFilteredContent(filtered);
-    } else {
-      setFilteredContent(content);
-    }
-  }, [searchQuery, content]);
+    // Rely on server-side filtering for accuracy, especially for course searches.
+    // Client-side filtering by institute name here was incorrectly hiding institutes
+    // when searching for courses.
+    setFilteredContent(content);
+  }, [content]);
 
   const renderPagination = () => {
     const totalPages = Math.ceil(totalDocuments / itemsPerPage);

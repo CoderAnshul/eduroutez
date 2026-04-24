@@ -86,59 +86,74 @@ const Banner = () => {
 
       setIsLoading(true);
       try {
-        const endpoint =
-          searchType === "counsellor" ? "counselors" : "institutes";
-        console.log("Fetching from:", `${baseURL}/${endpoint}`);
+        let filteredResults = [];
 
-        // Add limit to reduce payload size and improve loading time
-        const limit = searchType === "counsellor" ? 50 : 100;
-        const response = await axios.get(`${baseURL}/${endpoint}?limit=${limit}&page=1`);
-        console.log("API Response:", response.data);
+        if (searchType === "course") {
+          // Dedicated course search
+          const response = await axios.get(
+            `${baseURL}/courses?search=${encodeURIComponent(inputField)}&limit=20&page=0`
+          );
+          console.log("Course API Response:", response.data);
+
+          if (!isMounted) return;
+
+          const courseResult = response.data?.data?.result || response.data?.result || [];
+          filteredResults = courseResult.map((course) => {
+            const inst = course.institute || {};
+            const cityData = course.city || inst.city || "";
+            const cityName = typeof cityData === "object" ? cityData.name : cityData;
+
+            return {
+              courseTitle: course.courseTitle || course.name || "Untitled Course",
+              instituteName: inst.instituteName || course.instituteName || "",
+              cityName: cityName || "",
+              courseId: course._id,
+              slug: course.slug,
+            };
+          });
+        } else if (searchType === "counsellor") {
+          // Dedicated counsellor search
+          const response = await axios.get(
+            `${baseURL}/counselors?search=${encodeURIComponent(inputField)}&limit=20&page=1`
+          );
+          console.log("Counsellor API Response:", response.data);
+
+          if (!isMounted) return;
+
+          const counsellorResult = response.data?.data?.result || response.data?.result || [];
+          filteredResults = counsellorResult.map((counselor) => ({
+            firstname: counselor.firstname,
+            lastname: counselor.lastname,
+            specialization: counselor.specialization,
+            _id: counselor._id,
+          }));
+        } else {
+          // Institute search using searchFields
+          const searchFields = JSON.stringify({ instituteName: inputField });
+          const response = await axios.get(`${baseURL}/institutes`, {
+            params: { searchFields, limit: 20, page: 1 },
+          });
+          console.log("Institute API Response:", response.data);
+
+          if (!isMounted) return;
+
+          const instituteResult = response.data?.data?.result || response.data?.result || [];
+          filteredResults = instituteResult.map((institute) => {
+            const cityData = institute.city || "";
+            const cityName = typeof cityData === "object" ? cityData.name : cityData;
+            return {
+              instituteName: institute.instituteName,
+              cityName: cityName || "",
+              slug: institute.slug,
+              _id: institute._id,
+            };
+          });
+        }
 
         if (!isMounted) return;
-
-        if (response.data?.data?.result) {
-          const searchRegex = new RegExp(inputField, "i");
-          let filteredResults = [];
-
-          if (searchType === "counsellor") {
-            filteredResults = response.data.data.result.filter(
-              (counselor) =>
-                searchRegex.test(counselor.firstname) ||
-                searchRegex.test(counselor.lastname) ||
-                (counselor.specialization &&
-                  searchRegex.test(counselor.specialization))
-            );
-          } else if (searchType === "course") {
-            // Extract all courses from institutes and flatten them into a single array
-            filteredResults = response.data.data.result.reduce(
-              (courses, institute) => {
-                if (institute.courses) {
-                  const matchingCourses = institute.courses
-                    .filter((course) => searchRegex.test(course.courseTitle))
-                    .map((course) => ({
-                      courseTitle: course.courseTitle,
-                      instituteName: institute.instituteName,
-                      city: institute.city,
-                      instituteId: institute._id,
-                    }));
-                  return [...courses, ...matchingCourses];
-                }
-                return courses;
-              },
-              []
-            );
-          } else {
-            filteredResults = response.data.data.result.filter((institute) =>
-              searchRegex.test(institute.instituteName)
-            );
-          }
-
-          console.log("Filtered Results:", filteredResults);
-
-          setSuggestions(filteredResults);
-          setShowSuggestions(filteredResults.length > 0);
-        }
+        console.log("Filtered Results:", filteredResults);
+        setSuggestions(filteredResults);
+        setShowSuggestions(filteredResults.length > 0);
       } catch (error) {
         console.error("Error fetching suggestions:", error);
         if (isMounted) {
@@ -171,7 +186,7 @@ const Banner = () => {
     if (searchType === "course") {
       setInputField(suggestion.courseTitle);
       dispatch(setInput(suggestion.courseTitle));
-      navigate("/searchpage");
+      navigate("/searchpage?fromSearch=true&searchType=course");
     } else if (searchType === "counsellor") {
       setInputField(suggestion.firstname + " " + suggestion.lastname);
       navigate(`/counselor?name=${encodeURIComponent(suggestion.firstname + " " + suggestion.lastname)}`);
@@ -179,7 +194,7 @@ const Banner = () => {
       // For institutes, include a search flag to indicate this came from search
       setInputField(suggestion.instituteName);
       dispatch(setInput(suggestion.instituteName));
-      navigate("/searchpage?fromSearch=true");
+      navigate("/searchpage?fromSearch=true&searchType=institute");
     }
     setShowSuggestions(false);
   };
@@ -198,10 +213,11 @@ const Banner = () => {
       setIsSearching(false);
     } else {
       dispatch(setInput(inputField));
-      navigate("/searchpage?fromSearch=true");
+      navigate(`/searchpage?fromSearch=true&searchType=${searchType}`);
       // Reset loading state immediately after navigation
       setIsSearching(false);
     }
+    setShowSuggestions(false);
   };
 
   const currentBanner =
@@ -316,6 +332,10 @@ const Banner = () => {
                       ? "Search for courses..."
                       : "Search for institutes..."
                 }
+                onBlur={() => {
+                  // Small timeout to allow suggestion clicks to register
+                  setTimeout(() => setShowSuggestions(false), 200);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     handleBtnClick();
@@ -351,6 +371,7 @@ const Banner = () => {
                   <div
                     key={index}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onMouseDown={(e) => e.preventDefault()} // Prevents blur from firing before click
                     onClick={() => handleSuggestionClick(suggestion)}
                   >
                     <div className="font-medium">
