@@ -45,18 +45,23 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
 
-    if (!userId || !accessToken || !refreshToken) {
+    // Only require a valid access token and userId to allow wishlist actions.
+    // Some login flows may not set a refresh token in localStorage immediately,
+    // causing authenticated users to be incorrectly redirected to login.
+    if (!userId || !accessToken) {
       navigate("/login", { state: { backgroundLocation: location } });
       return;
     }
 
     try {
+      const headers = {
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      };
+      if (refreshToken) headers["x-refresh-token"] = refreshToken;
+
       const response = await addToWishlist(userId, institute._id, null, {
-        headers: {
-          "Content-Type": "application/json",
-          "x-access-token": accessToken,
-          "x-refresh-token": refreshToken,
-        },
+        headers,
       }); // Assuming courseId is null for now
       const responseMessage = String(
         response?.message || response?.data?.message || ""
