@@ -25,6 +25,8 @@ const CounselorTestExam = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isTimedOut, setIsTimedOut] = useState(false);
     const [showGuidance, setShowGuidance] = useState(true);
+    const [showResultModal, setShowResultModal] = useState(false);
+    const [resultData, setResultData] = useState(null);
     const autoAdvanceTimer = useRef(null);
 
     const navigate = useNavigate();
@@ -78,13 +80,15 @@ const CounselorTestExam = () => {
                 const submittedResult = response?.data?.data || null;
                 if (submittedResult) {
                     sessionStorage.setItem("latestCounselorTestResult", JSON.stringify(submittedResult));
+                    setResultData(submittedResult);
                 }
 
+                // Show inline modal with result instead of redirecting to a separate page
+                setShowResultModal(true);
                 if (autoSubmit) {
                     setIsTimedOut(true);
                 } else {
                     toast.success("Test submitted successfully!");
-                    navigate("/dashboard/test-result", { state: { result: submittedResult } });
                 }
             }
         } catch (error) {
@@ -211,10 +215,10 @@ const CounselorTestExam = () => {
                         Your progress has been automatically saved and submitted.
                     </p>
                     <button
-                        onClick={() => navigate("/dashboard/test-result")}
+                        onClick={() => setShowResultModal(true)}
                         className="w-full bg-slate-900 text-white font-black py-4 rounded-xl hover:bg-[#b82025] transition-all shadow-xl shadow-slate-200"
                     >
-                        See My Score
+                        View Submission
                     </button>
                 </div>
             </div>
@@ -367,6 +371,32 @@ const CounselorTestExam = () => {
                     ></div>
                 ))}
             </div>
+            {/* Result Modal (inline) */}
+            {showResultModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+                    <div className="max-w-lg w-full bg-white rounded-xl shadow-xl p-6">
+                        <h3 className="text-xl font-bold text-slate-900 mb-3">Submission Received</h3>
+                        <p className="text-sm text-slate-600 mb-4">Your test has been submitted successfully. Once an administrator reviews and approves your result, you will receive an email notification.</p>
+
+                        {resultData ? (
+                            <div className="bg-slate-50 p-3 rounded-md mb-4">
+                                <p className="text-sm font-bold text-slate-800">Result Summary</p>
+                                <div className="text-sm text-slate-700 mt-2">
+                                    <p>Score: {resultData.score ?? resultData.marks ?? resultData.obtained ?? "-"}</p>
+                                    {resultData.total && <p>Total: {resultData.total}</p>}
+                                    {resultData.percentage && <p>Percentage: {resultData.percentage}%</p>}
+                                    {resultData.status && <p>Status: {resultData.status}</p>}
+                                </div>
+                            </div>
+                        ) : null}
+
+                        <div className="flex gap-3 justify-end">
+                            <button onClick={() => setShowResultModal(false)} className="px-4 py-2 rounded-md bg-white border">Close</button>
+                            <button onClick={() => { setShowResultModal(false); navigate('/dashboard'); }} className="px-4 py-2 rounded-md bg-[#b82025] text-white">Go to Dashboard</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

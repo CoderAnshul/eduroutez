@@ -28,7 +28,7 @@ createRoot(document.getElementById('root')).render(
     <Provider store={appStore}>
       <QueryClientProvider client={queryClient}>
         <ModalProvider>
-          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "1234567890-dummy.apps.googleusercontent.com"}>
             <App />
           </GoogleOAuthProvider>
         </ModalProvider>

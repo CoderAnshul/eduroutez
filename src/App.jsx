@@ -58,13 +58,12 @@ const Logout = React.lazy(() => import('./Pages/Logout'))
 
 const CounselorTestPayment = React.lazy(() => import('./Pages/CounselorTest/Payment'));
 const CounselorTestExam = React.lazy(() => import('./Pages/CounselorTest/TestExam'));
-const CounselorTestResult = React.lazy(() => import('./Pages/CounselorTest/TestResult'));
 
 const LegacyCounselorResultRedirect = () => {
   const isAuthenticated = Boolean(localStorage.getItem('accessToken'));
   return (
     <Navigate
-      to={isAuthenticated ? '/dashboard/test-result' : '/login'}
+      to={isAuthenticated ? '/dashboard' : '/login'}
       replace
     />
   );
@@ -207,7 +206,6 @@ const AppShell = () => {
 
             {/* Dashboard webinars list */}
             <Route path="webinar" element={<WebinarsPage />} />
-            <Route path="test-result" element={<CounselorTestResult />} />
 
             < Route path='refer&earn' element={<ReferAndEarn></ReferAndEarn>}></Route>
             <Route path="logout" element={<Logout />} />

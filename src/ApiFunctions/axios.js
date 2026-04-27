@@ -16,7 +16,8 @@ const getBaseUrl = () => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: getBaseUrl()
+  baseURL: getBaseUrl(),
+  withCredentials: true
 });
 
 // Simple in-memory GET cache to dedupe identical concurrent requests
