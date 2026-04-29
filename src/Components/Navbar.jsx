@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/Images/logo.png";
@@ -19,6 +19,7 @@ const Navbar = () => {
   console.log('Navbar component rendered');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // For hover menu
+  const dropdownRef = useRef(null);
   const location = useLocation();
   const { categoriesData, loading, error } = useCategories();
   console.log("categoriesData", categoriesData);
@@ -128,6 +129,17 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownRef]);
+
   if (location.pathname.startsWith("/dashboard")) {
     return null;
   }
@@ -213,23 +225,16 @@ const Navbar = () => {
                     Become a Counselor
                   </button>
                 )}
-                <div
-                  className="relative"
-                  onClick={() => {
-                    if (isDropdownOpen) {
-                      setIsDropdownOpen(false);
-                    } else {
-                      setIsDropdownOpen(true);
-                    }
-                  }}
-                >
-                  <div className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer">
+                <div className="relative" ref={dropdownRef}>
+                  <div
+                    className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer"
+                    onClick={() => setIsDropdownOpen((s) => !s)}
+                  >
                     <img className="h-3 opacity-75" src={menu} alt="menu" />
 
-                    <Link
-                      to="/"
+                    <div
                       className="secondMenu bg-gray-500 hover:scale-105 transition-all h-5 w-5 rounded-full"
-                    ></Link>
+                    ></div>
                   </div>
 
                   {/* Enhanced Dropdown menu - Animated */}
