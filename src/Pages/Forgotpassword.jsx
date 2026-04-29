@@ -3,6 +3,7 @@ import loginandSignupbg from "../assets/Images/loginandSignupbg.png";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import PasswordStrength from "../Components/PasswordStrength";
 
 const Forgotpassword = () => {
   const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ const Forgotpassword = () => {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [step, setStep] = useState(1); // 1: Identifier, 2: OTP & New Password
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -56,6 +58,11 @@ const Forgotpassword = () => {
 
     if (newPassword !== confirmPassword) {
       toast.error("Passwords do not match");
+      return;
+    }
+
+    if (!isPasswordValid) {
+      toast.error("Please choose a stronger password.");
       return;
     }
 
@@ -174,6 +181,7 @@ const Forgotpassword = () => {
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   required
                 />
+                <PasswordStrength password={newPassword} onValidationChange={setIsPasswordValid} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">Confirm Password</label>
