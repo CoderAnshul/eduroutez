@@ -100,6 +100,20 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
   console.log("h", isNaN(overallRating) ? 3 : overallRating);
 
   const handleDownloadBrochure = async () => {
+    // Guard: don't attempt download if brochure is not present
+    const hasBrochure = Boolean(
+      institute?.brochure ||
+      institute?.brochureUrl ||
+      institute?.brochure_link ||
+      institute?.brochureFile ||
+      institute?.brochureName ||
+      institute?.hasBrochure ||
+      institute?.brochureUploaded
+    );
+    if (!hasBrochure) {
+      toast.info("Brochure not available");
+      return;
+    }
     try {
       const response = await axiosInstance.get(
         `${baseURL}/download-bruchure/${institute._id}`,
@@ -333,12 +347,20 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
             </div>
           </div>
           <div className="flex items-center flex-wrap gap-4 !ml-0">
-            <button
-              className="bg-[#b82025] text-white px-4 py-2 rounded-lg"
-              onClick={handleDownloadBrochure}
-            >
-              Download Brochure
-            </button>
+            {(institute?.brochure ||
+              institute?.brochureUrl ||
+              institute?.brochure_link ||
+              institute?.brochureFile ||
+              institute?.brochureName ||
+              institute?.hasBrochure ||
+              institute?.brochureUploaded) && (
+              <button
+                className="bg-[#b82025] text-white px-4 py-2 rounded-lg"
+                onClick={handleDownloadBrochure}
+              >
+                Download Brochure
+              </button>
+            )}
             <Link to={instituteUrl} className="!bg-gray-100 !text-red-600 px-4 py-2 rounded-lg border border-red-600 !text-md viewmorebtn bg-[#b82025] text-sm text-white w-32 whitespace-nowrap transition-transform transform active:scale-95 hover:scale-105 flex items-center justify-center" style={{ textDecoration: 'none' }}>
               View more
             </Link>

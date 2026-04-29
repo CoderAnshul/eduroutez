@@ -150,6 +150,21 @@ const InstitueName = ({ instituteData }) => {
   }, []);
 
   const handleDownloadBrochure = async () => {
+    // Guard: ensure brochure exists before attempting download
+    const institute = instituteData?.data || {};
+    const hasBrochure = Boolean(
+      institute?.brochure ||
+      institute?.brochureUrl ||
+      institute?.brochure_link ||
+      institute?.brochureFile ||
+      institute?.brochureName ||
+      institute?.hasBrochure ||
+      institute?.brochureUploaded
+    );
+    if (!hasBrochure) {
+      toast.info("Brochure not available");
+      return;
+    }
     try {
       const response = await axiosInstance.get(
         `${baseURL}/download-bruchure/${instituteData.data._id}`,
@@ -301,12 +316,20 @@ const InstitueName = ({ instituteData }) => {
           </div>
 
           <div className="flex gap-3">
-            <button
-              className="bg-[#b82025] text-white px-4 py-2 rounded-lg"
-              onClick={handleDownloadBrochure}
-            >
-              Download Brochure
-            </button>
+            {(instituteData?.data?.brochure ||
+              instituteData?.data?.brochureUrl ||
+              instituteData?.data?.brochure_link ||
+              instituteData?.data?.brochureFile ||
+              instituteData?.data?.brochureName ||
+              instituteData?.data?.hasBrochure ||
+              instituteData?.data?.brochureUploaded) && (
+              <button
+                className="bg-[#b82025] text-white px-4 py-2 rounded-lg"
+                onClick={handleDownloadBrochure}
+              >
+                Download Brochure
+              </button>
+            )}
             <button
               className="bg-[#b82025] text-white px-4 py-2 rounded-lg"
               onClick={handleApplyNow}
