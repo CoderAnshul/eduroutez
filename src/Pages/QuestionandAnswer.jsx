@@ -52,12 +52,16 @@ const QuestionandAnswer = () => {
       if (!response.data || !response.data.data) return [];
 
       // Process questions and answers
-      return (response.data.data || []).map((question) => ({
+        return (response.data.data || []).map((question) => ({
         id: question._id || null,
         question: question.question || "No question available",
         grade: question.grade || "Not Specified",
         label: question.label || "Uncategorized",
-        askedBy: question.askedBy || "Anonymous",
+        // Prefer to show the user's name if backend returns an object { email, name }
+        askedBy:
+          question.askedBy && typeof question.askedBy === "object"
+            ? question.askedBy.name || question.askedBy.email || "Anonymous"
+            : question.askedBy || "Anonymous",
         instituteEmail: question.instituteEmail || "",
         createdAt: question.createdAt || new Date().toISOString(),
         answers: question.answers || [],
@@ -117,6 +121,34 @@ const QuestionandAnswer = () => {
 
   const toggleExpandQuestion = (id) => {
     setExpandedQuestion(expandedQuestion === id ? null : id);
+  };
+
+  // Helper to display a user's name when possible.
+  const formatUserDisplay = (user) => {
+    if (!user) return "Anonymous";
+    if (typeof user === "object") return user.name || user.email || "Anonymous";
+    if (typeof user === "string") {
+      // Some backends may serialize objects into a string like "@{email=foo; name=Bar}"
+      const atObj = user.match(/^@\{(.+)\}$/);
+      if (atObj) {
+        const inner = atObj[1];
+        const pairs = inner.split(";").map(s => s.trim()).filter(Boolean);
+        const obj = {};
+        pairs.forEach(p => {
+          const [k, v] = p.split("=");
+          if (k && v) obj[k.trim()] = v.trim();
+        });
+        return obj.name || obj.email || user;
+      }
+      // If it's a normal email, try to prettify the local part
+      if (user.includes("@")) {
+        const local = user.split("@")[0];
+        const words = local.split(/[._\-]+/).filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1));
+        return words.join(" ") || user;
+      }
+      return user;
+    }
+    return String(user);
   };
 
   const [form, setForm] = useState({});
@@ -485,7 +517,7 @@ const QuestionandAnswer = () => {
               >
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                  <span className="text-sm font-semibold">{item.askedBy}</span>
+                  <span className="text-sm font-semibold">{formatUserDisplay(item.askedBy)}</span>
                 </div>
                 <h3 className="font-bold text-lg">Q: {item.question}</h3>
 
@@ -510,7 +542,7 @@ const QuestionandAnswer = () => {
                             <div className="flex items-center space-x-2 mb-1">
                               <div className="w-6 h-6 bg-blue-200 rounded-full"></div>
                               <span className="text-sm font-medium">
-                                {answer.answeredBy}
+                                {formatUserDisplay(answer.answeredBy)}
                               </span>
                               <span className="text-xs text-gray-500">
                                 {new Date(answer.answeredAt).toLocaleString()}

@@ -102,6 +102,31 @@ const AnswersList = ({ answers }) => {
     return <div className="italic text-gray-500">No answers yet</div>;
   }
 
+  const formatUserDisplay = (user) => {
+    if (!user) return "Anonymous";
+    if (typeof user === "object") return user.name || user.email || "Anonymous";
+    if (typeof user === "string") {
+      const atObj = user.match(/^@\{(.+)\}$/);
+      if (atObj) {
+        const inner = atObj[1];
+        const pairs = inner.split(";").map(s => s.trim()).filter(Boolean);
+        const obj = {};
+        pairs.forEach(p => {
+          const [k, v] = p.split("=");
+          if (k && v) obj[k.trim()] = v.trim();
+        });
+        return obj.name || obj.email || user;
+      }
+      if (user.includes("@")) {
+        const local = user.split("@")[0];
+        const words = local.split(/[._\-]+/).filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1));
+        return words.join(" ") || user;
+      }
+      return user;
+    }
+    return String(user);
+  };
+
   // Show first answer or all answers based on state
   const displayedAnswers = showAllAnswers ? answers : [answers[0]];
   const remainingCount = answers.length - 1;
@@ -119,9 +144,9 @@ const AnswersList = ({ answers }) => {
           />
           <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
             <User className="h-4 w-4" />
-            <span>{answer.answeredBy}</span>
+            <span>{formatUserDisplay(answer?.answeredBy)}</span>
             <span>•</span>
-            <span>{formatDate(answer.answeredAt)}</span>
+            <span>{formatDate(answer?.answeredAt)}</span>
           </div>
         </div>
       ))}
@@ -221,6 +246,9 @@ const CombinedQuestionsPage = () => {
           label: [activeFilters.join("|")],
         });
       }
+
+      // Request user objects from backend when available
+      queryParams.user = true;
 
       const response = await axiosInstance.get(`${apiUrl}/question-answers`, {
         params: queryParams,
