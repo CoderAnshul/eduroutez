@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import fb from "../assets/Images/fb.png";
 import google from "../assets/Images/google.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -13,6 +13,20 @@ import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props
 
 const Login = ({ isMode, onSwitch, onClose }) => {
   const isPopupMode = isMode === "popup";
+  // If already logged in, avoid showing the login page/popup
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+      if (isPopupMode) {
+        if (onClose) onClose();
+      } else {
+        navigate("/", { replace: true });
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [isPopupMode, onClose, navigate]);
   const [showRolePopup, setShowRolePopup] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
