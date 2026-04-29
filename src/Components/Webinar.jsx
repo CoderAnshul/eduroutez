@@ -72,7 +72,7 @@ const Webinars = ({ instituteData }) => {
   }
 
   // Conditional rendering based on availability of webinars
-  if (!webinarData || webinarData.length === 0) {
+  if (!webinarData || !webinarData.result || webinarData.result.length === 0) {
     return null; // Return nothing if no webinars are available
   }
 
@@ -138,8 +138,9 @@ const Webinars = ({ instituteData }) => {
       </div>
     );
 
-  const displayedWebinars =
-    webinarData?.result?.slice(0, currentPage * itemsPerPage) || [];
+  const displayedWebinars = webinarData?.result
+    ? webinarData.result.slice(0, currentPage * itemsPerPage)
+    : [];
 
   const WebinarCard = ({ webinar }) => {
     const [imgSrc, setImgSrc] = useState(
@@ -232,7 +233,7 @@ const Webinars = ({ instituteData }) => {
       </div>
 
       <div className="w-full flex justify-center gap-4 mt-24">
-        {displayedWebinars.length < (webinarData?.length || 0) && (
+        {displayedWebinars.length < (webinarData?.result?.length || 0) && (
           <button
             className="bg-[#b82025] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b82025] transition duration-300"
             onClick={handleSeeMore}

@@ -9,6 +9,8 @@ const WebinarsPage = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
   const navigate = useNavigate();
+  const Images = import.meta.env.VITE_IMAGE_BASE_URL || "";
+  const PLACEHOLDER_IMAGE = "/placeholder-image.jpg";
 
   const { data, isLoading, isError, refetch } = useQuery(
     ["webinars", { search, page, limit }],
@@ -85,35 +87,70 @@ const WebinarsPage = () => {
               const formattedDate = webinar?.date
                 ? format(new Date(webinar.date), "MMM dd, yyyy")
                 : "Date TBA";
+              const imgSrc = webinar?.image ? `${Images}/${webinar.image}` : PLACEHOLDER_IMAGE;
 
               return (
                 <div
                   key={webinar._id}
                   className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
                 >
+                  <div className="h-44 w-full overflow-hidden">
+                    <img
+                      src={imgSrc}
+                      alt={webinar?.title || "Webinar image"}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = PLACEHOLDER_IMAGE;
+                        e.target.onerror = null;
+                      }}
+                    />
+                  </div>
                   <div className="p-4 flex flex-col justify-between h-56">
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">
-                        {webinar?.title || "Untitled Webinar"}
-                      </h2>
-                      <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
+                      <div className="flex items-center justify-between mb-2">
+                        <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">
+                          {webinar?.title || "Untitled Webinar"}
+                        </h2>
+                        {webinar?.instituteName && (
+                          <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                            {webinar.instituteName}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
                         <span>📅 {formattedDate}</span>
                         <span>⏰ {webinar?.time || "Time TBA"}</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-                        {webinar?.description || "No description available"}
-                      </p>
+
+                      <div className="text-sm text-gray-600 mt-3 line-clamp-3">
+                        {webinar?.description ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                webinar.description
+                                  .split(" ")
+                                  .slice(0, 30)
+                                  .join(" ") +
+                                (webinar.description.split(" ").length > 30 ? "..." : ""),
+                            }}
+                          />
+                        ) : (
+                          <p>No description available</p>
+                        )}
+                      </div>
                     </div>
+
                     <div className="mt-4 flex justify-between items-center gap-2">
                       <button
-                        className="px-3 py-2 bg-gray-100 text-gray-800 text-xs font-semibold rounded-lg hover:bg-gray-200 border border-gray-200"
+                        className="px-3 py-2 bg-gray-100 text-gray-800 text-sm font-semibold rounded-lg hover:bg-gray-200 border border-gray-200"
                         onClick={() => navigate("/dashboard/refer&earn")}
                       >
-                        Refer for Webinar
+                        Refer
                       </button>
                       {webinar?.webinarLink && (
                         <button
-                          className="px-3 py-2 bg-[#b82025] text-white text-xs font-semibold rounded-lg hover:bg-[#971a1f]"
+                          className="px-3 py-2 bg-[#b82025] text-white text-sm font-semibold rounded-lg hover:bg-[#971a1f]"
                           onClick={() => window.open(webinar.webinarLink, "_blank")}
                         >
                           Join Webinar

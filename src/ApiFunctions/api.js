@@ -207,7 +207,8 @@ export const getWebinars = async ({ search = "", page = 1, limit = 10 } = {}) =>
     };
 
     const response = await axiosInstance.get(`/webinars`, { params });
-    return normalize(response);
+    // Return wrapped shape { data: ... } for compatibility with callers
+    return { data: normalize(response) };
   } catch (error) {
     console.error("Error fetching webinars:", error);
     throw error;
