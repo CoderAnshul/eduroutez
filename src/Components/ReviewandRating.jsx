@@ -42,9 +42,15 @@ const ReviewandRating = ({ instituteData }) => {
   const handleReviewClick = (e) => {
     e.preventDefault(); // Prevent default for both buttons
     if (!accessToken) {
+      // Store redirect and institute id so after login we can auto-fill the review form
+      try {
+        sessionStorage.setItem('redirectAfterLogin', '/writereview');
+        sessionStorage.setItem('pendingReviewInstitute', instituteData?.data?._id || '');
+      } catch (err) {}
       setShowLoginPopup(true);
     } else {
-      window.location.href = "/writereview"; // Navigate to write review if logged in
+      // Navigate to write review and pass institute id as query param so it auto-selects
+      window.location.href = "/writereview?instituteId=" + encodeURIComponent(instituteData?.data?._id || '');
     }
   };
 

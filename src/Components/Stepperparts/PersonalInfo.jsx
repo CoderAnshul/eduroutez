@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useQuery } from "react-query";
 import { useDispatch } from "react-redux";
 import { getInstitutes } from "../../ApiFunctions/api";
@@ -30,14 +31,11 @@ const SearchableDropdown = ({ options, onChange, selected }) => {
         id="institute"
         className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
         onChange={onChange}
+        value={selected || ""}
       >
         <option value="">Select</option>
         {filteredOptions.map((item, index) => (
-          <option
-            selected={selected === item?._id}
-            key={index}
-            value={item._id}
-          >
+          <option key={index} value={item._id}>
             {item.instituteName}
           </option>
         ))}
@@ -48,6 +46,7 @@ const SearchableDropdown = ({ options, onChange, selected }) => {
 
 const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
   const [colleges, setColleges] = useState([]);
+  const location = useLocation();
   const [countries, setCountries] = useState([]);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -114,10 +113,32 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
   }, [apiUrl]);
 
   useEffect(() => {
-    if (data?.success === true) {
-      setColleges(data?.data?.result);
+    // Normalize different response shapes from getInstitutes
+    const resolved = data ?? {};
+    // Possible shapes:
+    // 1) { result: [...] }
+    // 2) { data: { result: [...] } }
+    // 3) array [...]
+    let list = [];
+    if (Array.isArray(resolved)) list = resolved;
+    else if (Array.isArray(resolved.result)) list = resolved.result;
+    else if (resolved.data && Array.isArray(resolved.data.result)) list = resolved.data.result;
+    else if (Array.isArray(resolved.data)) list = resolved.data;
+
+    setColleges(list || []);
+
+    // Auto-select institute if provided via query param or location state
+    try {
+      const params = new URLSearchParams(location.search);
+      const instId = params.get("instituteId") || params.get("institute") || location.state?.instituteId || location.state?.institute || sessionStorage.getItem('pendingReviewInstitute');
+      if (instId) {
+        setFormData((prev) => ({ ...prev, institute: instId }));
+        try { sessionStorage.removeItem('pendingReviewInstitute'); } catch (e) {}
+      }
+    } catch (err) {
+      // ignore
     }
-  }, [data]);
+  }, [data, location.search, location.state, setFormData]);
 
   // Check if all required fields are filled
   useEffect(() => {

@@ -173,6 +173,48 @@ const Writereview = () => {
     }
   }, [isSubmit]);
 
+  // Hide Tawk chat widget while on the write-review page to avoid overlaying action buttons
+  useEffect(() => {
+    let intervalId = null;
+    let hidden = false;
+
+    const tryHide = () => {
+      const api = window.Tawk_API;
+      if (api && typeof api.hideWidget === "function") {
+        try {
+          api.hideWidget();
+          hidden = true;
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
+
+    tryHide();
+    if (!hidden) {
+      intervalId = setInterval(() => {
+        tryHide();
+        if (hidden) {
+          clearInterval(intervalId);
+        }
+      }, 500);
+      // stop trying after 6 seconds
+      setTimeout(() => {
+        if (intervalId) clearInterval(intervalId);
+      }, 6000);
+    }
+
+    return () => {
+      // restore widget visibility when leaving the page
+      try {
+        if (window.Tawk_API && typeof window.Tawk_API.showWidget === "function") {
+          window.Tawk_API.showWidget();
+        }
+      } catch (e) {}
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, []);
+
   return (
     <>
       <div className="universal-max-width  max-w-4xl overflow-hidden shadow-none">
@@ -186,7 +228,7 @@ const Writereview = () => {
           {renderStepContent()}
         </div>
 
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t-2 border-gray-100 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)] z-50">
+        <div className="fixed bottom-0 left-0 w-full bg-white border-t-2 border-gray-100 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)] z-[100000]">
           <div className="w-full h-2 bg-gray-300 relative">
             <div
               className="h-2 bg-[#b82025] transition-all duration-500 ease-in-out"
