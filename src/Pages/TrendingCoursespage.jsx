@@ -57,7 +57,7 @@ const fetchCategories = async () => {
     });
     return response.data;
   } catch (error) {
-    throw new Error("Failed to fetch course categories");
+    throw new Error("Failed to  fetch course categories");
   }
 };
 
