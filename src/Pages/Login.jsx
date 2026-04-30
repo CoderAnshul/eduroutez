@@ -13,6 +13,8 @@ import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props
 
 const Login = ({ isMode, onSwitch, onClose }) => {
   const isPopupMode = isMode === "popup";
+  const location = useLocation();
+  const navigate = useNavigate();
   // If already logged in, avoid showing the login page/popup
   useEffect(() => {
     try {
@@ -34,8 +36,6 @@ const Login = ({ isMode, onSwitch, onClose }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
-  const location = useLocation();
-  const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_BASE_URL;
 
   const validateEmail = (email) => {
