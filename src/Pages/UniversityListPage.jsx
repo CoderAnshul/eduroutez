@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import SafeImage from "../Ui components/SafeImage";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import { bestRatedUniversityInstitutes } from "../ApiFunctions/api";
@@ -94,14 +95,12 @@ const UniversityListPage = () => {
               >
                 {/* University Image */}
                 <div className="h-56 overflow-hidden">
-                  <img
+                  <SafeImage
                     src={university.thumbnailImage ? `${Images}/${university.thumbnailImage}` : "/fallback-institute.jpg"}
                     alt={university.instituteName || university.name}
+                    title={university.instituteName || university.name}
                     className="w-full h-full object-cover"
                     loading="lazy"
-                    onError={(e) => {
-                      e.target.src = "/fallback-institute.jpg";
-                    }}
                   />
                 </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import SafeImage from "./SafeImage";
 import CustomButton from "./CustomButton";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import rupee from "../assets/Images/rupee.png";
@@ -178,19 +178,16 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
         {/* Make image clickable */}
         <div className="relative w-full md:w-2/6 !ml-0 block">
           <Link to={instituteUrl} className="group block">
-            <img
+            <SafeImage
               src={
                 institute.thumbnailImage
                   ? `${Image}/${institute.thumbnailImage}`
                   : serachBoximg
               }
               alt="Institute Thumbnail"
+              title={institute.instituteName}
               className="rounded-lg object-cover w-full h-44 group-hover:opacity-90 transition-opacity duration-200"
               style={{ cursor: 'pointer' }}
-              onError={(e) => {
-                e.target.src = serachBoximg;
-                e.target.onerror = null;
-              }}
             />
           </Link>
 

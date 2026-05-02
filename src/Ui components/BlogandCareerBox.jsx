@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import SafeImage from "./SafeImage";
 import { Link } from "react-router-dom";
 import CustomButton from "./CustomButton";
 import SocialShare from "../Components/SocialShare";
@@ -36,9 +36,10 @@ const BlogandCareerBox = ({ boxData, blogData }) => {
             className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
           >
             <div className="relative">
-              <img
+              <SafeImage
                 src={`${Images}/${blog?.thumbnail}`}
                 alt={blog.title}
+                title={blog.title}
                 className="w-full h-48 object-cover"
               />
             </div>

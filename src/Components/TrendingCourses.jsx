@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import SafeImage from "../Ui components/SafeImage";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useQuery } from "react-query";
@@ -223,13 +224,14 @@ const TrendingCourses = () => {
               >
                 <div className="bg-white rounded-xl shadow-md overflow-hidden h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                   <div className="relative h-48 overflow-hidden">
-                    <img
+                    <SafeImage
                       src={
                         course.coursePreviewThumbnail
                           ? `${Images}/${course.coursePreviewThumbnail}`
                           : "/api/placeholder/400/240"
                       }
                       alt={course.courseTitle}
+                      title=""
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-30"></div>
@@ -254,9 +256,9 @@ const TrendingCourses = () => {
                       </div>
 
                       <div>
-                        <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md">
+                        {/* <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md">
                           {course.courseTitle}
-                        </h3>
+                        </h3> */}
                         <div className="flex items-center mt-2 text-white text-opacity-90 text-sm drop-shadow-md">
                           <Clock size={14} className="mr-1" />
 

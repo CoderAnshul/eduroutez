@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import SafeImage from "../Ui components/SafeImage";
 import { useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import cardPhoto from "../assets/Images/teacher.jpg";
@@ -317,7 +318,7 @@ const StreamLevelPage = () => {
                     >
                       {/* Image */}
                       <div className="h-56 relative min-h-56 max-h-56 w-full overflow-hidden">
-                        <img
+                        <SafeImage
                           className="w-full h-full object-cover object-top rounded-t-xl"
                           src={
                             blog?.thumbnail
@@ -325,11 +326,8 @@ const StreamLevelPage = () => {
                               : cardPhoto
                           }
                           alt={blog.title || "Blog"}
+                          title={blog.title}
                           loading="lazy"
-                          onError={(e) => {
-                            e.target.src = cardPhoto;
-                            e.target.onerror = null;
-                          }}
                         />
                         <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-2 bg-white px-3 py-1 rounded-full text-black">
                           {blog.views && (
@@ -457,7 +455,7 @@ const StreamLevelPage = () => {
                   className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
                 >
                   <div className="h-48 w-full overflow-hidden">
-                    <img
+                    <SafeImage
                       className="h-full w-full object-cover"
                       src={
                         institute.thumbnailImage
@@ -465,6 +463,7 @@ const StreamLevelPage = () => {
                           : cardPhoto
                       }
                       alt={institute.instituteName || "Institute"}
+                      title={institute.instituteName}
                       loading="lazy"
                     />
                   </div>

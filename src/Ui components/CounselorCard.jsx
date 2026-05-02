@@ -1,4 +1,4 @@
-import React from 'react';
+import SafeImage from './SafeImage';
 import { Star, MapPin, GraduationCap, Languages, PhoneCall, VideoIcon } from 'lucide-react';
 
 const CounselorCard = ({ counselor }) => {
@@ -16,9 +16,10 @@ const CounselorCard = ({ counselor }) => {
         
         <div className="absolute -bottom-12 left-6">
           <div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-gray-100">
-            <img
+            <SafeImage
               src={counselor.profilePhoto || defaultImage}
               alt={`${counselor.firstname} ${counselor.lastname}`}
+              title={`${counselor.firstname?.charAt(0)}${counselor.lastname?.charAt(0)}`}
               className="w-full h-full object-cover"
             />
           </div>

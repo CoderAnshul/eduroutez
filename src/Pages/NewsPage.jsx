@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import SafeImage from "../Ui components/SafeImage";
 import { Loader2, Search } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
 import { Link } from "react-router-dom";
@@ -128,9 +129,10 @@ export default function NewsPage() {
                 className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
               >
                 {news.image && (
-                  <img
+                  <SafeImage
                     src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${news.image}`}
                     alt={news.title}
+                    title={news.title}
                     className="h-48 w-full object-cover"
                   />
                 )}

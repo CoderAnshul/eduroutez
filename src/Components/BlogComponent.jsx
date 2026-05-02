@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import SafeImage from "../Ui components/SafeImage";
 import agricultureImg from "../assets/Images/agriculture.jpg";
 import BlogCard from "../Ui components/BlogCard";
 import CustomButton from "../Ui components/CustomButton";
@@ -85,10 +86,11 @@ const BlogComponent = () => {
               >
                 {/* Image */}
                 <div className="h-56 relative min-h-56 max-h-56 w-full overflow-hidden">
-                  <img
+                  <SafeImage
                     className="w-full h-full object-cover object-top rounded-t-xl"
                     src={`${Images}/${blog?.thumbnail}`}
                     alt={blog.title}
+                    title={blog.title}
                     loading="lazy" // Lazy load images
                   />
                   <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-2 bg-white px-3 py-1 rounded-full text-black">

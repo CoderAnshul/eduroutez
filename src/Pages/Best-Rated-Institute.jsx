@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import SafeImage from "../Ui components/SafeImage";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
 
@@ -160,16 +161,14 @@ const BestRatedInstitute = () => {
               >
                 {/* Institute Image */}
                 <div className="h-56 overflow-hidden">
-                  <img
+                  <SafeImage
                     src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${
                       institute.thumbnailImage
                     }`}
                     alt={institute.instituteName}
+                    title={institute.instituteName}
                     className="w-full h-full object-cover"
                     loading="lazy"
-                    onError={(e) => {
-                      e.target.src = "/fallback-institute.jpg"; // Fallback image
-                    }}
                   />
                 </div>
 

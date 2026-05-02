@@ -1,4 +1,5 @@
 import React from "react";
+import SafeImage from "../Ui components/SafeImage";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useQuery } from "react-query";
@@ -150,11 +151,12 @@ const TrendingStreams = () => {
                     }`}
                   >
                     {hasImage ? (
-                      <img
+                      <SafeImage
                         src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${
                           item.image
                         }`}
                         alt={streamDetails.name || "Stream image"}
+                        title={streamDetails.name}
                         className="w-full h-full object-cover"
                       />
                     ) : (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import SafeImage from "../Ui components/SafeImage";
 import { Link } from "react-router-dom";
 import cardPhoto from "../assets/Images/teacher.jpg";
 import {
@@ -152,14 +152,15 @@ const TrendingInstitute = () => {
                 className="box shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
                 <div className="imageContainer h-48 overflow-hidden">
-                  <img
+                  <SafeImage
                     className="h-full w-full object-cover"
                     src={
                       institute.thumbnailImage
                         ? `${Images}/${institute.thumbnailImage}`
                         : cardPhoto
                     }
-                    alt="boxphoto"
+                    alt={institute.instituteName}
+                    title={institute.instituteName}
                   />
                 </div>
                 <div className="textContainer p-4">
