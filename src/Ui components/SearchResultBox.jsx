@@ -1,3 +1,6 @@
+import React from "react";
+
+import { useState } from "react";
 import SafeImage from "./SafeImage";
 import CustomButton from "./CustomButton";
 import serachBoximg from "../assets/Images/serachBoximg.jpg";
