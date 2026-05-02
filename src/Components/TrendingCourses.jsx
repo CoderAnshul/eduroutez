@@ -136,18 +136,18 @@ const TrendingCourses = () => {
           <div className="w-24 h-8 bg-gray-200 animate-pulse rounded"></div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {[1, 2, 3].map((item) => (
             <div
               key={item}
-              className="bg-white rounded-xl shadow-md overflow-hidden"
+              className="box w-full shadow-md animate-pulse"
             >
-              <div className="h-48 bg-gray-200 animate-pulse"></div>
+              <div className="h-48 bg-gray-200"></div>
               <div className="p-6 space-y-4">
-                <div className="h-4 bg-gray-200 rounded animate-pulse w-1/4"></div>
-                <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-16 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-8 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-6 bg-gray-200 rounded"></div>
+                <div className="h-16 bg-gray-200 rounded"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
               </div>
             </div>
           ))}
@@ -192,13 +192,13 @@ const TrendingCourses = () => {
 
   return (
     <div className="w-full max-w-[1420px] mx-auto p-2 md:p-6">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center space-x-3 max-sm:space-x-0">
-          <TrendingUp className="text-gray-700 w-6 h-6 block max-sm:hidden" />
-          <h2 className="text-2xl font-bold text-red-600">Trending Courses</h2>
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-4">
+        <div className="flex items-center space-x-3">
+          <TrendingUp className="text-gray-700 w-6 h-6 hidden sm:block" />
+          <h2 className="text-2xl font-bold text-red-600 text-center sm:text-left">Trending Courses</h2>
         </div>
         <Link to="/trendingCourses">
-          <button className="bg-[#b82025] text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-700 transition-all shadow-md">
+          <button className="bg-[#b82025] text-white px-6 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-700 transition-all shadow-md font-semibold transform hover:scale-105 active:scale-95 text-sm">
             <span className="whitespace-nowrap">View All</span>
             <ArrowRight size={18} />
           </button>
@@ -206,7 +206,7 @@ const TrendingCourses = () => {
       </div>
 
       {trendingCourses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {trendingCourses.map((course) => {
             const levelBadge = getLevelBadge(course.courseLevel);
             const slug =
