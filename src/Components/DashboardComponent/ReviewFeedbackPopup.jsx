@@ -18,8 +18,15 @@ const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setIsSubmitting(true);
     setError("");
+
+    // Require both rating and comment before attempting to submit
+    if (rating === 0 || comment.trim() === "") {
+      setError("Please provide both rating and review.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const studentEmail = localStorage.getItem("email");
@@ -67,7 +74,7 @@ const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
         <form onSubmit={handleSubmit}>
           {/* Rating Section */}
           <div className="mb-6 text-center">
-            <p className="text-lg font-medium mb-2">Give Your Rating</p>
+            <p className="text-lg font-medium mb-2">Give Your Rating *</p>
             <div className="flex justify-center space-x-1">
               {[...Array(5)].map((_, index) => (
                 <span
@@ -85,7 +92,7 @@ const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
 
           {/* Review Section */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Note</label>
+            <label className="block text-sm font-medium mb-2">Note *</label>
             <textarea
               className="w-full border border-gray-300 rounded px-3 py-2 resize-none"
               rows="5"
@@ -111,7 +118,7 @@ const ReviewFeedbackPopup = ({ isOpen, onClose, counselor }) => {
             <button
               type="submit"
               className="px-4 py-2 bg-[#b82025] text-white rounded hover:bg-red-700 disabled:opacity-50"
-              disabled={isSubmitting}
+              disabled={isSubmitting || rating === 0 || comment.trim() === ""}
             >
               {isSubmitting ? "Submitting..." : "Submit"}
             </button>
