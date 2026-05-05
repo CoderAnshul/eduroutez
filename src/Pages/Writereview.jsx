@@ -173,47 +173,6 @@ const Writereview = () => {
     }
   }, [isSubmit]);
 
-  // Hide Tawk chat widget while on the write-review page to avoid overlaying action buttons
-  useEffect(() => {
-    let intervalId = null;
-    let hidden = false;
-
-    const tryHide = () => {
-      const api = window.Tawk_API;
-      if (api && typeof api.hideWidget === "function") {
-        try {
-          api.hideWidget();
-          hidden = true;
-        } catch (e) {
-          // ignore
-        }
-      }
-    };
-
-    tryHide();
-    if (!hidden) {
-      intervalId = setInterval(() => {
-        tryHide();
-        if (hidden) {
-          clearInterval(intervalId);
-        }
-      }, 500);
-      // stop trying after 6 seconds
-      setTimeout(() => {
-        if (intervalId) clearInterval(intervalId);
-      }, 6000);
-    }
-
-    return () => {
-      // restore widget visibility when leaving the page
-      try {
-        if (window.Tawk_API && typeof window.Tawk_API.showWidget === "function") {
-          window.Tawk_API.showWidget();
-        }
-      } catch (e) {}
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, []);
 
   return (
     <>
@@ -238,7 +197,7 @@ const Writereview = () => {
             ></div>
           </div>
 
-          <div className="flex justify-between px-6 py-4">
+          <div className="flex justify-center gap-4 px-6 py-4">
             <button
               onClick={prevStep}
               disabled={currentStep == 1}

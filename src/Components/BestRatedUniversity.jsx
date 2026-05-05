@@ -190,11 +190,11 @@ const BestRatedUniversity = React.memo(() => {
         <div className="flex items-center justify-between mb-10">
           <h3 className="text-2xl font-bold">Best Rated Universities</h3>
         </div>
-        <div className="boxWrapper w-full flex flex-col md:flex-row flex-wrap items-center gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="box w-full max-w-sm lg:max-w-[500px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg animate-pulse"
+              className="box w-full shadow-lg animate-pulse"
             >
               <div className="imageContainer h-48 bg-gray-200"></div>
               <div className="textContainer p-4">
@@ -222,8 +222,8 @@ const BestRatedUniversity = React.memo(() => {
 
   return (
     <div className="universal-container py-12 w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
-      <div className="flex items-center justify-between mb-10">
-        <h3 className="text-2xl font-bold">Best Rated Universities</h3>
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-4">
+        <h3 className="text-2xl font-bold text-center sm:text-left">Best Rated Universities</h3>
         <button
           onClick={handleViewMore}
           className="bg-[#b82025] hover:bg-red-700 text-white py-2 px-5 rounded-lg flex items-center gap-2 transition-all duration-300 shadow-sm hover:shadow-md active:scale-95 group"
@@ -233,7 +233,7 @@ const BestRatedUniversity = React.memo(() => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         {renderedContent}
       </div>
     </div>

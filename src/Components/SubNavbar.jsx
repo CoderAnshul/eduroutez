@@ -440,7 +440,7 @@ const SubNavbar = ({ categories }) => {
   );
 
   const renderNewsContent = () => (
-    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
+    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100 hide-scrollbar">
     {/* <div className="bg-white rounded-xl w-full shadow-lg"> */}
       <div className="p-4 border-b">
         <h3 className="text-lg font-bold text-black">Latest Updates</h3>

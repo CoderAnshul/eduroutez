@@ -377,3 +377,14 @@ p {
   stroke-dashoffset: 100;
   animation: checkmark-draw 0.6s ease-in-out 0.2s forwards;
 }
+
+
+/* Hide scrollbar but keep scrolling */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari */
+}
