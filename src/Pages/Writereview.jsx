@@ -179,9 +179,9 @@ const Writereview = () => {
       <div className="universal-max-width  max-w-4xl overflow-hidden shadow-none">
         <Promotions location="REVIEW_PAGE" className="h-[90px]" />
       </div>
-      <h2 className=" font-bold mt-6 text-center w-full text-[#b82025] z-30 text-3xl">
+      {/* <h2 className=" font-bold mt-6 text-center w-full text-[#b82025] z-30 text-3xl">
         Review
-      </h2>
+      </h2> */}
       <div className="p-3 min-h-[60vh] lg:min-h-[85vh] pb-32 bg-white relative flex flex-col">
         <div className="p-2 md:p-6 rounded h-full relative shadow flex-1 flex flex-col">
           {renderStepContent()}

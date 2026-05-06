@@ -1,45 +1,143 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useQuery } from "react-query";
+import { useInfiniteQuery, useQuery } from "react-query";
 import { useDispatch } from "react-redux";
 import { getInstitutes } from "../../ApiFunctions/api";
 import { setAllFieldsTrue, setAllFieldsFalse } from "../../config/inputSlice";
 import axiosInstance from "../../ApiFunctions/axios";
 import Promotions from "../../Pages/CoursePromotions";
 
-const SearchableDropdown = ({ options, onChange, selected }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+const SearchableDropdown = ({ 
+  options, 
+  onChange, 
+  selected, 
+  searchTerm, 
+  onSearchChange, 
+  isLoading,
+  onLoadMore,
+  hasNextPage,
+  isFetchingNextPage
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedName, setSelectedName] = useState("");
+  const dropdownRef = React.useRef(null);
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+  // Sync selectedName if selected changes and we find it in options
+  useEffect(() => {
+    if (selected) {
+      const found = options?.find((opt) => opt._id === selected);
+      if (found) {
+        const name = typeof found.instituteName === 'object' ? found.instituteName.name : found.instituteName;
+        setSelectedName(name);
+      }
+    } else {
+      setSelectedName("");
+    }
+  }, [selected, options]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop <= clientHeight + 50 && hasNextPage && !isFetchingNextPage) {
+      onLoadMore();
+    }
   };
 
-  const filteredOptions = (options || [])?.filter((option) =>
-    option.instituteName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSelect = (option) => {
+    const name = typeof option.instituteName === 'object' ? option.instituteName.name : option.instituteName;
+    setSelectedName(name);
+    onChange({
+      target: {
+        id: "institute",
+        value: option._id,
+      },
+    });
+    onSearchChange("");
+    setIsOpen(false);
+  };
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search college"
-        value={searchTerm}
-        onChange={handleSearchChange}
-        className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
-      />
-      <select
-        id="institute"
-        className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
-        onChange={onChange}
-        value={selected || ""}
-      >
-        <option value="">Select</option>
-        {filteredOptions.map((item, index) => (
-          <option key={index} value={item._id}>
-            {item.instituteName}
-          </option>
-        ))}
-      </select>
+    <div className="relative w-full" ref={dropdownRef}>
+      <div className="relative">
+        <input
+          type="text"
+          placeholder={selectedName || "Search and select college"}
+          value={isOpen ? searchTerm : (selectedName || searchTerm)}
+          onFocus={() => setIsOpen(true)}
+          onChange={(e) => {
+            onSearchChange(e.target.value);
+            setIsOpen(true);
+          }}
+          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b82025]/20 focus:border-[#b82025] focus:outline-none transition-all pr-10 shadow-sm bg-white text-sm"
+        />
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          {(isLoading || isFetchingNextPage) && (
+            <div className="w-4 h-4 border-2 border-[#b82025] border-t-transparent rounded-full animate-spin"></div>
+          )}
+          <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+
+      {isOpen && (
+        <div 
+          onScroll={handleScroll}
+          className="absolute z-[200000] left-0 top-full w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-2xl max-h-[220px] overflow-y-auto hide-scrollbar animate-in fade-in slide-in-from-top-2 duration-200"
+        >
+          <div className="sticky top-0 bg-gray-50 px-4 py-1.5 text-[9px] font-bold text-gray-400 border-b border-gray-100 uppercase tracking-widest flex justify-between items-center">
+            <span>{options.length} {searchTerm ? 'Matches' : 'Colleges'} Loaded</span>
+            {hasNextPage && <span className="text-[8px] text-red-400 animate-pulse italic">Scroll for more...</span>}
+          </div>
+          {options.length > 0 ? (
+            <>
+              {options.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleSelect(item)}
+                  className={`px-4 py-2 cursor-pointer hover:bg-red-50 transition-colors flex items-center justify-between border-b border-gray-50 last:border-0 ${selected === item._id ? 'bg-red-50 text-[#b82025] font-bold' : 'text-gray-700'}`}
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">
+                      {typeof item.instituteName === 'object' ? item.instituteName.name : item.instituteName}
+                    </span>
+                    {(item.city || item.state) && (
+                      <span className="text-[10px] text-gray-400">
+                        {typeof item.city === 'object' ? item.city.name : item.city}
+                        {item.city && item.state ? ', ' : ''}
+                        {typeof item.state === 'object' ? item.state.name : item.state}
+                      </span>
+                    )}
+                  </div>
+                  {selected === item._id && (
+                    <svg className="w-4 h-4 text-[#b82025]" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
+              ))}
+              {isFetchingNextPage && (
+                <div className="px-4 py-3 text-center text-xs text-gray-400 italic bg-gray-50/50">
+                  Loading more...
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="px-4 py-8 text-xs text-gray-400 text-center italic">
+              {isLoading ? 'Searching...' : `No colleges found matching "${searchTerm}"`}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -88,14 +186,53 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
     }
   );
 
-  // Fetch institutes
-  const { data, isLoading, isError, error } = useQuery(
-    ["institutes"],
-    () => getInstitutes(),
+  const [collegeSearch, setCollegeSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(collegeSearch);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [collegeSearch]);
+
+  // Fetch institutes with infinite scroll
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery(
+    ["institutes", debouncedSearch],
+    ({ pageParam = 1 }) => getInstitutes(undefined, undefined, debouncedSearch, undefined, pageParam, 100),
     {
-      enabled: true,
+      getNextPageParam: (lastPage) => {
+        // Normalize response shape to find next page
+        const lastPageData = lastPage?.data || lastPage;
+        const totalPages = lastPageData?.totalPages;
+        const currentPage = lastPageData?.currentPage;
+        return currentPage < totalPages ? currentPage + 1 : undefined;
+      },
+      keepPreviousData: true,
     }
   );
+
+  // Flatten all pages into a single list of colleges
+  useEffect(() => {
+    const allColleges = data?.pages.flatMap((page) => {
+      const resolved = page ?? {};
+      let list = [];
+      if (Array.isArray(resolved)) list = resolved;
+      else if (Array.isArray(resolved.result)) list = resolved.result;
+      else if (resolved.data && Array.isArray(resolved.data.result)) list = resolved.data.result;
+      else if (Array.isArray(resolved.data)) list = resolved.data;
+      return list;
+    }) || [];
+
+    setColleges(allColleges);
+  }, [data]);
 
   // Fetch countries
   useEffect(() => {
@@ -105,29 +242,13 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
         setCountries(res.data?.data || []);
       } catch (err) {
         console.error("Failed to fetch countries:", err);
-        // If you have toast imported, uncomment the following line
-        // toast.error("Failed to fetch countries");
       }
     };
     fetchCountries();
   }, [apiUrl]);
 
+  // Auto-select institute if provided via query param or location state
   useEffect(() => {
-    // Normalize different response shapes from getInstitutes
-    const resolved = data ?? {};
-    // Possible shapes:
-    // 1) { result: [...] }
-    // 2) { data: { result: [...] } }
-    // 3) array [...]
-    let list = [];
-    if (Array.isArray(resolved)) list = resolved;
-    else if (Array.isArray(resolved.result)) list = resolved.result;
-    else if (resolved.data && Array.isArray(resolved.data.result)) list = resolved.data.result;
-    else if (Array.isArray(resolved.data)) list = resolved.data;
-
-    setColleges(list || []);
-
-    // Auto-select institute if provided via query param or location state
     try {
       const params = new URLSearchParams(location.search);
       const instId = params.get("instituteId") || params.get("institute") || location.state?.instituteId || location.state?.institute || sessionStorage.getItem('pendingReviewInstitute');
@@ -138,7 +259,7 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
     } catch (err) {
       // ignore
     }
-  }, [data, location.search, location.state, setFormData]);
+  }, [location.search, location.state, setFormData]);
 
   // Check if all required fields are filled
   useEffect(() => {
@@ -193,7 +314,7 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
 
   return (
     <div className="flex flex-col items-center h-fit mb-4">
-      <div className="w-full max-w-4xl p-6 bg-white rounded-lg h-fit">
+      <div className="w-full max-w-4xl px-6 pb-6 bg-white rounded-lg h-fit">
         <h1 className="text-2xl font-semibold text-center">
           Personal Information
         </h1>
@@ -302,6 +423,12 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
               options={colleges}
               selected={formData?.institute}
               onChange={handleInputChange}
+              searchTerm={collegeSearch}
+              onSearchChange={setCollegeSearch}
+              isLoading={isLoading}
+              onLoadMore={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
             />
           </div>
           <div>

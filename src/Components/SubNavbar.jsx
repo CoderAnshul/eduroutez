@@ -552,13 +552,13 @@ const SubNavbar = ({ categories }) => {
     const streamName = activeItem?.name;
 
     return (
-      <div className="bg-white w-full max-h-[500px] shadow-lg border border-gray-100 flex overflow-hidden">
-        <div className="w-[300px] bg-[#b82025] flex-shrink-0 self-start max-h-[500px] overflow-y-auto">
-          <ul className="w-full ml-0 mb-0 pb-0 space-y-0">
+      <div className="bg-[#b82025] w-full h-[500px] shadow-lg border border-gray-100 flex overflow-hidden">
+        <div className="w-[300px] bg-[#b82025] flex-shrink-0 h-full overflow-y-auto">
+          <ul className="w-full h-full flex flex-col ml-0 mb-0 pb-0 space-y-0">
             {category?.sidebarItems?.map((item) => (
               <li
                 key={item.id}
-                className={`px-4 py-1.5 group mb-0 text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${activeContent[category.label] === item.id ? "bg-black text-white" : "bg-[#b82025] text-white"
+                className={`pl-2 pr-4 flex-1 group mb-0 text-sm flex justify-between gap-3 items-center cursor-pointer transition-all hover:bg-black ${activeContent[category.label] === item.id ? "bg-black text-white" : "bg-[#b82025] text-white"
                   }`}
                 onMouseEnter={() => {
                   setActiveContent((prev) => ({ ...prev, [category.label]: item.id }));
@@ -576,19 +576,19 @@ const SubNavbar = ({ categories }) => {
           </ul>
         </div>
 
-        <div className="flex-1 p-8 overflow-y-auto flex flex-row flex-wrap gap-x-10 gap-y-12 items-start">
+        <div className="flex-1 p-6 bg-white h-full overflow-y-auto flex flex-row flex-wrap gap-x-8 gap-y-8 items-start">
           {(category.label === "Colleges" || category.label === "Exams") && streamName && renderStreamInstitutes(streamName)}
           {category.label === "Exams" && activeItem && renderExamBlogs(activeItem.id)}
 
-          <div className="space-y-6">
-            <h3 className="font-semibold text-red-500 text-base">{activeStream ? `${activeStream} Colleges by City` : "Colleges by City"}</h3>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-2 w-[280px]">
+          <div className="space-y-4">
+            <h3 className="font-semibold text-red-500 text-sm">{activeStream ? `${activeStream} Colleges by City` : "Colleges by City"}</h3>
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 gap-1.5 w-[250px]">
                 {staticTopCities.map((city, index) => (
                   <a
                     key={index}
                     onClick={() => handleLocationClick("city", city.name, activeStream)}
-                    className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
+                    className="text-xs hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
                     onMouseEnter={() => activeStream && setHoveredCity(city.name)}
                     onMouseLeave={() => setHoveredCity(null)}
                   >
@@ -596,23 +596,23 @@ const SubNavbar = ({ categories }) => {
                   </a>
                 ))}
               </div>
-              <div className="text-left mr-4">
-                <a onClick={() => handleAllCollegesByCity()} className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium text-black">
+              <div className="text-left">
+                <a onClick={() => handleAllCollegesByCity()} className="text-[10px] text-red-500 hover:text-red-600 cursor-pointer font-medium text-black">
                   {activeStream ? `View All ${activeStream} Cities` : "View All Cities"}
                 </a>
               </div>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <h3 className="font-semibold text-red-500 text-base">{activeStream ? `${activeStream} Colleges by State` : "Colleges by State"}</h3>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-2">
+          <div className="space-y-4">
+            <h3 className="font-semibold text-red-500 text-sm">{activeStream ? `${activeStream} Colleges by State` : "Colleges by State"}</h3>
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 gap-1.5">
                 {staticTopStates.map((state, index) => (
                   <a
                     key={index}
                     onClick={() => handleLocationClick("state", state.name, activeStream)}
-                    className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
+                    className="text-xs hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
                     onMouseEnter={() => activeStream && setHoveredState(state.name)}
                     onMouseLeave={() => setHoveredState(null)}
                   >
@@ -620,8 +620,8 @@ const SubNavbar = ({ categories }) => {
                   </a>
                 ))}
               </div>
-              <div className="text-left mr-4">
-                <a onClick={() => handleAllCollegesByState()} className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium">
+              <div className="text-left">
+                <a onClick={() => handleAllCollegesByState()} className="text-[10px] text-red-500 hover:text-red-600 cursor-pointer font-medium">
                   {activeStream ? `View All ${activeStream} States` : "View All States"}
                 </a>
               </div>
@@ -645,7 +645,7 @@ const SubNavbar = ({ categories }) => {
                     <img className="h-3 group-hover:rotate-180 transition-all" src={downArrow} alt="" />
                   </h5>
                   {hoveredCategory === category.label && (
-                    <div className="absolute top-full left-0 right-0 z-[1000] bg-transparent overflow-hidden ">
+                    <div className="absolute  top-full left-0 right-0 z-[1000] bg-transparent overflow-hidden ">
                       <div className="universal-max-width">
                         {category.label === "Courses"
                           ? renderCoursesContent()
