@@ -55,9 +55,13 @@ const Contactuspage = () => {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-800">Telephone</h3>
-            <p className="text-sm text-gray-600 mt-2 text-center">
-              (+91) 9594669999 <br />
-              (+91) 9594941234
+            <p className="text-sm text-gray-600 mt-2 text-center flex flex-col items-center">
+              <a href="tel:+919594669999" className="hover:text-blue-600 transition-colors">
+                (+91) 9594669999
+              </a>
+              <a href="tel:+919594941234" className="hover:text-blue-600 transition-colors">
+                (+91) 9594941234
+              </a>
             </p>
           </div>
 
@@ -81,7 +85,9 @@ const Contactuspage = () => {
             </div>
             <h3 className="text-xl font-semibold text-gray-800">Send Email</h3>
             <p className="text-sm text-gray-600 mt-2 text-center">
-              contact@eduroutez.com
+              <a href="mailto:contact@eduroutez.com" className="hover:text-teal-600 transition-colors">
+                contact@eduroutez.com
+              </a>
             </p>
           </div>
         </div>
