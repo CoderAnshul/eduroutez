@@ -99,7 +99,7 @@ const DetailPage = () => {
     { id: "overview", name: "Overview", titleRef: useRef(null) },
     { id: "eligibility", name: "Eligibility", titleRef: useRef(null) },
     { id: "jobRoles", name: "Jobs Roles", titleRef: useRef(null) },
-    { id: "opportunity", name: "Career Opportunity", titleRef: useRef(null) },
+    { id: "opportunity", name: "Career Opportunities", titleRef: useRef(null) },
     { id: "topColleges", name: "Top Colleges", titleRef: useRef(null) },
   ];
 

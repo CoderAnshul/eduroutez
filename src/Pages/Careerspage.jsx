@@ -255,7 +255,7 @@ const Careerspage = () => {
   return (
     <>
       <PageBanner
-        pageName="Career Opportunity"
+        pageName="Career Opportunities"
         currectPage="career opportunity"
       />
 
