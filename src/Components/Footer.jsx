@@ -197,24 +197,20 @@ const Footer = () => {
               </div>
             </div>
 
-            <div className="text-sm mt-1 text-wrap flex items-center">
-              <Phone size={16} className="mr-2 text-red-500" />
-              <a
-                href="tel:9594941234"
-                className="hover:text-red-400 text-white transition-colors"
-              >
-                (+91) 9594941234
-              </a>
-            </div>
-            <div className="text-sm mt-1 text-wrap flex items-center">
-              <Mail size={16} className="mr-2 text-red-500" />
-              <a
-                href="mailto:contact@eduroutez.com"
-                className="hover:text-red-400 text-white transition-colors"
-              >
-                contact@eduroutez.com
-              </a>
-            </div>
+            <a
+              href="tel:+919594941234"
+              className="text-sm mt-1 text-wrap flex items-center hover:text-red-400 text-white transition-colors group"
+            >
+              <Phone size={16} className="mr-2 text-red-500 group-hover:text-red-400 transition-colors" />
+              <span>(+91) 9594941234</span>
+            </a>
+            <a
+              href="mailto:contact@eduroutez.com"
+              className="text-sm mt-1 text-wrap flex items-center hover:text-red-400 text-white transition-colors group"
+            >
+              <Mail size={16} className="mr-2 text-red-500 group-hover:text-red-400 transition-colors" />
+              <span>contact@eduroutez.com</span>
+            </a>
 
             <div className="flex gap-4 mt-6">
               <Link to="https://www.facebook.com/eduroutez" target="_blank">
