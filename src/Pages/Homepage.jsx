@@ -47,7 +47,8 @@ const Homepage = () => {
       </div>
       {/* Using standard Tailwind classes for width and height instead of arbitrary values */}
       <div className="universal-max-width h-fit py-4">
-        <Promotions location="HOME_PAGE" className="h-[90px]" />
+        <Promotions location="HOME_PAGE"/>
+        {/* // <Promotions location="HOME_PAGE" className="h-[90px]" /> */}
       </div>
       <div className="universal-container flex flex-col items-center">
         <PopularCourses />
