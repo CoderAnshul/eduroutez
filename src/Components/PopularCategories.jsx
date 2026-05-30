@@ -43,7 +43,7 @@ const PopularCategories = () => {
   return (
     <div className="gradient-background flex flex-wrap flex-col items-center justify-center text-center min-h-96 w-full p-2 lg:p-8">
       <h1 className="text-3xl lg:text-4xl flex flex-col items-center justify-center text-center text-[#0B104A] font-semibold mb-5">
-        Find Out by Popular Categories
+        Find Out by Popular Streams
       </h1>
       <p className="text-sm md:w-[50%]">
         We offer a brand new approach to the most basic learning paradigms. Choose from a wide range of learning options and gain new skills! Our school is known for its quality education.

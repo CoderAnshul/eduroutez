@@ -94,7 +94,7 @@ const Faqs = ({ instituteData }) => {
     <div className="min-h-28 w-full flex flex-col justify-between rounded-xl mb-5 sm:p-4">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-bold">Questions & Answers</h3>
+          <h3 className="text-xl font-bold">FAQ'S</h3>
           <h4 className="font-semibold opacity-75">
             ({faqs?.length || 0} Questions)
           </h4>
