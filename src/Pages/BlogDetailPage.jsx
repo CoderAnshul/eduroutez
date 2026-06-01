@@ -352,7 +352,7 @@ const BlogDetailPage = () => {
     if (!html) return "";
     
     // Replace <oembed url="..."> with actual video player or iframe
-    return html.replace(/<oembed\s+url="([^"]+)"><\/oembed>/g, (match, url) => {
+    let processedHtml = html.replace(/<oembed\s+url="([^"]+)"><\/oembed>/g, (match, url) => {
       // Handle YouTube
       if (url.includes("youtube.com") || url.includes("youtu.be")) {
         let videoId = "";
@@ -403,6 +403,11 @@ const BlogDetailPage = () => {
           </video>
         </div>`;
     });
+
+    // Remove empty paragraphs or paragraphs containing only non-breaking spaces or breaks
+    processedHtml = processedHtml.replace(/<p>\s*(&nbsp;|<br\s*\/?>)*\s*<\/p>/gi, "");
+
+    return processedHtml;
   };
 
   // Helper to strip HTML tags for preview and remove media tags

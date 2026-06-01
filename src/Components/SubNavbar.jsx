@@ -515,28 +515,28 @@ const SubNavbar = ({ categories }) => {
     return (
       <div className=" flex gap-6">
       {/* <div className="p-4 flex gap-6"> */}
-        <div className="min-w-48">
-          <h3 className="font-semibold text-red-500 text-base mb-3">Popular Colleges</h3>
+        <div className="min-w-48 font-sans">
+          <h3 className="font-semibold text-red-500 text-base mb-3 font-sans">Popular Colleges</h3>
           {popular.length === 0 ? (
-            <p className="text-sm text-gray-500">Loading...</p>
+            <p className="text-sm text-gray-500 font-sans">Loading...</p>
           ) : (
             <div className="grid grid-cols-1 gap-2">
               {popular.slice(0, 5).map((institute) => (
-                <div key={institute._id} onClick={() => handleInstituteClick(institute)} className="cursor-pointer transition-colors hover:text-red-500 text-sm flex justify-between">
+                <div key={institute._id} onClick={() => handleInstituteClick(institute)} className="cursor-pointer transition-colors hover:text-red-500 text-sm flex justify-between font-sans">
                   <span>{institute.instituteName}</span>
                 </div>
               ))}
             </div>
           )}
         </div>
-        <div className="min-w-48">
-          <h3 className="font-semibold text-red-500 text-base mb-3">Top Colleges</h3>
+        <div className="min-w-48 font-sans">
+          <h3 className="font-semibold text-red-500 text-base mb-3 font-sans">Top Colleges</h3>
           {recent.length === 0 ? (
-            <p className="text-sm text-gray-500">Loading...</p>
+            <p className="text-sm text-gray-500 font-sans">Loading...</p>
           ) : (
             <div className="grid grid-cols-1 gap-2">
               {recent.slice(0, 5).map((institute) => (
-                <div key={institute._id} onClick={() => handleInstituteClick(institute)} className="cursor-pointer transition-colors hover:text-red-500 text-sm">
+                <div key={institute._id} onClick={() => handleInstituteClick(institute)} className="cursor-pointer transition-colors hover:text-red-500 text-sm font-sans">
                   {institute.instituteName}
                 </div>
               ))}
@@ -576,54 +576,54 @@ const SubNavbar = ({ categories }) => {
           </ul>
         </div>
 
-        <div className="flex-1 p-6 bg-white h-full overflow-y-auto flex flex-row flex-wrap gap-x-8 gap-y-8 items-start">
+        <div className="flex-1 p-6 bg-white h-full overflow-y-auto flex flex-row flex-wrap gap-x-8 gap-y-8 items-start font-sans">
           {(category.label === "Colleges" || category.label === "Exams") && streamName && renderStreamInstitutes(streamName)}
           {category.label === "Exams" && activeItem && renderExamBlogs(activeItem.id)}
 
-          <div className="space-y-4">
-            <h3 className="font-semibold text-red-500 text-sm">{activeStream ? `${activeStream} Colleges by City` : "Colleges by City"}</h3>
-            <div className="space-y-3">
-              <div className="grid grid-cols-1 gap-1.5 w-[250px]">
+          <div className="space-y-4 font-sans">
+            <h3 className="font-semibold text-red-500 text-base mb-3 font-sans">{activeStream ? `${activeStream} Colleges by City` : "Colleges by City"}</h3>
+            <div className="space-y-3 font-sans">
+              <div className="grid grid-cols-1 gap-2 w-[250px]">
                 {staticTopCities.map((city, index) => (
-                  <a
+                  <div
                     key={index}
                     onClick={() => handleLocationClick("city", city.name, activeStream)}
-                    className="text-xs hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
+                    className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between transition-colors font-sans"
                     onMouseEnter={() => activeStream && setHoveredCity(city.name)}
                     onMouseLeave={() => setHoveredCity(null)}
                   >
                     <span className="line-clamp-1">{activeStream ? `${activeStream} in ${city.name}` : city.name}</span>
-                  </a>
+                  </div>
                 ))}
               </div>
-              <div className="text-left">
-                <a onClick={() => handleAllCollegesByCity()} className="text-[10px] text-red-500 hover:text-red-600 cursor-pointer font-medium text-black">
+              <div className="text-left mt-2">
+                <div onClick={() => handleAllCollegesByCity()} className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium font-sans">
                   {activeStream ? `View All ${activeStream} Cities` : "View All Cities"}
-                </a>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="font-semibold text-red-500 text-sm">{activeStream ? `${activeStream} Colleges by State` : "Colleges by State"}</h3>
-            <div className="space-y-3">
-              <div className="grid grid-cols-1 gap-1.5">
+          <div className="space-y-4 font-sans">
+            <h3 className="font-semibold text-red-500 text-base mb-3 font-sans">{activeStream ? `${activeStream} Colleges by State` : "Colleges by State"}</h3>
+            <div className="space-y-3 font-sans">
+              <div className="grid grid-cols-1 gap-2">
                 {staticTopStates.map((state, index) => (
-                  <a
+                  <div
                     key={index}
                     onClick={() => handleLocationClick("state", state.name, activeStream)}
-                    className="text-xs hover:text-red-500 cursor-pointer truncate flex justify-between text-black"
+                    className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between transition-colors font-sans"
                     onMouseEnter={() => activeStream && setHoveredState(state.name)}
                     onMouseLeave={() => setHoveredState(null)}
                   >
                     <span>{activeStream ? `${activeStream} in ${state.name}` : state.name}</span>
-                  </a>
+                  </div>
                 ))}
               </div>
-              <div className="text-left">
-                <a onClick={() => handleAllCollegesByState()} className="text-[10px] text-red-500 hover:text-red-600 cursor-pointer font-medium">
+              <div className="text-left mt-2">
+                <div onClick={() => handleAllCollegesByState()} className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium font-sans">
                   {activeStream ? `View All ${activeStream} States` : "View All States"}
-                </a>
+                </div>
               </div>
             </div>
           </div>
