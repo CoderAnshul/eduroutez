@@ -286,7 +286,7 @@ const StreamLevelPage = () => {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
               <Sparkles className="text-red-500 w-6 h-6" />
-              <h2 className="text-3xl font-bold text-gray-900">Stream Related Blogs</h2>
+              <h2 className="text-2xl font-bold">Stream Related Blogs</h2>
             </div>
             <Link to="/blogpage">
               <button className="bg-[#b82025] text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
@@ -440,7 +440,7 @@ const StreamLevelPage = () => {
         <div className="universal-container py-12">
           <div className="flex items-center gap-2 mb-8">
             <Sparkles className="text-red-500 w-6 h-6" />
-            <h2 className="text-3xl font-bold text-gray-900">Stream Related Institutes</h2>
+            <h2 className="text-2xl font-bold">Stream Related Institutes</h2>
           </div>
           {institutesLoading ? (
             <div className="flex justify-center items-center h-64">

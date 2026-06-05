@@ -42,7 +42,7 @@ const ScheduleConfirmationPopup = ({ open, onClose }) => {
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">
+          <h2 className="text-2xl font-bold mb-3 tracking-tight">
             Test Scheduled!
           </h2>
           

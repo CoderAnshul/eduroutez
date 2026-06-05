@@ -46,7 +46,7 @@ const WebinarsPage = () => {
     <div className="universal-container py-8 min-h-screen">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">All Webinars</h1>
+          <h1 className="text-2xl sm:text-2xl font-bold">All Webinars</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">
             Browse upcoming and recorded webinars across all institutes.
           </p>
