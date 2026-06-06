@@ -15,19 +15,21 @@ const slides = [
 
 const Events = memo(({ className = "" }) => {
   return (
-    <div className={`relative h-[420px] w-full sm:w-1/2 bg-gray-300 ${className}`}>
+    <div className={`custom-banner-wrapper  relative w-full lg:w-1/2 sm:grow min-w-0 bg-gray-300 ${className}`}>
       <Swiper
         navigation={true}
         modules={[Navigation]}
         className="events-swiper"
         slidesPerView={1}
         spaceBetween={0}
+        observer={true}
+        observeParents={true}
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            <div className="relative h-[420px] w-full bg-gray-300">
+            <div className="slide-content-wrapper  relative bg-gray-300">
               <img
-                className="w-full h-full object-cover"
+                className="object-cover"
                 src={slide.img}
                 alt={`slide-${slide.id}`}
                 loading="lazy"

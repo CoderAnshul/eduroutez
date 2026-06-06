@@ -70,7 +70,7 @@ const Homepage = () => {
       </div>
       <Reviews />
       {/* <Events className = "!w-full"/> */}
-      <div className="flex gap-2 flex-col sm:flex-row items-center">
+      <div className="flex gap-2 flex-col lg:flex-row items-center">
         <Events />
         <ConsellingBanner />
       </div>

@@ -38,7 +38,7 @@ const ConsellingBanner = React.memo(({ className = "" }) => {
 
   return (
     <div
-      className={`relative h-[420px] w-full overflow-hidden sm:w-1/2 bg-gray-300 ${className}`}
+      className={`custom-banner-wrapper relative w-full lg:w-1/2 sm:grow min-w-0 bg-gray-300 ${className}`}
     >
       <Swiper
         navigation={true}
@@ -46,19 +46,21 @@ const ConsellingBanner = React.memo(({ className = "" }) => {
         className="counselling-swiper"
         slidesPerView={1}
         spaceBetween={0}
+        observer={true}
+        observeParents={true}
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            <div className="relative h-[420px] bg-gray-300">
+            <div className="slide-content-wrapper relative bg-gray-300">
               <img
-                className="w-full h-full object-cover"
+                className="object-cover"
                 src={slide.img}
                 alt={`slide-${slide.id}`}
                 loading="lazy"
               />
-              <div className="h-full w-full text-white flex flex-col justify-between pt-12 pb-14 px-[5vw] md:px-[60px] items-end text-right absolute left-0 top-0 z-50 bg-[#00000075]">
-                <div className="max-w-[85%] sm:max-w-[75%] md:max-w-[380px] flex flex-col items-end">
-                  <h2 className="text-[28px] sm:text-[32px] md:text-[36px] font-semibold text-white leading-tight">
+              <div className="h-full w-full text-white flex flex-col justify-between 2xl:justify-start pt-12 pb-14 px-[5vw] md:px-[60px] items-end text-right absolute left-0 top-0 z-50 bg-[#00000075]">
+                <div className="max-w-[65%] sm:max-w-[65%] md:max-w-[380px] flex flex-col items-end">
+                  <h2 className="text-[20px] sm:text-[32px] md:text-[36px] font-semibold text-white leading-tight">
                     {slide.title}
                   </h2>
                   {slide.subtitle && (
@@ -68,7 +70,7 @@ const ConsellingBanner = React.memo(({ className = "" }) => {
                   )}
                 </div>
                 <Link to="/counselor">
-                  <button className="text-white text-sm flex transition-transform transform active:scale-95 hover:scale-105 items-center py-3 px-5 bg-blue-600 gap-1 font-medium">
+                  <button className="text-white mt-10 text-sm flex transition-transform transform active:scale-95 hover:scale-105 items-center py-3 px-5 bg-blue-600 gap-1 font-medium">
                     Book Counseling
                     <img className="h-5" src={uparrow} alt="arrow" />
                   </button>

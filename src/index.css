@@ -406,3 +406,53 @@ p {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;             /* Chrome, Safari */
 }
+
+/* Custom Banner Responsiveness and Height Adjustments */
+.custom-banner-wrapper {
+  height: 240px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.custom-banner-wrapper .swiper,
+.custom-banner-wrapper .swiper-wrapper,
+.custom-banner-wrapper .swiper-slide,
+.custom-banner-wrapper .slide-content-wrapper,
+.custom-banner-wrapper .slide-content-wrapper > img {
+  height: 100% !important;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .custom-banner-wrapper {
+    height: 420px;
+  }
+
+  .custom-banner-wrapper:only-child {
+    height: auto !important;
+    width: 100% !important;
+  }
+  
+  .custom-banner-wrapper:only-child .swiper,
+  .custom-banner-wrapper:only-child .swiper-wrapper,
+  .custom-banner-wrapper:only-child .swiper-slide,
+  .custom-banner-wrapper:only-child .slide-content-wrapper,
+  .custom-banner-wrapper:only-child .slide-content-wrapper > img {
+    height: auto !important;
+  }
+}
+
+@media (min-width: 1580px) {
+  .custom-banner-wrapper {
+    height: 550px;
+  }
+}
+
+@media (min-width: 640px) {
+  .custom-banner-wrapper:only-child .counselling-swiper .slide-content-wrapper > div {
+    justify-content: flex-start !important;
+  }
+  .custom-banner-wrapper:only-child .counselling-swiper .slide-content-wrapper a {
+    margin-top: 2rem !important;
+  }
+}

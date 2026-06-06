@@ -247,7 +247,9 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
                 {overallRating}
               </span>
             )}
-            <span>({institute?.reviews?.length || 0})</span>
+            {institute?.reviews?.length > 0 && (
+              <span>({institute.reviews.length})</span>
+            )}
             <span className="flex items-center gap-2 text-gray-600">
               {institute.state?.name && (
                 <>
