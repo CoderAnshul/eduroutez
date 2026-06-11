@@ -13,7 +13,7 @@ import ConsellingBanner from "../Components/ConsellingBanner";
 const fetchTrendingStreams = async (page) => {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}/trending-streams?page=${page}&limit=9`
+      `${import.meta.env.VITE_BASE_URL}/trending-streams?page=${page}&limit=10000`
     );
     console.log("Trending Streams:", response.data);
     return response.data;

@@ -6,7 +6,7 @@ const baseURL = import.meta.env.VITE_BASE_URL;
 // Helper to normalize different server response shapes
 const normalize = (res) => {
   try {
-    return res?.data?.data ?? res?.data ?? res;
+    return res?.data?.data ?? res?.dat / career - categorya ?? res;
   } catch {
     return res;
   }
@@ -58,8 +58,9 @@ export const addToWishlist = async (userId, instituteId) => {
         headers: {
           'Content-Type': 'application/json',
           'x-access-token': localStorage.getItem('accessToken'),
-          'x-refresh-token': localStorage.getItem('refreshToken')  }
-        }    );
+          'x-refresh-token': localStorage.getItem('refreshToken')
+        }
+      });
     return normalize(response);
   } catch (error) {
     console.error("Error adding to wishlist:", error);
@@ -70,10 +71,10 @@ export const addToWishlist = async (userId, instituteId) => {
 export const blogById = async (idOrSlug) => {
   try {
     console.log("Processing request for:", idOrSlug);
-    
+
     // Determine if we're dealing with an ID or a slug
     const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
-    
+
     let response;
 
     if (isSlug) {
@@ -152,10 +153,10 @@ export const CarrerDetail = async (idOrSlug) => {
 export const getInstituteById = async (idOrSlug) => {
   try {
     console.log("Processing request for:", idOrSlug);
-    
+
     // Determine if we're dealing with an ID or a slug
     const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
-    
+
     let response;
 
     if (isSlug) {
@@ -176,10 +177,10 @@ export const getInstituteById = async (idOrSlug) => {
 export const getCoursesById = async (idOrSlug) => {
   try {
     console.log("Processing request for:", idOrSlug);
-    
+
     // Determine if we're dealing with an ID or a slug
     const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
-    
+
     let response;
 
     if (isSlug) {
@@ -217,7 +218,7 @@ export const getWebinars = async ({ search = "", page = 1, limit = 10 } = {}) =>
 
 export const createReview = async (formData) => {
   try {
-      const response = await axiosInstance.post(`/review`, formData, {
+    const response = await axiosInstance.post(`/review`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -266,8 +267,8 @@ export const blogs = async (page) => {
     const response = await axios.get(`${baseURL}/blogs?sortCon={"createdAt":"desc"}`, {
       params: {
         page,
-        limit:8
-            },
+        limit: 8
+      },
     });
     return response.data;
 
@@ -292,7 +293,7 @@ export const getBlogs = async () => {
 
 export const createQuery = async (formData) => {
   try {
-    
+
     const response = await axios.post(`${baseURL}/query`, formData);
     return response.data;
   } catch (error) {
@@ -314,8 +315,8 @@ export const careers = async (page) => {
     const response = await axios.get(`${baseURL}/careers?sort={"createdAt":"desc"}`, {
       params: {
         page,
-        limit:8
-            },
+        limit: 8
+      },
     });
     return response.data;
   } catch (error) {
@@ -353,11 +354,11 @@ export const popularCourses = async () => {
 export const AllpopularCourses = async (params = {}) => {
   try {
     // Destructure with default values
-    const { 
-      page = 1, 
-      limit = 10, 
-      filters = {}, 
-      search = '' 
+    const {
+      page = 1,
+      limit = 10,
+      filters = {},
+      search = ''
     } = params;
 
     // Prepare query parameters
@@ -369,14 +370,14 @@ export const AllpopularCourses = async (params = {}) => {
     };
 
     // Remove undefined or null values
-    Object.keys(queryParams).forEach(key => 
+    Object.keys(queryParams).forEach(key =>
       queryParams[key] === undefined && delete queryParams[key]
     );
 
-    const response = await axios.get( `${baseURL}/courses`, {
+    const response = await axios.get(`${baseURL}/courses`, {
       params: queryParams
     });
-    
+
 
     return response;
   } catch (error) {
@@ -387,10 +388,10 @@ export const AllpopularCourses = async (params = {}) => {
 
 export const courseCategoriesList = async (params = {}) => {
   try {
-    const { page = 0,limit = 10000 } = params;
+    const { page = 0, limit = 10000 } = params;
 
     const response = await axios.get(`${baseURL}/course-categories`, {
-      params: { page,limit }
+      params: { page, limit }
     });
 
     console.log('courseCategoriesList', response);
@@ -440,7 +441,7 @@ export const bestRatedUniversityInstitutes = async () => {
 
 
 
-export const allbestRatedInstitute = async () => {  
+export const allbestRatedInstitute = async () => {
   try {
     const response = await axios.get(`${baseURL}/best-rated-institute`);
     return response.data;
@@ -452,11 +453,11 @@ export const allbestRatedInstitute = async () => {
 
 export const trendingInstitute = async () => {
   try {
-    console.log("trendingInstitute",`${baseURL}/institutes?filters={"isTrending":true}&limit=3`);
+    console.log("trendingInstitute", `${baseURL}/institutes?filters={"isTrending":true}&limit=3`);
     const response = await axios.get(
       `${baseURL}/institutes?filters={"isTrending":true}&limit=3`
     );
-    console.log('tred',response.data);
+    console.log('tred', response.data);
     return response.data;
 
     // return response.data;
@@ -485,7 +486,7 @@ export const alltrendingInstitute = async () => {
 //careerCategories
 export const careerCategories = async () => {
   try {
-    const response = await axios.get(`${baseURL}/career-category?page=0`);
+    const response = await axios.get(`${baseURL}/career-category?page=0&limit=10000`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching career categories `, error);
