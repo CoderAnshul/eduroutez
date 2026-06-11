@@ -639,8 +639,9 @@ const BlogDetailPage = () => {
 
         {/* Use shared AuthPopup for login */}
         <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
-      </>
-      );
+      </div>
+    </>
+  );
 };
 
-      export default BlogDetailPage;
+export default BlogDetailPage;
