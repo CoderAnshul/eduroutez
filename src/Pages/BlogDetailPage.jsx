@@ -28,7 +28,7 @@ const CoverImageSlider = ({ images, baseUrl }) => {
         aria-label="Previous image"
         type="button"
       >
-        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" /></svg>
       </button>
       <img
         src={`${baseUrl}/${images[current]}`}
@@ -42,7 +42,7 @@ const CoverImageSlider = ({ images, baseUrl }) => {
         aria-label="Next image"
         type="button"
       >
-        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
       </button>
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
         {images.map((_, idx) => (
@@ -218,7 +218,7 @@ const BlogDetailPage = () => {
     fetchData().then(() => {
       try {
         window.__fetchedBlogKeys && window.__fetchedBlogKeys.add(fetchKey);
-      } catch (e) {}
+      } catch (e) { }
     });
   }, [id, currentUserId]);
 
@@ -350,7 +350,7 @@ const BlogDetailPage = () => {
   // Helper function to transform CKEditor oembed tags into actual media elements
   const transformDescription = (html) => {
     if (!html) return "";
-    
+
     // Replace <oembed url="..."> with actual video player or iframe
     let processedHtml = html.replace(/<oembed\s+url="([^"]+)"><\/oembed>/g, (match, url) => {
       // Handle YouTube
@@ -372,7 +372,7 @@ const BlogDetailPage = () => {
             ></iframe>
           </div>`;
       }
-      
+
       // Handle Vimeo
       if (url.includes("vimeo.com")) {
         const videoId = url.split("/").pop();
@@ -477,10 +477,9 @@ const BlogDetailPage = () => {
               <button
                 onClick={handleLike}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
-                  ${
-                    isLiked
-                      ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
-                      : "bg-gray-100 text-black border-gray-300 hover:bg-gray-200"
+                  ${isLiked
+                    ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
+                    : "bg-gray-100 text-black border-gray-300 hover:bg-gray-200"
                   } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
               >
                 {/* Thumb SVG */}
@@ -489,9 +488,8 @@ const BlogDetailPage = () => {
                   width="24"
                   height="24"
                   viewBox="0 0 24 24"
-                  className={`transition-transform duration-300 ${
-                    isLiked ? "scale-110" : ""
-                  }`}
+                  className={`transition-transform duration-300 ${isLiked ? "scale-110" : ""
+                    }`}
                   fill={isLiked ? "#F59E0B" : "none"}
                   stroke="#F59E0B"
                   strokeWidth="2"
@@ -629,19 +627,20 @@ const BlogDetailPage = () => {
               <BlogReviewForm blog={data} />
             </div>
           </div>
+          {/* //<Events /> */}
+
+
+          <HighRatedCareers />
+        </div>
+        <div className="flex gap-2 items-center">
+          <Events />
+          <ConsellingBanner />
         </div>
 
-        <HighRatedCareers />
-      </div>
-      <div className="flex gap-2 items-center">
-        <Events />
-        <ConsellingBanner />
-      </div>
-
-      {/* Use shared AuthPopup for login */}
-      <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
-    </>
-  );
+        {/* Use shared AuthPopup for login */}
+        <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
+      </>
+      );
 };
 
-export default BlogDetailPage;
+      export default BlogDetailPage;

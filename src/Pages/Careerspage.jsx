@@ -267,14 +267,12 @@ const Careerspage = () => {
       </button>
 
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-[10001] flex transition-opacity duration-300 ${
-          isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black bg-opacity-50 z-[10001] flex transition-opacity duration-300 ${isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
       >
         <div
-          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${
-            isFilterOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${isFilterOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
         >
           <button
             className="text-gray-800 font-bold text-xl mb-4"
@@ -317,9 +315,8 @@ const Careerspage = () => {
       </div>
 
       <div
-        className={`universal-container flex pt-5 mb-14 ${
-          isFilterOpen ? "pointer-events-none" : ""
-        }`}
+        className={`universal-container flex pt-5 mb-14 ${isFilterOpen ? "pointer-events-none" : ""
+          }`}
       >
         <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
           <h3 className="text-lg font-semibold mb-4">Filter by Category</h3>
@@ -460,7 +457,8 @@ const Careerspage = () => {
       </div>
       <BlogComponent />
       <div className="flex gap-2 flex-col sm:flex-row items-center">
-        <Events />
+        {/* //<Events /> */}
+
         <ConsellingBanner />
       </div>
     </>

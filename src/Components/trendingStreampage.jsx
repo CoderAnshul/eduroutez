@@ -151,9 +151,8 @@ const TrendingStreams = () => {
                   <div className="h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">
                     {/* Image or Pattern Header */}
                     <div
-                      className={`h-36 relative overflow-hidden ${
-                        hasImage ? "" : design.bgColor
-                      }`}
+                      className={`h-36 relative overflow-hidden ${hasImage ? "" : design.bgColor
+                        }`}
                     >
                       {hasImage ? (
                         <img
@@ -238,9 +237,8 @@ const TrendingStreams = () => {
 
                       {/* Course count */}
                       <p className="text-gray-600 mb-6 line-clamp-2">
-                        {`Explore ${
-                          streamDetails.name || "this stream"
-                        } and discover comprehensive courses and resources designed to enhance your knowledge and skills.`}
+                        {`Explore ${streamDetails.name || "this stream"
+                          } and discover comprehensive courses and resources designed to enhance your knowledge and skills.`}
                       </p>
 
                       {/* Explore button */}
@@ -313,7 +311,7 @@ const TrendingStreams = () => {
       <HighRatedCareers />
 
       <div className="flex gap-4 flex-col sm:flex-row">
-        <Events />
+        {/*         {/* //<Events /> */}
         <ConsellingBanner />
       </div>
     </>

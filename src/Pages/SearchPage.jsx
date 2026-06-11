@@ -91,7 +91,7 @@ const SearchPage = () => {
     setFetchError(false);
     ////console.debug('SearchPage: baseURL=', baseURL, 'searchSource=', searchSource);
 
-      if (searchSource === "input" && inputField) {
+    if (searchSource === "input" && inputField) {
       const type = searchParams.get("searchType") || "institute";
       const instName = type === "institute" ? inputField : "";
       const courseName = type === "course" ? inputField : "";
@@ -137,8 +137,8 @@ const SearchPage = () => {
 
       // If no filters in URL, load default data
       if (Object.keys(initialFilters).length === 0 && !sortFromUrl) {
-          //console.debug('Calling getInstitutes for default load...');
-          getInstitutes("", "", "", "", 1, itemsPerPage)
+        //console.debug('Calling getInstitutes for default load...');
+        getInstitutes("", "", "", "", 1, itemsPerPage)
           .then((data) => {
             //console.debug('getInstitutes (default) response:', data);
             const payload = data?.data?.data ?? data?.data ?? data;
@@ -169,16 +169,16 @@ const SearchPage = () => {
         // But if only sort is present, fetch immediately
         if (sortFromUrl && Object.keys(initialFilters).length === 0) {
           fetchFilteredInstitutes({}, 1, itemsPerPage, sortFromUrl)
-              .then((data) => {
-                //console.debug('fetchFilteredInstitutes (sort) response:', data);
-                setInitialLoadComplete(true);
-              })
-              .catch((error) => {
-                //console.error("Error fetching sorted institutes:", error);
-                setFetchError(true);
-                setLoading(false);
-                setInitialLoadComplete(true);
-              });
+            .then((data) => {
+              //console.debug('fetchFilteredInstitutes (sort) response:', data);
+              setInitialLoadComplete(true);
+            })
+            .catch((error) => {
+              //console.error("Error fetching sorted institutes:", error);
+              setFetchError(true);
+              setLoading(false);
+              setInitialLoadComplete(true);
+            });
         } else {
           setInitialLoadComplete(true);
           setLoading(false);
@@ -828,7 +828,7 @@ const SearchPage = () => {
     if (totalPages <= 1) return null;
 
     return (
-      <Pagination 
+      <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
@@ -1076,9 +1076,11 @@ const SearchPage = () => {
       <BlogComponent />
       <HighRatedCareers />
       <BestRated />
-      {/* <Events /> */}
+      {/*         {/* //<Events /> */}
+ */}
       <div className="flex gap-2 flex-col sm:flex-row items-center">
-        <Events />
+        {/* //<Events /> */}
+
         <ConsellingBanner />
       </div>
     </>

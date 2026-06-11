@@ -28,7 +28,7 @@ const CoverImageSlider = ({ images = [], baseUrl = "" }) => {
         aria-label="Previous image"
         type="button"
       >
-        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" /></svg>
       </button>
       <img
         src={`${baseUrl}/${images[current]}`}
@@ -42,7 +42,7 @@ const CoverImageSlider = ({ images = [], baseUrl = "" }) => {
         aria-label="Next image"
         type="button"
       >
-        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></svg>
       </button>
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
         {images.map((_, idx) => (
@@ -159,10 +159,10 @@ const DetailPage = () => {
               careerId = payload._id;
               window.careerIdMap = window.careerIdMap || {};
               window.careerIdMap[id] = careerId;
-                const generatedSlug = getCareerSlug(payload);
-                if (generatedSlug) {
-                  window.careerIdMap[generatedSlug] = careerId;
-                }
+              const generatedSlug = getCareerSlug(payload);
+              if (generatedSlug) {
+                window.careerIdMap[generatedSlug] = careerId;
+              }
               localStorage.setItem(
                 "careerIdMap",
                 JSON.stringify(window.careerIdMap)
@@ -316,22 +316,22 @@ const DetailPage = () => {
   //   [&>h2]:text-xl [&>h2]:font-bold [&>h2]:my-3
   //   [&>h3]:text-lg [&>h3]:font-bold [&>h3]:my-2
   //   [&>p]:text-black  [&>p]:leading-relaxed
-    
+
   //   [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:my-4
   //   [&>ul>li]:text-black [&>ul>li]:my-2
-    
+
   //   [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:my-4
   //   [&>ol>li]:text-black [&>ol>li]:my-2
-    
+
   //   [&>table]:w-full [&>table]:border-collapse [&>table]:my-4
   //   [&>table>thead>tr>th]:bg-gray-50 [&>table>thead>tr>th]:text-left 
   //   [&>table>thead>tr>th]:p-3 [&>table>thead>tr>th]:border [&>table>thead>tr>th]:border-gray-200
   //   [&>table>tbody>tr>td]:p-3 [&>table>tbody>tr>td]:border [&>table>tbody>tr>td]:border-gray-200
-    
+
   //   [&>a]:text-blue-600 [&>a]:underline [&>a:hover]:text-blue-800
-    
+
   //   [&>img]:max-w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:my-4
-    
+
   //   [&>blockquote]:pl-4 [&>blockquote]:border-l-4 [&>blockquote]:border-gray-300 
   //   [&>blockquote]:italic [&>blockquote]:my-4 [&>blockquote]:text-gray-600
   // `;
@@ -360,7 +360,7 @@ const DetailPage = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 {data.title || "Career Details"}
               </h1>
-              
+
               <div className="flex items-center gap-4">
                 {/* Views Counter */}
                 <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 text-slate-600">
@@ -371,11 +371,10 @@ const DetailPage = () => {
                 {/* Like Button */}
                 <button
                   onClick={handleLike}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all duration-300 border ${
-                    isLiked 
-                      ? "bg-red-50 text-red-600 border-red-200" 
-                      : "bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100"
-                  }`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all duration-300 border ${isLiked
+                    ? "bg-red-50 text-red-600 border-red-200"
+                    : "bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100"
+                    }`}
                 >
                   <ThumbsUp className={`h-5 w-5 ${isLiked ? "fill-current" : ""}`} />
                   {data.likes?.length || 0}
@@ -399,11 +398,10 @@ const DetailPage = () => {
                     <li
                       key={tab.id}
                       className={`cursor-pointer px-8 py-3 text-sm font-medium transition-all duration-200 
-                      ${
-                        activeTab === tab.name
+                      ${activeTab === tab.name
                           ? "bg-[#b82025] rounded-full mx-2 text-white"
                           : "text-gray-700 hover:text-black hover:bg-gray-50 rounded-full mx-2"
-                      }`}
+                        }`}
                       onClick={() => scrollToSection(tab)}
                     >
                       {tab.name}
@@ -426,7 +424,7 @@ const DetailPage = () => {
                   className="bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.1)] rounded-xl p-8 scroll-mt-24"
                 >
                   <h3 ref={tab.titleRef} className="font-bold mb-6">
-                  {/* <h3 ref={tab.titleRef} className="text-lg font-bold mb-6"> */}
+                    {/* <h3 ref={tab.titleRef} className="text-lg font-bold mb-6"> */}
                     {tab.name}
                   </h3>
                   {isArray ? (
@@ -456,7 +454,8 @@ const DetailPage = () => {
         <BlogComponent />
       </div>
       <div className="flex gap-4 flex-col sm:flex-row">
-        <Events />
+        {/* //<Events /> */}
+
         <ConsellingBanner />
       </div>
     </>

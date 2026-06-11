@@ -52,7 +52,7 @@ const fetchCategories = async () => {
     const response = await axios.get(`${baseURL}/course-categories`, {
       params: {
         page: 0,
-        limit:10000,
+        limit: 10000,
       },
     });
     return response.data;
@@ -302,14 +302,12 @@ const TrendingCourses = () => {
 
         {/* Mobile Filter Overlay */}
         <div
-          className={`fixed inset-0 bg-black bg-opacity-50 z-[1000] flex transition-opacity duration-300 ${
-            isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+          className={`fixed inset-0 bg-black bg-opacity-50 z-[1000] flex transition-opacity duration-300 ${isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
         >
           <div
-            className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${
-              isFilterOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
+            className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${isFilterOpen ? "translate-x-0" : "-translate-x-full"
+              }`}
           >
             <button
               className="text-gray-800 font-bold text-xl mb-4"
@@ -523,7 +521,7 @@ const TrendingCourses = () => {
                 </div>
 
                 {/* Pagination */}
-                <Pagination 
+                <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={paginate}
@@ -561,7 +559,8 @@ const TrendingCourses = () => {
         <BestRated />
       </div>
       <div className="flex gap-2 flex-col sm:flex-row items-center">
-        <Events />
+        {/* //<Events /> */}
+
         <ConsellingBanner />
       </div>
     </>

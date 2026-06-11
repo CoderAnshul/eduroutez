@@ -167,8 +167,7 @@ const Blogpage = () => {
     window.history.replaceState(
       {},
       "",
-      `${location.pathname}${
-        queryParams.toString() ? `?${queryParams.toString()}` : ""
+      `${location.pathname}${queryParams.toString() ? `?${queryParams.toString()}` : ""
       }`
     );
   };
@@ -316,14 +315,12 @@ const Blogpage = () => {
 
       {/* Sidebar Overlay for Mobile */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-[10001] flex transition-opacity duration-300 ${
-          isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black bg-opacity-50 z-[10001] flex transition-opacity duration-300 ${isFilterOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
       >
         <div
-          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${
-            isFilterOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${isFilterOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
         >
           <button
             className="text-gray-800 font-bold text-xl mb-4"
@@ -363,9 +360,8 @@ const Blogpage = () => {
 
       {/* Main Content */}
       <div
-        className={`universal-container flex mt-10 ${
-          isFilterOpen ? "pointer-events-none" : ""
-        }`}
+        className={`universal-container flex mt-10 ${isFilterOpen ? "pointer-events-none" : ""
+          }`}
       >
         {/* Desktop Sidebar */}
         <div className="hidden md:block w-1/4 bg-gray-100 p-4 rounded-lg shadow-md sticky top-20 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
@@ -414,7 +410,7 @@ const Blogpage = () => {
             ))}
           </div>
           <BlogandCareerBoxWithSlugs blogData={currentItems || []} />
-          <Pagination 
+          <Pagination
             currentPage={page}
             totalPages={totalPages}
             onPageChange={handlePageChange}
@@ -425,7 +421,8 @@ const Blogpage = () => {
       <PopularCourses />
       <HighRatedCareers />
       <div className="flex max-sm:flex-col gap-2 items-center">
-        <Events />
+        {/* //<Events /> */}
+
         <ConsellingBanner />
       </div>
     </>

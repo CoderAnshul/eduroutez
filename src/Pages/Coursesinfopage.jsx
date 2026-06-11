@@ -148,7 +148,7 @@ const Coursesinfopage = () => {
           return;
         }
 
-          if (isMounted) {
+        if (isMounted) {
           console.debug('Coursesinfopage: fetched response', response);
           setCourseData(response);
           // Check if user has already liked this course
@@ -183,31 +183,31 @@ const Coursesinfopage = () => {
       rootMargin: '0px',
       threshold: 0.1
     };
-    
+
     const handleIntersect = (entries, observer) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           // Find which tab this section belongs to
-          const index = sectionRefs.findIndex(ref => 
+          const index = sectionRefs.findIndex(ref =>
             ref.current === entry.target
           );
-          
+
           if (index !== -1) {
             setActiveTab(index);
           }
         }
       });
     };
-    
+
     const observer = new IntersectionObserver(handleIntersect, observerOptions);
-    
+
     // Observe all section refs that exist
     sectionRefs.forEach(ref => {
       if (ref.current) {
         observer.observe(ref.current);
       }
     });
-    
+
     return () => {
       // Clean up observer when component unmounts
       sectionRefs.forEach(ref => {
@@ -362,7 +362,7 @@ const Coursesinfopage = () => {
   }
 
   // Debugging: log render-time state
-  try { console.debug('Coursesinfopage render', { isLoading, isError, courseData }); } catch (e) {}
+  try { console.debug('Coursesinfopage render', { isLoading, isError, courseData }); } catch (e) { }
 
   if (isError || !courseData?.data) {
     return (
@@ -418,11 +418,10 @@ const Coursesinfopage = () => {
           <button
             onClick={handleLike}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
-                ${
-                  isLiked
-                    ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
-                    : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-                } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
+                ${isLiked
+                ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
+                : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+              } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
           >
             {/* Thumb SVG */}
             <svg
@@ -430,9 +429,8 @@ const Coursesinfopage = () => {
               width="24"
               height="24"
               viewBox="0 0 24 24"
-              className={`transition-transform duration-300 ${
-                isLiked ? "scale-110" : ""
-              }`}
+              className={`transition-transform duration-300 ${isLiked ? "scale-110" : ""
+                }`}
               fill={isLiked ? "#F59E0B" : "none"}
               stroke="#F59E0B"
               strokeWidth="2"
@@ -471,18 +469,18 @@ const Coursesinfopage = () => {
                   <p>
                     {(content.courseDurationYears ||
                       content.courseDurationMonths) && (
-                      <>
-                        <strong>Duration: </strong>
-                        {[
-                          content.courseDurationYears > 0 &&
+                        <>
+                          <strong>Duration: </strong>
+                          {[
+                            content.courseDurationYears > 0 &&
                             `${content.courseDurationYears} years`,
-                          content.courseDurationMonths > 0 &&
+                            content.courseDurationMonths > 0 &&
                             `${content.courseDurationMonths} months`,
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                      </>
-                    )}
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                        </>
+                      )}
                   </p>
                   <p>
                     <strong>Category:</strong>{" "}
@@ -618,11 +616,11 @@ const Coursesinfopage = () => {
         <Suspense fallback={<LoadingComponent />}>
           <HighRatedCareers />
         </Suspense>
-        
+
         <Suspense fallback={<LoadingComponent />}>
           <BlogComponent />
         </Suspense>
-        
+
         <Suspense fallback={<LoadingComponent />}>
           <BestRated />
         </Suspense>
@@ -630,9 +628,10 @@ const Coursesinfopage = () => {
 
       <div className="w-full flex items-start mt-10">
         <Suspense fallback={<LoadingComponent />}>
-          <Events />
+          {/* //<Events /> */}
+
         </Suspense>
-        
+
         <Suspense fallback={<LoadingComponent />}>
           <ConsellingBanner />
         </Suspense>

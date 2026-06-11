@@ -184,7 +184,7 @@ const Instituepage = () => {
         try {
           const baseURL = import.meta.env.VITE_BASE_URL || '';
           const response = await axios.get(`${baseURL}/news/${instituteData.data._id}`);
-          
+
           if (response?.data?.data) {
             setNewsData(response.data.data);
           } else {
@@ -212,7 +212,7 @@ const Instituepage = () => {
           const response = await axios.get(`${baseURL}/webinars-by-institute/${instituteData.data._id}`);
           console.log("Webinar data response:", response);
 
-          
+
           if (response?.data?.data) {
             console.log("Webinar data:", response.data.data);
             setWebinarData(response.data.data);
@@ -235,47 +235,47 @@ const Instituepage = () => {
   useEffect(() => {
     if (instituteData?.data) {
       const data = instituteData.data;
-      
+
       // Filter tabs based on whether they have corresponding data
       const filteredTabs = allPossibleTabs.filter(tabInfo => {
         // Special case for News tab - only include if we have news data and it's not empty
         if (tabInfo.key === "News") {
           return !isNewsLoading && newsData.length > 0;
         }
-        
+
         // Special case for Webinar tab - only include if we have webinar data and it's not empty
         if (tabInfo.key === "Webinar") {
           console.log("Checking Webinar tab:", !isWebinarLoading && webinarData?.length > 0);
           return !isWebinarLoading && webinarData?.result?.length > 0;
         }
-        
+
         // If no dataKey specified, always include the tab
         if (tabInfo.dataKey === null) return true;
-        
+
         // Check if the corresponding data exists and is not empty
         const hasData = (() => {
           const value = data[tabInfo.dataKey];
-          
+
           // Handle arrays
           if (Array.isArray(value)) {
             return value.length > 0;
           }
-          
+
           // Handle strings
           if (typeof value === 'string') {
             return value && value.trim() !== '';
           }
-          
+
           // Handle objects and other types
           return value !== null && value !== undefined;
         })();
-        
+
         return hasData;
       }).map(tabInfo => tabInfo.key); // Extract just the key names
-      
+
       console.log("Filtered tabs:", filteredTabs);
       setTabs(filteredTabs);
-      
+
       // Create refs for each tab
       setSectionRefs(filteredTabs.map(() => React.createRef()));
     }
@@ -328,7 +328,7 @@ const Instituepage = () => {
 
   return (
     <>
-    <div className="universal-container flex flex-col items-start pt-[2vw]">
+      <div className="universal-container flex flex-col items-start pt-[2vw]">
         <ImageSlider instituteData={instituteData} />
         <InstitueName instituteData={instituteData} />
         <TabSlider tabs={tabs} sectionRefs={sectionRefs} />
@@ -341,14 +341,14 @@ const Instituepage = () => {
                   <CollegeInfo instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Courses */}
               {tabs.includes("Courses") && (
                 <div ref={sectionRefs[getTabIndex("Courses")]} className="min-h-24 py-4">
                   <InstituteCourses instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Exams Accepted */}
               {instituteData?.data?.examAccepted && (
                 <div className="px-4 py-5 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
@@ -381,69 +381,69 @@ const Instituepage = () => {
                   </div>
                 </div>
               )}
-              
+
               {/* Admissions */}
               {tabs.includes("Admissions") && (
                 <div ref={sectionRefs[getTabIndex("Admissions")]} className="min-h-24 py-4">
                   <Addmissioninfo instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Placements */}
               {tabs.includes("Placements") && (
                 <div ref={sectionRefs[getTabIndex("Placements")]} className="min-h-24 pt-4">
                   <Placementinfo instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Campus */}
               {tabs.includes("Campus") && (
                 <div ref={sectionRefs[getTabIndex("Campus")]} className="min-h-24 pt-4">
                   <CampusInfo instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Fees */}
               {tabs.includes("Fees") && (
                 <div ref={sectionRefs[getTabIndex("Fees")]} className="min-h-24 pt-4">
                   <FeeInfo instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Scholarship */}
               {tabs.includes("Scholarship") && (
                 <div ref={sectionRefs[getTabIndex("Scholarship")]} className="min-h-24 pt-4">
                   <ScholarshipInfo instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Promotions */}
               <Promotions
                 location="INSTITUTE_PAGE_RECTANGLE"
-                // className="h-[90px]"
+              // className="h-[90px]"
               />
-              
+
               {/* Cut-offs */}
               {tabs.includes("Cut-offs") && (
                 <div ref={sectionRefs[getTabIndex("Cut-offs")]} className="min-h-24 pt-4">
                   <CutTOffInfo instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Ranking */}
               {tabs.includes("Ranking") && (
                 <div ref={sectionRefs[getTabIndex("Ranking")]} className="min-h-24 pt-4">
                   <Ranking instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Gallery */}
               {tabs.includes("Gallery") && (
                 <div ref={sectionRefs[getTabIndex("Gallery")]} className="min-h-24 pt-4">
                   <GalleryInfo instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Review */}
               {tabs.includes("Review") && (
                 <div ref={sectionRefs[getTabIndex("Review")]} className="min-h-24 pt-4">
@@ -455,35 +455,35 @@ const Instituepage = () => {
                   />
                 </div>
               )}
-              
-             {/* Facilities */}
-             {tabs.includes("Facilities") && (
+
+              {/* Facilities */}
+              {tabs.includes("Facilities") && (
                 <div ref={sectionRefs[getTabIndex("Facilities")]} className="min-h-24 py-4">
                   <InstituteFacilites instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Q & A */}
               {tabs.includes("Q & A") && (
                 <div ref={sectionRefs[getTabIndex("Q & A")]} className="min-h-24 py-4">
                   <Faqs instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* News - only shown if there's data */}
               {shouldShowNews && (
                 <div ref={sectionRefs[getTabIndex("News")]} className="min-h-24 py-4">
                   <News instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Webinar - only shown if there's data */}
               {shouldShowWebinar && (
                 <div ref={sectionRefs[getTabIndex("Webinar")]} className="min-h-24 py-4">
                   <Webinar instituteData={instituteData} />
                 </div>
               )}
-              
+
               {/* Recruiters */}
               {tabs.includes("Q & A") && (
                 <div className="min-h-24 py-4">
@@ -498,7 +498,7 @@ const Instituepage = () => {
               <Link to="/counselor" className="block group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
                 {/* Background Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#800e13] to-[#b82025] transition-transform duration-500 group-hover:scale-105" />
-                
+
                 {/* Decorative Elements */}
                 <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10 blur-3xl transition-transform duration-700 group-hover:translate-x-[-10px] group-hover:translate-y-[10px]" />
                 <div className="absolute -left-12 -bottom-12 h-32 w-32 rounded-full bg-black/10 blur-2xl" />
@@ -518,8 +518,8 @@ const Instituepage = () => {
 
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                       <span className="h-0.5 w-6 bg-red-300/50 rounded-full"></span>
-                       <p className="text-xs font-bold tracking-widest text-red-100/90 uppercase">Webinar</p>
+                      <span className="h-0.5 w-6 bg-red-300/50 rounded-full"></span>
+                      <p className="text-xs font-bold tracking-widest text-red-100/90 uppercase">Webinar</p>
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2 leading-tight tracking-wide font-sans">Career Guidance</h3>
                     <p className="text-sm text-red-50/80 leading-relaxed font-light">
@@ -528,7 +528,7 @@ const Instituepage = () => {
                   </div>
                 </div>
               </Link>
-              
+
               <QueryForm instituteData={instituteData} />
               <Promotions location="INSTITUTE_PAGE " className="h-[250px]" />
             </div>
@@ -540,8 +540,9 @@ const Instituepage = () => {
         {/* <Events className="!w-full" /> */}
       </div>
       <div className="flex gap-2 flex-col sm:flex-row items-center">
-          <Events />
-          <ConsellingBanner />
+        {/* //<Events /> */}
+
+        <ConsellingBanner />
       </div>
     </>
   );
