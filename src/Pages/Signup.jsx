@@ -14,6 +14,7 @@ import ScheduleConfirmationPopup from "../Components/ScheduleConfirmationPopup";
 import loadRazorpayScript from "../loadRazorpayScript";
 import logo from "../assets/Images/logo.png";
 import { useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 const Signup = ({ isMode, onSwitch, onClose }) => {
   const isPopupMode = isMode === "popup";
@@ -357,9 +358,9 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
 
       if (role === "student") {
         if (isMode === 'popup' && onClose) {
-           onClose();
+          onClose();
         } else {
-           navigate("/");
+          navigate("/");
         }
       } else if (role === "counsellor" || role === "admin" || role === "superadmin" || role === "institute") {
         setShowRolePopup(true);
@@ -646,432 +647,465 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     showOtpDialog || showGuidancePopup || showSchedulePopup || showConfirmationPopup || showRolePopup;
 
   return (
-    <div
-      className={isPopupMode ? "w-full" : "w-full flex min-h-screen items-center justify-center bg-gray-100 px-4 py-8"}
-    >
-      {!isFlowPopupOpen && (
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex py-6 sm:py-8 flex-col justify-start overflow-y-auto items-center px-5 sm:px-8 max-h-[92vh]">
-        <div className="w-full flex items-center justify-center mb-5 relative">
-          <img src={logo} alt="Eduroutez" className="h-10 w-auto mx-auto" />
-          <button
-            type="button"
-            onClick={() => (isMode === "popup" && onClose ? onClose() : navigate("/"))}
-            className="absolute right-0 top-0 text-gray-500 hover:text-gray-700"
-            aria-label="Close signup"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-bold text-center opacity-90 leading-tight mb-3">
-          Register Now
-        </h1>
-        <p className="text-gray-500 mb-8 text-center">
-          Please fill in the form to create an account
-        </p>
+    <>
+    {/* Seo */}
+      <Helmet>
+        <title>Register on Eduroutez | Student, College, University, Institute & Counselor Registration</title>
+        <meta
+          name="description"
+          content="Sign up on Eduroutez as a Student, College, Institute, University, or Counselor. Explore admissions, courses, career guidance, and connect with the education community."
+        />
+        <meta
+          name="keywords"
+          content="student signup, college registration, institute registration, university registration, counselor registration, education portal, Eduroutez"
+        />
+        <meta name="robots" content="index, follow" />
+        <link
+          rel="canonical"
+          href="https://eduroutez.com/signup"
+        />
+        <meta
+          property="og:title"
+          content="Register on Eduroutez"
+        />
+        <meta
+          property="og:description"
+          content="Join Eduroutez as a Student, College, University, Institute, or Counselor and connect with the education ecosystem."
+        />
+        <meta
+          property="og:url"
+          content="https://eduroutez.com/signup"
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
 
-        <form className="w-full max-w-sm" onSubmit={(e) => e.preventDefault()}>
-          {/* Role Selection */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1" htmlFor="role">
-              Who you are *
-            </label>
-            <select
-              id="role"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.role}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Who you are</option>
-              {roleTypes.map((roleType) => (
-                <option key={roleType.value} value={roleType.value}>
-                  {roleType.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Name Field */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1" htmlFor="name">
-              Name *
-            </label>
-            <input
-              type="text"
-              id="name"
-              placeholder={`Enter your ${roleSpecificLabel.toLowerCase()}`}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* Location Selection */}
-          {isMode !== "popup" && (
-            <>
-              {/* Country Selection */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Country</label>
-                <select
-                  id="country"
-                  className="w-full px-4 py-2 border rounded-lg"
-                  value={formData.country}
-                  onChange={handleChange}
-                >
-                  <option value="">Select a Country</option>
-                  {countries.map((country) => (
-                    <option key={country.id} value={country.id}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* State Selection */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">State</label>
-                <select
-                  id="state"
-                  className="w-full px-4 py-2 border rounded-lg"
-                  value={formData.state}
-                  onChange={handleChange}
-                  disabled={!formData.country}
-                >
-                  <option value="">Select a State</option>
-                  {states.map((state) => (
-                    <option key={state.id} value={state.id}>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* City Selection */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">City</label>
-                <select
-                  id="city"
-                  className="w-full px-4 py-2 border rounded-lg"
-                  value={formData.city}
-                  onChange={handleChange}
-                  disabled={!formData.state}
-                >
-                  <option value="">Select a City</option>
-                  {cities.map((city) => (
-                    <option key={city.id} value={city.id}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </>
-          )}
-
-          {/* Email Field */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Email *</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
-                }`}
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-            {emailError && (
-              <p className="text-red-500 text-xs mt-1">{emailError}</p>
-            )}
-          </div>
-
-          {/* Contact Field */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Contact *
-            </label>
-            <input
-              type="tel"
-              id="contact_number"
-              placeholder="Enter your contact number"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${phoneError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
-                }`}
-              value={formData.contact_number}
-              onChange={handleChange}
-              required
-            />
-            {phoneError && (
-              <p className="text-red-500 text-xs mt-1">{phoneError}</p>
-            )}
-          </div>
-
-          {/* Password Field */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Password *</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                placeholder="Create a password"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
+      <div
+        className={isPopupMode ? "w-full" : "w-full flex min-h-screen items-center justify-center bg-gray-100 px-4 py-8"}
+      >
+        {!isFlowPopupOpen && (
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex py-6 sm:py-8 flex-col justify-start overflow-y-auto items-center px-5 sm:px-8 max-h-[92vh]">
+            <div className="w-full flex items-center justify-center mb-5 relative">
+              <img src={logo} alt="Eduroutez" className="h-10 w-auto mx-auto" />
               <button
                 type="button"
-                className="absolute right-3 top-[10px] text-gray-500 hover:text-gray-700"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => (isMode === "popup" && onClose ? onClose() : navigate("/"))}
+                className="absolute right-0 top-0 text-gray-500 hover:text-gray-700"
+                aria-label="Close signup"
               >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
+                <X className="h-5 w-5" />
               </button>
             </div>
-            <PasswordStrength
-              password={formData.password}
-              onValidationChange={(isValid) => setIsPasswordValid(isValid)}
-            />
-          </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-center opacity-90 leading-tight mb-3">
+              Register Now
+            </h1>
+            <p className="text-gray-500 mb-8 text-center">
+              Please fill in the form to create an account
+            </p>
 
-          {/* Confirm Password Field */}
-          {isMode !== "popup" && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Confirm Password *
-              </label>
-              <div className="relative">
+            <form className="w-full max-w-sm" onSubmit={(e) => e.preventDefault()}>
+              {/* Role Selection */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="role">
+                  Who you are *
+                </label>
+                <select
+                  id="role"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                  value={formData.role}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Who you are</option>
+                  {roleTypes.map((roleType) => (
+                    <option key={roleType.value} value={roleType.value}>
+                      {roleType.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Name Field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="name">
+                  Name *
+                </label>
                 <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  id="confirmPassword"
-                  placeholder="Confirm your password"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
-                  value={formData.confirmPassword}
+                  type="text"
+                  id="name"
+                  placeholder={`Enter your ${roleSpecificLabel.toLowerCase()}`}
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                  value={formData.name}
                   onChange={handleChange}
                   required
                 />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
               </div>
-            </div>
-          )}
 
-          {formData.role === "student" && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Referral Code
-              </label>
-              <input
-                type="text"
-                id="referralCode"
-                placeholder="Enter your Referral Code"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                value={formData.referralCode}
-                onChange={handleChange}
-              />
-            </div>
-          )}
+              {/* Location Selection */}
+              {isMode !== "popup" && (
+                <>
+                  {/* Country Selection */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">Country</label>
+                    <select
+                      id="country"
+                      className="w-full px-4 py-2 border rounded-lg"
+                      value={formData.country}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select a Country</option>
+                      {countries.map((country) => (
+                        <option key={country.id} value={country.id}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-          <button
-            type="button"
-            className="w-full bg-red-700 text-white py-2 rounded-lg font-semibold hover:bg-red-800 disabled:bg-red-400"
-            onClick={handleSendOtp}
-            disabled={isLoading}
-          >
-            {isLoading ? "Processing..." : "Sign Up"}
-          </button>
-        </form>
+                  {/* State Selection */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">State</label>
+                    <select
+                      id="state"
+                      className="w-full px-4 py-2 border rounded-lg"
+                      value={formData.state}
+                      onChange={handleChange}
+                      disabled={!formData.country}
+                    >
+                      <option value="">Select a State</option>
+                      {states.map((state) => (
+                        <option key={state.id} value={state.id}>
+                          {state.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-        {/* Social Login Section */}
-        <div className="my-6 flex items-center">
-          <span className="w-1/2 h-px bg-gray-300"></span>
-          <span className="mx-2 text-gray-500 whitespace-nowrap text-sm">
-            Or Sign Up with
-          </span>
-          <span className="w-1/2 h-px bg-gray-300"></span>
-        </div>
+                  {/* City Selection */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">City</label>
+                    <select
+                      id="city"
+                      className="w-full px-4 py-2 border rounded-lg"
+                      value={formData.city}
+                      onChange={handleChange}
+                      disabled={!formData.state}
+                    >
+                      <option value="">Select a City</option>
+                      {cities.map((city) => (
+                        <option key={city.id} value={city.id}>
+                          {city.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
 
-        <div className="flex justify-center gap-4">
-          <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center bg-white rounded-full hover:bg-gray-200">
-            <img src={fb} className="h-7" alt="Facebook icon" />
-          </button>
-          <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center rounded-full bg-white hover:bg-gray-200">
-            <img src={google} className="h-6" alt="Google icon" />
-          </button>
-        </div>
-
-        <p className="text-sm text-gray-500 mt-6">
-          Already have an account?{" "}
-          {isMode === 'popup' ? (
-            <button
-              onClick={onSwitch}
-              type="button"
-              className="text-red-500 font-medium hover:underline"
-            >
-              Log in
-            </button>
-          ) : (
-            <Link
-              to="/login"
-              state={{ backgroundLocation: location.state?.backgroundLocation || location }}
-              className="text-red-500 font-medium hover:underline"
-            >
-              Log in
-            </Link>
-          )}
-        </p>
-      </div>
-      )}
-
-      {/* OTP Dialog */}
-      {showOtpDialog && (
-        <div className="fixed inset-0 z-[11000] flex items-center justify-center bg-slate-950/65 backdrop-blur-[2px] px-4 py-6 sm:px-6">
-          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_30px_90px_rgba(15,23,42,0.35)] sm:p-6">
-            {/* Header */}
-            <div className="mb-5 flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">Verify OTP</h2>
-                <p className="mt-1 text-sm text-slate-500">Secure verification for your signup</p>
+              {/* Email Field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Email *</label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Enter your email"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${emailError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                    }`}
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+                {emailError && (
+                  <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                )}
               </div>
+
+              {/* Contact Field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Contact *
+                </label>
+                <input
+                  type="tel"
+                  id="contact_number"
+                  placeholder="Enter your contact number"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${phoneError ? "border-red-500 focus:ring-red-500" : "focus:ring-red-500"
+                    }`}
+                  value={formData.contact_number}
+                  onChange={handleChange}
+                  required
+                />
+                {phoneError && (
+                  <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+                )}
+              </div>
+
+              {/* Password Field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Password *</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    placeholder="Create a password"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-[10px] text-gray-500 hover:text-gray-700"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+                <PasswordStrength
+                  password={formData.password}
+                  onValidationChange={(isValid) => setIsPasswordValid(isValid)}
+                />
+              </div>
+
+              {/* Confirm Password Field */}
+              {isMode !== "popup" && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1">
+                    Confirm Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      id="confirmPassword"
+                      placeholder="Confirm your password"
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-10"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {formData.role === "student" && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1">
+                    Referral Code
+                  </label>
+                  <input
+                    type="text"
+                    id="referralCode"
+                    placeholder="Enter your Referral Code"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                    value={formData.referralCode}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+
               <button
-                onClick={() => setShowOtpDialog(false)}
-                className="h-9 w-9 rounded-full text-gray-500 transition hover:bg-slate-100 hover:text-slate-700"
-                aria-label="Close OTP popup"
+                type="button"
+                className="w-full bg-red-700 text-white py-2 rounded-lg font-semibold hover:bg-red-800 disabled:bg-red-400"
+                onClick={handleSendOtp}
+                disabled={isLoading}
               >
-                <X className="mx-auto h-4 w-4" />
+                {isLoading ? "Processing..." : "Sign Up"}
+              </button>
+            </form>
+
+            {/* Social Login Section */}
+            <div className="my-6 flex items-center">
+              <span className="w-1/2 h-px bg-gray-300"></span>
+              <span className="mx-2 text-gray-500 whitespace-nowrap text-sm">
+                Or Sign Up with
+              </span>
+              <span className="w-1/2 h-px bg-gray-300"></span>
+            </div>
+
+            <div className="flex justify-center gap-4">
+              <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center bg-white rounded-full hover:bg-gray-200">
+                <img src={fb} className="h-7" alt="Facebook icon" />
+              </button>
+              <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center rounded-full bg-white hover:bg-gray-200">
+                <img src={google} className="h-6" alt="Google icon" />
               </button>
             </div>
 
-            <p className="mb-6 text-sm leading-relaxed text-slate-600">
-              Please enter the OTP sent to your email and phone number.
-            </p>
-
-            {/* OTP Inputs */}
-            <div className="mb-6 flex justify-center gap-2 sm:gap-3">
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  id={`otp-${index}`}
-                  ref={(el) => {
-                    if (el) otpInputRefs.current[index] = el;
-                  }}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength="1"
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e)}
-                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                  onPaste={handleOtpPaste}
-                  onFocus={(e) => e.target.select()}
-                  className="h-12 w-12 rounded-xl border border-slate-300 bg-slate-50 text-center text-xl font-bold text-slate-800 transition focus:border-[#b82025] focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/40 sm:h-14 sm:w-14"
-                  autoComplete="off"
-                  autoFocus={index === 0}
-                />
-              ))}
-            </div>
-
-            {/* Countdown Timer & Resend OTP */}
-            <div className="mb-6 text-center text-sm text-slate-600">
-              {canResend ? (
+            <p className="text-sm text-gray-500 mt-6">
+              Already have an account?{" "}
+              {isMode === 'popup' ? (
                 <button
-                  onClick={() => {
-                    handleSendOtp();
-                    setTimer(90);
-                    setCanResend(false);
-                  }}
-                  className="font-semibold text-[#b82025] hover:underline"
+                  onClick={onSwitch}
+                  type="button"
+                  className="text-red-500 font-medium hover:underline"
                 >
-                  Resend OTP
+                  Log in
                 </button>
               ) : (
-                `Resend OTP in ${timer}s`
+                <Link
+                  to="/login"
+                  state={{ backgroundLocation: location.state?.backgroundLocation || location }}
+                  className="text-red-500 font-medium hover:underline"
+                >
+                  Log in
+                </Link>
               )}
-            </div>
+            </p>
+          </div>
+        )}
 
-            {/* Buttons */}
-            <div className="flex justify-between gap-3">
-              <button
-                onClick={() => setShowOtpDialog(false)}
-                className="w-1/2 rounded-xl border border-slate-300 bg-slate-100 px-4 py-2.5 font-medium text-slate-700 transition hover:bg-slate-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleVerifyOtp}
-                className="w-1/2 rounded-xl bg-[#b82025] px-4 py-2.5 font-semibold text-white shadow-lg shadow-red-900/20 transition hover:bg-[#a11d21]"
-              >
-                Verify OTP
-              </button>
+        {/* OTP Dialog */}
+        {showOtpDialog && (
+          <div className="fixed inset-0 z-[11000] flex items-center justify-center bg-slate-950/65 backdrop-blur-[2px] px-4 py-6 sm:px-6">
+            <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_30px_90px_rgba(15,23,42,0.35)] sm:p-6">
+              {/* Header */}
+              <div className="mb-5 flex items-start justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight text-slate-900">Verify OTP</h2>
+                  <p className="mt-1 text-sm text-slate-500">Secure verification for your signup</p>
+                </div>
+                <button
+                  onClick={() => setShowOtpDialog(false)}
+                  className="h-9 w-9 rounded-full text-gray-500 transition hover:bg-slate-100 hover:text-slate-700"
+                  aria-label="Close OTP popup"
+                >
+                  <X className="mx-auto h-4 w-4" />
+                </button>
+              </div>
+
+              <p className="mb-6 text-sm leading-relaxed text-slate-600">
+                Please enter the OTP sent to your email and phone number.
+              </p>
+
+              {/* OTP Inputs */}
+              <div className="mb-6 flex justify-center gap-2 sm:gap-3">
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    id={`otp-${index}`}
+                    ref={(el) => {
+                      if (el) otpInputRefs.current[index] = el;
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength="1"
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e)}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                    onPaste={handleOtpPaste}
+                    onFocus={(e) => e.target.select()}
+                    className="h-12 w-12 rounded-xl border border-slate-300 bg-slate-50 text-center text-xl font-bold text-slate-800 transition focus:border-[#b82025] focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/40 sm:h-14 sm:w-14"
+                    autoComplete="off"
+                    autoFocus={index === 0}
+                  />
+                ))}
+              </div>
+
+              {/* Countdown Timer & Resend OTP */}
+              <div className="mb-6 text-center text-sm text-slate-600">
+                {canResend ? (
+                  <button
+                    onClick={() => {
+                      handleSendOtp();
+                      setTimer(90);
+                      setCanResend(false);
+                    }}
+                    className="font-semibold text-[#b82025] hover:underline"
+                  >
+                    Resend OTP
+                  </button>
+                ) : (
+                  `Resend OTP in ${timer}s`
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-between gap-3">
+                <button
+                  onClick={() => setShowOtpDialog(false)}
+                  className="w-1/2 rounded-xl border border-slate-300 bg-slate-100 px-4 py-2.5 font-medium text-slate-700 transition hover:bg-slate-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleVerifyOtp}
+                  className="w-1/2 rounded-xl bg-[#b82025] px-4 py-2.5 font-semibold text-white shadow-lg shadow-red-900/20 transition hover:bg-[#a11d21]"
+                >
+                  Verify OTP
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    {/* Guidance Test and Scheduling Popups for Counsellor */}
-    <GuidanceTestPopup
-      open={showGuidancePopup}
-      onClose={() => setShowGuidancePopup(false)}
-      onScheduleLater={handleScheduleLater}
-      onPay={handleGuidancePay}
-    />
-    <ScheduleTestPopup
-      open={showSchedulePopup}
-      onClose={() => setShowSchedulePopup(false)}
-      onSchedule={handleScheduleTest}
-    />
-    <ScheduleConfirmationPopup
-      open={showConfirmationPopup}
-      onClose={() => setShowConfirmationPopup(false)}
-    />
+        )}
+        {/* Guidance Test and Scheduling Popups for Counsellor */}
+        <GuidanceTestPopup
+          open={showGuidancePopup}
+          onClose={() => setShowGuidancePopup(false)}
+          onScheduleLater={handleScheduleLater}
+          onPay={handleGuidancePay}
+        />
+        <ScheduleTestPopup
+          open={showSchedulePopup}
+          onClose={() => setShowSchedulePopup(false)}
+          onSchedule={handleScheduleTest}
+        />
+        <ScheduleConfirmationPopup
+          open={showConfirmationPopup}
+          onClose={() => setShowConfirmationPopup(false)}
+        />
 
-    {/* Role popup for counsellor/admin */}
-    {showRolePopup && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
-        <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform transition-all">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-black text-slate-800">Login Info</h2>
-            <button onClick={() => {
-              setShowRolePopup(false);
-              if (isMode === "popup" && onClose) onClose();
-            }} className="text-slate-400 hover:text-slate-600 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+        {/* Role popup for counsellor/admin */}
+        {showRolePopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
+            <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform transition-all">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-black text-slate-800">Login Info</h2>
+                <button onClick={() => {
+                  setShowRolePopup(false);
+                  if (isMode === "popup" && onClose) onClose();
+                }} className="text-slate-400 hover:text-slate-600 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <p className="text-slate-600 mb-8 font-medium leading-relaxed">
+                Please log in to the correct portal for your role (Admin, Counsellor, or Institute).<br />
+                You cannot access this panel as a {formData.role} user.<br />
+                <span className="block mt-4">Go to: <a href="https://admin.eduroutez.com/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">Admin/Counsellor/Institute Portal</a> </span>
+              </p>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    setShowRolePopup(false);
+                    if (isMode === "popup" && onClose) onClose();
+                  }}
+                  className="w-full bg-[#b82025] text-white font-black py-4 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
-          <p className="text-slate-600 mb-8 font-medium leading-relaxed">
-            Please log in to the correct portal for your role (Admin, Counsellor, or Institute).<br/>
-            You cannot access this panel as a {formData.role} user.<br/>
-            <span className="block mt-4">Go to: <a href="https://admin.eduroutez.com/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">Admin/Counsellor/Institute Portal</a> </span>
-          </p>
-          <div className="flex flex-col gap-3">
-            <button 
-              onClick={() => {
-                setShowRolePopup(false);
-                if (isMode === "popup" && onClose) onClose();
-              }}
-              className="w-full bg-[#b82025] text-white font-black py-4 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        )}
       </div>
-    )}
-  </div>
+    </>
   );
   // Handler for schedule later button in GuidanceTestPopup
   // (already defined above the return statement)

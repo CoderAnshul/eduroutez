@@ -10,6 +10,7 @@ import PopularCourses from "../Components/PopularCourses";
 import HighRatedCareers from "../Components/HighRatedCareers";
 import SocialShare from "../Components/SocialShare";
 import Pagination from "../Components/Pagination";
+import { Helmet } from "react-helmet-async";
 
 // Create a module-level object to store the blog ID mapping
 const blogIdMapStore = {};
@@ -303,6 +304,22 @@ const Blogpage = () => {
 
   return (
     <>
+    {/* Seo */}
+      <Helmet>
+        <title>Education Blogs, Career Tips & Exam Updates | Eduroutez</title>
+        <meta
+          name="description"
+          content="Read the latest education news, career guidance, exam updates, study tips, college admissions and higher education blogs on Eduroutez." />
+        <meta
+          name="keywords"
+          content="education blogs, career tips, exam updates, study tips, college admissions, education news"
+        />
+        <link
+          rel="canonical"
+          href="https://eduroutez.com/blogpage"
+        />
+      </Helmet>
+
       <PageBanner pageName="Blog" currectPage="blog" />
 
       {/* Filter button for mobile */}

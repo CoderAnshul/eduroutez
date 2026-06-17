@@ -5,6 +5,7 @@ import { useQuery } from "react-query";
 
 import CustomButton from "../Ui components/CustomButton";
 import { allbestRatedInstitute } from "../ApiFunctions/api";
+import { Helmet } from "react-helmet-async";
 
 const BestRatedInstitute = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -134,79 +135,93 @@ const BestRatedInstitute = () => {
   }
 
   return (
-    <div className="universal-container py-8">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
-        <h1 className="text-4xl font-bold mb-4">Best Rated Institutes</h1>
-        <p className="text-xl">
-          Discover top-rated educational institutions that can transform your
-          academic journey
-        </p>
-      </div>
+    <>
+    {/* Seo */}
+      <Helmet>
+        <title>Best Rated Institutes in India | Eduroutez</title>
+        <meta
+          name="description"
+          content="Explore the best rated colleges, universities and educational institutes in India. Compare rankings, courses, fees and admission details on Eduroutez."
+        />
+        <link
+          rel="canonical"
+          href="https://eduroutez.com/institute"
+        />
+      </Helmet>
 
-      {/* Institutes Grid */}
-      {institutes.length === 0 ? (
-        <div className="text-center text-gray-500 py-10">
-          No institutes found
+      <div className="universal-container py-8">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
+          <h1 className="text-4xl font-bold mb-4">Best Rated Institutes</h1>
+          <p className="text-xl">
+            Discover top-rated educational institutions that can transform your
+            academic journey
+          </p>
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {paginatedContent.map((institute, index) => (
-              <Link
-                key={institute._id || index}
-                to={getInstituteUrl(institute)}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                aria-label={institute.instituteName}
-              >
-                {/* Institute Image */}
-                <div className="h-56 overflow-hidden">
-                  <SafeImage
-                    src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${
-                      institute.thumbnailImage
-                    }`}
-                    alt={institute.instituteName}
-                    title={institute.instituteName}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
 
-                {/* Institute Details */}
-                <div className="!p-6">
-                  <h2 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A] antialiased leading-tight">
-                  {/* <h2 className="text-2xl font-bold mb-2 text-gray-800"> */}
-                    {institute.instituteName}
-                  </h2>
-
-                  <p className="text-sm mt-2 mb-4 line-clamp-3">
-                  {/* <p className="text-gray-600 mb-4 p4 line-clamp-3"> */}
-                    {institute.about ? (
-                      <span
-                        dangerouslySetInnerHTML={{ __html: institute.about }}
-                      />
-                    ) : (
-                      "No description available"
-                    )}
-                  </p>
-                </div>
-              </Link>
-            ))}
+        {/* Institutes Grid */}
+        {institutes.length === 0 ? (
+          <div className="text-center text-gray-500 py-10">
+            No institutes found
           </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {paginatedContent.map((institute, index) => (
+                <Link
+                  key={institute._id || index}
+                  to={getInstituteUrl(institute)}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  aria-label={institute.instituteName}
+                >
+                  {/* Institute Image */}
+                  <div className="h-56 overflow-hidden">
+                    <SafeImage
+                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${institute.thumbnailImage
+                        }`}
+                      alt={institute.instituteName}
+                      title={institute.instituteName}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
 
-          {/* Load More Button */}
-          {currentPage < totalPages && (
-            <div className="flex justify-center mt-10">
-              <CustomButton
-                text="Load More Institutes"
-                onClick={handleLoadMore}
-                className="bg-[#b82025] text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-all"
-              />
+                  {/* Institute Details */}
+                  <div className="!p-6">
+                    <h2 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A] antialiased leading-tight">
+                      {/* <h2 className="text-2xl font-bold mb-2 text-gray-800"> */}
+                      {institute.instituteName}
+                    </h2>
+
+                    <p className="text-sm mt-2 mb-4 line-clamp-3">
+                      {/* <p className="text-gray-600 mb-4 p4 line-clamp-3"> */}
+                      {institute.about ? (
+                        <span
+                          dangerouslySetInnerHTML={{ __html: institute.about }}
+                        />
+                      ) : (
+                        "No description available"
+                      )}
+                    </p>
+                  </div>
+                </Link>
+              ))}
             </div>
-          )}
-        </>
-      )}
-    </div>
+
+            {/* Load More Button */}
+            {currentPage < totalPages && (
+              <div className="flex justify-center mt-10">
+                <CustomButton
+                  text="Load More Institutes"
+                  onClick={handleLoadMore}
+                  className="bg-[#b82025] text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-all"
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 };
 
