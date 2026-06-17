@@ -12,8 +12,16 @@ const AuthForm = ({ initialTab = 'login', onClose, setAuthTab }) => {
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_BASE_URL;
 
-  const handleLoginChange = (e) => setLoginData({ ...loginData, [e.target.id]: e.target.value });
-  const handleSignupChange = (e) => setSignupData({ ...signupData, [e.target.id]: e.target.value });
+  const handleLoginChange = (e) => {
+    const { id, value } = e.target;
+    const cleanValue = id === 'password' ? value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B00-\u2BFF]/g, "") : value;
+    setLoginData({ ...loginData, [id]: cleanValue });
+  };
+  const handleSignupChange = (e) => {
+    const { id, value } = e.target;
+    const cleanValue = id === 'password' ? value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B00-\u2BFF]/g, "") : value;
+    setSignupData({ ...signupData, [id]: cleanValue });
+  };
 
   const openOAuth = (provider) => {
     try {

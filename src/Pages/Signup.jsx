@@ -415,7 +415,11 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       });
     } else {
       // Normal field update
-      setFormData({ ...formData, [id]: value });
+      let cleanValue = value;
+      if (id === "password" || id === "confirmPassword") {
+        cleanValue = value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B00-\u2BFF]/g, "");
+      }
+      setFormData({ ...formData, [id]: cleanValue });
 
       if (id === "email") {
         if (value && !validateEmail(value)) {

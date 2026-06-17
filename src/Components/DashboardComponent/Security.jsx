@@ -13,7 +13,9 @@ const PasswordChangeForm = () => {
   const [status, setStatus] = useState({ type: "", message: "" });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const cleanValue = value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B00-\u2BFF]/g, "");
+    setFormData({ ...formData, [name]: cleanValue });
     // Clear status when user starts typing
     setStatus({ type: "", message: "" });
   };
