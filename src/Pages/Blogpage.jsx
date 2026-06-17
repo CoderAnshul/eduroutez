@@ -336,7 +336,7 @@ const Blogpage = () => {
           }`}
       >
         <div
-          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${isFilterOpen ? "translate-x-0" : "-translate-x-full"
+          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 h-full overflow-y-auto ${isFilterOpen ? "translate-x-0" : "-translate-x-full"
             }`}
         >
           <button

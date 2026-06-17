@@ -131,9 +131,13 @@ const Login = ({ isMode, onSwitch, onClose }) => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
+    let cleanValue = value;
+    if (id === "password") {
+      cleanValue = value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B00-\u2BFF]/g, "");
+    }
+    setFormData({ ...formData, [id]: cleanValue });
     if (id === "email") {
-      setEmailError(value && !validateEmail(value) ? "Please enter a valid email address" : "");
+      setEmailError(cleanValue && !validateEmail(cleanValue) ? "Please enter a valid email address" : "");
     }
   };
 

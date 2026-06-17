@@ -64,7 +64,7 @@ const Homepage = () => {
         <TrendingInstitute />
       </div>
       {/* <Instructor /> */}
-      <BecomeCounselorBanner />
+      {/* <BecomeCounselorBanner /> */}
       <div className='universal-container flex flex-col items-center' >
         <BlogComponent />
       </div>
@@ -73,7 +73,7 @@ const Homepage = () => {
       <div className="flex gap-2 flex-col lg:flex-row items-center">
         {/* //<Events /> */}
 
-        <ConsellingBanner />
+        {/* <ConsellingBanner /> */}
       </div>
     </>
   )
