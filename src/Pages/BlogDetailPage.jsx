@@ -58,6 +58,7 @@ const CoverImageSlider = ({ images, baseUrl }) => {
     </div>
   );
 };
+
 import { blogById, getRecentBlogs } from "../ApiFunctions/api";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import HighRatedCareers from "../Components/HighRatedCareers";
@@ -68,6 +69,7 @@ import BlogReviewForm from "../Components/BlogReviewForm";
 import axiosInstance from "../ApiFunctions/axios";
 import SocialShare from "../Components/SocialShare";
 import AuthPopup from "../Components/AuthPopup";
+import { Helmet } from "react-helmet-async";
 
 const BlogDetailPage = () => {
   const [data, setData] = useState(null);
@@ -437,6 +439,28 @@ const BlogDetailPage = () => {
 
   return (
     <>
+      {/* Seo */}
+      <Helmet>
+        <title>
+          {data?.metaTitle || data?.title || "Blog | Eduroutez"}
+        </title>
+        <meta
+          name="description"
+          content={
+            data?.metaDescription ||
+            "Read the latest education and career guidance articles on Eduroutez."
+          }
+        />
+        <meta
+          name="keywords"
+          content={data?.metaKeywords || ""}
+        />
+        <link
+          rel="canonical"
+          href={window.location.href}
+        />
+      </Helmet>
+
       <div className="universal-container mt-10">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
           {/* Blog Header - Only one instance */}

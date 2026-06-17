@@ -5,10 +5,23 @@ import { Link } from "react-router-dom";
 import Instructor from "../Components/Instructor";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
+import { Helmet } from "react-helmet-async";
 
 const Aboutus = () => {
   return (
     <>
+    <Helmet>
+      <title>About Eduroutez | Education & Career Guidance Platform</title>
+      <meta
+        name="description"
+        content="Learn about Eduroutez, an education platform helping students find colleges, universities, courses, admissions, and career guidance across India."
+      />
+      <link
+        rel="canonical"
+        href="https://eduroutez.com/aboutus"
+      />
+    </Helmet>
+
       <PageBanner pageName="About us" currectPage="about us" />
       <section className="py-16 bg-gradient-to-r from-[#f3f4f6] via-[#f9f9fa] to-[#fef7f3]">
         <div className="universal-container text-center py-12">
@@ -88,7 +101,7 @@ const Aboutus = () => {
           <div className="relative flex-1">
             <img
               src={aboutimg} // Replace with your actual image source
-              alt="Main"
+              alt="About Eduroutez Education Platform"
               className="rounded-lg"
             />
           </div>

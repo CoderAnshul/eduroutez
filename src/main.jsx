@@ -10,6 +10,8 @@ import {
 import { Provider } from "react-redux";
 import appStore from './config/appStore.js'
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { HelmetProvider } from "react-helmet-async";
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,7 +31,10 @@ createRoot(document.getElementById('root')).render(
       <QueryClientProvider client={queryClient}>
         <ModalProvider>
           <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "1234567890-dummy.apps.googleusercontent.com"}>
+            <HelmetProvider>
             <App />
+
+            </HelmetProvider>
           </GoogleOAuthProvider>
         </ModalProvider>
       </QueryClientProvider>
