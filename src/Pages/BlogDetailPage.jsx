@@ -651,7 +651,7 @@ const BlogDetailPage = () => {
               <BlogReviewForm blog={data} />
             </div>
           </div>
-          {/* //{/* <Events /> */} */}
+          {/* <Events /> */}
 
 
           <HighRatedCareers />

@@ -457,7 +457,7 @@ const Careerspage = () => {
       </div>
       <BlogComponent />
       <div className="flex gap-2 flex-col sm:flex-row items-center">
-        {/* //{/* <Events /> */} */}
+        {/* <Events /> */}
 
          {/* <ConsellingBanner /> */}
       </div>
