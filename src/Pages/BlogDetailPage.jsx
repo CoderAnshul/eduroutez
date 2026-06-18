@@ -651,14 +651,14 @@ const BlogDetailPage = () => {
               <BlogReviewForm blog={data} />
             </div>
           </div>
-          {/* //<Events /> */}
+          {/* //{/* <Events /> */} */}
 
 
           <HighRatedCareers />
         </div>
         <div className="flex gap-2 items-center">
-          <Events />
-          <ConsellingBanner />
+          {/* <Events /> */}
+           {/* <ConsellingBanner /> */}
         </div>
 
         {/* Use shared AuthPopup for login */}

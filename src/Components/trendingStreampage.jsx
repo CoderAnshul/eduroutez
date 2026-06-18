@@ -311,8 +311,8 @@ const TrendingStreams = () => {
       <HighRatedCareers />
 
       <div className="flex gap-4 flex-col sm:flex-row">
-        {/*         {/* //<Events /> */}
-        <ConsellingBanner />
+        {/*         {/* //{/* <Events /> */} */}
+         {/* <ConsellingBanner /> */}
       </div>
     </>
   );

@@ -10,6 +10,7 @@ import { Eye, EyeOff, X } from "lucide-react";
 import logo from "../assets/Images/logo.png";
 import { useGoogleLogin } from '@react-oauth/google';
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
+import { Helmet } from "react-helmet-async";
 
 const Login = ({ isMode, onSwitch, onClose }) => {
   const isPopupMode = isMode === "popup";

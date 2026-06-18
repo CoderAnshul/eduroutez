@@ -501,9 +501,9 @@ const StreamLevelPage = () => {
       )}
 
       <div className="w-full flex items-start mt-10">
-        {/* //<Events /> */}
+        {/* //{/* <Events /> */} */}
 
-        <ConsellingBanner />
+         {/* <ConsellingBanner /> */}
       </div>
     </>
   );

@@ -156,9 +156,9 @@ const Aboutus = () => {
 
       {/* <Instructor /> */}
       <div className="flex gap-2 flex-col sm:flex-row items-center mt-2">
-        {/* //<Events /> */}
+        {/* //{/* <Events /> */} */}
 
-        <ConsellingBanner />
+         {/* <ConsellingBanner /> */}
       </div>
     </>
   );

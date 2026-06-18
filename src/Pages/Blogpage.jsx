@@ -438,9 +438,9 @@ const Blogpage = () => {
       <PopularCourses />
       <HighRatedCareers />
       <div className="flex max-sm:flex-col gap-2 items-center">
-        {/* //<Events /> */}
+        {/* //{/* <Events /> */} */}
 
-        <ConsellingBanner />
+         {/* <ConsellingBanner /> */}
       </div>
     </>
   );

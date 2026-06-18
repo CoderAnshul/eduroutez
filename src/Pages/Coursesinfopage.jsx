@@ -628,12 +628,12 @@ const Coursesinfopage = () => {
 
       <div className="w-full flex items-start mt-10">
         <Suspense fallback={<LoadingComponent />}>
-          {/* //<Events /> */}
+          {/* //{/* <Events /> */} */}
 
         </Suspense>
 
         <Suspense fallback={<LoadingComponent />}>
-          <ConsellingBanner />
+           {/* <ConsellingBanner /> */}
         </Suspense>
       </div>
 

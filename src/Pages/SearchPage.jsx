@@ -1076,12 +1076,12 @@ const SearchPage = () => {
       <BlogComponent />
       <HighRatedCareers />
       <BestRated />
-      {/*         {/* //<Events /> */}
+      {/*         {/* //{/* <Events /> */} */}
  */}
       <div className="flex gap-2 flex-col sm:flex-row items-center">
-        {/* //<Events /> */}
+        {/* //{/* <Events /> */} */}
 
-        <ConsellingBanner />
+         {/* <ConsellingBanner /> */}
       </div>
     </>
   );

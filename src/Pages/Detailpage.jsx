@@ -454,9 +454,9 @@ const DetailPage = () => {
         <BlogComponent />
       </div>
       <div className="flex gap-4 flex-col sm:flex-row">
-        {/* //<Events /> */}
+        {/* //{/* <Events /> */} */}
 
-        <ConsellingBanner />
+         {/* <ConsellingBanner /> */}
       </div>
     </>
   );
