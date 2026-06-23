@@ -3,7 +3,7 @@ import SafeImage from "../Ui components/SafeImage";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useQuery } from "react-query";
-import { Sparkles, ArrowRight, BookOpen, Award, Users } from "lucide-react";
+import { Sparkles, ArrowRight, BookOpen, Award, Users, ChevronLeft, ChevronRight } from "lucide-react";
 
 // Function to fetch trending streams
 const fetchTrendingStreams = async () => {
@@ -18,6 +18,115 @@ const fetchTrendingStreams = async () => {
 };
 
 const TrendingStreams = () => {
+  const scrollRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let intervalId;
+    const startInterval = () => {
+      intervalId = setInterval(() => {
+        if (window.innerWidth >= 768) return;
+        const children = Array.from(container.children).filter(
+          (child) => !child.classList.contains("nav-btn")
+        );
+        if (children.length <= 1) return;
+
+        const containerWidth = container.clientWidth;
+        const scrollLeft = container.scrollLeft;
+
+        let currentIdx = 0;
+        let minDiff = Infinity;
+        children.forEach((child, idx) => {
+          const childCenter = child.offsetLeft + child.clientWidth / 2;
+          const containerCenter = scrollLeft + containerWidth / 2;
+          const diff = Math.abs(childCenter - containerCenter);
+          if (diff < minDiff) {
+            minDiff = diff;
+            currentIdx = idx;
+          }
+        });
+
+        let nextIdx = (currentIdx + 1) % children.length;
+        const nextChild = children[nextIdx];
+        if (nextChild) {
+          container.scrollTo({
+            left: nextChild.offsetLeft - (containerWidth - nextChild.clientWidth) / 2,
+            behavior: "smooth",
+          });
+        }
+      }, 4000);
+    };
+
+    startInterval();
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const handlePrev = () => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const containerWidth = container.clientWidth;
+    const children = Array.from(container.children).filter(
+      (child) => !child.classList.contains("nav-btn")
+    );
+    if (children.length <= 1) return;
+
+    const scrollLeft = container.scrollLeft;
+    let currentIdx = 0;
+    let minDiff = Infinity;
+    children.forEach((child, idx) => {
+      const childCenter = child.offsetLeft + child.clientWidth / 2;
+      const containerCenter = scrollLeft + containerWidth / 2;
+      const diff = Math.abs(childCenter - containerCenter);
+      if (diff < minDiff) {
+        minDiff = diff;
+        currentIdx = idx;
+      }
+    });
+
+    let prevIdx = (currentIdx - 1 + children.length) % children.length;
+    const prevChild = children[prevIdx];
+    if (prevChild) {
+      container.scrollTo({
+        left: prevChild.offsetLeft - (containerWidth - prevChild.clientWidth) / 2,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleNext = () => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const containerWidth = container.clientWidth;
+    const children = Array.from(container.children).filter(
+      (child) => !child.classList.contains("nav-btn")
+    );
+    if (children.length <= 1) return;
+
+    const scrollLeft = container.scrollLeft;
+    let currentIdx = 0;
+    let minDiff = Infinity;
+    children.forEach((child, idx) => {
+      const childCenter = child.offsetLeft + child.clientWidth / 2;
+      const containerCenter = scrollLeft + containerWidth / 2;
+      const diff = Math.abs(childCenter - containerCenter);
+      if (diff < minDiff) {
+        minDiff = diff;
+        currentIdx = idx;
+      }
+    });
+
+    let nextIdx = (currentIdx + 1) % children.length;
+    const nextChild = children[nextIdx];
+    if (nextChild) {
+      container.scrollTo({
+        left: nextChild.offsetLeft - (containerWidth - nextChild.clientWidth) / 2,
+        behavior: "smooth",
+      });
+    }
+  };
+
   const { data, isLoading, isError } = useQuery(
     ["trendingStreams"],
     fetchTrendingStreams,
@@ -121,7 +230,7 @@ const TrendingStreams = () => {
           <Sparkles className="text-red-500 w-6 h-6" />
           <h3 className="text-2xl font-bold">Popular Courses</h3>
         </div>
-        <Link to="/trending-stream">
+        <Link to="/popular-courses">
           <button className="bg-[#b82025] hover:bg-[#b82025] text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2 transform hover:scale-105 shadow-md">
             View all
             <ArrowRight className="w-4 h-4" />
@@ -129,117 +238,146 @@ const TrendingStreams = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {trendingStreams.length > 0 ? (
-          trendingStreams.map((item) => {
-            const streamDetails = item.streamDetails[0] || {};
-            const level = item._id.level;
-            const design = getStreamCardDesign(level);
-            const hasImage = !!item.image;
+      <style dangerouslySetInnerHTML={{__html: `
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}} />
+      <div className="relative w-full">
+        {/* Left Navigation Button */}
+        <button
+          onClick={handlePrev}
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="w-5 h-5 text-gray-700" />
+        </button>
 
-            return (
-              <Link
-                key={`${streamDetails._id}-${level}`}
-                to={`/popularcourses?stream=${streamDetails._id}&level=${level}`}
-                className="block group"
-              >
-                <div className="h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">
-                  {/* Image or decorative background */}
-                  <div
-                    className={`h-36 relative overflow-hidden ${
-                      !hasImage ? design.bgColor : ""
-                    }`}
-                  >
-                    {hasImage ? (
-                      <SafeImage
-                        src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${
-                          item.image
-                        }`}
-                        alt={streamDetails.name || "Stream image"}
-                        title={streamDetails.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div
-                        className={`h-full flex items-center justify-center ${design.bgColor}`}
-                      >
-                        <div className={`p-8 ${design.color}`}>
+        <div 
+          ref={scrollRef}
+          className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {trendingStreams.length > 0 ? (
+            trendingStreams.map((item) => {
+              const streamDetails = item.streamDetails[0] || {};
+              const level = item._id.level;
+              const design = getStreamCardDesign(level);
+              const hasImage = !!item.image;
+
+              return (
+                <Link
+                  key={`${streamDetails._id}-${level}`}
+                  to={`/popular-courses-detail?stream=${streamDetails._id}&level=${level}`}
+                  className="block group w-[85vw] sm:w-[320px] md:w-auto flex-shrink-0 snap-center"
+                >
+                  <div className="h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">
+                    {/* Image or decorative background */}
+                    <div
+                      className={`h-36 relative overflow-hidden ${
+                        !hasImage ? design.bgColor : ""
+                      }`}
+                    >
+                      {hasImage ? (
+                        <SafeImage
+                          src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${
+                            item.image
+                          }`}
+                          alt={streamDetails.name || "Stream image"}
+                          title={streamDetails.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div
+                          className={`h-full flex items-center justify-center ${design.bgColor}`}
+                        >
+                          <div className={`p-8 ${design.color}`}>
+                            {design.icon}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Level badge floating at bottom-right */}
+                      <div className="absolute bottom-0 right-0 transform translate-y-1/2 mr-4">
+                        <div
+                          className={`${design.bgColor} ${design.color} ${design.borderColor} border rounded-full p-3 shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                        >
                           {design.icon}
                         </div>
                       </div>
-                    )}
+                    </div>
 
-                    {/* Level badge floating at bottom-right */}
-                    <div className="absolute bottom-0 right-0 transform translate-y-1/2 mr-4">
-                      <div
-                        className={`${design.bgColor} ${design.color} ${design.borderColor} border rounded-full p-3 shadow-lg group-hover:shadow-xl transition-all duration-300`}
-                      >
-                        {design.icon}
+                    <div className="px-6 pt-8 pb-6">
+                      {/* Level indicator */}
+                      <div className="mb-3">
+                        <span
+                          className={`text-xs font-semibold tracking-wider uppercase ${design.color}`}
+                        >
+                          {level?.charAt(0).toUpperCase() + level?.slice(1) ||
+                            "Unknown Level"}
+                        </span>
+                      </div>
+
+                      {/* Stream title */}
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 transition-colors duration-300 group-hover:text-red-500">
+                        {streamDetails.name || "Unnamed Stream"}
+                      </h3>
+
+                      {/* Short description - placeholder text based on stream name */}
+                      <p className="text-gray-600 mb-6 line-clamp-2">
+                        {`Explore ${
+                          streamDetails.name || "this stream"
+                        } and discover comprehensive courses and resources designed to enhance your knowledge and skills.`}
+                      </p>
+
+                      {/* Explore button */}
+                      <div className="flex items-center">
+                        <button
+                          className={`flex items-center ${design.color} ${design.bgColor} ${design.borderColor} border rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${design.hoverBg} hover:text-white`}
+                        >
+                          Explore Stream
+                          <ArrowRight className="ml-2 w-4 h-4 transform transition-transform duration-300 group-hover:translate-x-1" />
+                        </button>
                       </div>
                     </div>
                   </div>
-
-                  <div className="px-6 pt-8 pb-6">
-                    {/* Level indicator */}
-                    <div className="mb-3">
-                      <span
-                        className={`text-xs font-semibold tracking-wider uppercase ${design.color}`}
-                      >
-                        {level?.charAt(0).toUpperCase() + level?.slice(1) ||
-                          "Unknown Level"}
-                      </span>
-                    </div>
-
-                    {/* Stream title */}
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 transition-colors duration-300 group-hover:text-red-500">
-                      {streamDetails.name || "Unnamed Stream"}
-                    </h3>
-
-                    {/* Short description - placeholder text based on stream name */}
-                    <p className="text-gray-600 mb-6 line-clamp-2">
-                      {`Explore ${
-                        streamDetails.name || "this stream"
-                      } and discover comprehensive courses and resources designed to enhance your knowledge and skills.`}
-                    </p>
-
-                    {/* Explore button */}
-                    <div className="flex items-center">
-                      <button
-                        className={`flex items-center ${design.color} ${design.bgColor} ${design.borderColor} border rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${design.hoverBg} hover:text-white`}
-                      >
-                        Explore Stream
-                        <ArrowRight className="ml-2 w-4 h-4 transform transition-transform duration-300 group-hover:translate-x-1" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            );
-          })
-        ) : (
-          <div className="col-span-full text-center py-12 bg-white rounded-xl shadow-md">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 text-red-300"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+                </Link>
+              );
+            })
+          ) : (
+            <div className="col-span-full text-center py-12 bg-white rounded-xl shadow-md w-full">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-red-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <p className="text-gray-600">No trending streams available.</p>
+              <button className="mt-4 bg-red-50 text-red-500 py-2 px-6 rounded-lg border border-red-100 hover:bg-[#b82025] hover:text-white transition-colors">
+                Refresh
+              </button>
             </div>
-            <p className="text-gray-600">No trending streams available.</p>
-            <button className="mt-4 bg-red-50 text-red-500 py-2 px-6 rounded-lg border border-red-100 hover:bg-[#b82025] hover:text-white transition-colors">
-              Refresh
-            </button>
-          </div>
-        )}
+          )}
+        </div>
+
+        {/* Right Navigation Button */}
+        <button
+          onClick={handleNext}
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-5 h-5 text-gray-700" />
+        </button>
       </div>
     </div>
   );

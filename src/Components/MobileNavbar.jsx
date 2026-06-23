@@ -258,7 +258,7 @@ const MobileNavbar = ({ categories }) => {
       <div className="mt-4 text-right">
         <span 
           className="text-xs text-red-500 cursor-pointer"
-          onClick={() => handleLinkClick("/popularcourses")}
+          onClick={() => handleLinkClick("/popular-courses")}
         >
           View All Courses →
         </span>

@@ -195,7 +195,7 @@ const BestRatedInstitute = () => {
 
                     <p className="text-sm mt-2 mb-4 line-clamp-3">
                       {/* <p className="text-gray-600 mb-4 p4 line-clamp-3"> */}
-                      {institute.about ? (
+                      {institute.about && institute.about !== "0" && institute.about !== 0 ? (
                         <span
                           dangerouslySetInnerHTML={{ __html: institute.about }}
                         />

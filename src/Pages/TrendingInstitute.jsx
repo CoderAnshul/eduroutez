@@ -167,15 +167,15 @@ const TrendingInstitute = () => {
                   <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A] antialiased leading-tight">
                     {institute.instituteName}
                   </h3>
-                  <div className="text-sm mt-2 mb-4 line-clamp-3">
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: institute.about
-                          ? institute.about.slice(0, 100) + "..."
-                          : "No description available",
-                      }}
-                    />
-                  </div>
+                   <div className="text-sm mt-2 mb-4 line-clamp-3">
+                     <span
+                       dangerouslySetInnerHTML={{
+                         __html: institute.about && institute.about !== "0" && institute.about !== 0
+                           ? institute.about.slice(0, 100) + "..."
+                           : "No description available",
+                       }}
+                     />
+                   </div>
                   {/* {institute.maxFees && (
                                         <h3 className='flex items-center mt-2 text-2xl font-bold text-[#000000c4]'>
                                             <img className='h-5 mt-1 opacity-70' src={rupee} alt="rupee" />

@@ -145,7 +145,7 @@ const TrendingStreams = () => {
               return (
                 <Link
                   key={`${streamDetails._id}-${level}`}
-                  to={`/popularcourses?stream=${streamDetails._id}&level=${level}`}
+                  to={`/popular-courses-detail?stream=${streamDetails._id}&level=${level}`}
                   className="block group"
                 >
                   <div className="h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">

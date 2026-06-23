@@ -323,10 +323,16 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
             )}
           </div>
 
-          <p
-            className="text-sm text-gray-600 line-clamp-3"
-            dangerouslySetInnerHTML={{ __html: institute.about }}
-          />
+          {institute.about && institute.about !== "0" && institute.about !== 0 ? (
+            <p
+              className="text-sm text-gray-600 line-clamp-3"
+              dangerouslySetInnerHTML={{ __html: institute.about }}
+            />
+          ) : (
+            <p className="text-sm text-gray-600 line-clamp-3">
+              No information available
+            </p>
+          )}
           <div className="flex justify-between items-center flex-wrap gap-3 !mt-8 md:!mt-3 text-sm text-blue-600">
             <div className="space-x-4">
               {/* Links updated below to use slug URLs */}

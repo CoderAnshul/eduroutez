@@ -213,22 +213,59 @@ p {
   overflow-wrap: break-word;
 }
 
-.text-base table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+.text-base table,
+.ck-content table,
+.blog-content-wrapper table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+  border: 2px solid #94a3b8 !important; /* Thicker outer boundary */
 }
 
 .text-base table th,
-.text-base table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+.text-base table td,
+.ck-content table th,
+.ck-content table td,
+.blog-content-wrapper table th,
+.blog-content-wrapper table td {
+  border: 1px solid #cbd5e1 !important; /* Inner cell borders */
+  padding: 10px 12px !important;
+  text-align: left !important;
 }
 
-.text-base table th {
-  background-color: #f4f4f4;
-  font-weight: bold;
+.text-base table th,
+.ck-content table th,
+.blog-content-wrapper table th {
+  background-color: #f8fafc !important;
+  font-weight: bold !important;
+  border-bottom: 2px solid #94a3b8 !important; /* Distinct header boundary */
+}
+
+.text-base ul, .ck-content ul {
+  list-style-type: disc !important;
+  padding-left: 1.5rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.text-base ol, .ck-content ol {
+  list-style-type: decimal !important;
+  padding-left: 1.5rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.text-base li, .ck-content li {
+  margin-bottom: 0.25rem !important;
+}
+
+.text-base ul ul, .ck-content ul ul {
+  list-style-type: circle !important;
+}
+
+.text-base ul ul ul, .ck-content ul ul ul {
+  list-style-type: square !important;
 }
 
 /* Loader styles */
@@ -279,9 +316,17 @@ p {
 /* ............ new changes .............. */
 
 @media screen and (max-width: 768px) {
-  .text-base {
-    /* width: 1000px; */
-    overflow-x: auto;
+  .text-base,
+  .ck-content,
+  .blog-content-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .text-base table,
+  .ck-content table,
+  .blog-content-wrapper table {
+    min-width: 650px !important; /* Force a minimum width on mobile to enable horizontal sliding/scrolling */
   }
 }
 
