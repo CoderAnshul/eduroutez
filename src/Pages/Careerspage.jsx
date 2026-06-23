@@ -11,6 +11,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Promotions from "./CoursePromotions";
 import SocialShare from "../Components/SocialShare";
+import { Helmet } from "react-helmet-async";
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -254,6 +255,25 @@ const Careerspage = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          Career Opportunities in India | Career Options, Career Guidance & Job Paths | Eduroutez
+        </title>
+        <meta
+          name="description"
+          content="Explore career opportunities in Engineering, Medical, Commerce, Arts, Science, Pharmacy, Education, Agriculture and more. Discover career paths, eligibility, skills, salary and future scope with Eduroutez."
+        />
+        <meta
+          name="keywords"
+          content="career opportunities, career guidance, career options after 12th, engineering careers, medical careers, commerce careers, arts careers, science careers, career planning, jobs in India"
+
+        />
+        <link
+          rel="canonical"
+          href="https://eduroutez.com/careerspage"
+        />
+      </Helmet>
+
       <PageBanner
         pageName="Career Opportunities"
         currectPage="career opportunity"
