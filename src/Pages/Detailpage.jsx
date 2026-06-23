@@ -82,6 +82,7 @@ import BlogComponent from "../Components/BlogComponent";
 import axiosInstance from "../ApiFunctions/axios";
 import SocialShare from "../Components/SocialShare";
 import { Eye, ThumbsUp } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 const DetailPage = () => {
   const [data, setData] = useState(null);
@@ -338,6 +339,31 @@ const DetailPage = () => {
 
   return (
     <>
+    {/* SEO */}
+      <Helmet>
+        <title>
+          {`${data.title} Career Details, Eligibility, Skills & Career Scope | Eduroutez`}
+        </title>
+
+        <meta
+          name="description"
+          content={
+            data.metaDescription ||
+            `${data.title} career details including eligibility, required skills, job roles, salary, career opportunities and future scope.`
+          }
+        />
+
+        <meta
+          name="keywords"
+          content={`${data.title}, career guidance, career opportunities, salary, eligibility, skills, career path`}
+        />
+
+        <link
+          rel="canonical"
+          href={`https://eduroutez.com/detailpage/${slug}`}
+        />
+      </Helmet>
+
       <div className="min-h-screen bg-gray-50">
         {/* Banner Section */}
         <div className="universal-container py-8">
