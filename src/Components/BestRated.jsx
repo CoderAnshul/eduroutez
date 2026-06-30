@@ -7,6 +7,7 @@ import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, ThumbsUp, Users, MapPin } from "lucide-react";
 import { bestRatedInstitute } from "../ApiFunctions/api";
+import WishlistButton from "./WishlistButton";
 
 const BestRated = React.memo(() => {
   const [content, setContent] = useState([]);
@@ -135,6 +136,12 @@ const BestRated = React.memo(() => {
                   <div className="bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
                     Best Rated
                   </div>
+                  <WishlistButton
+                    type="institute"
+                    id={institute._id}
+                    className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110"
+                    size={4}
+                  />
                 </div>
 
                 <div>

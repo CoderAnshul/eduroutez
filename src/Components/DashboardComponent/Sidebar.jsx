@@ -8,6 +8,7 @@ const Sidebar = () => {
     { name: "Dashboard", path: "/dashboard", icon: "🏠" },
     { name: "My Profile", path: "/dashboard/profile-page", icon: "👤" },
     { name: "Wishlist", path: "/dashboard/wishlist", icon: "🏫" },
+    { name: "Activity History", path: "/dashboard/activity", icon: "📊" },
     { name: "My Documents", path: "/dashboard/documents", icon: "📄" },
     { name: "Talk to Counselor", path: "/dashboard/counselor", icon: "👤" },
     { name: "My Reviews", path: "/dashboard/reviews", icon: "📝" },

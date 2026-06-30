@@ -6,6 +6,7 @@ import TabSlider from "../Ui components/TabSlider";
 import { getCoursesById } from "../ApiFunctions/api";
 import axiosInstance from "../ApiFunctions/axios";
 import SocialShare from "../Components/SocialShare";
+import WishlistButton from "../Components/WishlistButton";
 
 // Lazy loaded components
 const QueryForm = lazy(() => import("../Ui components/QueryForm"));
@@ -414,6 +415,15 @@ const Coursesinfopage = () => {
               className=" !top-full -left-44"
             />
           </div>
+
+          <WishlistButton
+            type="course"
+            id={content?._id}
+            className="px-3 py-2 rounded-lg border border-gray-300 bg-gray-100 hover:bg-gray-200"
+            size={5}
+            showLabel
+            labelClass="text-sm font-medium"
+          />
 
           <button
             onClick={handleLike}

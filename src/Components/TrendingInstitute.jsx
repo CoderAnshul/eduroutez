@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import cardPhoto from "../assets/Images/teacher.jpg";
-import rupee from "../assets/Images/rupee.png";
 import { useQuery } from "react-query";
+import WishlistButton from "./WishlistButton";
 import { trendingInstitute } from "../ApiFunctions/api";
 
 const TrendingInstitute = () => {
@@ -117,7 +117,7 @@ const TrendingInstitute = () => {
                 key={institute._id || index}
                 className="box lg:max-w-[500px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg"
               >
-                <div className="imageContainer">
+                <div className="imageContainer relative">
                   <img
                     className="h-full w-full object-cover"
                     src={
@@ -127,6 +127,14 @@ const TrendingInstitute = () => {
                     }
                     alt="Institute"
                   />
+                  <div className="absolute top-2 right-2 z-10">
+                    <WishlistButton
+                      type="institute"
+                      id={institute._id}
+                      className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110"
+                      size={4}
+                    />
+                  </div>
                 </div>
                 <div className="textContainer p-4">
                   <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A]">

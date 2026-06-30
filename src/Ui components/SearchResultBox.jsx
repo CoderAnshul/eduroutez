@@ -63,9 +63,10 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
       };
       if (refreshToken) headers["x-refresh-token"] = refreshToken;
 
-      const response = await addToWishlist(userId, institute._id, null, {
-        headers,
-      }); // Assuming courseId is null for now
+      const response = await addToWishlist({
+        instituteId: institute._id,
+        customHeaders: headers,
+      });
       const responseMessage = String(
         response?.message || response?.data?.message || ""
       ).toLowerCase();
@@ -196,7 +197,7 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
 
           {hasWishlistFeature && (
             <button
-              className="absolute top-2 right-2 z-20 bg-white p-2 rounded-full shadow-md pointer-events-auto"
+              className={`absolute top-2 right-2 z-20 p-2 rounded-full shadow-md pointer-events-auto transition-all duration-200 ${isWishlisted ? "bg-red-50 shadow-red-200" : "bg-white hover:bg-gray-50"}`}
               aria-label={
                 isWishlisted ? "Remove from wishlist" : "Add to wishlist"
               }
@@ -216,15 +217,15 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke={isWishlisted ? "white" : "currentColor"}
-                fill={isWishlisted ? "red" : "none"}
-                className="w-5 h-5"
+                strokeWidth={isWishlisted ? 0 : 1.5}
+                stroke={isWishlisted ? "none" : "currentColor"}
+                fill={isWishlisted ? "#dc2626" : "none"}
+                className={`w-5 h-5 transition-all duration-300 ${isWishlisted ? "drop-shadow-sm scale-110" : "hover:scale-110"}`}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5c0-2.64 2.36-4.5 5-4.5 1.54 0 3.04.99 3.76 2.39h.48C13.95 4.99 15.46 4 17 4c2.64 0 5 1.86 5 4.5 0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
                 />
               </svg>
             </button>

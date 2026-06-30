@@ -5,7 +5,8 @@ import serachBoximg from "../assets/Images/serachBoximg.jpg";
 import axiosInstance from "../ApiFunctions/axios";
 import { toast } from "react-toastify";
 import AuthPopup from "../Components/AuthPopup";
-import { Building, Calendar } from "lucide-react";
+import { Building, Calendar, Heart } from "lucide-react";
+import WishlistButton from "../Components/WishlistButton";
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 const baseURL = import.meta.env.VITE_BASE_URL;
@@ -315,7 +316,14 @@ const InstitueName = ({ instituteData }) => {
             )}
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
+            <WishlistButton
+              type="institute"
+              id={instituteData?.data?._id}
+              className="bg-white border border-gray-200 hover:border-red-200 px-3 py-2 rounded-lg shadow-sm"
+              size={5}
+              showLabel
+            />
             {(instituteData?.data?.brochure ||
               instituteData?.data?.brochureUrl ||
               instituteData?.data?.brochure_link ||

@@ -5,6 +5,7 @@ import { useQuery } from "react-query";
 
 import CustomButton from "../Ui components/CustomButton";
 import { allbestRatedInstitute } from "../ApiFunctions/api";
+import WishlistButton from "../Components/WishlistButton";
 
 const BestRatedInstitute = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -160,7 +161,7 @@ const BestRatedInstitute = () => {
                 aria-label={institute.instituteName}
               >
                 {/* Institute Image */}
-                <div className="h-56 overflow-hidden">
+                <div className="h-56 overflow-hidden relative">
                   <SafeImage
                     src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${
                       institute.thumbnailImage
@@ -170,6 +171,9 @@ const BestRatedInstitute = () => {
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
+                  <div className="absolute top-3 right-3 z-10">
+                    <WishlistButton type="institute" id={institute._id} className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110" size={4} />
+                  </div>
                 </div>
 
                 {/* Institute Details */}

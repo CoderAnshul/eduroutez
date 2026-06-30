@@ -3,6 +3,7 @@ import SafeImage from "../Ui components/SafeImage";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import { bestRatedUniversityInstitutes } from "../ApiFunctions/api";
+import WishlistButton from "../Components/WishlistButton";
 
 
 const ITEMS_PER_PAGE = 6;
@@ -94,7 +95,7 @@ const UniversityListPage = () => {
                 aria-label={university.instituteName || university.name}
               >
                 {/* University Image */}
-                <div className="h-56 overflow-hidden">
+                <div className="h-56 overflow-hidden relative">
                   <SafeImage
                     src={university.thumbnailImage ? `${Images}/${university.thumbnailImage}` : "/fallback-institute.jpg"}
                     alt={university.instituteName || university.name}
@@ -102,6 +103,9 @@ const UniversityListPage = () => {
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
+                  <div className="absolute top-3 right-3 z-10">
+                    <WishlistButton type="institute" id={university._id} className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110" size={4} />
+                  </div>
                 </div>
 
                 {/* University Details */}

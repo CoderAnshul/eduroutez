@@ -9,6 +9,7 @@ import Promotions from "./CoursePromotions";
 import SocialShare from "../Components/SocialShare";
 import { Sparkles } from "lucide-react";
 import HighRatedCareers from "../Components/HighRatedCareers";
+import WishlistButton from "../Components/WishlistButton";
 
 const StreamLevelPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -454,7 +455,7 @@ const StreamLevelPage = () => {
                   key={institute._id}
                   className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
                 >
-                  <div className="h-48 w-full overflow-hidden">
+                  <div className="h-48 w-full overflow-hidden relative">
                     <SafeImage
                       className="h-full w-full object-cover"
                       src={
@@ -466,6 +467,9 @@ const StreamLevelPage = () => {
                       title={institute.instituteName}
                       loading="lazy"
                     />
+                    <div className="absolute top-3 right-3 z-10">
+                      <WishlistButton type="institute" id={institute._id} className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110" size={4} />
+                    </div>
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">

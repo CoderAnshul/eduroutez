@@ -1,4 +1,5 @@
 import React from "react";
+import WishlistButton from "../Components/WishlistButton";
 
 const CourseCard = ({ course }) => {
 
@@ -43,8 +44,12 @@ const CourseCard = ({ course }) => {
   };
 
   return (
-    <div className="border max-w-sm hover:-translate-y-2 hover:shadow-lg hover:bg-red-50 transform transition-all flex-1 w-full rounded-lg shadow-sm p-2 flex flex-col justify-between group">
+    <div className="border max-w-sm hover:-translate-y-2 hover:shadow-lg hover:bg-red-50 transform transition-all flex-1 w-full rounded-lg shadow-sm p-2 flex flex-col justify-between group relative">
       
+      <div className="absolute top-2 right-2 z-10">
+        <WishlistButton type="course" id={course._id} className="bg-white/90 hover:bg-white p-1.5 rounded-full shadow-sm" size={3.5} />
+      </div>
+
         <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4 min-w-[260px]">
           <div className="border-b-2 p-1 mb-2">
             <h4 className="text-sm font-bold mb-2 text-gray-700">Duration</h4>

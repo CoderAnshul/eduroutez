@@ -13,12 +13,24 @@ import {
   FileDown,
   Clock,
   CheckCircle,
+  Heart,
+  Building2,
+  BookOpen,
+  TrendingUp,
+  Zap,
+  Trophy,
+  Gift,
+  Video,
+  Edit3,
 } from "lucide-react";
 import axios from "axios";
+import { getRecentActivity, getActivityStats } from "../../ApiFunctions/api";
 
 const WelcomeBanner = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [activityStats, setActivityStats] = useState({ total: 0, likes: 0, wishlists: 0, reviews: 0, points: 0, referrals: 0 });
   const navigate = useNavigate();
 
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -46,8 +58,33 @@ const WelcomeBanner = () => {
       }
     };
 
+    const fetchActivity = async () => {
+      try {
+        const [recent, stats] = await Promise.all([
+          getRecentActivity(5),
+          getActivityStats(),
+        ]);
+        setRecentActivity(Array.isArray(recent) ? recent : []);
+        setActivityStats(stats || { total: 0, likes: 0, wishlists: 0, reviews: 0 });
+      } catch {}
+    };
+
     fetchUserProfile();
+    fetchActivity();
   }, []);
+
+  const getTimeAgo = (dateStr) => {
+    if (!dateStr) return "";
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(dateStr).toLocaleDateString();
+  };
 
   const getLevelDetails = (points) => {
     const levels = [
@@ -298,6 +335,106 @@ const WelcomeBanner = () => {
               />
             ))}
           </div>
+
+          {/* Activity Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-blue-50 rounded-xl p-4 flex items-center gap-3">
+              <div className="bg-blue-500 p-2 rounded-lg">
+                <TrendingUp className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-blue-700">{activityStats.total}</p>
+                <p className="text-[10px] text-blue-600/70 font-medium uppercase tracking-wide">Total Activities</p>
+              </div>
+            </div>
+            <div className="bg-red-50 rounded-xl p-4 flex items-center gap-3">
+              <div className="bg-red-500 p-2 rounded-lg">
+                <Heart className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-red-700">{activityStats.likes}</p>
+                <p className="text-[10px] text-red-600/70 font-medium uppercase tracking-wide">Likes</p>
+              </div>
+            </div>
+            <div className="bg-teal-50 rounded-xl p-4 flex items-center gap-3">
+              <div className="bg-teal-500 p-2 rounded-lg">
+                <Building2 className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-teal-700">{activityStats.wishlists}</p>
+                <p className="text-[10px] text-teal-600/70 font-medium uppercase tracking-wide">Saved</p>
+              </div>
+            </div>
+            <div className="bg-amber-50 rounded-xl p-4 flex items-center gap-3">
+              <div className="bg-amber-500 p-2 rounded-lg">
+                <Trophy className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-amber-700">{activityStats.points}</p>
+                <p className="text-[10px] text-amber-600/70 font-medium uppercase tracking-wide">Points</p>
+              </div>
+            </div>
+            <div className="bg-indigo-50 rounded-xl p-4 flex items-center gap-3">
+              <div className="bg-indigo-500 p-2 rounded-lg">
+                <Gift className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-indigo-700">{activityStats.referrals}</p>
+                <p className="text-[10px] text-indigo-600/70 font-medium uppercase tracking-wide">Referrals</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Activity Feed */}
+          {recentActivity.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  Recent Activity
+                </h3>
+                <button
+                  onClick={() => navigate("/dashboard/activity")}
+                  className="text-xs font-medium text-red-600 hover:text-red-700"
+                >
+                  View All
+                </button>
+              </div>
+              <div className="space-y-2">
+                {recentActivity.filter((a) => !["review_submitted","review_updated","unlike_blog","unlike_course","unlike_career","unwishlist_institute","unwishlist_course"].includes(a.type)).slice(0, 5).map((act) => {
+                  const actType = act.type || "";
+                  let icon = Star;
+                  let label = actType;
+                  let color = "bg-gray-100";
+                  if (actType.startsWith("like_")) { icon = Heart; color = "bg-red-100"; label = "Liked"; }
+                  else if (actType.startsWith("wishlist_")) { icon = Building2; color = "bg-teal-100"; label = "Saved"; }
+                  else if (actType === "points_earned") { icon = Trophy; color = "bg-amber-100"; label = "Earned points"; }
+                  else if (actType === "points_redeemed") { icon = Gift; color = "bg-rose-100"; label = "Redeemed points"; }
+                  else if (actType === "referral_used") { icon = Share2; color = "bg-indigo-100"; label = "Referral"; }
+                  else if (actType === "counselor_booked") { icon = UserPlus; color = "bg-green-100"; label = "Booked counselor"; }
+                  else if (actType === "webinar_registered") { icon = Video; color = "bg-orange-100"; label = "Webinar"; }
+                  else if (actType === "profile_updated") { icon = Edit3; color = "bg-violet-100"; label = "Updated profile"; }
+                  else if (actType === "question_asked") { icon = HelpCircle; color = "bg-sky-100"; label = "Asked question"; }
+                  const Icon = icon;
+                  const when = getTimeAgo(act.createdAt);
+                  return (
+                    <div key={act._id} className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                      <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center shrink-0`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-700 truncate">
+                          {label}{act.targetName ? `: ${act.targetName}` : ""}
+                        </p>
+                        <p className="text-[10px] text-gray-400">{when}</p>
+                      </div>
+                      <span className="text-[10px] text-gray-400 uppercase">{act.targetType || ""}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {user.role === "counselor" && user.isVerified && user.certificateUrl && (

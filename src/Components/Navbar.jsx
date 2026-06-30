@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/Images/logo.png";
-import explore from "../assets/Images/explore.png";
 
 import edit from "../assets/Images/editBtn.png";
 import menu from "../assets/Images/menuBar.png";
@@ -10,10 +9,13 @@ import menubar from "../assets/Images/secondMenu.png";
 import SecondMenu from "./SubNavbar";
 import MobileNavbar from "./MobileNavbar";
 import axiosInstance from "../ApiFunctions/axios";
-import { ArrowRight, LogOut, User, Settings, LayoutDashboard } from "lucide-react";
+import { ArrowRight, LogOut, User, Settings, LayoutDashboard, Sparkles, Search, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setInput } from "../config/inputSlice";
 import useCategories from "../DataFiles/categories";
 import { toast } from "react-toastify";
+import useModal from "./Modal/useModal";
 
 const Navbar = () => {
   console.log('Navbar component rendered');
@@ -95,6 +97,110 @@ const Navbar = () => {
     navigate("/question-&-answers");
   };
 
+  const dispatch = useDispatch();
+  const { showAlert } = useModal();
+  const [inputField, setInputField] = useState("");
+  const [searchType, setSearchType] = useState("institute");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchContainerRef = useRef(null);
+
+  // Fetch suggestions based on input
+  useEffect(() => {
+    let isMounted = true;
+    const fetchSuggestions = async () => {
+      if (inputField.length < 2) {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        let filteredResults = [];
+        if (searchType === "course") {
+          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/courses?search=${encodeURIComponent(inputField)}&limit=10&page=0`);
+          if (!isMounted) return;
+          const courseResult = response.data?.data?.result || response.data?.result || [];
+          filteredResults = courseResult.map((course) => {
+            const inst = course.institute || {};
+            const cityData = course.city || inst.city || "";
+            const cityName = typeof cityData === "object" ? cityData.name : cityData;
+            return { courseTitle: course.courseTitle || course.name || "Untitled Course", instituteName: inst.instituteName || course.instituteName || "", cityName: cityName || "", courseId: course._id, slug: course.slug };
+          });
+        } else if (searchType === "counsellor") {
+          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/counselors?search=${encodeURIComponent(inputField)}&limit=10&page=1`);
+          if (!isMounted) return;
+          const counsellorResult = response.data?.data?.result || response.data?.result || [];
+          filteredResults = counsellorResult.map((c) => ({ firstname: c.firstname, lastname: c.lastname, specialization: c.specialization, _id: c._id }));
+        } else {
+          const searchFields = JSON.stringify({ instituteName: inputField });
+          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/institutes`, { params: { searchFields, limit: 10, page: 1 } });
+          if (!isMounted) return;
+          const instituteResult = response.data?.data?.result || response.data?.result || [];
+          filteredResults = instituteResult.map((inst) => {
+            const cityData = inst.city || "";
+            const cityName = typeof cityData === "object" ? cityData.name : cityData;
+            return { instituteName: inst.instituteName, cityName: cityName || "", slug: inst.slug, _id: inst._id };
+          });
+        }
+        if (!isMounted) return;
+        setSuggestions(filteredResults);
+        setShowSuggestions(filteredResults.length > 0);
+      } catch (error) {
+        if (isMounted) { setSuggestions([]); setShowSuggestions(false); }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+    const debounceTimer = setTimeout(fetchSuggestions, 500);
+    return () => { isMounted = false; clearTimeout(debounceTimer); };
+  }, [inputField, searchType]);
+
+  const handleInputChange = (e) => setInputField(e.target.value);
+
+  const handleSuggestionClick = (suggestion) => {
+    if (searchType === "course") {
+      setInputField(suggestion.courseTitle);
+      dispatch(setInput(suggestion.courseTitle));
+      navigate("/searchpage?fromSearch=true&searchType=course");
+    } else if (searchType === "counsellor") {
+      setInputField(suggestion.firstname + " " + suggestion.lastname);
+      navigate(`/counselor?name=${encodeURIComponent(suggestion.firstname + " " + suggestion.lastname)}`);
+    } else {
+      setInputField(suggestion.instituteName);
+      dispatch(setInput(suggestion.instituteName));
+      navigate("/searchpage?fromSearch=true&searchType=institute");
+    }
+    setShowSuggestions(false);
+  };
+
+  const handleBtnClick = async () => {
+    if (inputField === "") { showAlert("Please enter something"); return; }
+    setIsSearching(true);
+    if (searchType === "counsellor") {
+      navigate(`/counselor?name=${encodeURIComponent(inputField)}`);
+      setIsSearching(false);
+    } else {
+      dispatch(setInput(inputField));
+      navigate(`/searchpage?fromSearch=true&searchType=${searchType}`);
+      setIsSearching(false);
+    }
+    setShowSuggestions(false);
+  };
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const handleLogout = async () => {
     setIsDropdownOpen(false);
@@ -158,11 +264,64 @@ const Navbar = () => {
             </Link>
           </div>
 
+          {/* Search Bar */}
+          <div ref={searchContainerRef} className="hidden md:flex flex-1 max-w-md mx-2 lg:mx-4 relative">
+            <div className="flex items-center w-full h-10 bg-gray-100 border border-gray-200 rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-red-300 focus-within:bg-white focus-within:border-red-300 transition-all">
+              <select
+                value={searchType}
+                onChange={(e) => setSearchType(e.target.value)}
+                className="h-full bg-gray-100 border-r border-gray-300 px-2 text-xs outline-none cursor-pointer"
+              >
+                <option value="institute">Institute</option>
+                <option value="course">Course</option>
+                <option value="counsellor">Counsellor</option>
+              </select>
+              <div className="flex items-center flex-1 px-2 gap-1.5">
+                <Search className="w-4 h-4 text-gray-400 shrink-0" />
+                <input
+                  type="text"
+                  value={inputField}
+                  onChange={handleInputChange}
+                  placeholder={searchType === "counsellor" ? "Search counsellors..." : searchType === "course" ? "Search courses..." : "Search institutes..."}
+                  className="text-xs w-full outline-none bg-transparent"
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleBtnClick(); }}
+                />
+              </div>
+              <button
+                onClick={handleBtnClick}
+                disabled={isSearching}
+                className="h-full px-3 bg-[#b82025] text-white text-xs font-medium hover:bg-red-700 transition-colors disabled:opacity-60"
+              >
+                {isSearching ? "..." : "Search"}
+              </button>
+            </div>
+
+            {/* Suggestions dropdown */}
+            {showSuggestions && (
+              <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                {suggestions.length > 0 ? suggestions.map((suggestion, index) => (
+                  <div key={index} className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    <div className="font-medium text-xs">
+                      {searchType === "course" ? suggestion.courseTitle : searchType === "counsellor" ? suggestion.firstname + " " + suggestion.lastname : suggestion.instituteName}
+                    </div>
+                    {searchType === "course" && <div className="text-[10px] text-gray-500">{suggestion.instituteName} - {suggestion.cityName}</div>}
+                    {searchType === "counsellor" && suggestion.specialization && <div className="text-[10px] text-gray-500">{suggestion.specialization}</div>}
+                    {searchType === "institute" && suggestion.cityName && <div className="text-[10px] text-gray-500">{suggestion.cityName}</div>}
+                  </div>
+                )) : !isLoading && <div className="px-3 py-2 text-xs text-gray-500">No results found</div>}
+              </div>
+            )}
+          </div>
+
           <div className="CustomFlex gap-3">
             <div className="">
               <button
                 onClick={handleQuestion}
-                className="md:flex hidden items-center text-xs font-medium gap-2 px-4 hover:scale-95 py-2 bg-[#b82025] uppercase text-white  hover:bg-[#b82025] transition-colors"
+                className="md:flex hidden items-center text-xs font-medium gap-2 px-4 hover:scale-95 py-2 bg-[#b82025] uppercase text-white hover:bg-[#b82025] transition-colors"
               >
                 Ask
                 <ArrowRight className="h-4 w-4 hidden md:flex" />
@@ -184,15 +343,11 @@ const Navbar = () => {
             </Link>
 
             <Link
-              to="/searchpage"
+              to="/recommendations"
               className="CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
             >
-              <img
-                className="h-4 group-hover:rotate-180 transition-all"
-                src={explore}
-                alt="exploreBtn"
-              />
-              <span className="text-black">Explore</span>
+              <Sparkles className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              <span className="text-black">Recommend</span>
             </Link>
             {!accessToken && (
               <Link
@@ -334,6 +489,11 @@ const Navbar = () => {
           <li>
             <Link className="text-black" to="/searchpage" onClick={toggleMenu}>
               Explore
+            </Link>
+          </li>
+          <li>
+            <Link className="text-black" to="/recommendations" onClick={toggleMenu}>
+              Recommendations
             </Link>
           </li>
           <li>

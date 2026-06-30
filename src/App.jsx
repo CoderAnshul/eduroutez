@@ -52,9 +52,11 @@ const Writereview = React.lazy(() => import('./Pages/Writereview'));
 const Forgotpassword = React.lazy(() => import('./Pages/Forgotpassword'));
 // const counselling = React.lazy(() => import('./Pages/counselling'));
 const Wishlist = React.lazy(() => import('./Pages/Wishlist'));
+const ActivityHistory = React.lazy(() => import('./Pages/ActivityHistory'));
 const Question = React.lazy(() => import('./Pages/Question-Answer'))
 const Redeem = React.lazy(() => import('./Pages/Redeem'))
 const Logout = React.lazy(() => import('./Pages/Logout'))
+const RecommendationsPage = React.lazy(() => import('./Pages/RecommendationsPage'))
 
 const CounselorTestPayment = React.lazy(() => import('./Pages/CounselorTest/Payment'));
 const CounselorTestExam = React.lazy(() => import('./Pages/CounselorTest/TestExam'));
@@ -164,6 +166,7 @@ const AppShell = () => {
           <Route path="/detailpage/:slug" element={<Detailpage />} />
 
           <Route path="/webinars" element={<WebinarsPage />} />
+          <Route path="/recommendations" element={<RecommendationsPage />} />
 
           <Route path="/writereview" element={<Writereview />} />
           <Route path="/policy" element={<Policy />} />
@@ -200,6 +203,7 @@ const AppShell = () => {
             <Route path="settings" element={<SettingsPage />} />
             <Route path="slots" element={<ScheduledSlots />} />
             <Route path="wishlist" element={<Wishlist />} />
+            <Route path="activity" element={<ActivityHistory />} />
             <Route path='reviews' element={<ReviewActivity />}></Route>
             <Route path="redeem" element={<Redeem />} />
             <Route path='payout' element={<Payout />} />

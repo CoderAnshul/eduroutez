@@ -21,6 +21,7 @@ import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import Pagination from "../Components/Pagination";
+import WishlistButton from "../Components/WishlistButton";
 
 // Function to fetch trending courses
 const baseURL = import.meta.env.VITE_BASE_URL;
@@ -426,15 +427,7 @@ const TrendingCourses = () => {
                                   {levelBadge.label}
                                 </div>
 
-                                {/* {course.isCourseFree === "free" ? (
-                                <div className="bg-white text-green-600 text-xs font-bold px-3 py-1 rounded-full">
-                                  Free
-                                </div>
-                              ) : (
-                                <div className="bg-white text-red-600 text-xs font-bold px-3 py-1 rounded-full">
-                                  Paid
-                                </div>
-                              )} */}
+                                <WishlistButton type="course" id={course._id} className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110" size={4} />
                               </div>
 
                               <div>

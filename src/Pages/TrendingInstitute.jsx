@@ -1,6 +1,7 @@
 import SafeImage from "../Ui components/SafeImage";
 import { Link } from "react-router-dom";
 import cardPhoto from "../assets/Images/teacher.jpg";
+import WishlistButton from "../Components/WishlistButton";
 import {
   alltrendingInstitute
 } from "../ApiFunctions/api";
@@ -151,7 +152,7 @@ const TrendingInstitute = () => {
                 key={institute._id || index}
                 className="box shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
-                <div className="imageContainer h-48 overflow-hidden">
+                <div className="imageContainer h-48 overflow-hidden relative">
                   <SafeImage
                     className="h-full w-full object-cover"
                     src={
@@ -162,6 +163,9 @@ const TrendingInstitute = () => {
                     alt={institute.instituteName}
                     title={institute.instituteName}
                   />
+                  <div className="absolute top-3 right-3 z-10">
+                    <WishlistButton type="institute" id={institute._id} className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110" size={4} />
+                  </div>
                 </div>
                 <div className="textContainer p-4">
                   <h3 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A] antialiased leading-tight">

@@ -24,6 +24,9 @@ const SubNavbar = ({ categories }) => {
   const [examBlogs, setExamBlogs] = useState({});
   const [hoveredCity, setHoveredCity] = useState(null);
   const [hoveredState, setHoveredState] = useState(null);
+  const [courseCategories, setCourseCategories] = useState([]);
+  const [selectedCourseCat, setSelectedCourseCat] = useState(null);
+  const [coursesByCategory, setCoursesByCategory] = useState({});
 
   const navigate = useNavigate();
 
@@ -141,11 +144,34 @@ const SubNavbar = ({ categories }) => {
       }
     };
 
+    const fetchCourseCategories = async () => {
+      try {
+        const res = await axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/course-categories?page=0&limit=50`);
+        const cats = res.data?.data?.result || res.data?.result || [];
+        setCourseCategories(cats);
+        if (cats.length > 0) setSelectedCourseCat(cats[0]._id);
+      } catch {}
+    };
+
     fetchPopularCourses();
     fetchCareers();
     fetchLatestNews();
     fetchTopColleges();
+    fetchCourseCategories();
   }, []);
+
+  // Fetch courses when a course category is selected
+  useEffect(() => {
+    if (!selectedCourseCat) return;
+    if (coursesByCategory[selectedCourseCat]) return;
+    const fetchCourses = async () => {
+      try {
+        const res = await axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/courses?filters={"category":"${selectedCourseCat}"}&limit=50`);
+        setCoursesByCategory((prev) => ({ ...prev, [selectedCourseCat]: res.data?.data?.result || [] }));
+      } catch {}
+    };
+    fetchCourses();
+  }, [selectedCourseCat]);
 
   const updateGlobalMap = () => {
     window.courseIdMap = { ...window.courseIdMap, ...courseIdMap };
@@ -316,28 +342,50 @@ const SubNavbar = ({ categories }) => {
   const handleLinkClick = (url) => { navigate(url); setHoveredCategory(null); };
 
   const renderCoursesContent = () => (
-    <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
-        <h3 className="font-bold text-xl text-gray-800 flex items-center">
-          <span className="w-1.5 h-6 bg-[#b82025] mr-3"></span> Popular Courses
-        </h3>
-        <span className="text-xs px-3 py-1 bg-red-50 text-red-500 rounded-none font-medium">
-          {popularCourses?.result?.length || 0} Courses Available
-        </span>
+    <div className="bg-white w-full max-h-[500px] shadow-lg border border-gray-100 flex overflow-hidden">
+      {/* Sidebar - Course Categories */}
+      <div className="w-[220px] bg-[#b82025] flex-shrink-0 h-full overflow-y-auto">
+        <div className="p-3 text-white text-xs font-bold uppercase tracking-wider border-b border-white/20">Categories</div>
+        <ul className="w-full flex flex-col ml-0 mb-0 space-y-0">
+          {courseCategories.map((cat) => (
+            <li
+              key={cat._id}
+              className={`pl-3 pr-3 py-2 text-xs cursor-pointer transition-all hover:bg-black/20 ${
+                selectedCourseCat === cat._id ? "bg-black text-white font-medium" : "text-white/90"
+              }`}
+              onMouseEnter={() => setSelectedCourseCat(cat._id)}
+            >
+              {cat.title || cat.name}
+            </li>
+          ))}
+        </ul>
       </div>
-      <div className="grid grid-cols-3 gap-x-8">
-        {popularCourses?.result?.map((course) => (
-          <div key={course._id} className="group">
-            <a onClick={() => handleCourseClick(course)} className="flex items-center space-x-2 px-2 py-1 cursor-pointer transition-all duration-200 hover:text-red-500">
-              <div className="w-8 h-8 bg-red-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+
+      {/* Content - Courses in selected category */}
+      <div className="flex-1 p-6 bg-white h-full overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-base text-gray-800">
+            {courseCategories.find((c) => c._id === selectedCourseCat)?.title || "Courses"}
+          </h3>
+          <span
+            onClick={() => { navigate("/popularcourses"); setHoveredCategory(null); }}
+            className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
+          >
+            View All
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+          {(coursesByCategory[selectedCourseCat] || popularCourses?.result || []).slice(0, 20).map((course) => (
+            <div key={course._id} className="group">
+              <a onClick={() => handleCourseClick(course)} className="flex items-center gap-2 px-2 py-1.5 cursor-pointer transition-all duration-200 hover:text-red-500 rounded hover:bg-red-50">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-red-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
                 </svg>
-              </div>
-              <span className="text-sm text-black hover:text-red-500 truncate transition-colors">{course.courseTitle}</span>
-            </a>
-          </div>
-        ))}
+                <span className="text-sm text-gray-700 hover:text-red-500 truncate">{course.courseTitle || course.name}</span>
+              </a>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

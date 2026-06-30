@@ -4,6 +4,7 @@ import cardPhoto from "../assets/Images/teacher.jpg";
 import { useQuery } from "react-query";
 import { bestRatedUniversityInstitutes } from "../ApiFunctions/api";
 import { ArrowRight, MapPin, Users, ThumbsUp } from "lucide-react";
+import WishlistButton from "./WishlistButton";
 
 // Clean HTML content
 const stripHtml = (html) => {
@@ -125,11 +126,17 @@ const BestRatedUniversity = React.memo(() => {
             <div className="absolute inset-0 bg-black bg-opacity-30"></div>
 
             <div className="absolute inset-0 p-6 flex flex-col justify-between">
-              <div className="flex justify-between items-start">
-                <div className="bg-red-600/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                  Best Rated
+                <div className="flex justify-between items-start">
+                  <div className="bg-red-600/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                    Best Rated
+                  </div>
+                  <WishlistButton
+                    type="institute"
+                    id={institute._id}
+                    className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110"
+                    size={4}
+                  />
                 </div>
-              </div>
 
               <div>
                 <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md antialiased leading-tight">
