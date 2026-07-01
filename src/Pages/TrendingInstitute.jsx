@@ -153,6 +153,12 @@ const TrendingInstitute = () => {
                 className="box shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
                 <div className="imageContainer h-48 overflow-hidden relative">
+                  {institute.admissionOpen && (
+                    <div className="absolute top-3 left-3 z-10 bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 animate-pulse">
+                      <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                      Admission Open
+                    </div>
+                  )}
                   <SafeImage
                     className="h-full w-full object-cover"
                     src={

@@ -118,6 +118,12 @@ const TrendingInstitute = () => {
                 className="box lg:max-w-[500px] max-lg:max-w-[340px] max-md:max-w-full shadow-lg"
               >
                 <div className="imageContainer relative">
+                  {institute.admissionOpen && (
+                    <div className="absolute top-2 left-2 z-10 bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 animate-pulse">
+                      <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                      Admission Open
+                    </div>
+                  )}
                   <img
                     className="h-full w-full object-cover"
                     src={

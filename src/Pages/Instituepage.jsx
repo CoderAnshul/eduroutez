@@ -247,6 +247,7 @@ const Instituepage = () => {
         logo: d.instituteLogo ? `${BASE_IMG}/uploads/${d.instituteLogo}` : null,
         thumbnailImage: d.thumbnailImage ? `${BASE_IMG}/uploads/${d.thumbnailImage}` : null,
         organisationType: d.organisationType,
+        admissionOpen: d.admissionOpen || false,
         viewedAt: Date.now(),
       };
       const raw = localStorage.getItem("recentlyViewed") || "[]";

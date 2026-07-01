@@ -157,6 +157,12 @@ const InstituteCard = ({ institute }) => {
         <div className="flex items-center gap-2">
           <TierBadge tier={t} />
           <EligBadge eligible={institute._eligible} note={institute._eligibilityNote} />
+          {institute.admissionOpen && (
+            <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+              Admissions Open
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           {institute._match === "same_city" && <Navigation className="w-3 h-3 text-green-600" />}

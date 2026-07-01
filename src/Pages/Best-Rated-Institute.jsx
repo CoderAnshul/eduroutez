@@ -188,6 +188,12 @@ const BestRatedInstitute = () => {
                     <div className="absolute top-3 right-3 z-10">
                       <WishlistButton type="institute" id={institute._id} className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110" size={4} />
                     </div>
+                    {institute.admissionOpen && (
+                      <div className="absolute top-3 left-3 z-10 bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 animate-pulse">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                        Admission Open
+                      </div>
+                    )}
                   </div>
 
                   {/* Institute Details */}

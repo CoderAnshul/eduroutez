@@ -181,6 +181,12 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
         <div className="flex justify-between flex-col md:flex-row gap-3">
         {/* Make image clickable */}
         <div className="relative w-full md:w-2/6 !ml-0 block">
+          {institute.admissionOpen && (
+            <div className="absolute top-2 left-2 z-20 bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 animate-pulse">
+              <span className="w-1.5 h-1.5 bg-white rounded-full" />
+              Admission Open
+            </div>
+          )}
           <Link to={instituteUrl} className="group block">
             <SafeImage
               src={

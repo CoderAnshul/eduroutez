@@ -80,9 +80,14 @@ const RecentlyViewed = ({ compact }) => {
                   )}
                 </div>
                 <div className="min-w-0 flex-1 relative z-10">
-                  <p className="text-[13px] font-bold text-gray-800 truncate group-hover:text-red-500 transition-colors">
-                    {inst.instituteName}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-[13px] font-bold text-gray-800 truncate group-hover:text-red-500 transition-colors">
+                      {inst.instituteName}
+                    </p>
+                    {inst.admissionOpen && (
+                      <span className="shrink-0 text-[8px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full leading-none">Open</span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 mt-1">
                     {inst.city && (
                       <span className="text-[11px] font-medium text-gray-500 truncate flex items-center gap-1">
@@ -161,6 +166,12 @@ const RecentlyViewed = ({ compact }) => {
                       </div>
 
                       <div className="flex-1 min-w-0 pt-0.5">
+                        {inst.admissionOpen && (
+                          <span className="inline-flex items-center gap-1 text-[8px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full mb-1">
+                            <span className="w-1 h-1 bg-green-500 rounded-full" />
+                            Admissions Open
+                          </span>
+                        )}
                         <p className="text-[13px] font-bold text-gray-800 line-clamp-2 leading-snug group-hover:text-red-500 transition-colors">
                           {inst.instituteName}
                         </p>

@@ -242,8 +242,16 @@ const BestRated = React.memo(() => {
 
               <div className="absolute inset-0 p-6 flex flex-col justify-between">
                 <div className="flex justify-between items-start">
-                  <div className="bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                    Best Rated
+                  <div className="flex items-center gap-2">
+                    <div className="bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                      Best Rated
+                    </div>
+                    {institute.admissionOpen && (
+                      <div className="bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 animate-pulse">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                        Admission Open
+                      </div>
+                    )}
                   </div>
                   <WishlistButton
                     type="institute"

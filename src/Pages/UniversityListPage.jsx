@@ -95,18 +95,24 @@ const UniversityListPage = () => {
                 aria-label={university.instituteName || university.name}
               >
                 {/* University Image */}
-                <div className="h-56 overflow-hidden relative">
-                  <SafeImage
-                    src={university.thumbnailImage ? `${Images}/${university.thumbnailImage}` : "/fallback-institute.jpg"}
-                    alt={university.instituteName || university.name}
-                    title={university.instituteName || university.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-3 right-3 z-10">
-                    <WishlistButton type="institute" id={university._id} className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110" size={4} />
+                  <div className="h-56 overflow-hidden relative">
+                    <SafeImage
+                      src={university.thumbnailImage ? `${Images}/${university.thumbnailImage}` : "/fallback-institute.jpg"}
+                      alt={university.instituteName || university.name}
+                      title={university.instituteName || university.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-3 right-3 z-10">
+                      <WishlistButton type="institute" id={university._id} className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110" size={4} />
+                    </div>
+                    {university.admissionOpen && (
+                      <div className="absolute top-3 left-3 z-10 bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 animate-pulse">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                        Admission Open
+                      </div>
+                    )}
                   </div>
-                </div>
 
                 {/* University Details */}
                 <div className="!p-6">
