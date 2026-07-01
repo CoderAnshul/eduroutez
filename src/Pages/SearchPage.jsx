@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { useSearchParams, useLocation } from "react-router-dom";
 import Promotions from "./CoursePromotions";
 import ConsellingBanner from "../Components/ConsellingBanner";
+import { Helmet } from "react-helmet-async";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -918,6 +919,15 @@ const SearchPage = () => {
 
   return (
     <>
+      {/* SEO */}
+      <Helmet>
+        <title>Top Colleges, Universities & Courses in India 2025 | Eduroutez</title>
+        <meta name="description"
+          content="Search and compare colleges, universities, courses, fees, admissions, placements and rankings across India on Eduroutez." />
+
+        <link rel="canonical" href="https://eduroutez.com/searchpage/" />
+      </Helmet>
+
       <Promotions location="SEARCH_PAGE" className="!h-fit"></Promotions>
       {/* <Promotions location="SEARCH_PAGE" className="!h-[320px]"></Promotions> */}
 
@@ -1080,7 +1090,7 @@ const SearchPage = () => {
       <div className="flex gap-2 flex-col sm:flex-row items-center">
         {/* <Events /> */}
 
-         {/* <ConsellingBanner /> */}
+        {/* <ConsellingBanner /> */}
       </div>
     </>
   );

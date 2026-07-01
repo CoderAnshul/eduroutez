@@ -89,82 +89,101 @@ export default function NewsPage() {
   }
 
   return (
-    <div className="universal-container py-8">
-      <div className="mb-8 space-y-4">
-        <h1 className="text-3xl font-bold">Latest News</h1>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search news..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 focus:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500/50"
-            />
-          </div>
-          <select
-            value={sortOrder}
-            onChange={handleSortChange}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500/50"
-          >
-            <option value="latest">Latest First</option>
-            <option value="oldest">Oldest First</option>
-          </select>
-        </div>
-      </div>
+    <>
+      {/* SEO */}
+      <Helmet>
+        <title>
+          Latest Education News | Eduroutez
+        </title>
 
-      {filteredAndSortedNews.length === 0 ? (
-        <div className="text-center text-gray-500">
-          {searchQuery
-            ? "No results found for your search."
-            : "No news articles available."}
+        <meta
+          name="description"
+          content="Latest college news, admission updates, placements, scholarships, and exam notifications."
+        />
+
+        <link
+          rel="canonical"
+          href="https://eduroutez.com/news"
+        />
+      </Helmet>
+
+      <div className="universal-container py-8">
+        <div className="mb-8 space-y-4">
+          <h1 className="text-3xl font-bold">Latest News</h1>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search news..."
+                value={searchQuery}
+                onChange={handleSearch}
+                className="w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 focus:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500/50"
+              />
+            </div>
+            <select
+              value={sortOrder}
+              onChange={handleSortChange}
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500/50"
+            >
+              <option value="latest">Latest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
+          </div>
         </div>
-      ) : (
-        <>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {currentNews.map((news, index) => (
-              <div
-                key={news.id || index}
-                className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
-              >
-                {news.image && (
-                  <SafeImage
-                    src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${news.image}`}
-                    alt={news.title}
-                    title={news.title}
-                    className="h-48 w-full object-cover"
-                  />
-                )}
-                <div className="p-4">
-                  <h2 className="mb-2 line-clamp-2 text-xl font-semibold text-gray-800">
-                    {news.title}
-                  </h2>
-                  <p className="line-clamp-3 text-gray-600">
-                    {news.description}
-                  </p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
-                      {new Date(news.createdAt).toLocaleDateString()}
-                    </span>
-                    {news.category && (
-                      <span className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-600">
-                        {news.category}
+
+        {filteredAndSortedNews.length === 0 ? (
+          <div className="text-center text-gray-500">
+            {searchQuery
+              ? "No results found for your search."
+              : "No news articles available."}
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {currentNews.map((news, index) => (
+                <div
+                  key={news.id || index}
+                  className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+                >
+                  {news.image && (
+                    <SafeImage
+                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${news.image}`}
+                      alt={news.title}
+                      title={news.title}
+                      className="h-48 w-full object-cover"
+                    />
+                  )}
+                  <div className="p-4">
+                    <h2 className="mb-2 line-clamp-2 text-xl font-semibold text-gray-800">
+                      {news.title}
+                    </h2>
+                    <p className="line-clamp-3 text-gray-600">
+                      {news.description}
+                    </p>
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-sm text-gray-500">
+                        {new Date(news.createdAt).toLocaleDateString()}
                       </span>
-                    )}
+                      {news.category && (
+                        <span className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-600">
+                          {news.category}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          <Pagination 
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={(newPage) => setPage(newPage)}
-          />
-        </>
-      )}
-    </div>
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={(newPage) => setPage(newPage)}
+            />
+          </>
+        )}
+      </div>
+    </>
   );
 }

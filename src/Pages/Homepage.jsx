@@ -18,6 +18,7 @@ import ConsellingBanner from '../Components/ConsellingBanner'
 import Promotions from './CoursePromotions'
 import TrendingCourses from '../Components/TrendingCourses'
 import BecomeCounselorBanner from '../Components/BecomeCounselorBanner'
+import { Helmet } from 'react-helmet-async'
 
 const Homepage = () => {
 
@@ -39,6 +40,19 @@ const Homepage = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Find Top Colleges, Universities & Courses in India | Eduroutez</title>
+        <meta
+          name="description"
+          content="Search and compare colleges, universities, courses, entrance exams, and career counselors across India. Apply online with Eduroutez."
+        />
+        <meta
+          name="keywords"
+          content="top colleges in India, universities in India, courses after 12th, engineering colleges, MBA colleges, admission 2026, career counseling, college search, education portal, Eduroutez"
+        />
+        <link rel="iconion" href="https://eduroutez.com/" />
+      </Helmet>
+
       <Banner />
 
       {/* <div className="universal-container flex flex-col items-center">
@@ -73,7 +87,7 @@ const Homepage = () => {
       <div className="flex gap-2 flex-col lg:flex-row items-center">
         {/* <Events /> */}
 
-        {/*  {/* <ConsellingBanner /> */} 
+        {/*  {/* <ConsellingBanner /> */}
       </div>
     </>
   )

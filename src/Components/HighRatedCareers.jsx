@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useQuery } from "react-query";
 import { career } from "../ApiFunctions/api";
 import cardPhoto from "../assets/Images/teacher.jpg";
 import SocialShare from "./SocialShare";
-import { Sparkles, ArrowRight, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sparkles, ArrowRight, Eye } from "lucide-react";
 
 // Clean HTML content
 const stripHtml = (html) => {
@@ -15,116 +15,7 @@ const stripHtml = (html) => {
   return temp.textContent || temp.innerText || "";
 };
 
-const HighRatedCareers = ({ title = "High Rated Careers", streamId, categoryId }) => {
-  const scrollRef = useRef(null);
-
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    let intervalId;
-    const startInterval = () => {
-      intervalId = setInterval(() => {
-        if (window.innerWidth >= 768) return;
-        const children = Array.from(container.children).filter(
-          (child) => !child.classList.contains("nav-btn")
-        );
-        if (children.length <= 1) return;
-
-        const containerWidth = container.clientWidth;
-        const scrollLeft = container.scrollLeft;
-
-        let currentIdx = 0;
-        let minDiff = Infinity;
-        children.forEach((child, idx) => {
-          const childCenter = child.offsetLeft + child.clientWidth / 2;
-          const containerCenter = scrollLeft + containerWidth / 2;
-          const diff = Math.abs(childCenter - containerCenter);
-          if (diff < minDiff) {
-            minDiff = diff;
-            currentIdx = idx;
-          }
-        });
-
-        let nextIdx = (currentIdx + 1) % children.length;
-        const nextChild = children[nextIdx];
-        if (nextChild) {
-          container.scrollTo({
-            left: nextChild.offsetLeft - (containerWidth - nextChild.clientWidth) / 2,
-            behavior: "smooth",
-          });
-        }
-      }, 4000);
-    };
-
-    startInterval();
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const handlePrev = () => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const containerWidth = container.clientWidth;
-    const children = Array.from(container.children).filter(
-      (child) => !child.classList.contains("nav-btn")
-    );
-    if (children.length <= 1) return;
-
-    const scrollLeft = container.scrollLeft;
-    let currentIdx = 0;
-    let minDiff = Infinity;
-    children.forEach((child, idx) => {
-      const childCenter = child.offsetLeft + child.clientWidth / 2;
-      const containerCenter = scrollLeft + containerWidth / 2;
-      const diff = Math.abs(childCenter - containerCenter);
-      if (diff < minDiff) {
-        minDiff = diff;
-        currentIdx = idx;
-      }
-    });
-
-    let prevIdx = (currentIdx - 1 + children.length) % children.length;
-    const prevChild = children[prevIdx];
-    if (prevChild) {
-      container.scrollTo({
-        left: prevChild.offsetLeft - (containerWidth - prevChild.clientWidth) / 2,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const handleNext = () => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const containerWidth = container.clientWidth;
-    const children = Array.from(container.children).filter(
-      (child) => !child.classList.contains("nav-btn")
-    );
-    if (children.length <= 1) return;
-
-    const scrollLeft = container.scrollLeft;
-    let currentIdx = 0;
-    let minDiff = Infinity;
-    children.forEach((child, idx) => {
-      const childCenter = child.offsetLeft + child.clientWidth / 2;
-      const containerCenter = scrollLeft + containerWidth / 2;
-      const diff = Math.abs(childCenter - containerCenter);
-      if (diff < minDiff) {
-        minDiff = diff;
-        currentIdx = idx;
-      }
-    });
-
-    let nextIdx = (currentIdx + 1) % children.length;
-    const nextChild = children[nextIdx];
-    if (nextChild) {
-      container.scrollTo({
-        left: nextChild.offsetLeft - (containerWidth - nextChild.clientWidth) / 2,
-        behavior: "smooth",
-      });
-    }
-  };
-
+const HighRatedCareers = ({ title = "High Rating Careers", streamId, categoryId }) => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
 
@@ -234,115 +125,86 @@ const HighRatedCareers = ({ title = "High Rated Careers", streamId, categoryId }
         </Link>
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      `}} />
-      <div className="relative w-full">
-        {/* Left Navigation Button */}
-        <button
-          onClick={handlePrev}
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="w-5 h-5 text-gray-700" />
-        </button>
-
-        <div 
-          ref={scrollRef}
-          className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {memoizedContent && memoizedContent.length > 0 ? (
-            memoizedContent.map((box, index) => (
-              <Link
-                to={`/detailpage/${box.slug}`}
-                key={box._id || index}
-                className="group bg-white text-black shadow-md rounded-xl overflow-hidden h-full flex flex-col transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 w-[85vw] sm:w-[320px] md:w-auto flex-shrink-0 snap-center"
-              >
-                {/* Image with Overlay */}
-                <div className="relative h-48 overflow-hidden flex-shrink-0">
-                  <img
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    src={images[box._id] || cardPhoto}
-                    alt={box?.title || "Career"}
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-                  
-                  <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                    <div className="flex justify-between items-start">
-                      <div className="bg-white/20 backdrop-blur-md text-white border border-white/30 text-[10px] font-medium px-2 py-1 rounded shadow-sm">
-                        Career
-                      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {memoizedContent && memoizedContent.length > 0 ? (
+          memoizedContent.map((box, index) => (
+            <Link
+              to={`/detailpage/${box.slug}`}
+              key={box._id || index}
+              className="group bg-white text-black shadow-md rounded-xl overflow-hidden h-full flex flex-col transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            >
+              {/* Image with Overlay */}
+              <div className="relative h-48 overflow-hidden flex-shrink-0">
+                <img
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  src={images[box._id] || cardPhoto}
+                  alt={box?.title || "Career"}
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+                
+                <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                  <div className="flex justify-between items-start">
+                    <div className="bg-white/20 backdrop-blur-md text-white border border-white/30 text-[10px] font-medium px-2 py-1 rounded shadow-sm">
+                      Career
                     </div>
+                  </div>
 
-                    <div>
-                      <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md antialiased leading-tight mb-2">
-                        {box?.title || "Untitled"}
-                      </h3>
-                    </div>
+                  <div>
+                    <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md antialiased leading-tight mb-2">
+                      {box?.title || "Untitled"}
+                    </h3>
                   </div>
                 </div>
+              </div>
 
-                {/* Content */}
-                <div className="p-6 flex-1 flex flex-col">
-                  <div className="space-y-4 px-2 pt-1 flex-1">
-                    <div 
-                      className="text-gray-700 text-sm line-clamp-3 h-18"
-                      dangerouslySetInnerHTML={{
-                        __html: stripHtml(box?.description || "No description available")
-                      }}
-                    ></div>
+              {/* Content */}
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="space-y-4 px-2 pt-1 flex-1">
+                  <div 
+                    className="text-gray-700 text-sm line-clamp-3 h-18"
+                    dangerouslySetInnerHTML={{
+                      __html: stripHtml(box?.description || "No description available")
+                    }}
+                  ></div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-auto">
-                      <div className="flex items-center gap-2 text-gray-500 text-xs">
-                        <Eye size={14} className="text-gray-400" />
-                        <span>{box.views || 0} views</span>
-                      </div>
-
-                      <div 
-                        className="transition-transform hover:scale-110"
-                        onClick={(e) => handleShareClick(e, box)}
-                      >
-                        <SocialShare
-                          title={box.title}
-                          url={`${window.location.origin}/detailpage/${box.slug}`}
-                          contentType="career"
-                        />
-                      </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-auto">
+                    <div className="flex items-center gap-2 text-gray-500 text-xs">
+                      <Eye size={14} className="text-gray-400" />
+                      <span>{box.views || 0} views</span>
                     </div>
-                  </div>
 
-                  {/* Pin Action Button to Bottom */}
-                  <div className="mt-6">
-                    <div className="w-full bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-center font-medium text-sm flex items-center justify-center group-hover:bg-[#b82025] group-hover:text-white transition-all duration-300">
-                      <span>View Career</span>
-                      <ArrowRight
-                        size={16}
-                        className="ml-2 transition-transform group-hover:translate-x-1"
+                    <div 
+                      className="transition-transform hover:scale-110"
+                      onClick={(e) => handleShareClick(e, box)}
+                    >
+                      <SocialShare
+                        title={box.title}
+                        url={`${window.location.origin}/detailpage/${box.slug}`}
+                        contentType="career"
                       />
                     </div>
                   </div>
                 </div>
-              </Link>
-            ))
-          ) : (
-            <div className="w-full text-center">
-              No careers available at the moment.
-            </div>
-          )}
-        </div>
 
-        {/* Right Navigation Button */}
-        <button
-          onClick={handleNext}
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-5 h-5 text-gray-700" />
-        </button>
+                {/* Pin Action Button to Bottom */}
+                <div className="mt-6">
+                  <div className="w-full bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-center font-medium text-sm flex items-center justify-center group-hover:bg-[#b82025] group-hover:text-white transition-all duration-300">
+                    <span>View Career</span>
+                    <ArrowRight
+                      size={16}
+                      className="ml-2 transition-transform group-hover:translate-x-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))
+        ) : (
+          <div className="w-full text-center">
+            No careers available at the moment.
+          </div>
+        )}
       </div>
     </div>
   );
