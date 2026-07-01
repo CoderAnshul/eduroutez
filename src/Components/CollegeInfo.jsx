@@ -3,6 +3,8 @@ import ExpandedBox from '../Ui components/ExpandedBox'
 
 const CollegeInfo = ({instituteData}) => {
 
+    const specs = instituteData?.data?.specialization || [];
+
     const contentData = [
         {
           title: "Introduction",
@@ -35,6 +37,18 @@ const CollegeInfo = ({instituteData}) => {
   return (
     <div className='min-h-28 w-full flex flex-col justify-between bg-white shadow-[0px_0px_10px_rgba(0,0,0,0.2)] rounded-xl mb-5 p-2 '>
         <ExpandedBox contentData={contentData} instituteData={instituteData}/>
+        {specs.length > 0 && (
+            <div className="px-4 pb-4">
+                <h3 className="text-lg font-bold mb-3">Specializations</h3>
+                <div className="flex flex-wrap gap-2">
+                    {specs.map((s, i) => (
+                        <span key={i} className="px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-full text-xs sm:text-sm font-medium break-all sm:break-words whitespace-normal max-w-full">
+                            {s}
+                        </span>
+                    ))}
+                </div>
+            </div>
+        )}
     </div>
   )
 }

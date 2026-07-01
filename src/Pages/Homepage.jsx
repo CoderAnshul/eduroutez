@@ -17,6 +17,7 @@ import { useParams } from 'react-router-dom'
 import ConsellingBanner from '../Components/ConsellingBanner'
 import Promotions from './CoursePromotions'
 import TrendingCourses from '../Components/TrendingCourses'
+import CourseRanking from '../Components/CourseRanking'
 import BecomeCounselorBanner from '../Components/BecomeCounselorBanner'
 
 const Homepage = () => {
@@ -56,6 +57,7 @@ const Homepage = () => {
       <div className="universal-container flex flex-col items-center">
         <TrendingCourses />
       </div>
+      <CourseRanking />
       <PopularCategories />
       <div className='universal-container flex flex-col items-center' >
         <BestRated />

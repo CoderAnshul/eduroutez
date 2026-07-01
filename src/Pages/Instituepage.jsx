@@ -342,13 +342,6 @@ const Instituepage = () => {
                 </div>
               )}
 
-              {/* Courses */}
-              {tabs.includes("Courses") && (
-                <div ref={sectionRefs[getTabIndex("Courses")]} className="min-h-24 py-4">
-                  <InstituteCourses instituteData={instituteData} />
-                </div>
-              )}
-
               {/* Exams Accepted */}
               {instituteData?.data?.examAccepted && (
                 <div className="px-4 py-5 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
@@ -386,6 +379,13 @@ const Instituepage = () => {
               {tabs.includes("Admissions") && (
                 <div ref={sectionRefs[getTabIndex("Admissions")]} className="min-h-24 py-4">
                   <Addmissioninfo instituteData={instituteData} />
+                </div>
+              )}
+
+              {/* Courses */}
+              {tabs.includes("Courses") && (
+                <div ref={sectionRefs[getTabIndex("Courses")]} className="min-h-24 py-4">
+                  <InstituteCourses instituteData={instituteData} />
                 </div>
               )}
 
