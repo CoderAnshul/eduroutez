@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -8,12 +8,30 @@ const AuthForm = ({ initialTab = 'login', onClose, setAuthTab }) => {
   const [loading, setLoading] = useState(false);
   const [showCounsellorPayPopup, setShowCounsellorPayPopup] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({ name: '', email: '', phoneNo: '', role: 'student', password: '' });
+  const [signupData, setSignupData] = useState({ name: '', email: '', phoneNo: '', role: 'student', password: '', category: '' });
+  const [streams, setStreams] = useState([]);
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_BASE_URL;
 
   const handleLoginChange = (e) => setLoginData({ ...loginData, [e.target.id]: e.target.value });
   const handleSignupChange = (e) => setSignupData({ ...signupData, [e.target.id]: e.target.value });
+
+  useEffect(() => {
+    if (signupData.role === 'counsellor') {
+      const fetchStreams = async () => {
+        try {
+          const res = await axios.get(`${apiUrl}/streams?limit=100&sort={"createdAt":"asc"}`);
+          setStreams(res.data?.data?.result || []);
+        } catch (err) {
+          console.error("Failed to fetch streams:", err);
+        }
+      };
+      fetchStreams();
+    } else {
+      setStreams([]);
+      setSignupData(prev => ({ ...prev, category: '' }));
+    }
+  }, [signupData.role]);
 
   const openOAuth = (provider) => {
     try {
@@ -85,6 +103,7 @@ const AuthForm = ({ initialTab = 'login', onClose, setAuthTab }) => {
         phoneNo: signupData.phoneNo,
         role: signupData.role,
         password: signupData.password,
+        ...(signupData.role === 'counsellor' && { category: signupData.category }),
       };
       const res = await axios.post(`${apiUrl}/signup`, payload);
       const data = res.data;
@@ -153,6 +172,20 @@ const AuthForm = ({ initialTab = 'login', onClose, setAuthTab }) => {
                 <option value="college">College</option>
               </select>
             </div>
+
+            {signupData.role === 'counsellor' && (
+              <div className="flex gap-2 items-center">
+                <label className="text-sm w-32">Stream</label>
+                <select id="category" value={signupData.category} onChange={handleSignupChange} className="flex-1 px-3 py-2 border rounded" required>
+                  <option value="">Select stream</option>
+                  {streams.map((stream) => (
+                    <option key={stream.id || stream._id} value={stream.name}>
+                      {stream.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="flex gap-2">
               <button type="submit" disabled={loading} className="flex-1 bg-red-600 text-white px-4 py-2 rounded">{loading ? 'Signing...' : 'Sign up'}</button>

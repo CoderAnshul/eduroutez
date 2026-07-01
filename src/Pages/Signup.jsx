@@ -33,6 +33,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [streams, setStreams] = useState([]);
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,6 +77,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     confirmPassword: "",
     referralCode: "",
     role: "",
+    category: "",
     // Store the name values separately for display purposes
     countryName: "",
     stateName: "",
@@ -181,6 +183,25 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       fetchCities();
     }
   }, [formData.state, formData.country, countries, states, apiUrl]);
+
+  useEffect(() => {
+    if (formData.role === "counsellor") {
+      const fetchStreams = async () => {
+        try {
+          const res = await axiosInstance.get(`${apiUrl}/streams?limit=100&sort={"createdAt":"asc"}`);
+          setStreams(res.data?.data?.result || []);
+        } catch (err) {
+          console.error("Failed to fetch streams:", err);
+        }
+      };
+      fetchStreams();
+    } else {
+      setStreams([]);
+      if (formData.category) {
+        setFormData(prev => ({ ...prev, category: "" }));
+      }
+    }
+  }, [formData.role]);
 
   useEffect(() => {
     if (showOtpDialog) {
@@ -463,6 +484,10 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       toast.error("Please fill all required fields");
       return false;
     }
+    if (formData.role === "counsellor" && !formData.category) {
+      toast.error("Please select a stream");
+      return false;
+    }
     return true;
   };
 
@@ -702,6 +727,29 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
               required
             />
           </div>
+
+          {/* Stream Selection for Counsellor */}
+          {formData.role === "counsellor" && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1" htmlFor="category">
+                Stream *
+              </label>
+              <select
+                id="category"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                value={formData.category}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select your stream</option>
+                {streams.map((stream) => (
+                  <option key={stream.id || stream._id} value={stream.name}>
+                    {stream.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Location Selection */}
           {isMode !== "popup" && (
