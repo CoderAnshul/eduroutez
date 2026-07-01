@@ -257,10 +257,10 @@ const Navbar = () => {
         <div className="universal-max-width h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button onClick={toggleMenu} className="lg:hidden">
-              <img className="h-6" src={menubar} alt="open menu" />
+              <img className="h-6" src={menubar} alt="Open navigation menu" />
             </button>
             <Link to="/">
-              <img className="h-8 md:h-10" src={logo} alt="mainLogo" />
+              <img className="h-8 md:h-10" src={logo} alt="Eduroutez Logo" />
             </Link>
           </div>
 

@@ -142,7 +142,7 @@ const TrendingInstitute = () => {
                   </h3>
 
                   <p className="text-sm mt-2">
-                    {institute.about ? (
+                    {institute.about && institute.about !== "0" && institute.about !== 0 ? (
                       <span
                         dangerouslySetInnerHTML={{
                           __html: institute.about.slice(0, 100) + "...",

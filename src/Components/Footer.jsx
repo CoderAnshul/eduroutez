@@ -172,9 +172,9 @@ const Footer = () => {
           {/* Logo and Social Media */}
           <div>
             <Link to="/">
-              <img className="h-8 md:h-10" src={logo} alt="mainLogo" />
+              <img className="h-8 md:h-10 mb-3" src={logo} alt="mainLogo" />
             </Link>
-            <div className="mt-3">
+            {/* <div className="mt-3">
               <div className="flex items-start">
                 <div className="transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
                   <svg
@@ -195,7 +195,7 @@ const Footer = () => {
                   McDonaldʼs, Naupada, Thane West, Thane, Maharashtra 400602
                 </span>
               </div>
-            </div>
+            </div> */}
 
             <a
               href="tel:+919594941234"
@@ -205,11 +205,11 @@ const Footer = () => {
               <span>(+91) 9594941234</span>
             </a>
             <a
-              href="mailto:contact@eduroutez.com"
+              href="mailto:contact@eduroutez.in"
               className="text-sm mt-1 text-wrap flex items-center hover:text-red-400 text-white transition-colors group"
             >
               <Mail size={16} className="mr-2 text-red-500 group-hover:text-red-400 transition-colors" />
-              <span>contact@eduroutez.com</span>
+              <span>contact@eduroutez.in</span>
             </a>
 
             <div className="flex gap-4 mt-6">

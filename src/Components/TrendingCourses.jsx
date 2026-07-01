@@ -10,6 +10,8 @@ import {
   BookOpen,
   ArrowRight,
   ThumbsUp,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import WishlistButton from "./WishlistButton";
 
@@ -29,6 +31,115 @@ const fetchTrendingCourses = async () => {
 };
 
 const TrendingCourses = () => {
+  const scrollRef = React.useRef(null);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let intervalId;
+    const startInterval = () => {
+      intervalId = setInterval(() => {
+        if (window.innerWidth >= 768) return;
+        const children = Array.from(container.children).filter(
+          (child) => !child.classList.contains("nav-btn")
+        );
+        if (children.length <= 1) return;
+
+        const containerWidth = container.clientWidth;
+        const scrollLeft = container.scrollLeft;
+
+        let currentIdx = 0;
+        let minDiff = Infinity;
+        children.forEach((child, idx) => {
+          const childCenter = child.offsetLeft + child.clientWidth / 2;
+          const containerCenter = scrollLeft + containerWidth / 2;
+          const diff = Math.abs(childCenter - containerCenter);
+          if (diff < minDiff) {
+            minDiff = diff;
+            currentIdx = idx;
+          }
+        });
+
+        let nextIdx = (currentIdx + 1) % children.length;
+        const nextChild = children[nextIdx];
+        if (nextChild) {
+          container.scrollTo({
+            left: nextChild.offsetLeft - (containerWidth - nextChild.clientWidth) / 2,
+            behavior: "smooth",
+          });
+        }
+      }, 4000);
+    };
+
+    startInterval();
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const handlePrev = () => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const containerWidth = container.clientWidth;
+    const children = Array.from(container.children).filter(
+      (child) => !child.classList.contains("nav-btn")
+    );
+    if (children.length <= 1) return;
+
+    const scrollLeft = container.scrollLeft;
+    let currentIdx = 0;
+    let minDiff = Infinity;
+    children.forEach((child, idx) => {
+      const childCenter = child.offsetLeft + child.clientWidth / 2;
+      const containerCenter = scrollLeft + containerWidth / 2;
+      const diff = Math.abs(childCenter - containerCenter);
+      if (diff < minDiff) {
+        minDiff = diff;
+        currentIdx = idx;
+      }
+    });
+
+    let prevIdx = (currentIdx - 1 + children.length) % children.length;
+    const prevChild = children[prevIdx];
+    if (prevChild) {
+      container.scrollTo({
+        left: prevChild.offsetLeft - (containerWidth - prevChild.clientWidth) / 2,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleNext = () => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const containerWidth = container.clientWidth;
+    const children = Array.from(container.children).filter(
+      (child) => !child.classList.contains("nav-btn")
+    );
+    if (children.length <= 1) return;
+
+    const scrollLeft = container.scrollLeft;
+    let currentIdx = 0;
+    let minDiff = Infinity;
+    children.forEach((child, idx) => {
+      const childCenter = child.offsetLeft + child.clientWidth / 2;
+      const containerCenter = scrollLeft + containerWidth / 2;
+      const diff = Math.abs(childCenter - containerCenter);
+      if (diff < minDiff) {
+        minDiff = diff;
+        currentIdx = idx;
+      }
+    });
+
+    let nextIdx = (currentIdx + 1) % children.length;
+    const nextChild = children[nextIdx];
+    if (nextChild) {
+      container.scrollTo({
+        left: nextChild.offsetLeft - (containerWidth - nextChild.clientWidth) / 2,
+        behavior: "smooth",
+      });
+    }
+  };
+
   const [courseIdMap, setCourseIdMap] = useState({});
 
   // Initialize courseIdMap from localStorage
@@ -198,7 +309,7 @@ const TrendingCourses = () => {
           <TrendingUp className="text-gray-700 w-6 h-6 hidden sm:block" />
           <h2 className="text-2xl font-bold text-red-600 text-center sm:text-left">Trending Courses</h2>
         </div>
-        <Link to="/trendingCourses">
+        <Link to="/trending-courses">
           <button className="bg-[#b82025] text-white px-6 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-700 transition-all shadow-md font-semibold transform hover:scale-105 active:scale-95 text-sm">
             <span className="whitespace-nowrap">View All</span>
             <ArrowRight size={18} />
@@ -207,131 +318,143 @@ const TrendingCourses = () => {
       </div>
 
       {trendingCourses.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {trendingCourses.map((course) => {
-            const levelBadge = getLevelBadge(course.courseLevel);
-            const slug =
-              course.slug ||
-              course.courseTitle
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/(^-|-$)/g, "");
+        <>
+          <style dangerouslySetInnerHTML={{
+            __html: `
+            .no-scrollbar::-webkit-scrollbar {
+              display: none;
+            }
+          `}} />
+          <div className="relative w-full">
+            {/* Left Navigation Button */}
+            <button
+              onClick={handlePrev}
+              className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-700" />
+            </button>
 
-            return (
-              <Link
-                key={course._id}
-                to={`/coursesinfopage/${slug}`}
-                className="group"
-              >
-                <div className="bg-white rounded-xl shadow-md overflow-hidden h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                  <div className="relative h-48 overflow-hidden">
-                    <SafeImage
-                      src={
-                        course.coursePreviewThumbnail
-                          ? `${Images}/${course.coursePreviewThumbnail}`
-                          : "/api/placeholder/400/240"
-                      }
-                      alt={course.courseTitle}
-                      title=""
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+            <div
+              ref={scrollRef}
+              className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {trendingCourses.map((course) => {
+                const levelBadge = getLevelBadge(course.courseLevel);
+                const slug =
+                  course.slug ||
+                  course.courseTitle
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/(^-|-$)/g, "");
 
-                    <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                      <div className="flex justify-between items-start">
-                        <div
-                          className={`${levelBadge.color} text-xs font-semibold px-3 py-1 rounded-full`}
-                        >
-                          {levelBadge.label}
-                        </div>
-                        <WishlistButton
-                          type="course"
-                          id={course._id}
-                          className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110"
-                          size={4}
+                return (
+                  <Link
+                    key={course._id}
+                    to={`/coursesinfopage/${slug}`}
+                    className="group w-[85vw] sm:w-[320px] md:w-auto flex-shrink-0 snap-center"
+                  >
+                    <div className="bg-white rounded-xl shadow-md overflow-hidden h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                      <div className="relative h-48 overflow-hidden">
+                        <SafeImage
+                          src={
+                            course.coursePreviewThumbnail
+                              ? `${Images}/${course.coursePreviewThumbnail}`
+                              : "/api/placeholder/400/240"
+                          }
+                          alt={course.courseTitle}
+                          title=""
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-                      </div>
+                        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
 
-                      <div>
-                        {/* <h3 className="text-white text-xl font-bold line-clamp-2 drop-shadow-md">
-                          {course.courseTitle}
-                        </h3> */}
-                        <div className="flex items-center mt-2 text-white text-opacity-90 text-sm drop-shadow-md">
-                          <Clock size={14} className="mr-1" />
+                        <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                          <div className="flex justify-between items-start">
+                            <div
+                              className={`${levelBadge.color} text-xs font-semibold px-3 py-1 rounded-full`}
+                            >
+                              {levelBadge.label}
+                            </div>
+                            <WishlistButton
+                              type="course"
+                              id={course._id}
+                              className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110"
+                              size={4}
+                            />
+                          </div>
 
-                          {course.courseDurationYears > 0
-                            ? `${course.courseDurationYears} Years`
-                            : ""}
+                          <div>
+                            <div className="flex items-center mt-2 text-white text-opacity-90 text-sm drop-shadow-md">
+                              <Clock size={14} className="mr-1" />
 
-                          {course.courseDurationMonths > 0
-                            ? `${course.courseDurationMonths} months`
-                            : ""}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                              {course.courseDurationYears > 0
+                                ? `${course.courseDurationYears} Years`
+                                : ""}
 
-                  {/* Course content */}
-                  {/* <div className="p-0"> */}
-                  <div className="p-6">
-                    <div className="space-y-4 px-2 pt-3">
-                      {/* Short description */}
-                      <div className="text-black line-clamp-3 h-18">
-                        {stripHtml(course.shortDescription || "")}
-                      </div>
-
-                      <div className="flex w-full justify-between gap-3 pt-2">
-                        <div className="flex items-center text-sm text-gray-500">
-                          {course.likes?.length > 0 && (
-                            <>
-                              <ThumbsUp
-                                size={16}
-                                className="mr-2 text-gray-500"
-                              />
-                              <span>{course.likes?.length}</span>
-                            </>
-                          )}
-                        </div>
-
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Users size={16} className="mr-2 text-gray-500" />
-                          <span>{course.views || 0} views</span>
+                              {course.courseDurationMonths > 0
+                                ? `${course.courseDurationMonths} months`
+                                : ""}
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Application dates if available */}
-                      {/* {course.applicationStartDate ? ( */}
-                      {/* //   <div className="border-t border-gray-100 pt-4 mt-4">
-                      //     <div className="text-xs text-gray-500 mb-1">Application period:</div>
-                      //     <div className="text-sm">
-                      //       <span className="font-medium">{formatDate(course.applicationStartDate)}</span>
-                      //       <span className="mx-2">-</span>
-                      //       <span className="font-medium">{formatDate(course.applicationEndDate)}</span>
-                      //     </div>
-                      //   </div>
-                      // ) : (
-                      //   <div className="border-t border-gray-100 pt-4 mt-4">
-                      //     {/* Empty space - no text */}
-                      {/* //     <div className="h-6"></div>
-                      //   </div> */}
-                    </div>
+                      {/* Course content */}
+                      <div className="p-6">
+                        <div className="space-y-4 px-2 pt-3">
+                          {/* Short description */}
+                          <div className="text-black line-clamp-3 h-18">
+                            {stripHtml(course.shortDescription || "")}
+                          </div>
 
-                    {/* Action button */}
-                    <div className="mt-6">
-                      <div className="w-full bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-center font-medium flex items-center justify-center group-hover:bg-[#b82025] group-hover:text-white transition-colors">
-                        <span>View Course</span>
-                        <ArrowRight
-                          size={16}
-                          className="ml-2 transition-transform group-hover:translate-x-1"
-                        />
+                          <div className="flex w-full justify-between gap-3 pt-2">
+                            <div className="flex items-center text-sm text-gray-500">
+                              {course.likes?.length > 0 && (
+                                <>
+                                  <ThumbsUp
+                                    size={16}
+                                    className="mr-2 text-gray-500"
+                                  />
+                                  <span>{course.likes?.length}</span>
+                                </>
+                              )}
+                            </div>
+
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Users size={16} className="mr-2 text-gray-500" />
+                              <span>{course.views || 0} views</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action button */}
+                        <div className="mt-6">
+                          <div className="w-full bg-gray-50 text-gray-700 py-2 px-4 rounded-lg text-center font-medium flex items-center justify-center group-hover:bg-[#b82025] group-hover:text-white transition-colors">
+                            <span>View Course</span>
+                            <ArrowRight
+                              size={16}
+                              className="ml-2 transition-transform group-hover:translate-x-1"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Right Navigation Button */}
+            <button
+              onClick={handleNext}
+              className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-700" />
+            </button>
+          </div>
+        </>
       ) : null}
     </div>
   );

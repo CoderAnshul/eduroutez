@@ -476,7 +476,7 @@ const StreamLevelPage = () => {
                       {institute.instituteName || "Institute Name Not Available"}
                     </h3>
                     <p className="text-gray-600 text-sm line-clamp-3">
-                      {institute.about ? (
+                      {institute.about && institute.about !== "0" && institute.about !== 0 ? (
                         <span
                           dangerouslySetInnerHTML={{
                             __html: institute.about.slice(0, 150) + "...",
@@ -486,7 +486,7 @@ const StreamLevelPage = () => {
                         "No information available"
                       )}
                     </p>
-                    {institute.overallRating && (
+                    {institute.overallRating > 0 && (
                       <div className="mt-4 flex items-center gap-2">
                         <span className="text-yellow-500 font-semibold">
                           ⭐ {institute.overallRating.toFixed(1)}
@@ -505,9 +505,9 @@ const StreamLevelPage = () => {
       )}
 
       <div className="w-full flex items-start mt-10">
-        {/* //<Events /> */}
+        {/* <Events /> */}
 
-        <ConsellingBanner />
+         {/* <ConsellingBanner /> */}
       </div>
     </>
   );

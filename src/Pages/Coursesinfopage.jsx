@@ -7,6 +7,7 @@ import { getCoursesById } from "../ApiFunctions/api";
 import axiosInstance from "../ApiFunctions/axios";
 import SocialShare from "../Components/SocialShare";
 import WishlistButton from "../Components/WishlistButton";
+import { Helmet } from "react-helmet-async";
 
 // Lazy loaded components
 const QueryForm = lazy(() => import("../Ui components/QueryForm"));
@@ -384,14 +385,40 @@ const Coursesinfopage = () => {
 
   return (
     <>
+      {/* SEO */}
+      <Helmet>
+        <title>
+          {`${content.courseTitle} Course Details 2025: Eligibility, Fees, Admission & Career Scope | Eduroutez`}
+        </title>
+
+        <meta
+          name="description"
+          content={
+            content.shortDescription ||
+            `${content.courseTitle} course details including eligibility, fees, admission process, syllabus, duration and career opportunities.`
+          }
+        />
+
+        <meta
+          name="keywords"
+          content={`${content.courseTitle}, admission, eligibility, fees, syllabus, career opportunities, ${content.category?.title || ""}`}
+        />
+
+        <link
+          rel="canonical"
+          href={`https://eduroutez.com/coursesinfopage/${slug}`}
+        />
+      </Helmet>
+
       <div className="universal-container py-6 bg-gray-50 flex flex-col items-start">
         {/* Course Title */}
         <div className="flex justify-between items-center w-full">
+          {/* <h1><CoursesName content={content.courseTitle || "Untitled Course"} /></h1> */}
           <CoursesName content={content.courseTitle || "Untitled Course"} />
           <div className="flex items-center gap-4">
             {/* Views Counter */}
             <div className="flex items-center gap-2 text-gray-600">
-              <svg
+              <svgD
                 xmlns="http://www.w3.org/2000/svg"
                 width="22"
                 height="22"
@@ -404,7 +431,7 @@ const Coursesinfopage = () => {
               >
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
-              </svg>
+              </svgD>
               <span className="font-medium">{content.views || 0}</span>
             </div>
 
@@ -638,12 +665,12 @@ const Coursesinfopage = () => {
 
       <div className="w-full flex items-start mt-10">
         <Suspense fallback={<LoadingComponent />}>
-          {/* //<Events /> */}
+          {/* <Events /> */}
 
         </Suspense>
 
         <Suspense fallback={<LoadingComponent />}>
-          <ConsellingBanner />
+          {/* <ConsellingBanner /> */}
         </Suspense>
       </div>
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://eduroutez.com/</loc>
+  </url>
+
+  <url>
+    <loc>https://eduroutez.com/login</loc>
+  </url>
+
+  <url>
+    <loc>https://eduroutez.com/signup</loc>
+  </url>
+
+  <url>
+    <loc>https://eduroutez.com/searchpage</loc>
+  </url>
+
+  <url>
+    <loc>https://eduroutez.com/university</loc>
+  </url>
+  
+  <url>
+    <loc>https://eduroutez.com/blogpage</loc>
+  </url>
+
+</urlset>

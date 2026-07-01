@@ -327,7 +327,7 @@ const SubNavbar = ({ categories }) => {
     );
   };
 
-  const handleViewAllCourses = () => { navigate("/popularcourses"); setHoveredCategory(null); };
+  const handleViewAllCourses = () => { navigate("/popular-courses"); setHoveredCategory(null); };
   const handleViewAllCareers = () => { navigate("/careerspage"); setHoveredCategory(null); };
   const handleViewAllColleges = () => { navigate("/topcolleges"); setHoveredCategory(null); };
   const handleAllCollegesByCity = () => { navigate(`/searchpage${activeStream ? `?stream=${encodeURIComponent(activeStream)}` : ""}`); setHoveredCategory(null); };

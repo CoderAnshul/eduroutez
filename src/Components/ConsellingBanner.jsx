@@ -5,14 +5,6 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import uparrow from "../assets/Images/uparrow.png";
-import banner from "../assets/Images/Counsellor Image_01.jpg";
-import banner2 from "../assets/Images/Counsellor Image_02.jpg";
-import banner3 from "../assets/Images/Counsellor Image_03.jpg";
-import banner4 from "../assets/Images/Counsellor Image_04.jpg";
-import banner5 from "../assets/Images/Counsellor Image_05.jpg";
-import banner6 from "../assets/Images/Counsellor Image_06.jpg";
-import banner7 from "../assets/Images/Counsellor Image_07.jpg";
-import banner8 from "../assets/Images/Counsellor Image_08.jpg";
 
 import "../assets/swipers/conseling.css";
 
@@ -21,17 +13,14 @@ const ConsellingBanner = React.memo(({ className = "" }) => {
     () => [
       {
         id: 1,
-        img: banner,
+        img: "/1.png",
         title: "Struggling with Career Choices? Get Expert Guidance Today.",
         subtitle: "",
       },
-      { id: 2, img: banner2, title: "Your Future, Your Choice – Let’s Plan It Together.", subtitle: "" },
-      { id: 3, img: banner3, title: "Confused About Your Career Path? We Can Help.", subtitle: "" },
-      { id: 4, img: banner4, title: "Unlock Your True Potential with Career Counseling.", subtitle: "" },
-      { id: 5, img: banner5, title: "Make Smart Career Decisions with Expert Advice.", subtitle: "" },
-      { id: 6, img: banner6, title: "Plan Your Career Future – Book a Career Counseling Session.", subtitle: "" },
-      { id: 7, img: banner7, title: " Start Your Career Planning with Eduroutez Expert Counsellor.", subtitle: "" },
-      { id: 8, img: banner8, title: "Still Unsure About Your Career?  Find the Right Direction with Our Expert Counsellors.", subtitle: "" },
+      { id: 2, img: "/2.png", title: "Your Future, Your Choice – Let’s Plan It Together.", subtitle: "" },
+      { id: 3, img: "/3.png", title: "Confused About Your Career Path? We Can Help.", subtitle: "" },
+      { id: 4, img: "/4.png", title: "Unlock Your True Potential with Career Counseling.", subtitle: "" },
+      { id: 5, img: "/5.png", title: "Make Smart Career Decisions with Expert Advice.", subtitle: "" },
     ],
     []
   );
@@ -53,7 +42,7 @@ const ConsellingBanner = React.memo(({ className = "" }) => {
           <SwiperSlide key={slide.id}>
             <div className="slide-content-wrapper relative bg-gray-300">
               <img
-                className="object-cover"
+                className="object-cover object-left sm:object-center"
                 src={slide.img}
                 alt={`slide-${slide.id}`}
                 loading="lazy"

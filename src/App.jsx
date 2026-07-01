@@ -72,6 +72,7 @@ const LegacyCounselorResultRedirect = () => {
   );
 };
 
+
 const AppShell = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -147,14 +148,19 @@ const AppShell = () => {
           <Route path="*" element={<PageNotFound />} />
           <Route path="/institute/:id" element={<Instituepage />} />
           <Route path="/institute/:slug" element={<Instituepage />} />
-          <Route path='/trendingCourses' element={<TrendingCourses></TrendingCourses>}></Route>
+          <Route path='/trending-courses' element={<TrendingCourses></TrendingCourses>}></Route>
           <Route path="/searchpage" element={<SearchPage />} />
           <Route path="/coursesinfopage/:id" element={<Coursesinfopage />} />
           <Route path="/coursesinfopage/:slug" element={<Coursesinfopage />} />
-          <Route path='/trending-stream' element={<TrendingStreams />}></Route>
+          <Route path="/popular-courses" element={<TrendingStreams />} />
+          <Route path="/popular-courses-detail" element={<PopularCourses />} />
           <Route path="/blogpage" element={<Blogpage />} />
           <Route path="/contactuspage" element={<Contactuspage />} />
-          <Route path="/popularcourses" element={<PopularCourses />} />
+          {/* Redirect legacy routes for backward compatibility */}
+          <Route path="/trendingCourses" element={<Navigate to="/trending-courses" replace />} />
+          <Route path="/trending-stream" element={<Navigate to="/popular-courses" replace />} />
+          <Route path="/popularcourses" element={<Navigate to="/popular-courses-detail" replace />} />
+
           <Route path="/aboutus" element={<Aboutus />} />
           <Route path="/counselingpage" element={<Counselingpage />} />
           <Route path="/questionandAnswer/:email" element={<QuestionandAnswer />} />

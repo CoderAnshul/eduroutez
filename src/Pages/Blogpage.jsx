@@ -10,6 +10,7 @@ import PopularCourses from "../Components/PopularCourses";
 import HighRatedCareers from "../Components/HighRatedCareers";
 import SocialShare from "../Components/SocialShare";
 import Pagination from "../Components/Pagination";
+import { Helmet } from "react-helmet-async";
 
 // Create a module-level object to store the blog ID mapping
 const blogIdMapStore = {};
@@ -303,6 +304,22 @@ const Blogpage = () => {
 
   return (
     <>
+    {/* Seo */}
+      <Helmet>
+        <title>Education Blogs, Career Tips & Exam Updates | Eduroutez</title>
+        <meta
+          name="description"
+          content="Read the latest education news, career guidance, exam updates, study tips, college admissions and higher education blogs on Eduroutez." />
+        <meta
+          name="keywords"
+          content="education blogs, career tips, exam updates, study tips, college admissions, education news"
+        />
+        <link
+          rel="canonical"
+          href="https://eduroutez.com/blogpage"
+        />
+      </Helmet>
+
       <PageBanner pageName="Blog" currectPage="blog" />
 
       {/* Filter button for mobile */}
@@ -319,7 +336,7 @@ const Blogpage = () => {
           }`}
       >
         <div
-          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 ${isFilterOpen ? "translate-x-0" : "-translate-x-full"
+          className={`w-3/4 bg-white p-4 rounded-lg shadow-md transform transition-transform duration-300 h-full overflow-y-auto ${isFilterOpen ? "translate-x-0" : "-translate-x-full"
             }`}
         >
           <button
@@ -421,9 +438,9 @@ const Blogpage = () => {
       <PopularCourses />
       <HighRatedCareers />
       <div className="flex max-sm:flex-col gap-2 items-center">
-        {/* //<Events /> */}
+        {/* <Events /> */}
 
-        <ConsellingBanner />
+         {/* <ConsellingBanner /> */}
       </div>
     </>
   );

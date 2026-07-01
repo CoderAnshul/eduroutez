@@ -15,7 +15,7 @@ const stripHtml = (html) => {
   return temp.textContent || temp.innerText || "";
 };
 
-const HighRatedCareers = ({ title = "High Rated Careers", streamId, categoryId }) => {
+const HighRatedCareers = ({ title = "High Rating Careers", streamId, categoryId }) => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
 
