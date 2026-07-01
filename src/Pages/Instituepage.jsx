@@ -24,6 +24,7 @@ const Placementinfo = React.lazy(() => import("../Components/Placementinfo"));
 const CampusInfo = React.lazy(() => import("../Components/CampusInfo"));
 const ScholarshipInfo = React.lazy(() => import("../Components/ScholarshipInfo"));
 const GalleryInfo = React.lazy(() => import("../Components/GalleryInfo"));
+const RecentlyViewed = React.lazy(() => import("../Components/RecentlyViewed"));
 const FeeInfo = React.lazy(() => import("../Components/FeeInfo"));
 const CutTOffInfo = React.lazy(() => import("../Components/CutTOffInfo"));
 const Ranking = React.lazy(() => import("../Components/Ranking"));
@@ -229,6 +230,31 @@ const Instituepage = () => {
     };
 
     fetchWebinarData();
+  }, [instituteData]);
+
+  // Save to recently viewed
+  useEffect(() => {
+    const d = instituteData?.data;
+    if (!d?._id) return;
+    try {
+      const BASE_IMG = import.meta.env.VITE_BASE_URL?.replace("/api", "") || "";
+      const entry = {
+        _id: d._id,
+        instituteName: d.instituteName,
+        slug: d.slug,
+        city: d.city?.name || "",
+        state: d.state?.name || "",
+        logo: d.instituteLogo ? `${BASE_IMG}/uploads/${d.instituteLogo}` : null,
+        thumbnailImage: d.thumbnailImage ? `${BASE_IMG}/uploads/${d.thumbnailImage}` : null,
+        organisationType: d.organisationType,
+        viewedAt: Date.now(),
+      };
+      const raw = localStorage.getItem("recentlyViewed") || "[]";
+      const list = JSON.parse(raw).filter((i) => i._id !== entry._id);
+      list.unshift(entry);
+      localStorage.setItem("recentlyViewed", JSON.stringify(list.slice(0, 12)));
+      window.dispatchEvent(new Event("recentlyViewedUpdate"));
+    } catch {}
   }, [instituteData]);
 
   // Filter tabs based on available data
@@ -529,6 +555,7 @@ const Instituepage = () => {
                 </div>
               </Link>
 
+              <RecentlyViewed compact />
               <QueryForm instituteData={instituteData} />
               <Promotions location="INSTITUTE_PAGE " className="h-[250px]" />
             </div>

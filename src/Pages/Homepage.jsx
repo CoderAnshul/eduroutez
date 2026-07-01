@@ -2,6 +2,7 @@ import React from 'react'
 import Banner from '../Components/Banner'
 import Counselling from '../Components/Counselling'
 import TrendingInstitute from '../Components/TrendingInstitute'
+import RecentlyViewed from '../Components/RecentlyViewed'
 import BestRated from '../Components/BestRated'
 import BestRatedUniversity from '../Components/BestRatedUniversity'
 import PopularCourses from '../Components/PopularCourses'
@@ -65,6 +66,8 @@ const Homepage = () => {
         <Promotions location="HOME_PAGE" />
         {/* // <Promotions location="HOME_PAGE" className="h-[90px]" /> */}
       </div>
+
+      <RecentlyViewed />
       <div className="universal-container flex flex-col items-center">
         <PopularCourses />
       </div>
