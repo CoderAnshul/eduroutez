@@ -245,6 +245,11 @@ const SearchResultBox = ({ institute, url, className = "" }) => {
             <Link to={instituteUrl} className="text-xl font-medium hover:no-underline hover:text-red-600" style={{ cursor: 'pointer' }}>
               {institute.instituteName}
             </Link>
+            {institute.rank && Number(institute.rank) > 0 && (
+              <span className="text-xs font-bold bg-red-50 text-[#b82025] px-2 py-1 rounded-full border border-red-200 shrink-0 ml-2">
+                #{institute.rank}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center space-x-3 text-sm text-gray-600">

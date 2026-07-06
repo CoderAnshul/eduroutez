@@ -6,6 +6,7 @@ import ScrollToTop from './Utilities/ScrollToTop';
 import Loader from './Components/Loader';
 import BecomeCouseller from './Pages/BecomeCouseller';
 import AuthRoute from './AuthRoute';
+import ChatbotWidget from './Components/ChatbotWidget';
 
 import Counselling from './Pages/counselling';
 
@@ -250,6 +251,8 @@ const AppShell = () => {
       )}
 
       {!shouldHideFooter && <Footer />}
+      {/* 24×7 AI Admission Counselor – visible on all pages */}
+      <ChatbotWidget />
     </>
   );
 };

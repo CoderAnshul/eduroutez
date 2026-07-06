@@ -1,7 +1,9 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useMemo, useEffect } from "react";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
+import { likeQuestion, likeAnswer } from "../ApiFunctions/api";
 import useModal from "../Components/Modal/useModal";
 
 const QuestionandAnswer = () => {
@@ -27,6 +29,93 @@ const QuestionandAnswer = () => {
   ];
 
   const Level = ["School", "Undergrad", "Postgrad"];
+  const queryClient = useQueryClient();
+  const userEmail = localStorage.getItem("email")?.replace(/^"|"$/g, "") || "";
+
+  const isLoggedIn = useMemo(() => {
+    const token = localStorage.getItem("accessToken");
+    return !!(token && token !== "null" && token !== "undefined" && token !== "");
+  }, []);
+
+  const handleVoteClick = () => {
+    if (!isLoggedIn) {
+      sessionStorage.setItem("redirectAfterLogin", location.pathname);
+      navigate("/login");
+      return false;
+    }
+    return true;
+  };
+
+  const handleVoteError = (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      sessionStorage.setItem("redirectAfterLogin", location.pathname);
+      navigate("/login");
+    }
+  };
+
+  const { mutate: voteQuestion } = useMutation({
+    mutationFn: ({ questionId, type }) => likeQuestion(questionId, type),
+    onSuccess: () => queryClient.invalidateQueries(["questions", email]),
+    onError: handleVoteError,
+  });
+
+  const { mutate: voteAnswer } = useMutation({
+    mutationFn: ({ questionId, answerId, type, answeredBy }) => likeAnswer(questionId, answerId, type, answeredBy),
+    onSuccess: () => queryClient.invalidateQueries(["questions", email]),
+    onError: handleVoteError,
+  });
+
+  const getUserQuestionVote = (question) => {
+    if (!userEmail || !question.questionLikes) return null;
+    const found = question.questionLikes.find((l) => {
+      const lid = typeof l.userId === "object" ? l.userId.email || l.userId.toString() : l.userId;
+      return lid === userEmail;
+    });
+    return found ? found.type : null;
+  };
+
+  const getUserAnswerVote = (answer) => {
+    if (!userEmail || !answer.likes) return null;
+    const found = answer.likes.find((l) => {
+      const lid = typeof l.userId === "object" ? l.userId.email || l.userId.toString() : l.userId;
+      return lid === userEmail;
+    });
+    return found ? found.type : null;
+  };
+
+  const VoteButtons = ({ voteScore = 0, userVote, onVote }) => (
+    <div className="flex items-center gap-1">
+      <button
+        type="button"
+        onClick={onVote ? () => onVote("upvote") : undefined}
+        className={`p-1 rounded transition-colors ${
+          userVote === "upvote"
+            ? "text-green-600 bg-green-100"
+            : "text-gray-400 hover:text-green-600 hover:bg-green-50"
+        }`}
+        title="Upvote"
+      >
+        <ThumbsUp className="h-3 w-3" />
+      </button>
+      <span className={`text-xs font-semibold min-w-[1.2rem] text-center ${
+        voteScore > 0 ? "text-green-600" : voteScore < 0 ? "text-red-500" : "text-gray-500"
+      }`}>{voteScore}</span>
+      <button
+        type="button"
+        onClick={onVote ? () => onVote("downvote") : undefined}
+        className={`p-1 rounded transition-colors ${
+          userVote === "downvote"
+            ? "text-red-500 bg-red-100"
+            : "text-gray-400 hover:text-red-500 hover:bg-red-50"
+        }`}
+        title="Downvote"
+      >
+        <ThumbsDown className="h-3 w-3" />
+      </button>
+    </div>
+  );
 
   const {
     data: questionsAndAnswers = [],
@@ -515,9 +604,23 @@ const QuestionandAnswer = () => {
                 key={item.id}
                 className="bg-red-100 shadow-lg rounded-lg p-4 space-y-2"
               >
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                  <span className="text-sm font-semibold">{formatUserDisplay(item.askedBy)}</span>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                    <span className="text-sm font-semibold">{formatUserDisplay(item.askedBy)}</span>
+                  </div>
+                  <VoteButtons
+                    voteScore={
+                      (item.questionLikes
+                        ? item.questionLikes.filter((l) => l.type === "upvote").length -
+                          item.questionLikes.filter((l) => l.type === "downvote").length
+                        : 0)
+                    }
+                    userVote={getUserQuestionVote(item)}
+                    onVote={(type) => {
+                      if (handleVoteClick()) voteQuestion({ questionId: item.id, type });
+                    }}
+                  />
                 </div>
                 <h3 className="font-bold text-lg">Q: {item.question}</h3>
 
@@ -537,16 +640,30 @@ const QuestionandAnswer = () => {
                           0,
                           expandedQuestion === item.id ? item.answers.length : 3
                         )
-                        .map((answer, index) => (
-                          <div key={index} className="bg-white p-3 rounded-lg">
-                            <div className="flex items-center space-x-2 mb-1">
-                              <div className="w-6 h-6 bg-blue-200 rounded-full"></div>
-                              <span className="text-sm font-medium">
-                                {formatUserDisplay(answer.answeredBy)}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {new Date(answer.answeredAt).toLocaleString()}
-                              </span>
+                        .map((answer, index) => {
+                          const answerVoteScore = answer.likes
+                            ? answer.likes.filter((l) => l.type === "upvote").length -
+                              answer.likes.filter((l) => l.type === "downvote").length
+                            : 0;
+                          return (
+                          <div key={answer._id || index} className="bg-white p-3 rounded-lg">
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-6 h-6 bg-blue-200 rounded-full"></div>
+                                <span className="text-sm font-medium">
+                                  {formatUserDisplay(answer.answeredBy)}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  {new Date(answer.answeredAt).toLocaleString()}
+                                </span>
+                              </div>
+                              <VoteButtons
+                                voteScore={answerVoteScore}
+                                userVote={getUserAnswerVote(answer)}
+                                onVote={(type) => {
+                                  if (handleVoteClick()) voteAnswer({ questionId: item.id, answerId: answer._id, type, answeredBy: answer.answeredBy });
+                                }}
+                              />
                             </div>
                             <div
                               dangerouslySetInnerHTML={{
@@ -554,7 +671,8 @@ const QuestionandAnswer = () => {
                               }}
                             />
                           </div>
-                        ))}
+                          );
+                        })}
                     </div>
 
                     {/* View More/Less button */}

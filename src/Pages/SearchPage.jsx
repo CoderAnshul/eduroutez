@@ -13,7 +13,7 @@ import HighRatedCareers from "../Components/HighRatedCareers";
 import { useQuery } from "react-query";
 import { getInstitutes } from "../ApiFunctions/api";
 import { useSelector } from "react-redux";
-import { useSearchParams, useLocation } from "react-router-dom";
+import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import Promotions from "./CoursePromotions";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import { Helmet } from "react-helmet-async";
@@ -21,6 +21,9 @@ import { Helmet } from "react-helmet-async";
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [sortBy, setSortBy] = useState(searchParams.get("sort") || "");
+  useEffect(() => { setSortBy(searchParams.get("sort") || ""); }, [location.search]);
   const [selectedFilters, setSelectedFilters] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [content, setContent] = useState([]);
@@ -167,19 +170,11 @@ const SearchPage = () => {
           });
       } else {
         // Filters or sort exist in URL - Filter component will trigger fetch via onFiltersChanged
-        // But if only sort is present, fetch immediately
-        if (sortFromUrl && Object.keys(initialFilters).length === 0) {
-          fetchFilteredInstitutes({}, 1, itemsPerPage, sortFromUrl)
-            .then((data) => {
-              //console.debug('fetchFilteredInstitutes (sort) response:', data);
-              setInitialLoadComplete(true);
-            })
-            .catch((error) => {
-              //console.error("Error fetching sorted institutes:", error);
-              setFetchError(true);
-              setLoading(false);
-              setInitialLoadComplete(true);
-            });
+        // If sort is present (even with other filters), fetch immediately to apply sort
+        if (sortFromUrl) {
+          fetchFilteredInstitutes(initialFilters, 1, itemsPerPage, sortFromUrl)
+            .then(() => setInitialLoadComplete(true))
+            .catch(() => { setFetchError(true); setLoading(false); setInitialLoadComplete(true); });
         } else {
           setInitialLoadComplete(true);
           setLoading(false);
@@ -751,9 +746,10 @@ const SearchPage = () => {
         queryString += `&searchFields=${encodeURIComponent(JSON.stringify(searchFields))}`;
       }
 
-      // Add sort parameter if provided
-      if (sortField) {
-        const sortObj = { [sortField]: "desc" };
+      // Only send non-rank sort to API (MongoDB puts null/0 first for rank asc, we sort client-side like navbar)
+      if (sortField && sortField !== "rank") {
+        const direction = "desc";
+        const sortObj = { [sortField]: direction };
         queryString += `&sort=${encodeURIComponent(JSON.stringify(sortObj))}`;
       }
 
@@ -761,13 +757,19 @@ const SearchPage = () => {
 
       if (response.data) {
         const { result = [], currentPage, totalPages, totalDocuments } = response?.data?.data || {};
-        //console.log(`Received page ${currentPage} of ${totalPages}, with ${result?.length || 0} results out of ${totalDocuments} total`);
 
-        const safeResult = Array.isArray(result) ? result : [];
+        let safeResult = Array.isArray(result) ? result : [];
+        if (sortField === "rank") {
+          safeResult = [...safeResult].sort((a, b) => {
+            const ra = Number(a.rank) > 0 ? Number(a.rank) : Infinity;
+            const rb = Number(b.rank) > 0 ? Number(b.rank) : Infinity;
+            return ra - rb;
+          });
+        }
         setContent(safeResult);
         setFilteredContent(safeResult);
         setTotalDocuments(totalDocuments);
-        setCurrentPage(currentPage || 1); // Update current page from API response
+        setCurrentPage(currentPage || 1);
 
         if (result && result.length > 0) {
           updateIdMapping(result);
@@ -825,6 +827,8 @@ const SearchPage = () => {
   }, [content]);
 
   const renderPagination = () => {
+    const isRankSort = sortBy === "rank";
+    if (isRankSort) return null;
     const totalPages = Math.ceil(totalDocuments / itemsPerPage);
     if (totalPages <= 1) return null;
 
@@ -967,6 +971,15 @@ const SearchPage = () => {
                 handleFilterChange={handleFilterChangeWithoutScroll}
                 selectedFilters={selectedFilters}
                 onFiltersChanged={handleFiltersChanged}
+                sortBy={sortBy}
+                onSortChange={(value) => {
+                  const params = new URLSearchParams(location.search);
+                  if (value) params.set("sort", value);
+                  else params.delete("sort");
+                  navigate(`/searchpage?${params.toString()}`, { replace: true });
+                  setLoading(true);
+                  fetchFilteredInstitutes(selectedFilters, 1, itemsPerPage, value || null);
+                }}
               />
             </div>
             <div className="p-4 border-t bg-white sticky bottom-0 text-center">
@@ -987,6 +1000,15 @@ const SearchPage = () => {
               handleFilterChange={handleFilterChangeWithoutScroll}
               selectedFilters={selectedFilters}
               onFiltersChanged={handleFiltersChanged}
+              sortBy={sortBy}
+              onSortChange={(value) => {
+                const params = new URLSearchParams(location.search);
+                if (value) { params.set("sort", value); setSortBy(value); }
+                else { params.delete("sort"); setSortBy(""); }
+                navigate(`/searchpage?${params.toString()}`, { replace: true });
+                setLoading(true);
+                fetchFilteredInstitutes(selectedFilters, 1, itemsPerPage, value || null);
+              }}
             />
           </div>
 
@@ -1055,6 +1077,40 @@ const SearchPage = () => {
                       <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                     </svg>
                     Filters
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <button
+                    onClick={() => {
+                      const newVal = sortBy === "views" ? "" : "views";
+                      const params = new URLSearchParams(location.search);
+                      if (newVal) params.set("sort", newVal);
+                      else params.delete("sort");
+                      navigate(`/searchpage?${params.toString()}`, { replace: true });
+                      setLoading(true);
+                      fetchFilteredInstitutes(selectedFilters, 1, itemsPerPage, newVal || null);
+                    }}
+                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                      sortBy === "views" ? "bg-[#b82025] text-white border-[#b82025]" : "bg-white text-gray-700 border-gray-300 hover:border-red-300"
+                    }`}
+                  >
+                    Popular Colleges
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newVal = sortBy === "rank" ? "" : "rank";
+                      const params = new URLSearchParams(location.search);
+                      if (newVal) params.set("sort", newVal);
+                      else params.delete("sort");
+                      navigate(`/searchpage?${params.toString()}`, { replace: true });
+                      setLoading(true);
+                      fetchFilteredInstitutes(selectedFilters, 1, itemsPerPage, newVal || null);
+                    }}
+                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                      sortBy === "rank" ? "bg-[#b82025] text-white border-[#b82025]" : "bg-white text-gray-700 border-gray-300 hover:border-red-300"
+                    }`}
+                  >
+                    Top Colleges (NIRF)
                   </button>
                 </div>
                 {/* <div style={{ width: '728px', height: '90px', overflow: 'hidden' }}> */}

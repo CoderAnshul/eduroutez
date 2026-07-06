@@ -1263,3 +1263,28 @@ export const quickNearby = async ({ state, city, budget, exam, marks, category }
   if (!state && !city) return [];
   return getNearbyInstitutes({ state, city, budget, exam, marks, category });
 };
+
+// ── Q&A Like / Vote ───────────────────────────────────────────────────────────
+
+const authHeaders = () => ({
+  "x-access-token": localStorage.getItem("accessToken") || "",
+  "x-refresh-token": localStorage.getItem("refreshToken") || "",
+});
+
+export const likeQuestion = async (questionId, type) => {
+  const res = await axiosInstance.post(
+    `/question-answer/${questionId}/like`,
+    { type },
+    { headers: authHeaders() }
+  );
+  return res.data;
+};
+
+export const likeAnswer = async (questionId, answerId, type, answeredBy) => {
+  const res = await axiosInstance.post(
+    `/question-answer/${questionId}/answer/${answerId}/like`,
+    { type, answeredBy },
+    { headers: authHeaders() }
+  );
+  return res.data;
+};

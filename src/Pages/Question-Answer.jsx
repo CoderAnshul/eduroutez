@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useQuery, useMutation } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Send,
@@ -12,8 +12,11 @@ import {
   ArrowUp,
   ArrowDown,
   ChevronDown,
+  ThumbsUp,
+  ThumbsDown,
 } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
+import { likeQuestion, likeAnswer } from "../ApiFunctions/api";
 import { toast } from "react-toastify";
 import AuthPopup from "../Components/AuthPopup";
 import Promotions from "./CoursePromotions";
@@ -86,9 +89,53 @@ const CategoryFilter = ({ onFilterChange }) => {
   );
 };
 
-// New component for displaying answers with "View More" functionality
-const AnswersList = ({ answers }) => {
+const VoteButtons = ({ voteScore = 0, userVote, onVote, disabled }) => {
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        type="button"
+        onClick={() => onVote("upvote")}
+        disabled={disabled}
+        className={`p-1 rounded transition-colors ${
+          userVote === "upvote"
+            ? "text-green-600 bg-green-100"
+            : "text-gray-400 hover:text-green-600 hover:bg-green-50"
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
+        title="Upvote"
+      >
+        <ThumbsUp className="h-4 w-4" />
+      </button>
+      <span
+        className={`text-sm font-semibold min-w-[1.5rem] text-center ${
+          voteScore > 0
+            ? "text-green-600"
+            : voteScore < 0
+            ? "text-red-500"
+            : "text-gray-500"
+        }`}
+      >
+        {voteScore}
+      </span>
+      <button
+        type="button"
+        onClick={() => onVote("downvote")}
+        disabled={disabled}
+        className={`p-1 rounded transition-colors ${
+          userVote === "downvote"
+            ? "text-red-500 bg-red-100"
+            : "text-gray-400 hover:text-red-500 hover:bg-red-50"
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
+        title="Downvote"
+      >
+        <ThumbsDown className="h-4 w-4" />
+      </button>
+    </div>
+  );
+};
+
+const AnswersList = ({ answers, questionId, onAnswerVote }) => {
   const [showAllAnswers, setShowAllAnswers] = useState(false);
+  const userEmail = localStorage.getItem("email") || "";
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -127,29 +174,45 @@ const AnswersList = ({ answers }) => {
     return String(user);
   };
 
-  // Show first answer or all answers based on state
+  const getUserVote = (answer) => {
+    const uid = localStorage.getItem("userId");
+    if (!uid || !answer.likes) return null;
+    const found = answer.likes.find((l) => l.userId?.toString() === uid.toString());
+    return found ? found.type : null;
+  };
+
   const displayedAnswers = showAllAnswers ? answers : [answers[0]];
   const remainingCount = answers.length - 1;
 
   return (
     <div className="space-y-4">
-      {displayedAnswers.map((answer, index) => (
-        <div
-          key={index}
-          className="p-4 bg-red-50 border-l-4 border-red-600 rounded-lg"
-        >
+      {displayedAnswers.map((answer, index) => {
+        const userVote = getUserVote(answer);
+        return (
           <div
-            dangerouslySetInnerHTML={{ __html: answer.answer }}
-            className="text-gray-700 mb-2"
-          />
-          <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
-            <User className="h-4 w-4" />
-            <span>{formatUserDisplay(answer?.answeredBy)}</span>
-            <span>•</span>
-            <span>{formatDate(answer?.answeredAt)}</span>
+            key={answer._id || index}
+            className="p-4 bg-red-50 border-l-4 border-red-600 rounded-lg"
+          >
+            <div
+              dangerouslySetInnerHTML={{ __html: answer.answer }}
+              className="text-gray-700 mb-2"
+            />
+            <div className="flex items-center justify-between text-sm text-gray-600 mt-2">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                <span>{formatUserDisplay(answer?.answeredBy)}</span>
+                <span>•</span>
+                <span>{formatDate(answer?.answeredAt)}</span>
+              </div>
+              <VoteButtons
+                voteScore={answer.voteScore ?? 0}
+                userVote={userVote}
+                onVote={(type) => onAnswerVote(questionId, answer._id, type, answer.answeredBy)}
+              />
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {!showAllAnswers && remainingCount > 0 && (
         <button
@@ -168,6 +231,7 @@ const AnswersList = ({ answers }) => {
 const CombinedQuestionsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     question: "",
     grade: "",
@@ -177,20 +241,70 @@ const CombinedQuestionsPage = () => {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilters, setActiveFilters] = useState([]);
-  const [sortOrder, setSortOrder] = useState("desc"); // Default to newest first
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const grades = ["8th", "9th", "10th", "11th", "12th"];
   const labels = ["Courses", "Career", "Institute", "Placement", "Admission"];
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const userEmail = localStorage.getItem("email") || "user@example.com";
 
-  // Check if user is logged in - check localStorage directly
   const isLoggedIn = useMemo(() => {
     if (typeof window === 'undefined') return false;
     const accessToken = localStorage.getItem("accessToken");
-    const isValid = !!(accessToken && accessToken !== "null" && accessToken !== "undefined" && accessToken !== "");
-    return isValid;
+    return !!(accessToken && accessToken !== "null" && accessToken !== "undefined" && accessToken !== "");
   }, []);
+
+  const handleVoteError = (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      sessionStorage.setItem("redirectAfterLogin", location.pathname);
+      navigate("/login");
+    } else {
+      toast.error("Failed to vote. Try again.");
+    }
+  };
+
+  const likeQuestionMutation = useMutation({
+    mutationFn: ({ questionId, type }) => likeQuestion(questionId, type),
+    onSuccess: () => queryClient.invalidateQueries(["questions"]),
+    onError: handleVoteError,
+  });
+
+  const likeAnswerMutation = useMutation({
+    mutationFn: ({ questionId, answerId, type, answeredBy }) => likeAnswer(questionId, answerId, type, answeredBy),
+    onSuccess: () => queryClient.invalidateQueries(["questions"]),
+    onError: handleVoteError,
+  });
+
+  const requireLogin = () => {
+    sessionStorage.setItem("redirectAfterLogin", location.pathname);
+    navigate("/login");
+  };
+
+  const handleQuestionVote = (questionId, type) => {
+    if (!isLoggedIn) {
+      requireLogin();
+      return;
+    }
+    likeQuestionMutation.mutate({ questionId, type });
+  };
+
+  const handleAnswerVote = (questionId, answerId, type, answeredBy) => {
+    if (!isLoggedIn) {
+      requireLogin();
+      return;
+    }
+    const answeredByEmail = typeof answeredBy === 'object' ? answeredBy?.email : answeredBy;
+    likeAnswerMutation.mutate({ questionId, answerId, type, answeredBy: answeredByEmail });
+  };
+
+  const getUserQuestionVote = (question) => {
+    const uid = localStorage.getItem("userId");
+    if (!uid || !question.questionLikes) return null;
+    const found = question.questionLikes.find((l) => l.userId?.toString() === uid.toString());
+    return found ? found.type : null;
+  };
 
   // Check for pending question after login redirect
   useEffect(() => {
@@ -518,9 +632,16 @@ const CombinedQuestionsPage = () => {
                     className="hover:shadow-xl transition-shadow"
                   >
                     <CardHeader>
-                      <h3 className="text-lg font-bold text-gray-800">
-                        {question.question}
-                      </h3>
+                      <div className="flex items-start justify-between">
+                        <h3 className="text-lg font-bold text-gray-800 flex-1">
+                          {question.question}
+                        </h3>
+                        <VoteButtons
+                          voteScore={question.voteScore ?? 0}
+                          userVote={getUserQuestionVote(question)}
+                          onVote={(type) => handleQuestionVote(question._id, type)}
+                        />
+                      </div>
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-2">
                         <div className="flex items-center gap-1">
                           <School className="h-4 w-4" />
@@ -531,14 +652,27 @@ const CombinedQuestionsPage = () => {
                           <span>{question.label}</span>
                         </div>
                         <div className="flex items-center gap-1">
+                          <User className="h-4 w-4" />
+                          <span>
+                            {question.askedBy?.name || question.askedBy?.email || "Anonymous"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MessageCircle className="h-4 w-4" />
+                          <span>{question.answers?.length || 0} answers</span>
+                        </div>
+                        <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
                           <span>{formatDate(question.createdAt)}</span>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      {/* Replace the existing answers section with the new AnswersList component */}
-                      <AnswersList answers={question.answers} />
+                      <AnswersList
+                        answers={question.answers}
+                        questionId={question._id}
+                        onAnswerVote={handleAnswerVote}
+                      />
                     </CardContent>
                   </Card>
                 ))}

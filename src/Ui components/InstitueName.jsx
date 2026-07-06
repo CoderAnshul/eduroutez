@@ -16,6 +16,7 @@ const InstitueName = ({ instituteData }) => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [streams, setStreams] = useState([]);
+  const [counselorCategories, setCounselorCategories] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -148,6 +149,25 @@ const InstitueName = ({ instituteData }) => {
     };
 
     fetchStreams();
+  }, []);
+
+  // Fetch counselors to determine which streams have available counselors
+  useEffect(() => {
+    const fetchCounselors = async () => {
+      try {
+        const response = await axiosInstance.get(`${baseURL}/counselors`);
+        const counselorList = response.data.data?.result || response.data.data || [];
+        const categories = [...new Set(
+          counselorList
+            .map(c => c.category?.trim().toLowerCase())
+            .filter(Boolean)
+        )];
+        setCounselorCategories(categories);
+      } catch (error) {
+        console.error("Error fetching counselors:", error);
+      }
+    };
+    fetchCounselors();
   }, []);
 
   const handleDownloadBrochure = async () => {
@@ -288,9 +308,16 @@ const InstitueName = ({ instituteData }) => {
       <div className="filler h-10 w-36 sm:h-14 sm:w-40 md:h-[70px] bg-transparent md:w-52 xl:h-[80px] xl:w-56 rounded-lg flex items-center justify-center "></div>
 
       <div className="name w-full min-h-20 ">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold ">
-          {instituteData.data.instituteName}
-        </h2>
+        <div className="flex items-center gap-3 flex-wrap">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold ">
+            {instituteData.data.instituteName}
+          </h2>
+          {instituteData?.data?.admissionOpen && (
+            <span className="bg-green-500 text-white text-xs sm:text-sm px-3 py-1 rounded-full font-semibold whitespace-nowrap">
+              Admission Open
+            </span>
+          )}
+        </div>
 
         <div className="text-container flex justify-between items-center flex-wrap gap-2 mt-1">
           <div className="flex mt-2 gap-3 whitespace-nowrap">
@@ -533,61 +560,65 @@ const InstitueName = ({ instituteData }) => {
 
                 {/* Right column */}
                 <div className="space-y-2">
-                  <div className="group">
-                    <label
-                      className="block text-xs font-medium text-gray-700 mb-1"
-                      htmlFor="stream"
-                    >
-                      Stream
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none text-gray-400">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                      </div>
-                      <select
-                        id="stream"
-                        name="stream"
-                        className="w-full pl-8 pr-2 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all duration-200 appearance-none bg-white"
-                        value={formData.stream}
-                        onChange={handleChange}
-                        required
+                  {counselorCategories.length > 0 && (
+                    <div className="group">
+                      <label
+                        className="block text-xs font-medium text-gray-700 mb-1"
+                        htmlFor="stream"
                       >
-                        <option value="">Select a Stream</option>
-                        {streams?.result?.map((stream) => (
-                          <option key={stream._id} value={stream._id}>
-                            {stream.name}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none text-gray-400">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                        Stream
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none text-gray-400">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                          </svg>
+                        </div>
+                        <select
+                          id="stream"
+                          name="stream"
+                          className="w-full pl-8 pr-2 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all duration-200 appearance-none bg-white"
+                          value={formData.stream}
+                          onChange={handleChange}
+                          required
                         >
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
+                          <option value="">Select a Stream</option>
+                          {streams?.result
+                            ?.filter(stream => counselorCategories.includes(stream.name?.trim().toLowerCase()))
+                            .map((stream) => (
+                              <option key={stream._id} value={stream._id}>
+                                {stream.name}
+                              </option>
+                            ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none text-gray-400">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="group">
                     <label

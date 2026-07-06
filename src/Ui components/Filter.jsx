@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFiltersChanged }) => {
+const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFiltersChanged, sortBy, onSortChange }) => {
   const [openSections, setOpenSections] = useState(
     filterSections.map(() => true)
   );
@@ -240,6 +240,31 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
 
   return (
     <div className="space-y-2">
+      {onSortChange && (
+        <div className="border border-gray-300 rounded-lg overflow-hidden">
+          <div className="bg-white p-3">
+            <span className="font-medium text-sm text-gray-700 block mb-2">Sort by</span>
+            <div className="flex flex-col gap-1.5">
+              <button
+                onClick={() => onSortChange(sortBy === "views" ? "" : "views")}
+                className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all border ${
+                  sortBy === "views" ? "bg-[#b82025] text-white border-[#b82025]" : "bg-white text-gray-700 border-gray-300 hover:border-red-300"
+                }`}
+              >
+                Popular Colleges
+              </button>
+              <button
+                onClick={() => onSortChange(sortBy === "rank" ? "" : "rank")}
+                className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all border ${
+                  sortBy === "rank" ? "bg-[#b82025] text-white border-[#b82025]" : "bg-white text-gray-700 border-gray-300 hover:border-red-300"
+                }`}
+              >
+                Top Colleges (NIRF)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {filterSections.map((section, index) => (
         <div
           key={index}

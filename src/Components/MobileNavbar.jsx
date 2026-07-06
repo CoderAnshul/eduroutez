@@ -12,6 +12,7 @@ const MobileNavbar = ({ categories }) => {
   const [careers, setCareers] = useState([]);
   const [latestNews, setLatestNews] = useState([]);
   const [topColleges, setTopColleges] = useState([]);
+  const [topNirfColleges, setTopNirfColleges] = useState([]);
   const [activeStream, setActiveStream] = useState(null);
   const [popularInstitutes, setPopularInstitutes] = useState({});
   const [recentInstitutes, setRecentInstitutes] = useState({});
@@ -58,6 +59,7 @@ const MobileNavbar = ({ categories }) => {
           break;
         case "Top Colleges":
           fetchTopColleges();
+          fetchTopNirfColleges();
           break;
         default:
           break;
@@ -113,6 +115,22 @@ const MobileNavbar = ({ categories }) => {
     }
   };
 
+  const fetchTopNirfColleges = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views","rank"]&limit=30`
+      );
+      const ranked = (response.data?.data?.result || []).sort((a, b) => {
+        const ra = a.rank && Number(a.rank) > 0 ? Number(a.rank) : Infinity;
+        const rb = b.rank && Number(b.rank) > 0 ? Number(b.rank) : Infinity;
+        return ra - rb;
+      }).slice(0, 10);
+      setTopNirfColleges(ranked);
+    } catch (error) {
+      console.error("Error fetching NIRF colleges:", error);
+    }
+  };
+
   const fetchInstitutesByStream = async (streamName) => {
     try {
       // Fetch popular institutes
@@ -120,10 +138,16 @@ const MobileNavbar = ({ categories }) => {
         `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"views":"desc"}&page=1&limit=5&filters={"streams":["${streamName}"]}`
       );
 
-      // Fetch recent institutes
+      // Fetch top NIRF ranked institutes
       const recentResponse = await axiosInstance.get(
-        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"createdAt":"desc"}&page=1&limit=5&filters={"streams":["${streamName}"]}`
+        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views","rank"]&limit=20&filters={"streams":["${streamName}"]}`
       );
+
+      const recentRanked = (recentResponse.data?.data?.result || []).sort((a, b) => {
+        const ra = a.rank && Number(a.rank) > 0 ? Number(a.rank) : Infinity;
+        const rb = b.rank && Number(b.rank) > 0 ? Number(b.rank) : Infinity;
+        return ra - rb;
+      }).slice(0, 5);
 
       setPopularInstitutes(prev => ({
         ...prev,
@@ -132,7 +156,7 @@ const MobileNavbar = ({ categories }) => {
       
       setRecentInstitutes(prev => ({
         ...prev,
-        [streamName]: recentResponse.data?.data
+        [streamName]: { result: recentRanked }
       }));
       
     } catch (error) {
@@ -337,13 +361,35 @@ const MobileNavbar = ({ categories }) => {
           </div>
         ))}
       </div>
-      <div className="mt-4 text-right">
+      <div className="text-right mt-2 mb-4">
         <span 
           className="text-xs text-red-500 cursor-pointer"
-          onClick={() => handleLinkClick("/topcolleges")}
+          onClick={() => handleLinkClick("/searchpage?sort=views")}
         >
-          View All Colleges →
+          View More →
         </span>
+      </div>
+
+      <h3 className="font-semibold text-red-500 mb-3">Top Colleges (NIRF)</h3>
+      <div className="space-y-2">
+        {topNirfColleges?.map((college) => (
+          <div 
+            key={college._id}
+            className="p-2 hover:bg-gray-50 rounded cursor-pointer flex justify-between"
+            onClick={() => handleInstituteClick(college)}
+          >
+            <span className="text-sm">{college.instituteName}</span>
+            <span className="text-xs text-gray-500">#{college.rank || "N/A"}</span>
+          </div>
+        ))}
+        <div className="text-right mt-2">
+          <span 
+            className="text-xs text-red-500 cursor-pointer"
+            onClick={() => handleLinkClick("/searchpage?sort=rank")}
+          >
+            View More →
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -462,12 +508,20 @@ const MobileNavbar = ({ categories }) => {
                   <span className="text-sm">{institute.instituteName}</span>
                 </div>
               ))}
+              <div className="text-right mt-2">
+                <span 
+                  className="text-xs text-red-500 cursor-pointer"
+                  onClick={() => handleLinkClick(`/searchpage?sort=views&stream=${encodeURIComponent(stream)}`)}
+                >
+                  View More →
+                </span>
+              </div>
             </div>
           )}
         </div>
         
         <div className="p-4 border-b">
-          <h3 className="font-semibold text-red-500 mb-3">Recent {stream} Colleges</h3>
+          <h3 className="font-semibold text-red-500 mb-3">Top {stream} Colleges (NIRF)</h3>
           {recent.length === 0 ? (
             <p className="text-sm text-gray-500">Loading...</p>
           ) : (
@@ -475,12 +529,21 @@ const MobileNavbar = ({ categories }) => {
               {recent.slice(0, 5).map((institute) => (
                 <div 
                   key={institute._id}
-                  className="p-1.5 hover:bg-gray-50 rounded cursor-pointer"
+                  className="p-1.5 hover:bg-gray-50 rounded cursor-pointer flex justify-between"
                   onClick={() => handleInstituteClick(institute)}
                 >
                   <span className="text-sm">{institute.instituteName}</span>
+                  <span className="text-xs text-gray-500">#{institute.rank || "N/A"}</span>
                 </div>
               ))}
+              <div className="text-right mt-2">
+                <span 
+                  className="text-xs text-red-500 cursor-pointer"
+                  onClick={() => handleLinkClick(`/searchpage?sort=rank&stream=${encodeURIComponent(stream)}`)}
+                >
+                  View More →
+                </span>
+              </div>
             </div>
           )}
         </div>

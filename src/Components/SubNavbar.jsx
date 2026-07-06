@@ -134,11 +134,16 @@ const SubNavbar = ({ categories }) => {
         );
         setTopColleges(popularResponse.data?.data?.result || []);
 
-        // Recent colleges
-        const recentResponse = await axiosInstance.get(
-          `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","createdAt"]&sort={"createdAt":"desc"}&page=1&limit=10`
+        // Top colleges by NIRF rank
+      const recentResponse = await axiosInstance.get(
+          `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views","rank"]&limit=30`
         );
-        setTopRecentColleges(recentResponse.data?.data?.result || []); // Fixed
+        const ranked = (recentResponse.data?.data?.result || []).sort((a, b) => {
+          const ra = a.rank && Number(a.rank) > 0 ? Number(a.rank) : Infinity;
+          const rb = b.rank && Number(b.rank) > 0 ? Number(b.rank) : Infinity;
+          return ra - rb;
+        }).slice(0, 10);
+        setTopRecentColleges(ranked); // Fixed
       } catch (error) {
         console.error("Error fetching colleges:", error);
       }
@@ -198,12 +203,18 @@ const SubNavbar = ({ categories }) => {
       );
 
       const recentResponse = await axiosInstance.get(
-        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views"]&sort={"createdAt":"desc"}&page=1&limit=10&filters={"streams":["${streamName}"]}`
+        `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views","rank"]&limit=20&filters={"streams":["${streamName}"]}`
       );
+
+      const recent = (recentResponse.data?.data?.result || []).sort((a, b) => {
+        const ra = a.rank && Number(a.rank) > 0 ? Number(a.rank) : Infinity;
+        const rb = b.rank && Number(b.rank) > 0 ? Number(b.rank) : Infinity;
+        return ra - rb;
+      }).slice(0, 10);
 
       return {
         popular: popularResponse.data?.data?.result || [],
-        recent: recentResponse.data?.data?.result || [],
+        recent,
       };
     } catch (error) {
       console.error(`Error fetching institutes for ${streamName}:`, error);
@@ -426,19 +437,29 @@ const SubNavbar = ({ categories }) => {
                 <span className="text-gray-500 text-xs">{college.views || 0} views</span>
               </a>
             ))}
+            <div className="text-right">
+              <a onClick={() => handleLinkClick("/searchpage?sort=views")} className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium">
+                View More →
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Recent Colleges */}
+        {/* Top Colleges by NIRF Rank */}
         <div className="space-y-6">
-          <h3 className="font-semibold text-red-500 text-base">Recently Added</h3>
+          <h3 className="font-semibold text-red-500 text-base">Top Colleges (NIRF)</h3>
           <div className="space-y-4">
             {topRecentColleges.map((college) => (
               <a key={college._id} onClick={() => handleInstituteClick(college)} className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between">
                 <span>{college.instituteName}</span>
-                <span className="text-gray-500 text-xs">{new Date(college.createdAt).toLocaleDateString()}</span>
+                <span className="text-gray-500 text-xs">#{college.rank || "N/A"}</span>
               </a>
             ))}
+            <div className="text-right">
+              <a onClick={() => handleLinkClick("/searchpage?sort=rank")} className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium">
+                View More →
+              </a>
+            </div>
           </div>
         </div>
 
@@ -574,20 +595,31 @@ const SubNavbar = ({ categories }) => {
                   <span>{institute.instituteName}</span>
                 </div>
               ))}
+              <div className="text-right mt-2">
+                <span onClick={() => handleLinkClick(`/searchpage?sort=views&stream=${encodeURIComponent(streamName)}`)} className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium">
+                  View More →
+                </span>
+              </div>
             </div>
           )}
         </div>
         <div className="min-w-48 font-sans">
-          <h3 className="font-semibold text-red-500 text-base mb-3 font-sans">Top Colleges</h3>
+          <h3 className="font-semibold text-red-500 text-base mb-3 font-sans">Top Colleges (NIRF)</h3>
           {recent.length === 0 ? (
             <p className="text-sm text-gray-500 font-sans">Loading...</p>
           ) : (
             <div className="grid grid-cols-1 gap-2">
               {recent.slice(0, 5).map((institute) => (
-                <div key={institute._id} onClick={() => handleInstituteClick(institute)} className="cursor-pointer transition-colors hover:text-red-500 text-sm font-sans">
-                  {institute.instituteName}
+                <div key={institute._id} onClick={() => handleInstituteClick(institute)} className="cursor-pointer transition-colors hover:text-red-500 text-sm font-sans flex justify-between">
+                  <span>{institute.instituteName}</span>
+                  <span className="text-gray-500 text-xs">#{institute.rank || "N/A"}</span>
                 </div>
               ))}
+              <div className="text-right mt-2">
+                <span onClick={() => handleLinkClick(`/searchpage?sort=rank&stream=${encodeURIComponent(streamName)}`)} className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium">
+                  View More →
+                </span>
+              </div>
             </div>
           )}
         </div>
