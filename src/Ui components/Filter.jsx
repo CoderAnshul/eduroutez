@@ -19,6 +19,8 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
   const [selectedFees, setSelectedFees] = useState([]);
   const [selectedExams, setSelectedExams] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
+  const [selectedTopCollege, setSelectedTopCollege] = useState([]);
+  const [selectedPopularCollege, setSelectedPopularCollege] = useState([]);
 
   // Ref to track if we need to update URL
   const shouldUpdateUrl = useRef(false);
@@ -73,6 +75,14 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     const ratings = ratingsParam ? ratingsParam.split(",").map(r => r.trim()).filter(Boolean) : [];
     setSelectedRatings(ratings);
 
+    const topCollegeParam = params.get("topCollege");
+    const topCollege = topCollegeParam ? topCollegeParam.split(",").map(t => t.trim()).filter(Boolean) : [];
+    setSelectedTopCollege(topCollege);
+
+    const popularCollegeParam = params.get("popularCollege");
+    const popularCollege = popularCollegeParam ? popularCollegeParam.split(",").map(p => p.trim()).filter(Boolean) : [];
+    setSelectedPopularCollege(popularCollege);
+
     // Debug: Log filter states to help identify issues
     console.log("Filter states initialized from URL:", {
       streams,
@@ -84,6 +94,8 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
       fees,
       exams,
       ratings,
+      topCollege,
+      popularCollege,
       url: location.search
     });
 
@@ -102,6 +114,8 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     if (fees.length > 0) apiFilters.Fees = fees;
     if (exams.length > 0) apiFilters.Exam = exams;
     if (ratings.length > 0) apiFilters.Ratings = ratings;
+    if (topCollege.length > 0) apiFilters.topCollege = topCollege;
+    if (popularCollege.length > 0) apiFilters.popularCollege = popularCollege;
 
     if (onFiltersChanged) {
       // If it's the initial mount or an external URL change (not triggered by this component)
@@ -136,6 +150,8 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     if (selectedFees.length > 0) queryParams.set("Fees", selectedFees.join(","));
     if (selectedExams.length > 0) queryParams.set("Exam", selectedExams.join(","));
     if (selectedRatings.length > 0) queryParams.set("Ratings", selectedRatings.join(","));
+    if (selectedTopCollege.length > 0) queryParams.set("topCollege", selectedTopCollege.join(","));
+    if (selectedPopularCollege.length > 0) queryParams.set("popularCollege", selectedPopularCollege.join(","));
 
     // Only update URL if it actually changed
     const newSearchParams = queryParams.toString();
@@ -155,6 +171,8 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     if (selectedFees.length > 0) apiFilters.Fees = selectedFees;
     if (selectedExams.length > 0) apiFilters.Exam = selectedExams;
     if (selectedRatings.length > 0) apiFilters.Ratings = selectedRatings;
+    if (selectedTopCollege.length > 0) apiFilters.topCollege = selectedTopCollege;
+    if (selectedPopularCollege.length > 0) apiFilters.popularCollege = selectedPopularCollege;
 
     // Notify parent of filter changes
     if (onFiltersChanged) {
@@ -170,6 +188,8 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     selectedFees,
     selectedExams,
     selectedRatings,
+    selectedTopCollege,
+    selectedPopularCollege,
     navigate,
     onFiltersChanged
   ]);
@@ -214,6 +234,12 @@ const Filter = ({ filterSections, handleFilterChange, selectedFilters, onFilters
     }
     else if (sectionLower === "ratings") {
       toggleArrayItem(selectedRatings, setSelectedRatings, item);
+    }
+    else if (sectionLower === "topcollege") {
+      toggleArrayItem(selectedTopCollege, setSelectedTopCollege, item);
+    }
+    else if (sectionLower === "popularcollege") {
+      toggleArrayItem(selectedPopularCollege, setSelectedPopularCollege, item);
     }
 
     // Call parent component's handleFilterChange

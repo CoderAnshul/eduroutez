@@ -5,6 +5,7 @@ import { ThumbsUp, ThumbsDown } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
 import { likeQuestion, likeAnswer } from "../ApiFunctions/api";
 import useModal from "../Components/Modal/useModal";
+import DOMPurify from "dompurify";
 
 const QuestionandAnswer = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -622,7 +623,10 @@ const QuestionandAnswer = () => {
                     }}
                   />
                 </div>
-                <h3 className="font-bold text-lg">Q: {item.question}</h3>
+                <div
+                  className="font-bold text-lg"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.question) }}
+                />
 
                 <div className="text-sm text-gray-500">
                   <span>Label: {item.label}</span>

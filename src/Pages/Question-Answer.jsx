@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -14,12 +14,24 @@ import {
   ChevronDown,
   ThumbsUp,
   ThumbsDown,
+  Eye,
+  EyeOff,
+  Edit3,
+  Trash2,
+  Save,
+  FileText,
+  Globe,
+  Lock,
+  Plus,
+  X,
 } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
-import { likeQuestion, likeAnswer } from "../ApiFunctions/api";
+import { likeQuestion, likeAnswer, updateQuestion, deleteQuestion, getMyQuestions } from "../ApiFunctions/api";
 import { toast } from "react-toastify";
 import AuthPopup from "../Components/AuthPopup";
 import Promotions from "./CoursePromotions";
+import RichEditor from "../Ui components/RichEditor";
+import DOMPurify from "dompurify";
 
 const Card = ({ children, className = "" }) => (
   <div
@@ -135,7 +147,10 @@ const VoteButtons = ({ voteScore = 0, userVote, onVote, disabled }) => {
 
 const AnswersList = ({ answers, questionId, onAnswerVote }) => {
   const [showAllAnswers, setShowAllAnswers] = useState(false);
-  const userEmail = localStorage.getItem("email") || "";
+  const [replyText, setReplyText] = useState("");
+  const [replyingToAnswerId, setReplyingToAnswerId] = useState(null);
+  const queryClient = useQueryClient();
+  const apiUrl = import.meta.env.VITE_BASE_URL;
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -181,6 +196,29 @@ const AnswersList = ({ answers, questionId, onAnswerVote }) => {
     return found ? found.type : null;
   };
 
+  const handleReplySubmit = async (answerId) => {
+    const stripped = replyText.replace(/<[^>]*>/g, "").trim();
+    if (!stripped) return;
+    try {
+      const currentEmail = localStorage.getItem("email") || "";
+      await axiosInstance.post(
+        `${apiUrl}/question-answer/${questionId}/answer/${answerId}/reply`,
+        { answer: replyText, repliedBy: currentEmail },
+        {
+          headers: {
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
+        }
+      );
+      setReplyText("");
+      setReplyingToAnswerId(null);
+      queryClient.invalidateQueries(["questions"]);
+    } catch (err) {
+      toast.error("Failed to submit reply");
+    }
+  };
+
   const displayedAnswers = showAllAnswers ? answers : [answers[0]];
   const remainingCount = answers.length - 1;
 
@@ -189,27 +227,91 @@ const AnswersList = ({ answers, questionId, onAnswerVote }) => {
       {displayedAnswers.map((answer, index) => {
         const userVote = getUserVote(answer);
         return (
-          <div
-            key={answer._id || index}
-            className="p-4 bg-red-50 border-l-4 border-red-600 rounded-lg"
-          >
-            <div
-              dangerouslySetInnerHTML={{ __html: answer.answer }}
-              className="text-gray-700 mb-2"
-            />
-            <div className="flex items-center justify-between text-sm text-gray-600 mt-2">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                <span>{formatUserDisplay(answer?.answeredBy)}</span>
-                <span>•</span>
-                <span>{formatDate(answer?.answeredAt)}</span>
-              </div>
-              <VoteButtons
-                voteScore={answer.voteScore ?? 0}
-                userVote={userVote}
-                onVote={(type) => onAnswerVote(questionId, answer._id, type, answer.answeredBy)}
+          <div key={answer._id || index}>
+            <div className="p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
+              <div
+                dangerouslySetInnerHTML={{ __html: answer.answer }}
+                className="text-gray-700 mb-2"
               />
+              <div className="flex items-center justify-between text-sm text-gray-600 mt-2">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>{formatUserDisplay(answer?.answeredBy)}</span>
+                  <span>•</span>
+                  <span>{formatDate(answer?.answeredAt)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const token = localStorage.getItem("accessToken");
+                      if (!token || token === "null") {
+                        sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
+                        window.location.href = "/login";
+                        return;
+                      }
+                      setReplyingToAnswerId(replyingToAnswerId === answer._id ? null : answer._id);
+                      setReplyText("");
+                    }}
+                    className="text-xs text-gray-500 hover:text-red-600 flex items-center gap-1"
+                  >
+                    <MessageCircle className="h-3 w-3" />
+                    Reply
+                  </button>
+                  <VoteButtons
+                    voteScore={answer.voteScore ?? 0}
+                    userVote={userVote}
+                    onVote={(type) => onAnswerVote(questionId, answer._id, type, answer.answeredBy)}
+                  />
+                </div>
+              </div>
             </div>
+
+            {/* Replies */}
+            {answer.replies && answer.replies.length > 0 && (
+              <div className="ml-8 mt-2 space-y-2">
+                {answer.replies.map((reply) => (
+                  <div key={reply._id} className="p-3 bg-gray-50 border-l-2 border-gray-300 rounded">
+                    <div
+                      dangerouslySetInnerHTML={{ __html: reply.answer }}
+                      className="text-gray-600 text-sm mb-1"
+                    />
+                    <div className="text-xs text-gray-400 flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      <span>{formatUserDisplay(reply.repliedBy)}</span>
+                      <span>•</span>
+                      <span>{formatDate(reply.repliedAt)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Reply form */}
+            {replyingToAnswerId === answer._id && (
+              <div className="ml-8 mt-2 space-y-2">
+                <RichEditor
+                  key={`reply-${answer._id}`}
+                  value={replyText}
+                  onChange={setReplyText}
+                  placeholder="Write a reply..."
+                  height={80}
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleReplySubmit(answer._id)}
+                    className="px-3 py-1.5 bg-[#b82025] text-white text-xs rounded-lg hover:bg-red-700"
+                  >
+                    Reply
+                  </button>
+                  <button
+                    onClick={() => { setReplyingToAnswerId(null); setReplyText(""); }}
+                    className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs rounded-lg hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         );
       })}
@@ -236,17 +338,29 @@ const CombinedQuestionsPage = () => {
     question: "",
     grade: "",
     label: "",
+    tags: [],
+    isAnonymous: false,
+    visibility: "public",
+    status: "published",
   });
+  const [tagInput, setTagInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilters, setActiveFilters] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc");
+  const [editingQuestion, setEditingQuestion] = useState(null);
+  const [showMyDrafts, setShowMyDrafts] = useState(false);
+  const [myDrafts, setMyDrafts] = useState([]);
+  const [loadingDrafts, setLoadingDrafts] = useState(false);
+  const [answerText, setAnswerText] = useState("");
+  const [answeringQuestionId, setAnsweringQuestionId] = useState(null);
 
   const grades = ["8th", "9th", "10th", "11th", "12th"];
   const labels = ["Courses", "Career", "Institute", "Placement", "Admission"];
   const apiUrl = import.meta.env.VITE_BASE_URL;
   const userEmail = localStorage.getItem("email") || "user@example.com";
+  const userId = localStorage.getItem("userId");
 
   const isLoggedIn = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -277,6 +391,38 @@ const CombinedQuestionsPage = () => {
     onError: handleVoteError,
   });
 
+  const submitAnswerMutation = useMutation({
+    mutationFn: async ({ questionId, answer }) => {
+      const currentEmail = localStorage.getItem("email") || "";
+      const response = await axiosInstance.post(
+        `${apiUrl}/question-answer/${questionId}/answer`,
+        { answer, answeredBy: currentEmail },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": localStorage.getItem("accessToken"),
+            "x-refresh-token": localStorage.getItem("refreshToken"),
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Answer submitted!");
+      setAnswerText("");
+      setAnsweringQuestionId(null);
+      queryClient.invalidateQueries(["questions"]);
+    },
+    onError: (error) => {
+      if (error.response?.status === 401) {
+        sessionStorage.setItem("redirectAfterLogin", location.pathname);
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.error?.message || "Failed to submit answer");
+      }
+    },
+  });
+
   const requireLogin = () => {
     sessionStorage.setItem("redirectAfterLogin", location.pathname);
     navigate("/login");
@@ -297,6 +443,20 @@ const CombinedQuestionsPage = () => {
     }
     const answeredByEmail = typeof answeredBy === 'object' ? answeredBy?.email : answeredBy;
     likeAnswerMutation.mutate({ questionId, answerId, type, answeredBy: answeredByEmail });
+  };
+
+  const handleAnswerSubmit = (questionId) => {
+    if (!isLoggedIn) {
+      sessionStorage.setItem("redirectAfterLogin", location.pathname);
+      navigate("/login");
+      return;
+    }
+    const stripped = answerText.replace(/<[^>]*>/g, "").trim();
+    if (!stripped) {
+      toast.error("Please write an answer");
+      return;
+    }
+    submitAnswerMutation.mutate({ questionId, answer: answerText });
   };
 
   const getUserQuestionVote = (question) => {
@@ -354,11 +514,14 @@ const CombinedQuestionsPage = () => {
         searchFields: JSON.stringify({ question: searchQuery }),
       };
       // Add filters in the JSON format if there are active filters
+      const baseFilters = { visibility: "public" };
       if (activeFilters.length > 0) {
-        // Create the filters object with label containing the pipe-separated categories
-        queryParams.filters = JSON.stringify({
-          label: [activeFilters.join("|")],
-        });
+        baseFilters.label = [activeFilters.join("|")];
+      }
+      queryParams.filters = JSON.stringify(baseFilters);
+      // Pass userId so the backend includes the user's own private questions
+      if (userId) {
+        queryParams.userId = userId;
       }
 
       // Request user objects from backend when available
@@ -376,12 +539,19 @@ const CombinedQuestionsPage = () => {
 
   const { mutate, isPending: isSubmitting } = useMutation({
     mutationFn: async (formData) => {
+      const payload = {
+        question: formData.question,
+        grade: formData.grade,
+        label: formData.label,
+        tags: formData.tags,
+        isAnonymous: formData.isAnonymous,
+        visibility: formData.visibility,
+        status: formData.status,
+        askedBy: userEmail,
+      };
       const response = await axiosInstance.post(
         `${apiUrl}/question-answer`,
-        {
-          ...formData,
-          askedBy: userEmail,
-        },
+        payload,
         {
           headers: {
             "Content-Type": "application/json",
@@ -392,19 +562,21 @@ const CombinedQuestionsPage = () => {
       );
       return response.data;
     },
-    onSuccess: () => {
-      toast.success("Question Submitted successfully!");
-      document.getElementById("questionForm").reset();
-      setFormData({ question: "", grade: "", label: "" });
+    onSuccess: (data, variables) => {
+      if (variables.status === "draft") {
+        toast.success("Draft saved!");
+      } else {
+        toast.success("Question submitted successfully!");
+      }
+      document.getElementById("questionForm")?.reset();
+      setFormData({ question: "", grade: "", label: "", tags: [], isAnonymous: false, visibility: "public", status: "published" });
+      setTagInput("");
       refetch();
     },
     onError: (error) => {
-      // Check if it's an authentication error (401 Unauthorized)
       if (error.response?.status === 401 || error.response?.data?.message?.includes("Unauthorized") || error.response?.data?.message?.includes("token")) {
-        // Store form data and redirect to login immediately without showing error
         sessionStorage.setItem("redirectAfterLogin", location.pathname);
         sessionStorage.setItem("pendingQuestion", JSON.stringify(formData));
-        // Redirect immediately without toast or delay to prevent page blink
         navigate("/login", { replace: true });
       } else {
         toast.error("An error occurred. Please try again.");
@@ -412,28 +584,145 @@ const CombinedQuestionsPage = () => {
     },
   });
 
+  const updateQuestionMutation = useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await updateQuestion(id, data);
+      return response;
+    },
+    onSuccess: () => {
+      toast.success("Question updated!");
+      setEditingQuestion(null);
+      queryClient.invalidateQueries(["questions"]);
+      if (showMyDrafts) fetchMyDrafts();
+    },
+    onError: (err) => {
+      toast.error("Failed to update question");
+    },
+  });
+
+  const deleteQuestionMutation = useMutation({
+    mutationFn: async (id) => {
+      const response = await deleteQuestion(id);
+      return response;
+    },
+    onSuccess: () => {
+      toast.success("Question deleted");
+      queryClient.invalidateQueries(["questions"]);
+    },
+    onError: (err) => {
+      toast.error("Failed to delete question");
+    },
+  });
+
+  const fetchMyDrafts = useCallback(async () => {
+    setLoadingDrafts(true);
+    try {
+      const res = await getMyQuestions("draft");
+      setMyDrafts(res?.data || []);
+    } catch (err) {
+      toast.error("Failed to load drafts");
+    }
+    setLoadingDrafts(false);
+  }, []);
+
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleQuestionChange = (value) => {
+    setFormData((prev) => ({ ...prev, question: value }));
+  };
+
+  const handleAddTag = () => {
+    const trimmed = tagInput.trim();
+    if (trimmed && !formData.tags.includes(trimmed)) {
+      setFormData((prev) => ({ ...prev, tags: [...prev.tags, trimmed] }));
+    }
+    setTagInput("");
+  };
+
+  const handleRemoveTag = (tag) => {
+    setFormData((prev) => ({ ...prev, tags: prev.tags.filter((t) => t !== tag) }));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
+
+  const handleSubmit = (e, status = "published") => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Check if user is logged in (check for token existence and validity)
+    const stripped = formData.question.replace(/<[^>]*>/g, "").trim();
+    if (!stripped) {
+      toast.error("Please enter your question");
+      return false;
+    }
+
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken || accessToken === "null" || accessToken === "undefined" || accessToken === "") {
-      // Store current page URL and form data for redirect/auto-submit after login
       sessionStorage.setItem("redirectAfterLogin", location.pathname);
-      sessionStorage.setItem("pendingQuestion", JSON.stringify(formData));
-      // Open the login popup instead of redirecting
+      sessionStorage.setItem("pendingQuestion", JSON.stringify({ ...formData, status }));
       setShowLoginPopup(true);
       return false;
     }
 
-    mutate(formData);
+    mutate({ ...formData, status });
     return false;
+  };
+
+  const handleEditQuestion = (question) => {
+    setEditingQuestion(question._id);
+    setFormData({
+      question: question.question,
+      grade: question.grade || "",
+      label: question.label || "",
+      tags: question.tags || [],
+      isAnonymous: question.isAnonymous || false,
+      visibility: question.visibility || "public",
+      status: question.status || "published",
+    });
+  };
+
+  const handleSaveEdit = (e, questionId, status = formData.status) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const stripped = formData.question.replace(/<[^>]*>/g, "").trim();
+    if (!stripped) {
+      toast.error("Question cannot be empty");
+      return;
+    }
+
+    updateQuestionMutation.mutate({
+      id: questionId,
+      data: {
+        question: formData.question,
+        grade: formData.grade,
+        label: formData.label,
+        tags: formData.tags,
+        isAnonymous: formData.isAnonymous,
+        visibility: formData.visibility,
+        status,
+      },
+    });
+  };
+
+  const handleDeleteQuestion = (questionId) => {
+    if (window.confirm("Are you sure you want to delete this question?")) {
+      deleteQuestionMutation.mutate(questionId);
+    }
+  };
+
+  const toggleMyDrafts = () => {
+    if (!showMyDrafts) {
+      fetchMyDrafts();
+    }
+    setShowMyDrafts(!showMyDrafts);
   };
 
   const handleSearchChange = (e) => {
@@ -486,32 +775,65 @@ const CombinedQuestionsPage = () => {
 
             <Card>
               <CardHeader>
-                <h2 className="text-2xl font-semibold text-gray-800">
-                  Ask a Question
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Get guidance from experts and peers!
-                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-semibold text-gray-800">
+                      {editingQuestion ? "Edit Question" : "Ask a Question"}
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Get guidance from experts and peers!
+                    </p>
+                  </div>
+                  <button
+                    onClick={toggleMyDrafts}
+                    className="flex items-center gap-1 text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded"
+                  >
+                    <FileText className="h-3 w-3" />
+                    {showMyDrafts ? "Hide Drafts" : "My Drafts"}
+                  </button>
+                </div>
               </CardHeader>
               <CardContent>
+                {showMyDrafts && (
+                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg max-h-40 overflow-y-auto">
+                    <h4 className="text-sm font-semibold text-yellow-800 mb-2">Your Drafts</h4>
+                    {loadingDrafts ? (
+                      <p className="text-xs text-yellow-600">Loading...</p>
+                    ) : myDrafts.length === 0 ? (
+                      <p className="text-xs text-yellow-600">No drafts saved</p>
+                    ) : (
+                      myDrafts.map((draft) => (
+                        <div key={draft._id} className="flex items-center justify-between py-1 border-b border-yellow-100 last:border-0">
+                          <span className="text-xs truncate flex-1">{draft.question.replace(/<[^>]*>/g, "")}</span>
+                          <button
+                            onClick={() => handleEditQuestion(draft)}
+                            className="text-xs text-blue-600 hover:text-blue-800 ml-2"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+
                 <form
                   id="questionForm"
-                  onSubmit={handleSubmit}
+                  onSubmit={(e) => handleSubmit(e, formData.status)}
                   className="space-y-5"
                 >
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Your Question
                     </label>
-                    <textarea
-                      name="question"
-                      value={formData.question}
-                      onChange={handleInputChange}
-                      required
-                      rows="4"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-                      placeholder="Type your question..."
-                    />
+                    <div className="border border-gray-300 rounded-lg overflow-hidden">
+                      <RichEditor
+                        value={formData.question}
+                        onChange={handleQuestionChange}
+                        placeholder="Type your question..."
+                        height={150}
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -555,24 +877,119 @@ const CombinedQuestionsPage = () => {
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors ${isSubmitting ? "opacity-75 cursor-not-allowed" : ""
-                      }`}
-                  >
-                    {isSubmitting ? (
+                  {/* Tags */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tags
+                    </label>
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      {formData.tags.map((tag) => (
+                              <span key={tag} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                                {tag}
+                                <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-blue-900">
+                                  <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                        placeholder="Add a tag and press Enter"
+                      />
+                      <button type="button" onClick={handleAddTag} className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg">
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Anonymous + Visibility */}
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="isAnonymous"
+                        checked={formData.isAnonymous}
+                        onChange={handleInputChange}
+                        className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                      />
+                      <span className="text-sm text-gray-700 flex items-center gap-1">
+                        {formData.isAnonymous ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        Post anonymously
+                      </span>
+                    </label>
+
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-gray-400" />
+                      <select
+                        name="visibility"
+                        value={formData.visibility}
+                        onChange={handleInputChange}
+                        className="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white"
+                      >
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    {editingQuestion ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Submitting...
+                        <button
+                          type="button"
+                          onClick={(e) => handleSaveEdit(e, editingQuestion, "draft")}
+                          disabled={updateQuestionMutation.isPending}
+                          className="flex items-center justify-center gap-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-75 text-sm"
+                        >
+                          <Save className="w-4 h-4" />
+                          Draft
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => handleSaveEdit(e, editingQuestion, "published")}
+                          disabled={updateQuestionMutation.isPending}
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-75"
+                        >
+                          <Send className="w-5 h-5" />
+                          {formData.status === "draft" ? "Publish" : "Save & Publish"}
+                        </button>
                       </>
                     ) : (
                       <>
-                        <Send className="w-5 h-5" />
-                        Submit Question
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-75"
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              Submitting...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-5 h-5" />
+                              Submit
+                            </>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => handleSubmit(e, "draft")}
+                          disabled={isSubmitting}
+                          className="flex items-center justify-center gap-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-75 text-sm"
+                        >
+                          <Save className="w-4 h-4" />
+                          Draft
+                        </button>
                       </>
                     )}
-                  </button>
+                  </div>
                 </form>
               </CardContent>
             </Card>
@@ -626,16 +1043,19 @@ const CombinedQuestionsPage = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {questionsData?.result?.map((question) => (
+                  {questionsData?.result?.map((question) => {
+                  const isOwner = question.userId?.toString() === userId || question.askedBy?.email === userEmail;
+                  return (
                   <Card
                     key={question._id}
                     className="hover:shadow-xl transition-shadow"
                   >
                     <CardHeader>
                       <div className="flex items-start justify-between">
-                        <h3 className="text-lg font-bold text-gray-800 flex-1">
-                          {question.question}
-                        </h3>
+                        <div
+                          className="text-lg font-bold text-gray-800 flex-1"
+                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(question.question) }}
+                        />
                         <VoteButtons
                           voteScore={question.voteScore ?? 0}
                           userVote={getUserQuestionVote(question)}
@@ -652,10 +1072,19 @@ const CombinedQuestionsPage = () => {
                           <span>{question.label}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <User className="h-4 w-4" />
-                          <span>
-                            {question.askedBy?.name || question.askedBy?.email || "Anonymous"}
-                          </span>
+                          {question.isAnonymous ? (
+                            <>
+                              <EyeOff className="h-4 w-4 text-gray-400" />
+                              <span className="italic text-gray-400">Anonymous</span>
+                            </>
+                          ) : (
+                            <>
+                              <User className="h-4 w-4" />
+                              <span>
+                                {question.askedBy?.name || question.askedBy?.email || "Anonymous"}
+                              </span>
+                            </>
+                          )}
                         </div>
                         <div className="flex items-center gap-1">
                           <MessageCircle className="h-4 w-4" />
@@ -665,7 +1094,45 @@ const CombinedQuestionsPage = () => {
                           <Clock className="h-4 w-4" />
                           <span>{formatDate(question.createdAt)}</span>
                         </div>
+                        {/* Visibility badge */}
+                        <div className="flex items-center gap-1">
+                          {question.visibility === "private" ? (
+                            <><Lock className="h-3 w-3 text-orange-500" /><span className="text-orange-500 text-xs">Private</span></>
+                          ) : (
+                            <><Globe className="h-3 w-3 text-green-500" /><span className="text-green-500 text-xs">Public</span></>
+                          )}
+                        </div>
+                        {/* Tags */}
+                        {question.tags && question.tags.length > 0 && (
+                          <div className="flex items-center gap-1 flex-wrap w-full">
+                            {question.tags.map((tag) => (
+                              <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs rounded-full font-medium border border-indigo-200">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {question.isEdited && (
+                          <span className="text-xs text-gray-400 italic">(edited)</span>
+                        )}
                       </div>
+                      {/* Edit/Delete buttons for owner */}
+                      {isOwner && (
+                        <div className="flex gap-2 mt-2 pt-2 border-t border-gray-100">
+                          <button
+                            onClick={() => handleEditQuestion(question)}
+                            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
+                          >
+                            <Edit3 className="h-3 w-3" /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteQuestion(question._id)}
+                            className="flex items-center gap-1 text-xs text-red-600 hover:text-red-800"
+                          >
+                            <Trash2 className="h-3 w-3" /> Delete
+                          </button>
+                        </div>
+                      )}
                     </CardHeader>
                     <CardContent>
                       <AnswersList
@@ -673,9 +1140,52 @@ const CombinedQuestionsPage = () => {
                         questionId={question._id}
                         onAnswerVote={handleAnswerVote}
                       />
+                      {answeringQuestionId === question._id ? (
+                        <div className="mt-4 space-y-2">
+                          <RichEditor
+                            key={`answer-${question._id}`}
+                            value={answerText}
+                            onChange={setAnswerText}
+                            placeholder="Write your answer..."
+                            height={120}
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleAnswerSubmit(question._id)}
+                              disabled={submitAnswerMutation.isPending}
+                              className="flex items-center gap-2 px-4 py-2 bg-[#b82025] text-white rounded-lg hover:bg-red-700 text-sm disabled:opacity-75"
+                            >
+                              {submitAnswerMutation.isPending ? "Submitting..." : "Submit Answer"}
+                            </button>
+                            <button
+                              onClick={() => { setAnsweringQuestionId(null); setAnswerText(""); }}
+                              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            if (!isLoggedIn) {
+                              sessionStorage.setItem("redirectAfterLogin", location.pathname);
+                              navigate("/login");
+                              return;
+                            }
+                            setAnsweringQuestionId(question._id);
+                            setAnswerText("");
+                          }}
+                          className="mt-3 flex items-center gap-2 text-sm text-red-600 hover:text-red-800 font-medium"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                          Write an answer
+                        </button>
+                      )}
                     </CardContent>
                   </Card>
-                ))}
+                  );
+                })}
 
                 {questionsData?.result?.length === 0 && (
                   <div className="text-center py-12">

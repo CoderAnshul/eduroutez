@@ -627,6 +627,14 @@ const SearchPage = () => {
       title: "Ratings",
       items: ["5 stars", "4 stars", "3 stars", "2 stars", "1 star"],
     },
+    {
+      title: "topCollege",
+      items: ["Yes"],
+    },
+    {
+      title: "popularCollege",
+      items: ["Yes"],
+    },
   ];
 
   // Add this function to prevent scroll reset
@@ -712,6 +720,19 @@ const SearchPage = () => {
       // Create a deep copy of filters to avoid modifying the original
       const apiFilters = JSON.parse(JSON.stringify(filters));
 
+      // Check for topCollege and popularCollege filters (they are boolean Yes/No)
+      const isTopCollege = apiFilters.topCollege && apiFilters.topCollege.includes("Yes");
+      const isPopularCollege = apiFilters.popularCollege && apiFilters.popularCollege.includes("Yes");
+
+      // Remove these from apiFilters since API may not support them
+      if (isTopCollege) delete apiFilters.topCollege;
+      if (isPopularCollege) delete apiFilters.popularCollege;
+
+      // Determine sort field based on these filters
+      let effectiveSortField = sortField;
+      if (isTopCollege && !sortField) effectiveSortField = "rank";
+      if (isPopularCollege && !sortField) effectiveSortField = "views";
+
       // Ensure we're using "streams" (plural) for the API
       if (apiFilters.stream && !apiFilters.streams) {
         apiFilters.streams = apiFilters.stream;
@@ -747,9 +768,9 @@ const SearchPage = () => {
       }
 
       // Only send non-rank sort to API (MongoDB puts null/0 first for rank asc, we sort client-side like navbar)
-      if (sortField && sortField !== "rank") {
+      if (effectiveSortField && effectiveSortField !== "rank") {
         const direction = "desc";
-        const sortObj = { [sortField]: direction };
+        const sortObj = { [effectiveSortField]: direction };
         queryString += `&sort=${encodeURIComponent(JSON.stringify(sortObj))}`;
       }
 
@@ -759,13 +780,30 @@ const SearchPage = () => {
         const { result = [], currentPage, totalPages, totalDocuments } = response?.data?.data || {};
 
         let safeResult = Array.isArray(result) ? result : [];
-        if (sortField === "rank") {
+
+        // Apply client-side filtering for topCollege and popularCollege
+        if (isTopCollege) {
+          safeResult = safeResult.filter(inst => inst.rank && Number(inst.rank) > 0);
+        }
+        if (isPopularCollege) {
+          safeResult = safeResult.filter(inst => inst.views && Number(inst.views) > 0);
+        }
+
+        // Client-side sort for rank (like navbar does)
+        if (effectiveSortField === "rank") {
           safeResult = [...safeResult].sort((a, b) => {
             const ra = Number(a.rank) > 0 ? Number(a.rank) : Infinity;
             const rb = Number(b.rank) > 0 ? Number(b.rank) : Infinity;
             return ra - rb;
           });
+        } else if (effectiveSortField === "views") {
+          safeResult = [...safeResult].sort((a, b) => {
+            const va = Number(a.views) || 0;
+            const vb = Number(b.views) || 0;
+            return vb - va; // descending for views
+          });
         }
+
         setContent(safeResult);
         setFilteredContent(safeResult);
         setTotalDocuments(totalDocuments);

@@ -338,10 +338,41 @@ export const createQuery = async (formData) => {
 
 export const postQuestion = async (formData) => {
   try {
-    const response = await axios.post(`${baseURL}/question-answer`, formData);
+    const response = await axiosInstance.post(`/question-answer`, formData);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching institute with ID :`, error);
+    console.error(`Error posting question:`, error);
+    throw error;
+  }
+};
+
+export const updateQuestion = async (id, formData) => {
+  try {
+    const response = await axiosInstance.patch(`/question-answer/${id}`, formData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating question:`, error);
+    throw error;
+  }
+};
+
+export const deleteQuestion = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/question-answer/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting question:`, error);
+    throw error;
+  }
+};
+
+export const getMyQuestions = async (status = "published") => {
+  try {
+    const response = await axiosInstance.get(`/my-questions?status=${status}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching my questions:`, error);
+    throw error;
   }
 };
 
