@@ -300,10 +300,12 @@ const SearchPage = () => {
       cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
-        const streamNames =
-          data.data?.result
-            ?.filter((stream) => stream.status)
-            ?.map((stream) => stream.name) || [];
+        const raw = data?.data?.result || data?.result || data || [];
+        const list = Array.isArray(raw) ? raw : [];
+        const streamNames = list
+          .filter((stream) => stream?.status)
+          .map((stream) => stream?.name)
+          .filter(Boolean);
         setStreams(streamNames);
       },
     }
@@ -740,11 +742,13 @@ const SearchPage = () => {
       }
 
       // Make sure all filter arrays are properly formatted
+      // Use $in operator for array values so MongoDB matches documents
+      // whose field CONTAINS any of the values (instead of exact array match)
       Object.keys(apiFilters).forEach((key) => {
-        // If the value is not already an array, convert it to an array
         if (!Array.isArray(apiFilters[key])) {
           apiFilters[key] = [apiFilters[key]];
         }
+        apiFilters[key] = { $in: apiFilters[key] };
       });
 
       // Include search query if it exists

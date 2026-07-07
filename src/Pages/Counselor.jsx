@@ -33,6 +33,7 @@ const CounselorListPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [streams, setStreams] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [nameStreams, setNameStreams] = useState(null);
   const [showSidebar, setShowSidebar] = useState(false);
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(6);
@@ -72,8 +73,24 @@ const CounselorListPage = () => {
     const nameParam = searchParams.get("name");
     if (nameParam) {
       setSearchTerm(nameParam);
+      fetchCounselorByName(nameParam);
+    } else {
+      setNameStreams(null);
     }
   }, [searchParams]);
+
+  const fetchCounselorByName = async (name) => {
+    try {
+      const res = await axios.get(`${VITE_BASE_URL}/counselors?search=${encodeURIComponent(name)}&limit=1`);
+      const counselor = res.data?.data?.result?.[0];
+      if (counselor?.streams?.length > 0) {
+        setNameStreams(counselor.streams);
+        setSelectedStreams(counselor.streams);
+      }
+    } catch (err) {
+      console.error("Error fetching counselor by name:", err.message);
+    }
+  };
 
   useEffect(() => {
     const quoteInterval = setInterval(() => {
@@ -160,13 +177,27 @@ const CounselorListPage = () => {
   useEffect(() => {
     const fetchStreams = async () => {
       try {
-        const response = await getCounsellorStreams();
-        const streamsData = response?.data?.result || [];
+        const [streamsRes, counselorsRes] = await Promise.all([
+          getCounsellorStreams(),
+          axios.get(`${VITE_BASE_URL}/counselors`),
+        ]);
 
-        // Filter only active streams (status === true)
-        const activeStreams = streamsData.filter((stream) => stream.status === true);
+        const allStreams = streamsRes?.data?.result || [];
+        const counselors = counselorsRes?.data?.data?.result || [];
 
-        setStreams(activeStreams);
+        // Collect all stream names that have at least one counselor
+        const availableStreams = new Set();
+        counselors.forEach((c) => {
+          (c.streams || []).forEach((s) => availableStreams.add(s));
+          if (c.category) availableStreams.add(c.category);
+        });
+
+        // Only show active streams that have counselors
+        const filtered = allStreams.filter(
+          (s) => s.status === true && availableStreams.has(s.name)
+        );
+
+        setStreams(filtered);
       } catch (error) {
         console.error("Error fetching streams:", error.message);
       }
@@ -185,25 +216,26 @@ const CounselorListPage = () => {
         'information technology': ['information technology', 'it', 'information tech'],
       };
 
-      // Case-insensitive filtering - normalize both stream names and counselor categories
+      // Case-insensitive filtering - check both category and streams array
       filtered = filtered.filter((counselor) => {
-        if (!counselor || !counselor.category) return false;
+        if (!counselor) return false;
 
-        const counselorCategory = counselor.category.trim().toLowerCase();
+        const counselorStreams = [
+          ...(counselor.streams || []),
+          ...(counselor.category ? [counselor.category] : []),
+        ].map((s) => s.trim().toLowerCase());
+
+        if (counselorStreams.length === 0) return false;
 
         return selectedStreams.some((stream) => {
           const streamLower = stream.trim().toLowerCase();
 
-          // Direct match
-          if (streamLower === counselorCategory) return true;
+          // Direct match against any of the counselor's streams
+          if (counselorStreams.includes(streamLower)) return true;
 
-          // Check if stream has known aliases
+          // Check aliases
           const aliases = streamNameMap[streamLower] || [];
-          if (aliases.includes(counselorCategory)) return true;
-
-          // Check if counselor category has known aliases
-          const categoryAliases = streamNameMap[counselorCategory] || [];
-          if (categoryAliases.includes(streamLower)) return true;
+          if (aliases.some((a) => counselorStreams.includes(a))) return true;
 
           return false;
         });
@@ -347,10 +379,16 @@ const CounselorListPage = () => {
                 <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
                   <h3 className="text-lg font-semibold mb-4">Filter by Stream</h3>
                   <div className="flex flex-col gap-2 border-2 border-gray-300 rounded-lg p-3">
-                    {streams.length === 0 ? (
-                      <p className="text-gray-500 text-sm">Loading streams...</p>
-                    ) : (
-                      streams.map((stream) => {
+                    {(() => {
+                      const displayStreams = nameStreams
+                        ? streams.filter((s) => nameStreams.includes(s.name))
+                        : streams;
+
+                      if (displayStreams.length === 0) {
+                        return <p className="text-gray-500 text-sm">Loading streams...</p>;
+                      }
+
+                      return displayStreams.map((stream) => {
                         const isChecked = selectedStreams.includes(stream.name);
                         return (
                           <label
@@ -372,8 +410,8 @@ const CounselorListPage = () => {
                             </span>
                           </label>
                         );
-                      })
-                    )}
+                      });
+                    })()}
                   </div>
                 </div>
                 <Promotions
