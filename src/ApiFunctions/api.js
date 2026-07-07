@@ -214,7 +214,8 @@ export const getCoursesById = async (idOrSlug) => {
     console.log("Processing request for:", idOrSlug);
 
     // Determine if we're dealing with an ID or a slug
-    const isSlug = isNaN(parseInt(idOrSlug)) || idOrSlug.includes("-");
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(idOrSlug);
+    const isSlug = !isObjectId;
 
     let response;
 
@@ -1040,7 +1041,7 @@ const scoreInstitute = (inst, { marks, exam, preferredCourse, budget, state, cit
   if (city && inst.city) {
     if (inst.city.toLowerCase() === city.toLowerCase()) dims.location = 100;
     else if (inst.city.toLowerCase().includes(city.toLowerCase()) ||
-             city.toLowerCase().includes(inst.city.toLowerCase())) dims.location = 75;
+      city.toLowerCase().includes(inst.city.toLowerCase())) dims.location = 75;
     else if (state && inst.state) {
       if (inst.state.toLowerCase() === state.toLowerCase()) dims.location = 55;
       else dims.location = 20;
@@ -1102,9 +1103,9 @@ export const getNearbyInstitutes = async ({ state, city, budget, exam, marks, ca
         _tier: classifyTier(i).tier,
         _tierLabel: classifyTier(i).tierLabel,
         _match: city && i.city?.toLowerCase() === city.toLowerCase() ? "same_city" :
-                state && i.state?.toLowerCase() === state.toLowerCase() ? "same_state" : "other",
+          state && i.state?.toLowerCase() === state.toLowerCase() ? "same_state" : "other",
         _score: city && i.city?.toLowerCase() === city.toLowerCase() ? 100 :
-                state && i.state?.toLowerCase() === state.toLowerCase() ? 70 : 40
+          state && i.state?.toLowerCase() === state.toLowerCase() ? 70 : 40
       }))
       .sort((a, b) => {
         if (a._match !== b._match) return a._match === "same_city" ? -1 : a._match === "same_state" ? -1 : 1;

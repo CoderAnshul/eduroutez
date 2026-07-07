@@ -62,9 +62,8 @@ const SubNavbar = ({ categories }) => {
 
         if (response.data?.data?.result) {
           response.data.data.result.forEach((course) => {
-            if (course.courseTitle) {
-              const slug = getCourseSlug(course);
-              courseIdMap[slug] = course._id;
+            if (course.slug) {
+              courseIdMap[course.slug] = course._id;
             }
           });
           updateGlobalMap();
@@ -135,7 +134,7 @@ const SubNavbar = ({ categories }) => {
         setTopColleges(popularResponse.data?.data?.result || []);
 
         // Top colleges by NIRF rank
-      const recentResponse = await axiosInstance.get(
+        const recentResponse = await axiosInstance.get(
           `${import.meta.env.VITE_BASE_URL}/institutes?select=["_id","slug","instituteName","views","rank"]&limit=30`
         );
         const ranked = (recentResponse.data?.data?.result || []).sort((a, b) => {
@@ -154,8 +153,10 @@ const SubNavbar = ({ categories }) => {
         const res = await axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/course-categories?page=0&limit=50`);
         const cats = res.data?.data?.result || res.data?.result || [];
         setCourseCategories(cats);
-        if (cats.length > 0) setSelectedCourseCat(cats[0]._id);
-      } catch {}
+        const DEFAULT_CAT_ID = "693906e3921a67f883d61a6e";
+        const hasDefault = cats.some((c) => c._id === DEFAULT_CAT_ID);
+        setSelectedCourseCat(hasDefault ? DEFAULT_CAT_ID : cats[0]?._id ?? null);
+      } catch { }
     };
 
     fetchPopularCourses();
@@ -173,7 +174,7 @@ const SubNavbar = ({ categories }) => {
       try {
         const res = await axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/courses?filters={"category":"${selectedCourseCat}"}&limit=50`);
         setCoursesByCategory((prev) => ({ ...prev, [selectedCourseCat]: res.data?.data?.result || [] }));
-      } catch {}
+      } catch { }
     };
     fetchCourses();
   }, [selectedCourseCat]);
@@ -184,10 +185,7 @@ const SubNavbar = ({ categories }) => {
     localStorage.setItem("courseIdMap", JSON.stringify({ ...existingMap, ...courseIdMap }));
   };
 
-  const getCourseSlug = (course) =>
-    course?.courseTitle
-      ? course.courseTitle.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim()
-      : course?._id;
+  const getCourseSlug = (course) => course?.slug || course?._id;
 
   const getCareerId = (career) => career?._id;
 
@@ -361,9 +359,8 @@ const SubNavbar = ({ categories }) => {
           {courseCategories.map((cat) => (
             <li
               key={cat._id}
-              className={`pl-3 pr-3 py-2 text-xs cursor-pointer transition-all hover:bg-black/20 ${
-                selectedCourseCat === cat._id ? "bg-black text-white font-medium" : "text-white/90"
-              }`}
+              className={`pl-3 pr-3 py-2 text-xs cursor-pointer transition-all hover:bg-black/20 ${selectedCourseCat === cat._id ? "bg-black text-white font-medium" : "text-white/90"
+                }`}
               onMouseEnter={() => setSelectedCourseCat(cat._id)}
             >
               {cat.title || cat.name}
@@ -425,7 +422,7 @@ const SubNavbar = ({ categories }) => {
 
   const renderTopCollegesContent = () => (
     <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
-    {/* <div className="p-6 bg-white w-full"> */}
+      {/* <div className="p-6 bg-white w-full"> */}
       <div className="grid grid-cols-3 gap-6">
         {/* Popular Colleges */}
         <div className="space-y-6">
@@ -510,7 +507,7 @@ const SubNavbar = ({ categories }) => {
 
   const renderNewsContent = () => (
     <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100 hide-scrollbar">
-    {/* <div className="bg-white rounded-xl w-full shadow-lg"> */}
+      {/* <div className="bg-white rounded-xl w-full shadow-lg"> */}
       <div className="p-4 border-b">
         <h3 className="text-lg font-bold text-black">Latest Updates</h3>
       </div>
@@ -545,7 +542,7 @@ const SubNavbar = ({ categories }) => {
 
   const renderMoreContent = () => (
     <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
-    {/* <div className="bg-pink rounded-lg shadow-lg p-6 w-full"> */}
+      {/* <div className="bg-pink rounded-lg shadow-lg p-6 w-full"> */}
       <div className="grid grid-cols-3 gap-8">
         <div className="space-y-4">
           <h3 className="font-semibold text-red-500 text-base border-b pb-2">Resources</h3>
@@ -583,7 +580,7 @@ const SubNavbar = ({ categories }) => {
 
     return (
       <div className=" flex gap-6">
-      {/* <div className="p-4 flex gap-6"> */}
+        {/* <div className="p-4 flex gap-6"> */}
         <div className="min-w-48 font-sans">
           <h3 className="font-semibold text-red-500 text-base mb-3 font-sans">Popular Colleges</h3>
           {popular.length === 0 ? (

@@ -6,7 +6,7 @@ const ScheduledSlots = () => {
     const [slots, setSlots] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    
+
     const apiUrl = import.meta.env.VITE_BASE_URL;
     const id = localStorage.getItem("userId");
 
@@ -125,7 +125,7 @@ const ScheduledSlots = () => {
                                     <div className="flex items-center gap-2">
                                         <MapPin className="h-4 w-4 text-gray-500" />
                                         <span className="text-gray-700">
-                                            {typeof slot.counselorId?.city === 'string' ? slot.counselorId.city : 'Location not specified'}, 
+                                            {typeof slot.counselorId?.city === 'string' ? slot.counselorId.city : 'Location not specified'},
                                             {typeof slot.counselorId?.country === 'string' ? slot.counselorId.country : ''}
                                         </span>
                                     </div>

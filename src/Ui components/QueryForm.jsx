@@ -18,25 +18,25 @@ const QueryForm = ({ instituteData }) => {
   const validateForm = (formData) => {
     const newErrors = {};
     const requiredFields = ["name", "email", "number", "query"];
-    
+
     requiredFields.forEach(field => {
       if (!formData.get(field)) {
         newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
       }
     });
-    
+
     // Email validation
     const email = formData.get("email");
     if (email && !/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = "Please enter a valid email address";
     }
-    
+
     // Phone number validation (simple check for numbers only)
     const phoneNo = formData.get("number");
     if (phoneNo && !/^\d+$/.test(phoneNo)) {
       newErrors.number = "Phone number should contain only digits";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -65,7 +65,7 @@ const QueryForm = ({ instituteData }) => {
       setShowLoginPopup(true);
       return;
     }
-    
+
     // Validate the form
     if (!validateForm(formData)) {
       toast.error("Please fill all required fields correctly");
@@ -142,9 +142,11 @@ const QueryForm = ({ instituteData }) => {
               type="text"
               name="name"
               placeholder="Enter your name"
-              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                errors.name ? "border-red-500" : ""
-              }`}
+              onChange={(e) => {
+                e.target.value = e.target.value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, "");
+              }}
+              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${errors.name ? "border-red-500" : ""
+                }`}
             />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
@@ -156,9 +158,11 @@ const QueryForm = ({ instituteData }) => {
               type="email"
               name="email"
               placeholder="Enter your email"
-              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                errors.email ? "border-red-500" : ""
-              }`}
+              onChange={(e) => {
+                e.target.value = e.target.value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, "");
+              }}
+              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${errors.email ? "border-red-500" : ""
+                }`}
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
@@ -170,9 +174,8 @@ const QueryForm = ({ instituteData }) => {
               type="text"
               name="number"
               placeholder="Enter your number"
-              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                errors.number ? "border-red-500" : ""
-              }`}
+              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${errors.number ? "border-red-500" : ""
+                }`}
             />
             {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number}</p>}
           </div>
@@ -184,9 +187,8 @@ const QueryForm = ({ instituteData }) => {
               name="query"
               placeholder="Enter your query"
               rows="4"
-              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent resize-none border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                errors.query ? "border-red-500" : ""
-              }`}
+              className={`w-full px-3 py-2 text-sm border-[1.5px] bg-transparent resize-none border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${errors.query ? "border-red-500" : ""
+                }`}
             ></textarea>
             {errors.query && <p className="text-red-500 text-xs mt-1">{errors.query}</p>}
           </div>

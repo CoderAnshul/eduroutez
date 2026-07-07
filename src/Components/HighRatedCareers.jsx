@@ -15,7 +15,7 @@ const stripHtml = (html) => {
   return temp.textContent || temp.innerText || "";
 };
 
-const HighRatedCareers = ({ title = "High Rating Careers", streamId, categoryId }) => {
+const HighRatedCareers = ({ title = "Highly Rated Careers", streamId, categoryId }) => {
   const [content, setContent] = useState([]);
   const [images, setImages] = useState({});
 
@@ -112,7 +112,7 @@ const HighRatedCareers = ({ title = "High Rating Careers", streamId, categoryId 
 
   return (
     <div className="universal-container py-12 w-full min-h-44 max-w-[1420px] pl-[10px] pr-[10px] pb-10 mx-auto">
-    {/* <div className="container mx-auto px-4 py-12"> */}
+      {/* <div className="container mx-auto px-4 py-12"> */}
       <div className="flex items-center justify-between mb-8 px-2">
         <div className="flex items-center gap-2">
           <h2 className="text-2xl font-bold">{title}</h2>
@@ -129,7 +129,7 @@ const HighRatedCareers = ({ title = "High Rating Careers", streamId, categoryId 
         {memoizedContent && memoizedContent.length > 0 ? (
           memoizedContent.map((box, index) => (
             <Link
-              to={`/detailpage/${box.slug}`}
+              to={`/detailpage/${box.slug || box._id}`}
               key={box._id || index}
               className="group bg-white text-black shadow-md rounded-xl overflow-hidden h-full flex flex-col transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
             >
@@ -142,7 +142,7 @@ const HighRatedCareers = ({ title = "High Rating Careers", streamId, categoryId 
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-                
+
                 <div className="absolute inset-0 p-6 flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div className="bg-white/20 backdrop-blur-md text-white border border-white/30 text-[10px] font-medium px-2 py-1 rounded shadow-sm">
@@ -161,7 +161,7 @@ const HighRatedCareers = ({ title = "High Rating Careers", streamId, categoryId 
               {/* Content */}
               <div className="p-6 flex-1 flex flex-col">
                 <div className="space-y-4 px-2 pt-1 flex-1">
-                  <div 
+                  <div
                     className="text-gray-700 text-sm line-clamp-3 h-18"
                     dangerouslySetInnerHTML={{
                       __html: stripHtml(box?.description || "No description available")
@@ -174,13 +174,13 @@ const HighRatedCareers = ({ title = "High Rating Careers", streamId, categoryId 
                       <span>{box.views || 0} views</span>
                     </div>
 
-                    <div 
+                    <div
                       className="transition-transform hover:scale-110"
                       onClick={(e) => handleShareClick(e, box)}
                     >
                       <SocialShare
                         title={box.title}
-                        url={`${window.location.origin}/detailpage/${box.slug}`}
+                        url={`${window.location.origin}/detailpage/${box.slug || box._id}`}
                         contentType="career"
                       />
                     </div>

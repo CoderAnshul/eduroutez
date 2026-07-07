@@ -70,13 +70,21 @@ const BecomeCounselor = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let cleanValue = value;
+
+    // Globally strip emojis from text fields
+    if (["firstname", "lastname", "email", "contactno"].includes(name)) {
+      const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu;
+      cleanValue = value.replace(emojiRegex, "");
+    }
+
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: cleanValue,
     }));
 
     if (name === "email") {
-      if (value && !validateEmail(value)) {
+      if (cleanValue && !validateEmail(cleanValue)) {
         setEmailError("Please enter a valid email address");
       } else {
         setEmailError("");

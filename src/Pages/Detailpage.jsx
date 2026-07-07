@@ -126,9 +126,10 @@ const DetailPage = () => {
       try {
         console.log("[DetailPage] fetchCareer start", { id, currentUserId });
 
-        // Determine if we're dealing with an ID or a slug
-        const isSlug = isNaN(parseInt(id)) || id.includes("-");
-        console.log("[DetailPage] route type", { id, isSlug });
+        // Determine if we're dealing with an ID (24-char hex ObjectId) or a slug
+        const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+        const isSlug = !isObjectId;
+        console.log("[DetailPage] route type", { id, isSlug, isObjectId });
 
         // Initialize variables for API response and career ID
         let response;
@@ -153,7 +154,7 @@ const DetailPage = () => {
             // then cache the resolved ID for future visits.
             console.log("[DetailPage] no mapped ID, fetching by slug directly", { slug: id });
             response = await CarrerDetail(id);
-            const payload = response?.data ?? response;
+            const payload = response; // CarrerDetail returns item directly
             console.log("[DetailPage] slug fetch payload", payload);
 
             if (payload && payload._id) {
@@ -179,7 +180,7 @@ const DetailPage = () => {
           response = await CarrerDetail(careerId);
 
           // If the career has a slug, we should save that mapping too
-          const payload = response?.data ?? response;
+          const payload = response; // CarrerDetail returns item directly
           console.log("[DetailPage] direct ID payload", payload);
           if (payload && payload.slug) {
             const slug = payload.slug;
@@ -199,10 +200,11 @@ const DetailPage = () => {
           }
         }
 
-        const payload = response?.data ?? response;
+        // CarrerDetail already returns the extracted item object directly
+        const payload = response;
         console.log("[DetailPage] normalized payload", payload);
 
-        if (!payload) {
+        if (!payload || !payload._id) {
           console.error("No career data found");
           return;
         }
@@ -339,7 +341,7 @@ const DetailPage = () => {
 
   return (
     <>
-    {/* SEO */}
+      {/* SEO */}
       <Helmet>
         <title>
           {`${data.title} Career Details, Eligibility, Skills & Career Scope | Eduroutez`}
@@ -360,7 +362,7 @@ const DetailPage = () => {
 
         <link
           rel="canonical"
-          href={`https://eduroutez.com/detailpage/${slug}`}
+          href={`https://eduroutez.com/detailpage/${data.slug || data._id}`}
         />
       </Helmet>
 
@@ -482,7 +484,7 @@ const DetailPage = () => {
       <div className="flex gap-4 flex-col sm:flex-row">
         {/* <Events /> */}
 
-         {/* <ConsellingBanner /> */}
+        {/* <ConsellingBanner /> */}
       </div>
     </>
   );

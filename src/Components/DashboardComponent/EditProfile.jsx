@@ -41,10 +41,10 @@ const EditProfile = () => {
           phone: response.data.data.phone,
           dob:
             response.data.data.dateOfBirth &&
-            !isNaN(new Date(response.data.data.dateOfBirth))
+              !isNaN(new Date(response.data.data.dateOfBirth))
               ? new Date(response.data.data.dateOfBirth)
-                  .toISOString()
-                  .split("T")[0]
+                .toISOString()
+                .split("T")[0]
               : "",
           gender: response.data.data.gender,
           designation: response.data.data.designation,
@@ -117,9 +117,10 @@ const EditProfile = () => {
                 <input
                   type="text"
                   value={userData.name}
-                  onChange={(e) =>
-                    setUserData({ ...userData, name: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const cleanValue = e.target.value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, "");
+                    setUserData({ ...userData, name: cleanValue })
+                  }}
                   className="w-full border rounded px-4 py-2"
                 />
               </div>
@@ -130,9 +131,10 @@ const EditProfile = () => {
                 <input
                   type="text"
                   value={userData.phone}
-                  onChange={(e) =>
-                    setUserData({ ...userData, phone: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const cleanValue = e.target.value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, "");
+                    setUserData({ ...userData, phone: cleanValue })
+                  }}
                   className="w-full border rounded px-4 py-2"
                 />
               </div>

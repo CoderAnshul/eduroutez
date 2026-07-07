@@ -27,6 +27,9 @@ export const ContactusForm = () => {
                   id="name"
                   type="text"
                   placeholder="Name"
+                  onChange={(e) => {
+                    e.target.value = e.target.value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, "");
+                  }}
                   className="w-full p-3 border border-gray-300 rounded-md bg-blue-50 text-sm"
                 />
               </div>
@@ -38,6 +41,9 @@ export const ContactusForm = () => {
                   id="email"
                   type="email"
                   placeholder="Your Email"
+                  onChange={(e) => {
+                    e.target.value = e.target.value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, "");
+                  }}
                   className="w-full p-3 border border-gray-300 rounded-md bg-blue-50 text-sm"
                 />
               </div>

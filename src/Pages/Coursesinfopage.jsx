@@ -406,7 +406,7 @@ const Coursesinfopage = () => {
 
         <link
           rel="canonical"
-          href={`https://eduroutez.com/coursesinfopage/${slug}`}
+          href={`https://eduroutez.com/coursesinfopage/${content.slug || content._id}`}
         />
       </Helmet>
 
