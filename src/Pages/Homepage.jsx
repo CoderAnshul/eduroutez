@@ -74,7 +74,7 @@ const Homepage = () => {
       <div className="universal-container flex flex-col items-center">
         <TrendingCourses />
       </div>
-      <CourseRanking />
+      {/* <CourseRanking /> */}
       <PopularCategories />
       <div className='universal-container flex flex-col items-center' >
         <BestRated />

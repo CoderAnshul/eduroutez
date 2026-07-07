@@ -228,7 +228,7 @@ const TrendingStreams = () => {
       <div className="flex items-center justify-between mb-10">
         <div className="flex items-center gap-2">
           <Sparkles className="text-red-500 w-6 h-6" />
-          <h3 className="text-2xl font-bold">Popular Courses</h3>
+          <h3 className="text-2xl font-bold">Popular Streams</h3>
         </div>
         <Link to="/popular-courses">
           <button className="bg-[#b82025] hover:bg-[#b82025] text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2 transform hover:scale-105 shadow-md">
@@ -238,7 +238,8 @@ const TrendingStreams = () => {
         </Link>
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
@@ -253,7 +254,7 @@ const TrendingStreams = () => {
           <ChevronLeft className="w-5 h-5 text-gray-700" />
         </button>
 
-        <div 
+        <div
           ref={scrollRef}
           className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -274,15 +275,13 @@ const TrendingStreams = () => {
                   <div className="h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">
                     {/* Image or decorative background */}
                     <div
-                      className={`h-36 relative overflow-hidden ${
-                        !hasImage ? design.bgColor : ""
-                      }`}
+                      className={`h-36 relative overflow-hidden ${!hasImage ? design.bgColor : ""
+                        }`}
                     >
                       {hasImage ? (
                         <SafeImage
-                          src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${
-                            item.image
-                          }`}
+                          src={`${import.meta.env.VITE_IMAGE_BASE_URL}/${item.image
+                            }`}
                           alt={streamDetails.name || "Stream image"}
                           title={streamDetails.name}
                           className="w-full h-full object-cover"
@@ -325,9 +324,8 @@ const TrendingStreams = () => {
 
                       {/* Short description - placeholder text based on stream name */}
                       <p className="text-gray-600 mb-6 line-clamp-2">
-                        {`Explore ${
-                          streamDetails.name || "this stream"
-                        } and discover comprehensive courses and resources designed to enhance your knowledge and skills.`}
+                        {`Explore ${streamDetails.name || "this stream"
+                          } and discover comprehensive courses and resources designed to enhance your knowledge and skills.`}
                       </p>
 
                       {/* Explore button */}
