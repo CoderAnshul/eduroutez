@@ -339,7 +339,7 @@ const DetailPage = () => {
 
   return (
     <>
-    {/* SEO */}
+      {/* SEO */}
       <Helmet>
         <title>
           {`${data.title} Career Details, Eligibility, Skills & Career Scope | Eduroutez`}
@@ -360,7 +360,19 @@ const DetailPage = () => {
 
         <link
           rel="canonical"
-          href={`https://eduroutez.com/detailpage/${slug}`}
+          href={`https://eduroutez.com/detailpage/${data?.slug}`}
+        />
+        <meta
+          property="og:title"
+          content={`${data.title} Career Details | Eduroutez`}
+        />
+
+        <meta
+          property="og:description"
+          content={
+            data.metaDescription ||
+            `${data.title} career details including eligibility, required skills, salary, career opportunities, and future scope.`
+          }
         />
       </Helmet>
 
@@ -482,7 +494,7 @@ const DetailPage = () => {
       <div className="flex gap-4 flex-col sm:flex-row">
         {/* <Events /> */}
 
-         {/* <ConsellingBanner /> */}
+        {/* <ConsellingBanner /> */}
       </div>
     </>
   );

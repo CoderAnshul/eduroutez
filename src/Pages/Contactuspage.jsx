@@ -7,12 +7,12 @@ import { Helmet } from "react-helmet-async";
 const Contactuspage = () => {
   return (
     <>
-    {/* SEO */}
+      {/* SEO */}
       <Helmet>
         <title>Contact Eduroutez | Get in Touch for Eduroutez & career Guidance</title>
         <meta
-          name="Description"
-          content="Contact Eduroutez for education guidance, college admission, career counseling, partnerships and support. reach out to our team for assistance"
+          name="description"
+          content="Contact Eduroutez for education guidance, college admission, career counseling, partnerships and support. Reach out to our team for assistance"
         />
         <meta
           name="keywords"
@@ -20,6 +20,13 @@ const Contactuspage = () => {
         />
         <link rel="canonical" href="https://eduroutez.com/contactuspage"
         />
+        <meta property="og:title"
+          pcontent="Contact Eduroutez | Education Support & Career Guidance" />
+        <meta
+          property="og:description"
+          content="Get in touch with Eduroutez for education guidance, college admissions, career counseling, and support."
+        />
+
       </Helmet>
 
       <PageBanner pageName="Get In Touch" currectPage="Contact us" />

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Calendar, Eye, Clock, AlertCircle, ThumbsUp } from 'lucide-react';
 import axios from "axios";
+import { Helmet } from "react-helmet-async";
 
 const NewsDetailPage = () => {
   const [newsDetail, setNewsDetail] = useState(null);
@@ -174,6 +175,19 @@ const NewsDetailPage = () => {
 
   return (
     <>
+      {/* SEO */}
+      <Helmet>
+        <title>{newsDetail?.title} | Eduroutez</title>
+        <meta name="description"
+          content={newsDetail?.description
+            ? newsDetail.description.replace(/<[^>]*>/g, "").substring(0, 160)
+            : "Latest education news, admissions, scholarships, exams and college updates on Eduroutez."} />
+
+        <meta name="keywords"
+          content="Education News, College News, Admission, Scholarships, Exams, Eduroutez"
+        />
+      </Helmet>
+
       <div className="universal-container min-h-screen bg-gray-50 py-8">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {/* News Header */}
