@@ -79,7 +79,8 @@ const QueryForm = ({ instituteData }) => {
       email: formData.get("email"),
       phoneNo: formData.get("number"),
       query: formData.get("query"),
-      instituteId: formData.get("instituteId")
+      instituteId: formData.get("instituteId"),
+      type: "query",
     };
 
     createQuery(data)
@@ -110,6 +111,7 @@ const QueryForm = ({ instituteData }) => {
           phoneNo: pending.phoneNo,
           query: pending.query,
           instituteId: pending.instituteId,
+          type: "query",
         });
         toast.success('Query Submitted Successfully');
         sessionStorage.removeItem('pendingQuery');

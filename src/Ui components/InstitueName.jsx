@@ -50,6 +50,7 @@ const InstitueName = ({ instituteData }) => {
         instituteId: data.instituteId || instituteData?.data?._id,
         stream: data.stream,
         level: data.level,
+        type: "application",
       };
 
       console.log("Query payload:", queryPayload);
@@ -267,6 +268,7 @@ const InstitueName = ({ instituteData }) => {
         instituteId: instituteData?.data?._id,
         stream: formData.stream,
         level: formData.level,
+        type: "application",
       };
 
       try {
