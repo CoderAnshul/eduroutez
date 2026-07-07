@@ -18,10 +18,13 @@ const BecomeCounselor = () => {
     contactno: "",
     password: "",
     category: "",
+    streams: [],
+    examAccepted: [],
     otp: ""
   });
 
   const [streams, setStreams] = useState([]);
+  const [examInput, setExamInput] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -569,23 +572,113 @@ const BecomeCounselor = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1" htmlFor="category">
-              Category
+            <label className="block text-sm font-medium mb-1">
+              Streams / Categories (select multiple)
             </label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              <option value="">Select a category</option>
+            <div className="border rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
               {streams.map((stream) => (
-                <option key={stream.id} value={stream.name}>
-                  {stream.name}
-                </option>
+                <label key={stream.id || stream._id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.streams.includes(stream.name)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData((prev) => ({
+                          ...prev,
+                          streams: [...prev.streams, stream.name],
+                        }));
+                      } else {
+                        setFormData((prev) => ({
+                          ...prev,
+                          streams: prev.streams.filter((s) => s !== stream.name),
+                        }));
+                      }
+                    }}
+                    className="accent-red-600"
+                  />
+                  <span className="text-sm">{stream.name}</span>
+                </label>
               ))}
-            </select>
+            </div>
+            {formData.streams.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {formData.streams.map((s) => (
+                  <span key={s} className="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">
+              Exams Accepted
+            </label>
+            <div className="flex gap-2 mb-2">
+              <input
+                type="text"
+                value={examInput}
+                onChange={(e) => setExamInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const val = examInput.trim();
+                    if (val && !formData.examAccepted.includes(val)) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        examAccepted: [...prev.examAccepted, val],
+                      }));
+                      setExamInput('');
+                    }
+                  }
+                }}
+                placeholder="Type exam name and press Enter"
+                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const val = examInput.trim();
+                  if (val && !formData.examAccepted.includes(val)) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      examAccepted: [...prev.examAccepted, val],
+                    }));
+                    setExamInput('');
+                  }
+                }}
+                className="px-3 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 text-sm"
+              >
+                Add
+              </button>
+            </div>
+            <div className="border rounded-lg p-3 min-h-[42px] flex flex-wrap gap-2">
+              {formData.examAccepted.length > 0 ? (
+                formData.examAccepted.map((exam) => (
+                  <span
+                    key={exam}
+                    className="inline-flex items-center gap-1 bg-red-100 text-red-700 text-sm px-2 py-1 rounded-full"
+                  >
+                    {exam}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          examAccepted: prev.examAccepted.filter((e) => e !== exam),
+                        }));
+                      }}
+                      className="ml-1 text-red-500 hover:text-red-700 font-bold"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))
+              ) : (
+                <span className="text-sm text-gray-400">No exams added yet</span>
+              )}
+            </div>
           </div>
 
           {!isOtpVerified && (

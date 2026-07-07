@@ -79,6 +79,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     referralCode: "",
     role: "",
     category: "",
+    streams: [],
     // Store the name values separately for display purposes
     countryName: "",
     stateName: "",
@@ -489,8 +490,8 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       toast.error("Please fill all required fields");
       return false;
     }
-    if (formData.role === "counsellor" && !formData.category) {
-      toast.error("Please select a stream");
+    if (formData.role === "counsellor" && formData.streams.length === 0) {
+      toast.error("Please select at least one stream");
       return false;
     }
     return true;
@@ -765,27 +766,50 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
                 />
               </div>
 
-              {/* Stream Selection for Counsellor */}
+              {/* Stream Selection for Counsellor (multi-select) */}
               {formData.role === "counsellor" && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1" htmlFor="category">
-                    Stream *
-                  </label>
-                  <select
-                    id="category"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                    value={formData.category}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select your stream</option>
-                    {streams.map((stream) => (
-                      <option key={stream.id || stream._id} value={stream.name}>
-                        {stream.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">
+                      Streams / Categories (select multiple) *
+                    </label>
+                    <div className="border rounded-lg p-3 max-h-40 overflow-y-auto space-y-2">
+                      {streams.map((stream) => (
+                        <label key={stream.id || stream._id} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.streams.includes(stream.name)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  streams: [...prev.streams, stream.name],
+                                }));
+                              } else {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  streams: prev.streams.filter((s) => s !== stream.name),
+                                }));
+                              }
+                            }}
+                            className="accent-red-600"
+                          />
+                          <span className="text-sm">{stream.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {formData.streams.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {formData.streams.map((s) => (
+                          <span key={s} className="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                </>
               )}
 
               {/* Location Selection */}
