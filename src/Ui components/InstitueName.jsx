@@ -27,6 +27,7 @@ const InstitueName = ({ instituteData }) => {
     instituteId: "",
     stream: "",
     level: "",
+    specialization: "",
   });
 
   // Helper function to check if user is logged in
@@ -50,6 +51,7 @@ const InstitueName = ({ instituteData }) => {
         instituteId: data.instituteId || instituteData?.data?._id,
         stream: data.stream,
         level: data.level,
+        specialization: data.specialization,
         type: "application",
       };
 
@@ -73,6 +75,7 @@ const InstitueName = ({ instituteData }) => {
         queryRelatedTo: "",
         stream: "",
         level: "",
+        specialization: "",
       });
     } catch (error) {
       console.error("Submit error:", error);
@@ -268,6 +271,7 @@ const InstitueName = ({ instituteData }) => {
         instituteId: instituteData?.data?._id,
         stream: formData.stream,
         level: formData.level,
+        specialization: formData.specialization,
         type: "application",
       };
 
@@ -712,6 +716,43 @@ const InstitueName = ({ instituteData }) => {
                         value={formData.queryRelatedTo}
                         onChange={handleChange}
                         required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="group">
+                    <label
+                      className="block text-xs font-medium text-gray-700 mb-1"
+                      htmlFor="specialization"
+                    >
+                      Specialization
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none text-gray-400">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                          <path d="M2 17l10 5 10-5"></path>
+                          <path d="M2 12l10 5 10-5"></path>
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        id="specialization"
+                        name="specialization"
+                        className="w-full pl-8 pr-2 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all duration-200"
+                        placeholder="e.g. Computer Science, MBA, Biotechnology"
+                        value={formData.specialization}
+                        onChange={handleChange}
                       />
                     </div>
                   </div>
