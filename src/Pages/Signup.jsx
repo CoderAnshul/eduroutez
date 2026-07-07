@@ -1027,9 +1027,9 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
             </div>
 
             <div className="flex justify-center gap-4">
-              <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center bg-white rounded-full hover:bg-gray-200">
+              {/* <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center bg-white rounded-full hover:bg-gray-200">
                 <img src={fb} className="h-7" alt="Facebook icon" />
-              </button>
+              </button> */}
               <button className="w-10 h-10 flex justify-center border-2 shadow-md items-center rounded-full bg-white hover:bg-gray-200">
                 <img src={google} className="h-6" alt="Google icon" />
               </button>

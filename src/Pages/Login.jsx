@@ -260,7 +260,7 @@ const Login = ({ isMode, onSwitch, onClose }) => {
           </div>
 
           <div className="flex justify-center gap-6">
-            <FacebookLogin
+            {/* <FacebookLogin
               appId={import.meta.env.VITE_FACEBOOK_APP_ID || "YOUR_FB_APP_ID"}
               callback={responseFacebook}
               render={renderProps => (
@@ -271,7 +271,7 @@ const Login = ({ isMode, onSwitch, onClose }) => {
                   <img src={fb} className="h-7 w-7" alt="facebook icon" />
                 </button>
               )}
-            />
+            /> */}
 
             <button
               onClick={() => googleLogin()}
