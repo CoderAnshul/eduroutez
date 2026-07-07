@@ -38,11 +38,13 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/u;
+    return regex.test(email) && !emojiRegex.test(email);
   };
 
   const validatePhone = (phone) => {
-    return /^\d{10}$/.test(phone);
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/u;
+    return /^\d{10}$/.test(phone) && !emojiRegex.test(phone);
   };
 
   const closeAllFlowPopups = () => {
@@ -439,13 +441,14 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
     } else {
       // Normal field update
       let cleanValue = value;
-      if (id === "password" || id === "confirmPassword") {
-        cleanValue = value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B00-\u2BFF]/g, "");
+      const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu;
+      if (id === "name" || id === "email" || id === "contact_number" || id === "password" || id === "confirmPassword") {
+        cleanValue = value.replace(emojiRegex, "");
       }
       setFormData({ ...formData, [id]: cleanValue });
 
       if (id === "email") {
-        if (value && !validateEmail(value)) {
+        if (cleanValue && !validateEmail(cleanValue)) {
           setEmailError("Please enter a valid email address");
         } else {
           setEmailError("");
@@ -453,7 +456,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       }
 
       if (id === "contact_number") {
-        if (value && !validatePhone(value)) {
+        if (cleanValue && !validatePhone(cleanValue)) {
           setPhoneError("Phone number must be exactly 10 digits");
         } else {
           setPhoneError("");
@@ -476,11 +479,11 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       return false;
     }
     if (emailError) {
-      toast.error("Please fix the email error first");
+      toast.error(emailError);
       return false;
     }
     if (phoneError) {
-      toast.error("Please fix the phone number error first");
+      toast.error(phoneError);
       return false;
     }
     if (
@@ -490,6 +493,21 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       toast.error("Please fill all required fields");
       return false;
     }
+
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/u;
+    if (emojiRegex.test(formData.name)) {
+      toast.error("Name cannot contain emojis");
+      return false;
+    }
+    if (emojiRegex.test(formData.email)) {
+      toast.error("Email cannot contain emojis");
+      return false;
+    }
+    if (emojiRegex.test(formData.contact_number)) {
+      toast.error("Contact number cannot contain emojis");
+      return false;
+    }
+
     if (formData.role === "counsellor" && formData.streams.length === 0) {
       toast.error("Please select at least one stream");
       return false;

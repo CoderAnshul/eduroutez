@@ -41,7 +41,8 @@ const Login = ({ isMode, onSwitch, onClose }) => {
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/u;
+    return regex.test(email) && !emojiRegex.test(email);
   };
 
   const handleAuthSuccess = (data) => {
@@ -133,8 +134,9 @@ const Login = ({ isMode, onSwitch, onClose }) => {
   const handleChange = (e) => {
     const { id, value } = e.target;
     let cleanValue = value;
-    if (id === "password") {
-      cleanValue = value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B00-\u2BFF]/g, "");
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu;
+    if (id === "password" || id === "email") {
+      cleanValue = value.replace(emojiRegex, "");
     }
     setFormData({ ...formData, [id]: cleanValue });
     if (id === "email") {
@@ -144,12 +146,21 @@ const Login = ({ isMode, onSwitch, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/u;
+    if (emojiRegex.test(formData.email)) {
+      toast.error("Email cannot contain emojis");
+      return;
+    }
+    if (!validateEmail(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
     mutation.mutate(formData);
   };
 
   return (
     <>
-    {/* Seo  */}
+      {/* Seo  */}
       <Helmet>
         <title>
           Login to Eduroutez | Student, College, University & Counselor Login

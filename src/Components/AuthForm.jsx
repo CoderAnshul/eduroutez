@@ -15,12 +15,20 @@ const AuthForm = ({ initialTab = 'login', onClose, setAuthTab }) => {
 
   const handleLoginChange = (e) => {
     const { id, value } = e.target;
-    const cleanValue = id === 'password' ? value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B00-\u2BFF]/g, "") : value;
+    let cleanValue = value;
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu;
+    if (id === 'password' || id === 'email') {
+      cleanValue = value.replace(emojiRegex, "");
+    }
     setLoginData({ ...loginData, [id]: cleanValue });
   };
   const handleSignupChange = (e) => {
     const { id, value } = e.target;
-    const cleanValue = id === 'password' ? value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B00-\u2BFF]/g, "") : value;
+    let cleanValue = value;
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu;
+    if (id === 'password' || id === 'name' || id === 'phoneNo' || id === 'email') {
+      cleanValue = value.replace(emojiRegex, "");
+    }
     setSignupData({ ...signupData, [id]: cleanValue });
   };
 
@@ -52,6 +60,16 @@ const AuthForm = ({ initialTab = 'login', onClose, setAuthTab }) => {
 
   const onLogin = async (e) => {
     e.preventDefault();
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/u;
+    if (emojiRegex.test(loginData.email)) {
+      toast.error("Email cannot contain emojis");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(loginData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
     setLoading(true);
     try {
       const res = await axios.post(`${apiUrl}/login`, { ...loginData, isStudent: true });
@@ -103,6 +121,32 @@ const AuthForm = ({ initialTab = 'login', onClose, setAuthTab }) => {
 
   const onSignup = async (e) => {
     e.preventDefault();
+    const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/u;
+    if (!signupData.name || signupData.name.trim() === '') {
+      toast.error("Name is required");
+      return;
+    }
+    if (emojiRegex.test(signupData.name)) {
+      toast.error("Name cannot contain emojis");
+      return;
+    }
+    if (emojiRegex.test(signupData.email)) {
+      toast.error("Email cannot contain emojis");
+      return;
+    }
+    if (emojiRegex.test(signupData.phoneNo)) {
+      toast.error("Contact number cannot contain emojis");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(signupData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    if (!/^\d{10}$/.test(signupData.phoneNo)) {
+      toast.error("Phone number must be exactly 10 digits");
+      return;
+    }
     setLoading(true);
     try {
       const payload = {
@@ -218,7 +262,7 @@ const AuthForm = ({ initialTab = 'login', onClose, setAuthTab }) => {
             <p className="text-sm text-gray-600 mb-4">To become a verified counsellor you need to complete a small verification payment. Would you like to pay now?</p>
             <div className="flex gap-3 justify-end">
               <button onClick={() => { setShowCounsellorPayPopup(false); setTab('login'); setAuthTab && setAuthTab('login'); }} className="px-4 py-2 rounded border">Later</button>
-              <button onClick={() => { setShowCounsellorPayPopup(false); sessionStorage.setItem('pendingApplication','counsellor'); navigate('/counselor-test/payment'); }} className="px-4 py-2 rounded bg-red-600 text-white">Pay Now</button>
+              <button onClick={() => { setShowCounsellorPayPopup(false); sessionStorage.setItem('pendingApplication', 'counsellor'); navigate('/counselor-test/payment'); }} className="px-4 py-2 rounded bg-red-600 text-white">Pay Now</button>
             </div>
           </div>
         </div>
