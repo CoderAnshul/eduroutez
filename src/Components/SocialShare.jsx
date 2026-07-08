@@ -1,11 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import useModal from './Modal/useModal';
 
-// Reusable social sharing component for any content type
 const SocialShare = ({ 
   title, 
   url, 
-  contentType = 'content', // 'course', 'blog', 'career', etc.
+  contentType = 'content',
   className = '',
   iconSize = 20
 }) => {
@@ -13,51 +12,56 @@ const SocialShare = ({
   const [copySuccess, setCopySuccess] = useState(false);
   const menuRef = useRef(null);
   
-  // If URL is not provided, use current page URL
   const shareUrl = url || window.location.href;
   
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-    
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
 
-  // Copy link to clipboard
-  const copyToClipboard = () => {
+  const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(shareUrl).then(() => {
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     });
-  };
+  }, [shareUrl]);
 
   const { showAlert } = useModal();
 
-  // Function to get deep link for platforms that don't have direct web sharing
-  const getDeepLink = (platform) => {
-    switch(platform) {
-      case 'Instagram':
-        // Instagram deep link (opens the app if installed)
-        return `instagram://share?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl)}`;
-      case 'Threads':
-        // Threads deep link (opens the app if installed)
-        return `https://www.threads.net/intent/post?text=${encodeURIComponent(title + ': ' + shareUrl)}`;
-      default:
-        return null;
-    }
-  };
+  const tryDeepLink = useCallback((platform) => {
+    const startTime = Date.now();
+    let fallbackTimer;
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        clearTimeout(fallbackTimer);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
-  // Social media platforms with their sharing URLs
+    window.location.href = platform.deepLinkUrl;
+
+    fallbackTimer = setTimeout(() => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      if (!document.hidden) {
+        if (platform.webUrl) {
+          window.open(platform.webUrl, '_blank', 'noopener');
+        } else if (platform.appStoreUrl) {
+          window.open(platform.appStoreUrl, '_blank', 'noopener');
+        }
+      }
+    }, 2000);
+  }, []);
+
   const platforms = [
     {
       name: 'Facebook',
@@ -67,7 +71,10 @@ const SocialShare = ({
         </svg>
       ),
       color: '#1877F2',
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
+      deepLinkUrl: `fb://share/?url=${encodeURIComponent(shareUrl)}`,
+      webUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      appStoreUrl: 'https://apps.apple.com/app/facebook/id284882215',
+      useDeepLink: true
     },
     {
       name: 'X (Twitter)',
@@ -77,7 +84,7 @@ const SocialShare = ({
         </svg>
       ),
       color: '#000000',
-      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl)}`
+      webUrl: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl)}`
     },
     {
       name: 'LinkedIn',
@@ -89,7 +96,10 @@ const SocialShare = ({
         </svg>
       ),
       color: '#0A66C2',
-      url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
+      deepLinkUrl: `linkedin://share?url=${encodeURIComponent(shareUrl)}`,
+      webUrl: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      appStoreUrl: 'https://apps.apple.com/app/linkedin/id288429040',
+      useDeepLink: true
     },
     {
       name: 'WhatsApp',
@@ -99,7 +109,7 @@ const SocialShare = ({
         </svg>
       ),
       color: '#25D366',
-      url: `https://wa.me/?text=${encodeURIComponent(title + ': ' + shareUrl)}`
+      webUrl: `https://wa.me/?text=${encodeURIComponent(title + ': ' + shareUrl)}`
     },
     {
       name: 'Telegram',
@@ -109,7 +119,7 @@ const SocialShare = ({
         </svg>
       ),
       color: '#0088cc',
-      url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`
+      webUrl: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`
     },
     {
       name: 'Instagram',
@@ -121,9 +131,10 @@ const SocialShare = ({
         </svg>
       ),
       color: '#E4405F',
-      // Using deep link to open Instagram app if installed
-      url: `instagram://share?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl)}`,
-      deepLink: true
+      deepLinkUrl: `instagram://app`,
+      appStoreUrl: 'https://apps.apple.com/app/instagram/id389801252',
+      useDeepLink: true,
+      copyBeforeDeepLink: true
     },
     {
       name: 'Threads',
@@ -133,9 +144,7 @@ const SocialShare = ({
         </svg>
       ),
       color: '#000000',
-      // Using deep link format that might work for Threads app
-      url: `https://www.threads.net/intent/post?text=${encodeURIComponent(title + ': ' + shareUrl)}`,
-      deepLink: true
+      webUrl: `https://www.threads.net/intent/post?text=${encodeURIComponent(title + ': ' + shareUrl)}`
     },
     {
       name: 'Snapchat',
@@ -145,32 +154,24 @@ const SocialShare = ({
         </svg>
       ),
       color: '#FFFC00',
-      url: `https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(shareUrl)}`
+      webUrl: `https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(shareUrl)}`
     }
   ];
 
   const handleShare = (platform) => {
-    // For platforms with deep links or special handling
-    if (platform.deepLink) {
-      // Try to open deep link first
-      window.location.href = platform.url;
-      
-      // Set a fallback timer to copy link if deep link fails
-      setTimeout(() => {
+    setIsOpen(false);
+
+    if (platform.useDeepLink) {
+      if (platform.copyBeforeDeepLink) {
         copyToClipboard();
-        showAlert(`If ${platform.name} didn't open, we've copied the link to your clipboard. You can now paste it in ${platform.name} manually.`);
-      }, 2000);
-      
-      setIsOpen(false);
+      }
+      tryDeepLink(platform);
       return;
     }
-    
-    // Regular web sharing for other platforms
-    if (platform.url) {
-      window.open(platform.url, '_blank', 'width=600,height=400');
+
+    if (platform.webUrl) {
+      window.open(platform.webUrl, '_blank', 'width=600,height=400');
     }
-    
-    setIsOpen(false);
   };
 
   const getTruncatedUrl = (url) => {

@@ -2,7 +2,6 @@ import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../assets/Images/logo.png";
 import favicon from "../../assets/Images/favicon.png";
-import axiosInstance from "../../ApiFunctions/axios";
 const Sidebar = () => {
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", icon: "🏠" },
@@ -20,25 +19,6 @@ const Sidebar = () => {
     { name: "Settings", path: "/dashboard/settings", icon: "⚙️" },
     { name: "Logout", path: "/dashboard/logout", icon: "🚪" },
   ];
-
-  const handleLogout = async (name) => {
-    if (name === "Logout") {
-      try {
-        await axiosInstance.post(`${import.meta.env.VITE_BASE_URL}/logout`, {}, {
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": localStorage.getItem("accessToken"),
-            "x-refresh-token": localStorage.getItem("refreshToken"),
-          }
-        });
-      } catch (error) {
-        console.error("Error during logout API call:", error);
-      } finally {
-        localStorage.clear();
-        window.location.href = "/";
-      }
-    }
-  };
 
   return (
     <>
@@ -60,7 +40,6 @@ const Sidebar = () => {
                     `flex items-center gap-3 p-2 rounded-md ${isActive ? "bg-[#b82025] text-white" : "hover:bg-gray-200"
                     }`
                   }
-                  onClick={() => handleLogout(item.name)}
                 >
                   <span>{item.icon}</span>
                   {item.name}

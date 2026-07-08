@@ -209,7 +209,7 @@ const WelcomeBanner = () => {
       icon: UserPlus,
       title: "Become Counselor",
       color: "bg-[#b82025]",
-      route: "/become-couseller",
+      route: "/counselor-test/payment",
     },
     {
       icon: MessageSquare,

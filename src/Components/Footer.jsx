@@ -232,7 +232,7 @@ const Footer = () => {
                 </div>
               </Link>
               <Link
-                to="https://www.linkedin.com/company/eduroutez-official "
+                to="https://www.linkedin.com/company/135123925"
                 target="_blank"
               >
                 <div className="aspect-w-1 aspect-h-1 transition-transform duration-300 hover:scale-110 hover:-translate-y-1">

@@ -52,6 +52,8 @@ const Login = ({ isMode, onSwitch, onClose }) => {
       localStorage.setItem('userId', data?.data?.user?._id);
       localStorage.setItem('role', data?.data?.user?.role);
       localStorage.setItem('email', data?.data?.user?.email);
+      localStorage.setItem('fullName', data?.data?.user?.name || '');
+      localStorage.setItem('phone', data?.data?.user?.phone || '');
       localStorage.setItem('refreshToken', data.data.refreshToken);
     }
 

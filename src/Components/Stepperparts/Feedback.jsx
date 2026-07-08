@@ -117,10 +117,10 @@ const Feedback = ({ formData, setFormData, setIsSubmit }) => {
     }));
 
     setFormData((prevState) => ({
-      ...prevState,
+      ...(prevState || {}),
       [sectionTitle]: {
-        ...prevState[sectionTitle],
-        [option]: !prevState[sectionTitle]?.[option], // Toggle option
+        ...((prevState || {})[sectionTitle] || {}),
+        [option]: !((prevState || {})[sectionTitle]?.[option]),
       },
     }));
   };
@@ -165,7 +165,7 @@ const Feedback = ({ formData, setFormData, setIsSubmit }) => {
                     <input
                       type="checkbox"
                       className="w-5 h-5 mr-3 accent-[#b82025] cursor-pointer"
-                      checked={formData[section.title]?.[option] || false}
+                      checked={formData?.[section.title]?.[option] || false}
                       onChange={() => handleChange(section.title, option)}
                     />
                     <span className="text-gray-600 group-hover/label:text-gray-900 font-medium">

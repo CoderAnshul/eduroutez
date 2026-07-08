@@ -125,10 +125,10 @@ const Promotions = ({ location, className }) => {
                   {randomPromo.description}
                 </p>
               )}
-              <p className="text-sm text-white/90 underline hover:text-white">
-                Learn more
-              </p>
             </div>
+            <p className="absolute bottom-6 right-6 text-sm text-white/90 underline hover:text-white">
+              Learn more
+            </p>
           </a>
         ) : (
           <div className={`relative rounded-lg ${className || ''}`}>

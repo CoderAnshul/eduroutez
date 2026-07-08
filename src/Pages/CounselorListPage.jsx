@@ -95,6 +95,14 @@ const CounselorListPage = () => {
         <div className="flex justify-center items-center h-64">
           <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
+      ) : counselors.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <i className="fa fa-user-slash text-gray-400 text-3xl"></i>
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">No Counselors Available</h2>
+          <p className="text-gray-500 max-w-md">There are no expert counselors available at the moment. Please check back later.</p>
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Heart, Plus, Building2, BookOpen, Briefcase, Clock, Trash2, IndianRupee, ExternalLink, Search } from "lucide-react";
 import searchBoximg from "../assets/Images/serachBoximg.jpg";
@@ -14,6 +14,7 @@ const TABS = [
 ];
 
 const Wishlist = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("institutes");
   const [colleges, setColleges] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -27,6 +28,10 @@ const Wishlist = () => {
   const itemsPerPage = 6;
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
   const Image_URL = import.meta.env.VITE_IMAGE_BASE_URL;
+
+  const handleExploreColleges = () => {
+    navigate('/searchpage');
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -250,39 +255,41 @@ const Wishlist = () => {
           <>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {displayedItems.map((college) => (
-                <div key={college._id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group relative">
-                  <button
-                    onClick={(e) => handleRemove(college._id, e)}
-                    className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-red-50 p-2 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
-                    aria-label="Remove from wishlist"
-                    title="Remove"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </button>
-                  <div className="relative">
-                    <img
-                      src={college.thumbnailImage ? `${Image_URL}/${college.thumbnailImage}` : searchBoximg}
-                      alt={college.instituteName}
-                      className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
-                  <div className="p-5">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-2 border-b border-red-200 pb-2">{college.instituteName}</h2>
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-600"><span className="font-medium text-red-600">Established:</span> {college.establishedYear}</p>
-                      <p className="text-sm text-gray-600 line-clamp-2">{college.collegeInfo}</p>
-                      <p className="text-sm text-gray-800"><span className="font-medium text-red-600">Highest Package:</span> {college.highestPackage}</p>
-                    </div>
+                <Link key={college._id} to={`/institute/${college.slug || college._id}`} className="group">
+                  <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden relative">
                     <button
-                      onClick={(e) => handleRemove(college._id, e)}
-                      className="mt-3 w-full flex items-center justify-center gap-2 py-2 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRemove(college._id, e); }}
+                      className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-red-50 p-2 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
+                      aria-label="Remove from wishlist"
+                      title="Remove"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      Remove from Wishlist
+                      <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={college.thumbnailImage ? `${Image_URL}/${college.thumbnailImage}` : searchBoximg}
+                        alt={college.instituteName}
+                        className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
+                    <div className="p-5">
+                      <h2 className="text-lg font-semibold text-gray-800 mb-2 border-b border-red-200 pb-2 group-hover:text-red-600 transition-colors">{college.instituteName}</h2>
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600"><span className="font-medium text-red-600">Established:</span> {college.establishedYear}</p>
+                        <p className="text-sm text-gray-600 line-clamp-2">{college.collegeInfo}</p>
+                        <p className="text-sm text-gray-800"><span className="font-medium text-red-600">Highest Package:</span> {college.highestPackage}</p>
+                      </div>
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRemove(college._id, e); }}
+                        className="mt-3 w-full flex items-center justify-center gap-2 py-2 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Remove from Wishlist
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 

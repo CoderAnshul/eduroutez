@@ -146,9 +146,9 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
   const [colleges, setColleges] = useState([]);
   const location = useLocation();
   const [countries, setCountries] = useState([]);
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState(localStorage.getItem("email") || "");
+  const [name, setName] = useState(localStorage.getItem("fullName") || "");
+  const [mobile, setMobile] = useState(localStorage.getItem("phone") || "");
   const dispatch = useDispatch();
   const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
   const apiUrl = import.meta.env.VITE_BASE_URL; // Using the same base URL for consistency
@@ -261,6 +261,16 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
     }
   }, [location.search, location.state, setFormData]);
 
+  // Sync localStorage values into formData on mount
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      email: prev.email || localStorage.getItem("email") || "",
+      fullName: prev.fullName || localStorage.getItem("fullName") || "",
+      mobileNumber: prev.mobileNumber || localStorage.getItem("phone") || "",
+    }));
+  }, []);
+
   // Check if all required fields are filled
   useEffect(() => {
     if (email !== "" && name !== "" && mobile !== "") {
@@ -334,7 +344,7 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
               id="email"
               placeholder="Enter your email"
               value={email}
-              disabled
+              readOnly
               className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none bg-gray-100"
             />
           </div>
@@ -350,7 +360,7 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
               id="fullName"
               placeholder="Enter your name"
               value={name}
-              disabled
+              readOnly
               className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none bg-gray-100"
             />
           </div>
@@ -366,7 +376,7 @@ const PersonalInfo = ({ formData, setFormData, setIsSubmit }) => {
               id="mobileNumber"
               placeholder="Enter your number"
               value={mobile}
-              disabled
+              readOnly
               className="w-full px-4 py-2 mt-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none bg-gray-100"
             />
           </div>

@@ -43,7 +43,7 @@ const Writereview = () => {
     } else if (currentStep === steps.length - 1) {
       const errors = handleSubmit(formData);
       if (!errors) {
-        setIsModalOpen(true); // Open the modal only after successful submission
+        // Modal will open on successful API response
       }
     }
   };
@@ -112,7 +112,7 @@ const Writereview = () => {
     }
 
     setFormData(newFormData);
-    setIsSubmit(false);
+    setIsSubmit(true);
     return null;
   };
 

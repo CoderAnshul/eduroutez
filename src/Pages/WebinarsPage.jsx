@@ -94,33 +94,38 @@ const WebinarsPage = () => {
                   key={webinar._id}
                   className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
                 >
-                  <div className="h-44 w-full overflow-hidden">
+                  <div className="h-44 w-full overflow-hidden bg-gray-200 relative">
+                    <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center p-4">
+                      <h3 className="text-gray-500 font-semibold text-sm text-center line-clamp-3">
+                        {webinar?.title || "Untitled Webinar"}
+                      </h3>
+                    </div>
                     <img
                       src={imgSrc}
                       alt={webinar?.title || "Webinar image"}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = PLACEHOLDER_IMAGE;
-                        e.target.onerror = null;
+                      className="hidden w-full h-full object-cover"
+                      ref={(el) => {
+                        if (el && el.complete) {
+                          el.classList.remove('hidden');
+                          el.previousElementSibling?.classList.add('hidden');
+                        }
+                      }}
+                      onLoad={(e) => {
+                        e.target.classList.remove('hidden');
+                        e.target.previousElementSibling?.classList.add('hidden');
                       }}
                     />
                   </div>
                   <div className="p-4 flex flex-col justify-between h-56">
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">
-                          {webinar?.title || "Untitled Webinar"}
-                        </h2>
+                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                        <span>📅 {formattedDate}</span>
+                        <span>⏰ {webinar?.time || "Time TBA"}</span>
                         {webinar?.instituteName && (
-                          <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                          <span className="ml-auto text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
                             {webinar.instituteName}
                           </span>
                         )}
-                      </div>
-
-                      <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
-                        <span>📅 {formattedDate}</span>
-                        <span>⏰ {webinar?.time || "Time TBA"}</span>
                       </div>
 
                       <div className="text-sm text-gray-600 mt-3 line-clamp-3">

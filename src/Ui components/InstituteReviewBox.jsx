@@ -112,7 +112,7 @@ const rating = calculateAverageRating();
 
         {/* Review */}
         <p className="text-gray-700 text-sm leading-5 break-words">
-          {truncateText(review, 140)}
+          {review || 'No text available.'}
         </p>
 
         {/* Read More */}
@@ -126,62 +126,52 @@ const rating = calculateAverageRating();
                 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[1000] flex items-center h-dvh justify-center bg-black bg-opacity-50">
-          <div className="bg-white relative rounded-lg shadow-lg p-6 max-w-lg w-full">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-50 p-3 sm:p-6">
+          <div className="bg-white relative rounded-lg shadow-lg p-4 sm:p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-gray-700 z-10 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
               onClick={toggleModal}
             >
               ✖
             </button>
             
-            {/* Reviewer Info */}
-            <h4 className="font-bold text-gray-800 mb-2">{reviewerName}</h4>
-            {/* <p className="text-xs text-gray-500 mb-4">
-              {designation} {year && `| ${year}`}
-            </p> */}
+            <h4 className="font-bold text-gray-800 mb-2 pr-8">{reviewerName}</h4>
             <p className="text-sm text-gray-700 mb-4 break-words">{review}</p>
           
+            <div className="space-y-3">
+              <div>
+                <h5 className="font-bold text-gray-800 mb-1">Placement</h5>
+                <p className="text-sm text-gray-700 break-words">{placementDescription}</p>
+              </div>
+              
+              <div>
+                <h5 className="font-bold text-gray-800 mb-1">Faculty</h5>
+                <p className="text-sm text-gray-700 break-words">{facultyDescription}</p>
+              </div>
+              
+              <div>
+                <h5 className="font-bold text-gray-800 mb-1">Campus</h5>
+                <p className="text-sm text-gray-700 break-words">{campusLifeDescription}</p>
+              </div>
 
-            {/* Suggestions */}
-            
-            <h5 className="font-bold text-gray-800 mb-2">placement
-            </h5>
-            <p className='text-sm text-gray-700 mb-4 break-words'>{placementDescription
-            }</p>
-            
-            <h5 className="font-bold text-gray-800 mb-2">Faculty</h5>
-            <p className='text-sm text-gray-700 mb-4 break-words'>{facultyDescription
-            }</p>
-            
-            <h5 className="font-bold text-gray-800 mb-2">Campus</h5>
-            <p className='text-sm text-gray-700 mb-4 break-words'>{campusLifeDescription}</p>
-
-            {/* Course Ratings */}
-            {/* {ratingCategories.some(category => courseRatings[category]) ? ( */}
-              <>
+              <div>
                 <h5 className="font-semibold text-gray-800 mb-2">Course Ratings</h5>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  {allRatings.map((key) => {
-                    
-                    return  (
-                      <li key={key}>
-                        <span className="font-medium">{key.name}: </span>
-                        <Rating 
-                          className="!text-sm" 
-                          name={key.stars} 
-                          value={key.stars} 
-                          precision={0.1} 
-                          readOnly 
-                        />
-                      </li>
-                    ) 
-                  })}
-                </ul>
-              </>
-            {/* ) : (
-              <p className="text-sm text-gray-500">No course ratings available.</p>
-            )} */}
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
+                  {allRatings.map((item) => (
+                    <div key={item.name} className="flex flex-col items-center p-2 bg-gray-50 rounded-lg">
+                      <span className="font-medium text-xs sm:text-sm capitalize">{item.name}</span>
+                      <Rating 
+                        className="!text-sm" 
+                        name={item.name} 
+                        value={Number(item.stars) || 0} 
+                        precision={0.1} 
+                        readOnly 
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
