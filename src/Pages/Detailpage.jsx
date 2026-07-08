@@ -362,7 +362,19 @@ const DetailPage = () => {
 
         <link
           rel="canonical"
-          href={`https://eduroutez.com/detailpage/${data.slug || data._id}`}
+          href={`https://eduroutez.com/detailpage/${data.data?.slug || data._id}`}
+        />
+        <meta
+          property="og:title"
+          content={`${data.title} Career Details | Eduroutez`}
+        />
+
+        <meta
+          property="og:description"
+          content={
+            data.metaDescription ||
+            `${data.title} career details including eligibility, required skills, salary, career opportunities, and future scope.`
+          }
         />
       </Helmet>
 

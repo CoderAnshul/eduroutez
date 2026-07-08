@@ -11,10 +11,10 @@ const Aboutus = () => {
   return (
     <>
     <Helmet>
-      <title>About Eduroutez | Education & Career Guidance Platform</title>
+      <title>About Eduroutez | Education, Colleges, Courses & Career Guidance</title>
       <meta
         name="description"
-        content="Learn about Eduroutez, an education platform helping students find colleges, universities, courses, admissions, and career guidance across India."
+        content="Learn about Eduroutez, India's education platform to explore colleges, universities, courses, admissions, scholarships, placements, and career guidance for students."
       />
       <link
         rel="canonical"

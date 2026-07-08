@@ -304,7 +304,7 @@ const Blogpage = () => {
 
   return (
     <>
-    {/* Seo */}
+      {/* Seo */}
       <Helmet>
         <title>Education Blogs, Career Tips & Exam Updates | Eduroutez</title>
         <meta
@@ -317,6 +317,14 @@ const Blogpage = () => {
         <link
           rel="canonical"
           href="https://eduroutez.com/blogpage"
+        />
+        <meta
+          property="og:title"
+          content="Education Blogs, Career Tips & Exam Updates | Eduroutez"
+        />
+        <meta
+          property="og:url"
+          content="https://eduroutez.com/blogpage"
         />
       </Helmet>
 
@@ -440,7 +448,7 @@ const Blogpage = () => {
       <div className="flex max-sm:flex-col gap-2 items-center">
         {/* <Events /> */}
 
-         {/* <ConsellingBanner /> */}
+        {/* <ConsellingBanner /> */}
       </div>
     </>
   );

@@ -441,23 +441,28 @@ const BlogDetailPage = () => {
     <>
       {/* Seo */}
       <Helmet>
-        <title>
-          {data?.metaTitle || data?.title || "Blog | Eduroutez"}
-        </title>
+        <title>{data.title} | Eduroutez</title>
         <meta
           name="description"
-          content={
-            data?.metaDescription ||
-            "Read the latest education and career guidance articles on Eduroutez."
-          }
+          content={stripHtmlForPreview(data.description).slice(0, 160) ||
+            "Read the latest education and career guidance articles on Eduroutez."}
         />
         <meta
           name="keywords"
-          content={data?.metaKeywords || ""}
+          content={`${data?.category}, ${data?.title}, Eduroutez`}
         />
         <link
           rel="canonical"
-          href={window.location.href}
+          href={`https://eduroutez.com/blog/${data.slug}`}
+        />
+        <meta property="og:title" content={data.title} />
+        <meta
+          property="og:image"
+          content={`${import.meta.env.VITE_IMAGE_BASE_URL}/${data.image}`}
+        />
+        <meta
+          property="og:url"
+          content={`https://eduroutez.com/blog/${data.slug}`}
         />
       </Helmet>
 
@@ -658,7 +663,7 @@ const BlogDetailPage = () => {
         </div>
         <div className="flex gap-2 items-center">
           {/* <Events /> */}
-           {/* <ConsellingBanner /> */}
+          {/* <ConsellingBanner /> */}
         </div>
 
         {/* Use shared AuthPopup for login */}

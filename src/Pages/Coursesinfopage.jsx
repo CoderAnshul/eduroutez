@@ -388,13 +388,12 @@ const Coursesinfopage = () => {
       {/* SEO */}
       <Helmet>
         <title>
-          {`${content.courseTitle} Course Details 2025: Eligibility, Fees, Admission & Career Scope | Eduroutez`}
+          {`${content.courseTitle} Course Details: Eligibility, Fees, Admission & Career Scope | Eduroutez`}
         </title>
 
         <meta
           name="description"
           content={
-            content.shortDescription ||
             `${content.courseTitle} course details including eligibility, fees, admission process, syllabus, duration and career opportunities.`
           }
         />
@@ -406,7 +405,7 @@ const Coursesinfopage = () => {
 
         <link
           rel="canonical"
-          href={`https://eduroutez.com/coursesinfopage/${content.slug || content._id}`}
+          href={`https://eduroutez.com/coursesinfopage/${content.content?.slug || content._id || ""}`}
         />
       </Helmet>
 

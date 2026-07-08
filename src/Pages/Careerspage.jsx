@@ -257,20 +257,42 @@ const Careerspage = () => {
     <>
       <Helmet>
         <title>
-          Career Opportunities in India | Career Options, Career Guidance & Job Paths | Eduroutez
+          Career Opportunities in India | Career Guidance & Career Options | Eduroutez
         </title>
+
         <meta
           name="description"
-          content="Explore career opportunities in Engineering, Medical, Commerce, Arts, Science, Pharmacy, Education, Agriculture and more. Discover career paths, eligibility, skills, salary and future scope with Eduroutez."
+          content="Explore career opportunities in Engineering, Medical, Commerce, Arts, Science, Pharmacy, Education, Agriculture, and more. Discover career paths, eligibility, required skills, salary, and future scope with Eduroutez."
         />
+
         <meta
           name="keywords"
-          content="career opportunities, career guidance, career options after 12th, engineering careers, medical careers, commerce careers, arts careers, science careers, career planning, jobs in India"
-
+          content="career opportunities, career guidance, career options, career options after 12th, engineering careers, medical careers, commerce careers, arts careers, science careers, pharmacy careers, education careers, agriculture careers, career planning, jobs in India, Eduroutez"
         />
+
         <link
           rel="canonical"
           href="https://eduroutez.com/careerspage"
+        />
+
+        <meta
+          property="og:title"
+          content="Career Opportunities in India | Career Guidance & Career Options | Eduroutez"
+        />
+
+        <meta
+          property="og:description"
+          content="Explore career opportunities across Engineering, Medical, Commerce, Arts, Science, Pharmacy, Education, Agriculture, and more with expert career guidance from Eduroutez."
+        />
+
+        <meta
+          property="og:url"
+          content="https://eduroutez.com/careerspage"
+        />
+
+        <meta
+          property="og:type"
+          content="website"
         />
       </Helmet>
 
@@ -479,7 +501,7 @@ const Careerspage = () => {
       <div className="flex gap-2 flex-col sm:flex-row items-center">
         {/* <Events /> */}
 
-         {/* <ConsellingBanner /> */}
+        {/* <ConsellingBanner /> */}
       </div>
     </>
   );
