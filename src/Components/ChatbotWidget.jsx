@@ -1,16 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
 
 const LANGUAGES = [
     { code: 'en', label: 'English' },
     { code: 'hi', label: 'हिंदी' },
-    { code: 'mr', label: 'मराठी' },
-    { code: 'ta', label: 'தமிழ்' },
-    { code: 'te', label: 'తెలుగు' },
-    { code: 'bn', label: 'বাংলা' },
-    { code: 'gu', label: 'ગુજરાતી' },
-    { code: 'kn', label: 'ಕನ್ನಡ' },
 ];
 
 const QUICK_PROMPTS = [
@@ -23,7 +19,7 @@ const QUICK_PROMPTS = [
 ];
 
 const BOT_AVATAR = (
-    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md">
+    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#b82025] to-[#8e1419] flex items-center justify-center flex-shrink-0 shadow-md">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
             <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -45,7 +41,7 @@ function TypingDots() {
             {[0, 1, 2].map((i) => (
                 <span
                     key={i}
-                    className="w-2 h-2 rounded-full bg-purple-400 animate-bounce"
+                    className="w-2 h-2 rounded-full bg-[#b82025] animate-bounce"
                     style={{ animationDelay: `${i * 0.15}s` }}
                 />
             ))}
@@ -53,18 +49,55 @@ function TypingDots() {
     );
 }
 
+const MarkdownComponents = {
+    strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
+    em: ({ children }) => <em className="italic">{children}</em>,
+    p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+    ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1">{children}</ul>,
+    ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1">{children}</ol>,
+    li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+    h1: ({ children }) => <h1 className="text-lg font-bold mb-2 text-gray-900">{children}</h1>,
+    h2: ({ children }) => <h2 className="text-base font-bold mb-1.5 text-gray-900">{children}</h2>,
+    h3: ({ children }) => <h3 className="text-sm font-bold mb-1 text-gray-900">{children}</h3>,
+    a: ({ href, children }) => (
+        <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#b82025] underline hover:text-[#e23744]">
+            {children}
+        </a>
+    ),
+    code: ({ children }) => (
+        <code className="bg-gray-100 text-[#b82025] px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>
+    ),
+    pre: ({ children }) => (
+        <pre className="bg-gray-100 rounded-lg p-3 mb-2 overflow-x-auto text-xs font-mono">{children}</pre>
+    ),
+    hr: () => <hr className="my-3 border-gray-200" />,
+    blockquote: ({ children }) => (
+        <blockquote className="border-l-4 border-[#b82025] pl-3 italic text-gray-600 mb-2">{children}</blockquote>
+    ),
+};
+
 function MessageBubble({ msg }) {
     const isUser = msg.role === 'user';
     return (
-        <div className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'} mb-3`}>
+        <div className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'} mb-3 animate-fade-in`}>
             {!isUser && BOT_AVATAR}
             <div
-                className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap break-words ${isUser
-                        ? 'bg-gradient-to-br from-purple-600 to-pink-500 text-white rounded-br-sm'
+                className={`max-w-[82%] px-4 py-3 rounded-2xl text-sm shadow-sm break-words ${
+                    isUser
+                        ? 'bg-gradient-to-br from-[#b82025] to-[#e23744] text-white rounded-br-sm'
                         : 'bg-white text-gray-800 border border-gray-100 rounded-bl-sm'
-                    }`}
+                }`}
             >
-                {msg.content}
+                {isUser ? (
+                    msg.content
+                ) : (
+                    <ReactMarkdown
+                        components={MarkdownComponents}
+                        remarkPlugins={[remarkGfm]}
+                    >
+                        {msg.content}
+                    </ReactMarkdown>
+                )}
             </div>
         </div>
     );
@@ -198,7 +231,7 @@ export default function ChatbotWidget() {
                 id="chatbot-toggle-btn"
                 onClick={() => setOpen((o) => !o)}
                 className="fixed bottom-6 right-6 z-[99999] w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
-                style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)' }}
+                style={{ background: 'linear-gradient(135deg, #b82025 0%, #e23744 100%)' }}
                 aria-label="Open AI Counselor"
             >
                 {open ? (
@@ -226,7 +259,7 @@ export default function ChatbotWidget() {
                 {/* Header */}
                 <div
                     className="flex items-center gap-3 px-4 py-3 flex-shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #db2777 100%)' }}
+                    style={{ background: 'linear-gradient(135deg, #b82025 0%, #8e1419 100%)' }}
                 >
                     <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -242,7 +275,7 @@ export default function ChatbotWidget() {
                     <div ref={langMenuRef} className="relative flex-shrink-0">
                         <button
                             onClick={() => setShowLangMenu((s) => !s)}
-                            className="flex items-center gap-1 text-white/90 hover:text-white text-xs bg-white/15 hover:bg-white/25 px-2 py-1 rounded-full transition-colors"
+                            className="flex items-center gap-1 text-white/90 hover:text-white text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded-full transition-colors"
                         >
                             <span>{selectedLang.label}</span>
                             <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M6 8L1 3h10z" /></svg>
@@ -253,7 +286,7 @@ export default function ChatbotWidget() {
                                     <button
                                         key={l.code}
                                         onClick={() => { setLanguage(l.code); setShowLangMenu(false); }}
-                                        className={`w-full text-left px-3 py-1.5 text-xs hover:bg-purple-50 text-gray-700 transition-colors ${language === l.code ? 'text-purple-600 font-semibold bg-purple-50' : ''}`}
+                                        className={`w-full text-left px-3 py-1.5 text-xs hover:bg-red-50 text-gray-700 transition-colors ${language === l.code ? 'text-[#b82025] font-semibold bg-red-50' : ''}`}
                                     >
                                         {l.label}
                                     </button>
@@ -297,7 +330,7 @@ export default function ChatbotWidget() {
                             <button
                                 key={p}
                                 onClick={() => sendMessage(p)}
-                                className="flex-shrink-0 text-xs bg-white border border-purple-200 text-purple-700 rounded-full px-3 py-1.5 hover:bg-purple-50 hover:border-purple-400 transition-all whitespace-nowrap shadow-sm"
+                                className="flex-shrink-0 text-xs bg-white border border-[#b82025]/30 text-[#b82025] rounded-full px-3 py-1.5 hover:bg-red-50 hover:border-[#b82025] transition-all whitespace-nowrap shadow-sm"
                             >
                                 {p}
                             </button>
@@ -320,7 +353,7 @@ export default function ChatbotWidget() {
                         }}
                         onKeyDown={handleKeyDown}
                         placeholder="Ask about admissions, courses…"
-                        className="flex-1 resize-none bg-gray-100 text-gray-800 placeholder-gray-400 text-sm rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white transition-all max-h-24 overflow-y-auto"
+                        className="flex-1 resize-none bg-gray-100 text-gray-800 placeholder-gray-400 text-sm rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#b82025] focus:bg-white transition-all max-h-24 overflow-y-auto"
                         style={{ minHeight: '40px' }}
                         disabled={loading}
                     />
@@ -329,7 +362,7 @@ export default function ChatbotWidget() {
                         onClick={() => sendMessage()}
                         disabled={loading || !input.trim()}
                         className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-                        style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}
+                        style={{ background: 'linear-gradient(135deg, #b82025, #e23744)' }}
                         aria-label="Send"
                     >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -340,7 +373,7 @@ export default function ChatbotWidget() {
 
                 {/* Footer */}
                 <div className="text-center text-[10px] text-gray-400 py-1.5 bg-white border-t border-gray-50 flex-shrink-0">
-                    Powered by <span className="text-purple-500 font-semibold">Eduroutez AI</span> · API cost applies
+                    Powered by <span className="text-[#b82025] font-semibold">Eduroutez AI</span> · API cost applies
                 </div>
             </div>
         </>
