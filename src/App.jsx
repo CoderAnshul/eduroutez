@@ -62,6 +62,9 @@ const ComparePage = React.lazy(() => import('./Pages/ComparePage'))
 
 const CounselorTestPayment = React.lazy(() => import('./Pages/CounselorTest/Payment'));
 const CounselorTestExam = React.lazy(() => import('./Pages/CounselorTest/TestExam'));
+const VoiceCounselor = React.lazy(() => import('./Pages/VoiceCounselor'));
+const PersonalityAssessment = React.lazy(() => import('./Pages/PersonalityAssessment'));
+const MarketTrends = React.lazy(() => import('./Pages/MarketTrends'));
 
 const LegacyCounselorResultRedirect = () => {
   const isAuthenticated = Boolean(localStorage.getItem('accessToken'));
@@ -227,6 +230,9 @@ const AppShell = () => {
           <Route path="/counselor-test/payment" element={<CounselorTestPayment />} />
           <Route path="/counselor-test/exam" element={<CounselorTestExam />} />
           <Route path="/counselor-test/result" element={<LegacyCounselorResultRedirect />} />
+          <Route path="/voice-counselor" element={<VoiceCounselor />} />
+          <Route path="/personality-assessment" element={<PersonalityAssessment />} />
+          <Route path="/market-trends" element={<MarketTrends />} />
         </Routes>
       </Suspense>
 
