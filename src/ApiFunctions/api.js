@@ -633,6 +633,9 @@ const normText = (title) =>
 
 const getInstFee = (inst) => Number(inst.minFees || inst.minFee || 0);
 
+// Extract a display name from a field that may be a string OR an object ({ name, iso2 }).
+const locName = (v) => (v && typeof v === "object" ? (v.name || "") : (v || ""));
+
 // ── Eligibility Check: Parse ALL criteria from HTML ────────────────────────
 
 const stripHtml = (html) => (html || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -1038,16 +1041,19 @@ const scoreInstitute = (inst, { marks, exam, preferredCourse, budget, state, cit
   dims.infrastructure = Math.min(dims.infrastructure, 100);
 
   // ── Dimension 4: Location Match (0-100) ──
-  if (city && inst.city) {
-    if (inst.city.toLowerCase() === city.toLowerCase()) dims.location = 100;
-    else if (inst.city.toLowerCase().includes(city.toLowerCase()) ||
-      city.toLowerCase().includes(inst.city.toLowerCase())) dims.location = 75;
-    else if (state && inst.state) {
-      if (inst.state.toLowerCase() === state.toLowerCase()) dims.location = 55;
+  const ic = normText(locName(inst.city));
+  const is = normText(locName(inst.state));
+  const cN = normText(city);
+  const sN = normText(state);
+  if (cN && ic) {
+    if (ic === cN) dims.location = 100;
+    else if (ic.includes(cN) || cN.includes(ic)) dims.location = 75;
+    else if (sN && is) {
+      if (is === sN) dims.location = 55;
       else dims.location = 20;
     } else dims.location = 30;
-  } else if (state && inst.state) {
-    if (inst.state.toLowerCase() === state.toLowerCase()) dims.location = 65;
+  } else if (sN && is) {
+    if (is === sN) dims.location = 65;
     else dims.location = 20;
   } else {
     dims.location = 30;
@@ -1102,10 +1108,10 @@ export const getNearbyInstitutes = async ({ state, city, budget, exam, marks, ca
         ...checkEligibility(i, { exam, marks, category }),
         _tier: classifyTier(i).tier,
         _tierLabel: classifyTier(i).tierLabel,
-        _match: city && i.city?.toLowerCase() === city.toLowerCase() ? "same_city" :
-          state && i.state?.toLowerCase() === state.toLowerCase() ? "same_state" : "other",
-        _score: city && i.city?.toLowerCase() === city.toLowerCase() ? 100 :
-          state && i.state?.toLowerCase() === state.toLowerCase() ? 70 : 40
+        _match: city && normText(i.city?.name) === normText(city) ? "same_city" :
+          state && normText(i.state?.name) === normText(state) ? "same_state" : "other",
+        _score: city && normText(i.city?.name) === normText(city) ? 100 :
+          state && normText(i.state?.name) === normText(state) ? 70 : 40
       }))
       .sort((a, b) => {
         if (a._match !== b._match) return a._match === "same_city" ? -1 : a._match === "same_state" ? -1 : 1;
@@ -1136,6 +1142,9 @@ export const getRecommendedInstitutes = async ({
       return b._score - a._score;
     });
 
+    // If an exam is selected, only show institutes that explicitly list it.
+    if (exam) scored = scored.filter((i) => i._examMatch === "accepted");
+
     return scored.slice(0, 15);
   } catch (error) {
     console.error("Error fetching recommended institutes:", error);
@@ -1146,29 +1155,32 @@ export const getRecommendedInstitutes = async ({
 // ── Shared Helpers ─────────────────────────────────────────────────────────
 
 const fetchInstitutes = async ({ state, city } = {}) => {
-  const results = [];
-
-  if (city) {
-    const cRes = await axiosInstance.get(`/institutes`, {
-      params: { limit: 30, searchFields: JSON.stringify({ city, ...(state ? { state } : {}) }) }
+  // Fetch a broad pool, then filter client-side. The DB stores city/state as
+  // objects ({ name, iso2 }), so server-side string search is unreliable and
+  // would otherwise collapse to a tiny/fixed result set.
+  let results = [];
+  try {
+    const res = await axiosInstance.get(`/institutes`, {
+      params: { limit: 100, sort: JSON.stringify({ createdAt: "desc" }) },
     });
-    results.push(...(normalize(cRes)?.result || []));
+    results = normalize(res)?.result || [];
+  } catch {
+    return [];
   }
 
-  if (state) {
-    const sRes = await axiosInstance.get(`/institutes`, {
-      params: { limit: 30, searchFields: JSON.stringify({ state }) }
+  const c = city ? normText(city) : null;
+  const s = state ? normText(state) : null;
+  if (c || s) {
+    const filtered = results.filter((i) => {
+      const ic = normText(i.city?.name || "");
+      const is = normText(i.state?.name || "");
+      if (c && ic && (ic.includes(c) || c.includes(ic))) return true;
+      if (c && is && (is.includes(c) || c.includes(is))) return true;
+      if (s && is && (is.includes(s) || s.includes(is))) return true;
+      return false;
     });
-    for (const i of (normalize(sRes)?.result || [])) {
-      if (!results.some((r) => r._id === i._id)) results.push(i);
-    }
-  }
-
-  if (!results.length) {
-    const aRes = await axiosInstance.get(`/institutes`, {
-      params: { limit: 30, sort: JSON.stringify({ createdAt: 'desc' }) }
-    });
-    results.push(...(normalize(aRes)?.result || []));
+    // Keep a varied list: only narrow to the location if we still have enough.
+    if (filtered.length >= 3) results = filtered;
   }
 
   return results;
@@ -1185,7 +1197,7 @@ const applyBudgetFilter = (list, budget) => {
 // ── Course Recommendations ──────────────────────────────────────────────────
 
 export const getRecommendedCourses = async ({
-  marks, preferredCourse, budget, state, city
+  marks, preferredCourse, budget, state, city, exam
 } = {}) => {
   try {
     const filters = {};
@@ -1205,6 +1217,9 @@ export const getRecommendedCourses = async ({
     if (budgetVal) {
       courses = courses.filter((c) => !c.coursePrice || Number(c.coursePrice) <= budgetVal * 1.2);
     }
+
+    // If an exam is selected, only show courses that explicitly accept it.
+    if (exam) courses = courses.filter((c) => checkExamMatch(c, exam) === "accepted");
 
     return courses
       .map((c) => {
@@ -1226,7 +1241,7 @@ export const getRecommendedCourses = async ({
           if (normText(c.courseTitle).includes(normText(preferredCourse))) score += 20;
         }
 
-        return { ...c, _score: score };
+        return { ...c, _score: score, _examMatch: exam ? checkExamMatch(c, exam) : "unknown" };
       })
       .sort((a, b) => b._score - a._score)
       .slice(0, 10);
@@ -1252,8 +1267,8 @@ export const getNearbyCounselors = async ({ state, city, preferredCourse } = {})
     return counselors
       .map((c) => {
         let score = 0;
-        if (city && c.city?.toLowerCase() === city.toLowerCase()) score += 50;
-        else if (state && c.state?.toLowerCase() === state.toLowerCase()) score += 30;
+        if (city && normText(c.city?.name) === normText(city)) score += 50;
+        else if (state && normText(c.state?.name) === normText(state)) score += 30;
         if (preferredCourse && c.category) {
           if (normText(c.category).includes(normText(preferredCourse))) score += 20;
         }
@@ -1319,4 +1334,29 @@ export const likeAnswer = async (questionId, answerId, type, answeredBy) => {
     { headers: authHeaders() }
   );
   return res.data;
+};
+
+// ── AI Career Outcome Predictor ──────────────────────────────────────────────
+
+export const predictCareerOutcome = async (payload = {}) => {
+  try {
+    const response = await axiosInstance.post(`/career-outcome/predict`, payload);
+    return response.data?.data ?? null;
+  } catch (error) {
+    console.error("Error predicting career outcome:", error);
+    throw error;
+  }
+};
+
+// ── AI College Matchmaking Engine (backend) ──────────────────────────────────
+
+export const getRecommendations = async (profile = {}) => {
+  try {
+    const userId = localStorage.getItem("userId") || undefined;
+    const response = await axiosInstance.post(`/recommendation`, { ...profile, userId });
+    return response.data?.data ?? null;
+  } catch (error) {
+    console.error("Error fetching backend recommendations:", error);
+    throw error;
+  }
 };

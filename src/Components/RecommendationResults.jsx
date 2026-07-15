@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import {
   BookOpen, Building2, Users, MapPin, Star, GraduationCap,
-  IndianRupee, Award, Target, ChevronRight, Navigation, Sparkles
+  IndianRupee, Award, Target, ChevronRight, Navigation, Sparkles, Check
 } from "lucide-react";
 
 const convertToReadableFormat = (number) => {
@@ -27,13 +27,41 @@ const SectionHeader = ({ icon: Icon, title, count, color }) => (
   </div>
 );
 
+const MatchPill = ({ children }) => (
+  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-green-700 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full">
+    <Check className="w-3 h-3" /> {children}
+  </span>
+);
+
+const Detail = ({ label, value }) => (
+  <div className="min-w-0">
+    <span className="text-gray-400">{label}: </span>
+    <span className="text-gray-700 font-medium break-words">{value}</span>
+  </div>
+);
+
+// city/state may be a string OR an object ({ name, iso2 }) from the API.
+const locName = (v) => (v && typeof v === "object" ? (v.name || "") : (v || ""));
+
 const CourseCard = ({ course }) => (
   <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
     <div className="p-5">
       <div className="flex items-start justify-between mb-3">
-        <h3 className="font-bold text-gray-800 text-lg leading-tight group-hover:text-red-600 transition-colors line-clamp-2">
-          {course.courseTitle}
-        </h3>
+        <div>
+          {course._bestMatch && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 px-2 py-0.5 rounded-full shadow mb-1">
+              <Sparkles className="w-3 h-3" /> Best Match
+            </span>
+          )}
+          <h3 className="font-bold text-gray-800 text-lg leading-tight group-hover:text-red-600 transition-colors line-clamp-2">
+            {course.courseTitle}
+          </h3>
+          <div className="flex flex-wrap gap-1.5 mt-1">
+            {course._examMatch === "accepted" && <MatchPill>Exam Accepted</MatchPill>}
+            {course._behaviorMatch && <MatchPill>Matches your interest</MatchPill>}
+            {course._courseMatch > 0 && <MatchPill>Course fit</MatchPill>}
+          </div>
+        </div>
         {course.coursePrice && (
           <span className="flex items-center gap-1 text-green-700 font-semibold bg-green-50 px-3 py-1 rounded-full text-sm whitespace-nowrap ml-2">
             <IndianRupee className="w-3.5 h-3.5" />
@@ -41,6 +69,13 @@ const CourseCard = ({ course }) => (
           </span>
         )}
       </div>
+
+      {course._aiReason && (
+        <p className="mb-3 text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 leading-snug">
+          <Sparkles className="w-3 h-3 inline mr-1 -mt-0.5" />
+          {course._aiReason}
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-4">
         {course.courseDurationYears || course.courseDurationMonths ? (
@@ -71,6 +106,15 @@ const CourseCard = ({ course }) => (
           </div>
         )}
       </div>
+
+      {(course.courseCategory || course.streams?.length || course.specialization?.length || course.ranking) && (
+        <div className="grid grid-cols-1 gap-y-1.5 mb-4 text-xs">
+          {course.courseCategory && <Detail label="Category" value={course.courseCategory} />}
+          {course.streams?.length ? <Detail label="Streams" value={course.streams.join(", ")} /> : null}
+          {course.specialization?.length ? <Detail label="Specialization" value={course.specialization.join(", ")} /> : null}
+          {course.ranking && <Detail label="Ranking" value={course.ranking} />}
+        </div>
+      )}
 
       <Link
         to={`/coursesinfopage/${course._id || course.slug}`}
@@ -157,6 +201,11 @@ const InstituteCard = ({ institute }) => {
         <div className="flex items-center gap-2">
           <TierBadge tier={t} />
           <EligBadge eligible={institute._eligible} note={institute._eligibilityNote} />
+          {institute._bestMatch && (
+            <span className="text-[10px] font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 px-2 py-0.5 rounded-full flex items-center gap-1 shadow">
+              <Sparkles className="w-3 h-3" /> Best Match
+            </span>
+          )}
           {institute.admissionOpen && (
             <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
@@ -181,7 +230,24 @@ const InstituteCard = ({ institute }) => {
         {(institute.city || institute.state) && (
           <p className="text-xs text-gray-400 mb-3">
             <MapPin className="w-3 h-3 inline mr-0.5" />
-            {[institute.city, institute.state].filter(Boolean).join(", ")}
+            {[locName(institute.city), locName(institute.state)].filter(Boolean).join(", ")}
+          </p>
+        )}
+
+        {(institute._examMatch === "accepted" || institute._match || institute._behaviorMatch || institute._courseMatch > 0) && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {institute._examMatch === "accepted" && <MatchPill>Exam Accepted</MatchPill>}
+            {institute._match === "same_city" && <MatchPill>In your city</MatchPill>}
+            {institute._match === "same_state" && <MatchPill>In your state</MatchPill>}
+            {institute._behaviorMatch && <MatchPill>Matches your interest</MatchPill>}
+            {institute._courseMatch > 0 && <MatchPill>Course fit</MatchPill>}
+          </div>
+        )}
+
+        {institute._aiReason && (
+          <p className="mb-3 text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 leading-snug">
+            <Sparkles className="w-3 h-3 inline mr-1 -mt-0.5" />
+            {institute._aiReason}
           </p>
         )}
 
@@ -233,6 +299,20 @@ const InstituteCard = ({ institute }) => {
           {institute.examAccepted && <span className="truncate max-w-[120px]">{institute.examAccepted}</span>}
         </div>
 
+        {(institute.ranking || institute.rank || institute.highestPackage || institute.affiliation ||
+          institute.streams?.length || institute.specialization?.length || institute.facilities?.length || institute.establishedYear) && (
+          <div className="grid grid-cols-1 gap-y-1.5 mb-3 text-xs">
+            {institute.ranking && <Detail label="Ranking" value={institute.ranking} />}
+            {institute.rank ? <Detail label="Rank" value={`#${institute.rank}`} /> : null}
+            {institute.highestPackage && <Detail label="Highest Package" value={convertToReadableFormat(institute.highestPackage)} />}
+            {institute.affiliation && <Detail label="Affiliation" value={institute.affiliation} />}
+            {institute.streams?.length ? <Detail label="Streams" value={institute.streams.join(", ")} /> : null}
+            {institute.specialization?.length ? <Detail label="Specialization" value={institute.specialization.join(", ")} /> : null}
+            {institute.facilities?.length ? <Detail label="Facilities" value={institute.facilities.join(", ")} /> : null}
+            {institute.establishedYear ? <Detail label="Est." value={institute.establishedYear} /> : null}
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           {institute.affiliation && (
             <span className="text-[10px] text-gray-400 truncate max-w-[180px]">{institute.affiliation}</span>
@@ -266,11 +346,18 @@ const CounselorCard = ({ counselor }) => (
         </div>
       </div>
 
+      {counselor._aiReason && (
+        <p className="mb-3 text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 leading-snug">
+          <Sparkles className="w-3 h-3 inline mr-1 -mt-0.5" />
+          {counselor._aiReason}
+        </p>
+      )}
+
       <div className="grid grid-cols-2 gap-3 mb-4">
-        {counselor.city && (
+        {locName(counselor.city) && (
           <div className="flex items-center gap-2 text-gray-600">
             <MapPin className="w-4 h-4 text-red-500 shrink-0" />
-            <span className="text-sm truncate">{counselor.city}</span>
+            <span className="text-sm truncate">{locName(counselor.city)}</span>
           </div>
         )}
         {counselor.ExperienceYear && (

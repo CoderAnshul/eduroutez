@@ -9,7 +9,7 @@ import menubar from "../assets/Images/secondMenu.png";
 import SecondMenu from "./SubNavbar";
 import MobileNavbar from "./MobileNavbar";
 import axiosInstance from "../ApiFunctions/axios";
-import { ArrowRight, LogOut, User, Settings, LayoutDashboard, Sparkles, Search, ChevronDown, Scale } from "lucide-react";
+import { ArrowRight, LogOut, User, Settings, LayoutDashboard, Sparkles, Search, ChevronDown, Scale, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setInput } from "../config/inputSlice";
@@ -350,6 +350,13 @@ const Navbar = () => {
               <span className="text-black">Recommend</span>
             </Link>
             <Link
+              to="/career-outcome"
+              className="CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
+            >
+              <TrendingUp className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              <span className="text-black">Career AI</span>
+            </Link>
+            <Link
               to="/compare"
               className="CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
             >
@@ -501,6 +508,11 @@ const Navbar = () => {
           <li>
             <Link className="text-black" to="/recommendations" onClick={toggleMenu}>
               Recommendations
+            </Link>
+          </li>
+          <li>
+            <Link className="text-black" to="/career-outcome" onClick={toggleMenu}>
+              Career AI
             </Link>
           </li>
           <li>

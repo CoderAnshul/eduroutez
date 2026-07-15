@@ -58,6 +58,7 @@ const Question = React.lazy(() => import('./Pages/Question-Answer'))
 const Redeem = React.lazy(() => import('./Pages/Redeem'))
 const Logout = React.lazy(() => import('./Pages/Logout'))
 const RecommendationsPage = React.lazy(() => import('./Pages/RecommendationsPage'))
+const CareerOutcomePredictor = React.lazy(() => import('./Pages/CareerOutcomePredictor'))
 const ComparePage = React.lazy(() => import('./Pages/ComparePage'))
 
 const CounselorTestPayment = React.lazy(() => import('./Pages/CounselorTest/Payment'));
@@ -178,6 +179,7 @@ const AppShell = () => {
 
           <Route path="/webinars" element={<WebinarsPage />} />
           <Route path="/recommendations" element={<RecommendationsPage />} />
+          <Route path="/career-outcome" element={<CareerOutcomePredictor />} />
           <Route path="/compare" element={<ComparePage />} />
 
           <Route path="/writereview" element={<Writereview />} />

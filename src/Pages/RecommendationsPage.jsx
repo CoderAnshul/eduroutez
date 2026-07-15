@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import RecommendationForm from "../Components/RecommendationForm";
 import RecommendationResults from "../Components/RecommendationResults";
-import { getFilteredRecommendations, quickNearby } from "../ApiFunctions/api";
+import { getFilteredRecommendations, getRecommendations, quickNearby } from "../ApiFunctions/api";
 import { Sparkles, ArrowLeft, BookOpen, Building2, Users, Navigation, MapPin } from "lucide-react";
 
 const RecommendationsPage = () => {
@@ -30,16 +30,33 @@ const RecommendationsPage = () => {
     }
   }, [nearbyOnly]);
 
+  const keepEligible = (data) => ({
+    ...data,
+    institutes: (data?.institutes || []).filter((i) => i._eligible !== false),
+    courses: (data?.courses || []).filter((c) => c._eligible !== false),
+  });
+
   const handleSubmit = useCallback(async (form) => {
     setLoading(true);
     setError(null);
     setProfile(form);
     setNearbyOnly(false);
     try {
-      const data = await getFilteredRecommendations(form);
-      setResults(data);
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
+      // Prefer the AI backend engine (includes student-behavior signals).
+      const data = await getRecommendations(form);
+      if (data && (data.institutes?.length || data.courses?.length || data.counselors?.length)) {
+        setResults(keepEligible(data));
+        return;
+      }
+      throw new Error("empty");
+    } catch {
+      // Fallback to the client-side engine if the backend is unavailable.
+      try {
+        const data = await getFilteredRecommendations(form);
+        setResults(keepEligible(data));
+      } catch {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -141,6 +158,19 @@ const RecommendationsPage = () => {
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
               <span className="font-medium">Refine Your Search</span>
             </button>
+            {results.behaviorUsed && results.behavior?.length > 0 && (
+              <div className="mb-6 bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3 flex flex-wrap items-center gap-2 text-sm text-indigo-800">
+                <span className="font-semibold">Personalized from your activity:</span>
+                {results.behavior.map((kw, i) => (
+                  <span key={i} className="bg-white text-indigo-700 px-2.5 py-1 rounded-full text-xs shadow-sm">{kw}</span>
+                ))}
+              </div>
+            )}
+            {results.aiSummary && (
+              <div className="mb-6 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl px-4 py-3 text-sm shadow">
+                <span className="font-semibold">AI Counselor:</span> {results.aiSummary}
+              </div>
+            )}
             <RecommendationResults results={results} loading={false} profile={profile} />
           </div>
         )}
