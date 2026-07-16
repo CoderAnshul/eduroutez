@@ -32,6 +32,7 @@ const News = React.lazy(() => import("../Components/News"));
 const Webinar = React.lazy(() => import("../Components/Webinar"));
 const HighRatedCareers = React.lazy(() => import("../Components/HighRatedCareers"));
 const BlogComponent = React.lazy(() => import("../Components/BlogComponent"));
+const RelatedContent = React.lazy(() => import("../Components/RelatedContent"));
 const Promotions = React.lazy(() => import("../Pages/CoursePromotions"));
 const ConsellingBanner = React.lazy(() => import("../Components/ConsellingBanner"));
 
@@ -565,6 +566,7 @@ const Instituepage = () => {
         <HighRatedCareers />
         <BlogComponent />
         <BestRated />
+        {instituteData && <RelatedContent contentId={instituteData._id} contentType="institute" />}
         {/* <Events className="!w-full" /> */}
       </div>
       <div className="flex gap-2 flex-col sm:flex-row items-center">

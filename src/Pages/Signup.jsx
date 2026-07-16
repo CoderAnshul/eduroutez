@@ -239,6 +239,7 @@ const Signup = ({ isMode, onSwitch, onClose }) => {
       const response = await axiosInstance.post(`${apiUrl}/send-otp`, {
         email: credentials.email,
         contact_number: credentials.contact_number,
+        role: credentials.role,
       });
       return response.data;
     },

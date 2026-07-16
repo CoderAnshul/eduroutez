@@ -66,6 +66,7 @@ import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import Promotions from "../Pages/CoursePromotions";
 import BlogReviewForm from "../Components/BlogReviewForm";
+import RelatedContent from "../Components/RelatedContent";
 import axiosInstance from "../ApiFunctions/axios";
 import SocialShare from "../Components/SocialShare";
 import AuthPopup from "../Components/AuthPopup";
@@ -659,6 +660,7 @@ const BlogDetailPage = () => {
           {/* <Events /> */}
 
 
+          <RelatedContent contentId={data._id} contentType="blog" />
           <HighRatedCareers />
         </div>
         <div className="flex gap-2 items-center">

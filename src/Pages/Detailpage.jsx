@@ -79,6 +79,7 @@ import { CarrerDetail } from "../ApiFunctions/api";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import BlogComponent from "../Components/BlogComponent";
+import RelatedContent from "../Components/RelatedContent";
 import axiosInstance from "../ApiFunctions/axios";
 import SocialShare from "../Components/SocialShare";
 import { Eye, ThumbsUp } from "lucide-react";
@@ -491,6 +492,7 @@ const DetailPage = () => {
         </div>
 
         {/* Additional Components */}
+        {data && <RelatedContent contentId={data._id} contentType="career" />}
         <BlogComponent />
       </div>
       <div className="flex gap-4 flex-col sm:flex-row">

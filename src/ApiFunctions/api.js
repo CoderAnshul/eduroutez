@@ -6,7 +6,7 @@ const baseURL = import.meta.env.VITE_BASE_URL;
 // Helper to normalize different server response shapes
 const normalize = (res) => {
   try {
-    return res?.data?.data ?? res?.dat / career - categorya ?? res;
+    return res?.data?.data ?? res?.data ?? res;
   } catch {
     return res;
   }
@@ -1345,6 +1345,32 @@ export const predictCareerOutcome = async (payload = {}) => {
   } catch (error) {
     console.error("Error predicting career outcome:", error);
     throw error;
+  }
+};
+
+// ── Geo-Demand Intelligence (backend) ────────────────────────────────────────
+
+export const getGeoDemand = async (days = 365) => {
+  try {
+    const response = await axiosInstance.get(`/recommendation/geo-demand`, { params: { days } });
+    return response.data?.data ?? null;
+  } catch (error) {
+    console.error("Error fetching geo demand:", error);
+    throw error;
+  }
+};
+
+// ── Related Content Engine ────────────────────────────────────────────────────
+
+export const getRelatedContent = async ({ contentId, contentType, limit = 6 }) => {
+  try {
+    const response = await axiosInstance.get(`/related-content`, {
+      params: { contentId, contentType, limit }
+    });
+    return response.data?.data ?? null;
+  } catch (error) {
+    console.error("Error fetching related content:", error);
+    return null;
   }
 };
 

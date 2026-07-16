@@ -17,6 +17,7 @@ const Events = lazy(() => import("../Components/Events"));
 const ConsellingBanner = lazy(() => import("../Components/ConsellingBanner"));
 const HighRatedCareers = lazy(() => import("../Components/HighRatedCareers"));
 const BlogComponent = lazy(() => import("../Components/BlogComponent"));
+const RelatedContent = lazy(() => import("../Components/RelatedContent"));
 const Promotions = lazy(() => import("../Pages/CoursePromotions"));
 const CourseReviewForm = lazy(() => import("../Components/CourseReviewForm"));
 
@@ -660,6 +661,12 @@ const Coursesinfopage = () => {
         <Suspense fallback={<LoadingComponent />}>
           <BestRated />
         </Suspense>
+
+        {courseData && (
+          <Suspense fallback={<LoadingComponent />}>
+            <RelatedContent contentId={courseData._id} contentType="course" />
+          </Suspense>
+        )}
       </div>
 
       <div className="w-full flex items-start mt-10">
