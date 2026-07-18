@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
 import useModal from "../Components/Modal/useModal";
 import axiosInstance from "../ApiFunctions/axios";
+import { Helmet } from "react-helmet-async";
 
 const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -375,210 +376,212 @@ const ProfilePage = () => {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="universal-container py-8">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
-        <h1 className="text-2xl font-semibold mb-6">My Profile</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Personal Information */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">
-                Personal Information
-              </h2>
-              <div className="mb-4">
-                <label className="block font-medium mb-2">
-                  Your Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Anshul Sharma"
-                  className="w-full border rounded px-4 py-2"
-                  required
-                />
+    <>
+      <div className="universal-container py-8">
+        <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
+          <h1 className="text-2xl font-semibold mb-6">My Profile</h1>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Personal Information */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">
+                  Personal Information
+                </h2>
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">
+                    Your Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Anshul Sharma"
+                    className="w-full border rounded px-4 py-2"
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    readOnly
+                    className="w-full border rounded px-4 py-2 bg-gray-100 cursor-not-allowed"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">
+                    Phone <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="7999967578"
+                    className="w-full border rounded px-4 py-2"
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">
+                    Date Of Birth <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth || ""}
+                    onChange={handleChange}
+                    className="w-full border rounded px-4 py-2"
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">
+                    Gender <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    className="w-full border rounded px-4 py-2"
+                    required
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
               </div>
-              <div className="mb-4">
-                <label className="block font-medium mb-2">
-                  Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  readOnly
-                  className="w-full border rounded px-4 py-2 bg-gray-100 cursor-not-allowed"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-medium mb-2">
-                  Phone <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="7999967578"
-                  className="w-full border rounded px-4 py-2"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-medium mb-2">
-                  Date Of Birth <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth || ""}
-                  onChange={handleChange}
-                  className="w-full border rounded px-4 py-2"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-medium mb-2">
-                  Gender <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                  className="w-full border rounded px-4 py-2"
-                  required
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
+
+              {/* About Information */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">About Information</h2>
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">Designation</label>
+                  <input
+                    type="text"
+                    name="designation"
+                    value={formData.designation || ""}
+                    onChange={handleChange}
+                    placeholder="UI/UX Designer | Product Designer | Mobile App Expert"
+                    className="w-full border rounded px-4 py-2"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">About</label>
+                  <textarea
+                    name="about"
+                    value={formData.about || ""}
+                    onChange={handleChange}
+                    placeholder="About Myself"
+                    className="w-full border rounded px-4 py-2"
+                    rows="4"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* About Information */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">About Information</h2>
-              <div className="mb-4">
-                <label className="block font-medium mb-2">Designation</label>
-                <input
-                  type="text"
-                  name="designation"
-                  value={formData.designation || ""}
-                  onChange={handleChange}
-                  placeholder="UI/UX Designer | Product Designer | Mobile App Expert"
-                  className="w-full border rounded px-4 py-2"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-medium mb-2">About</label>
-                <textarea
-                  name="about"
-                  value={formData.about || ""}
-                  onChange={handleChange}
-                  placeholder="About Myself"
-                  className="w-full border rounded px-4 py-2"
-                  rows="4"
-                />
+            {/* Address Section */}
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">Address</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">Address</label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address || ""}
+                    onChange={handleChange}
+                    placeholder="Enter Your Address"
+                    className="w-full border rounded px-4 py-2"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">Country</label>
+                  <select
+                    name="country"
+                    value={formData.country || ""}
+                    onChange={handleChange}
+                    className="w-full border rounded px-4 py-2"
+                  >
+                    <option value="">
+                      {formData.countryName
+                        ? `${formData.countryName} (Selected)`
+                        : "Select Country..."}
+                    </option>
+                    {countries.map((country) => (
+                      <option key={country.id} value={country.id}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">State</label>
+                  <select
+                    name="state"
+                    value={formData.state || ""}
+                    onChange={handleChange}
+                    className="w-full border rounded px-4 py-2"
+                    disabled={!formData.country}
+                  >
+                    <option value="">
+                      {formData.stateName
+                        ? `${formData.stateName} (Selected)`
+                        : "Select State..."}
+                    </option>
+                    {states.map((state) => (
+                      <option key={state.id} value={state.id}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block font-medium mb-2">City</label>
+                  <select
+                    name="city"
+                    value={formData.city || ""}
+                    onChange={handleChange}
+                    className="w-full border rounded px-4 py-2"
+                    disabled={!formData.state}
+                  >
+                    <option value="">
+                      {formData.cityName
+                        ? `${formData.cityName}`
+                        : "Select City..."}
+                    </option>
+                    {cities.map((city) => (
+                      <option key={city.id} value={city.id}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Address Section */}
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Address</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="mb-4">
-                <label className="block font-medium mb-2">Address</label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address || ""}
-                  onChange={handleChange}
-                  placeholder="Enter Your Address"
-                  className="w-full border rounded px-4 py-2"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block font-medium mb-2">Country</label>
-                <select
-                  name="country"
-                  value={formData.country || ""}
-                  onChange={handleChange}
-                  className="w-full border rounded px-4 py-2"
-                >
-                  <option value="">
-                    {formData.countryName
-                      ? `${formData.countryName} (Selected)`
-                      : "Select Country..."}
-                  </option>
-                  {countries.map((country) => (
-                    <option key={country.id} value={country.id}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block font-medium mb-2">State</label>
-                <select
-                  name="state"
-                  value={formData.state || ""}
-                  onChange={handleChange}
-                  className="w-full border rounded px-4 py-2"
-                  disabled={!formData.country}
-                >
-                  <option value="">
-                    {formData.stateName
-                      ? `${formData.stateName} (Selected)`
-                      : "Select State..."}
-                  </option>
-                  {states.map((state) => (
-                    <option key={state.id} value={state.id}>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block font-medium mb-2">City</label>
-                <select
-                  name="city"
-                  value={formData.city || ""}
-                  onChange={handleChange}
-                  className="w-full border rounded px-4 py-2"
-                  disabled={!formData.state}
-                >
-                  <option value="">
-                    {formData.cityName
-                      ? `${formData.cityName}`
-                      : "Select City..."}
-                  </option>
-                  {cities.map((city) => (
-                    <option key={city.id} value={city.id}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* Save Button */}
+            <div className="mt-8">
+              <button
+                type="submit"
+                className="px-6 py-3 bg-[#b82025] text-white font-semibold rounded shadow-md hover:bg-[#b82025] transition"
+              >
+                Save & Update
+              </button>
             </div>
-          </div>
-
-          {/* Save Button */}
-          <div className="mt-8">
-            <button
-              type="submit"
-              className="px-6 py-3 bg-[#b82025] text-white font-semibold rounded shadow-md hover:bg-[#b82025] transition"
-            >
-              Save & Update
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

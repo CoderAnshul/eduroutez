@@ -21,7 +21,11 @@ import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import Pagination from "../Components/Pagination";
+<<<<<<< HEAD
 import WishlistButton from "../Components/WishlistButton";
+=======
+import { Helmet } from "react-helmet-async";
+>>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
 
 // Function to fetch trending courses
 const baseURL = import.meta.env.VITE_BASE_URL;
@@ -283,6 +287,14 @@ const TrendingCourses = () => {
 
   return (
     <>
+      {/* SEO */}
+      <Helmet>
+        <title>Trending Courses in India | Popular Courses 2026 | Eduroutez</title>
+        <meta name="description"
+          content="Explore trending courses in India across Engineering, Medical, Management, IT, Design, Law, and more. Compare course details, eligibility, admissions, fees, and career opportunities on Eduroutez." />
+        <link rel="canonical" href="https://eduroutez.com/trending-courses" />
+      </Helmet>
+
       <div className="universal-container">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
@@ -554,7 +566,7 @@ const TrendingCourses = () => {
       <div className="flex gap-2 flex-col sm:flex-row items-center">
         {/* <Events /> */}
 
-         {/* <ConsellingBanner /> */}
+        {/* <ConsellingBanner /> */}
       </div>
     </>
   );

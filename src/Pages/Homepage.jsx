@@ -36,12 +36,6 @@ const Homepage = () => {
   // if (isError) return <p>Error: {error.message}</p>;
 
 
-
-
-
-
-
-
   return (
     <>
       <Helmet>

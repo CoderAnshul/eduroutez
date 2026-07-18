@@ -9,7 +9,11 @@ import Promotions from "./CoursePromotions";
 import SocialShare from "../Components/SocialShare";
 import { Sparkles } from "lucide-react";
 import HighRatedCareers from "../Components/HighRatedCareers";
+<<<<<<< HEAD
 import WishlistButton from "../Components/WishlistButton";
+=======
+import { Helmet } from "react-helmet-async";
+>>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
 
 const StreamLevelPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -214,24 +218,28 @@ const StreamLevelPage = () => {
 
   return (
     <>
-      <title>{pageData.title || "Stream Level Page"} | Your Site Name</title>
-      <meta
-        name="description"
-        content={
-          pageData.description?.substring(0, 160) ||
-          "Learn more about our programs"
-        }
-      />
+      {/* SEO */}
+      <Helmet>
+        <title>{pageData.title || "Stream Level Page"} | Your Site Name</title>
+        <meta
+          name="description"
+          content={
+            pageData?.description ?
+            pageData.description.substring(0, 160) :
+            "Explore popular courses, eligibility, syllabus, career opportunities, and admission details on Eduroutez."
+          }
+        />
+      </Helmet>
 
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center">
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         <div className="relative z-10">
-          <h1 className="text-5xl font-bold leading-tight">{pageData.title}</h1>
+          <h1 className="text-5xl font-bold leading-tight">{pageData.title}{baseURL}{streamId}{level}</h1>
           {pageData.level && (
             <div className="mt-4 inline-block bg-white bg-opacity-20 px-4 py-2 rounded-full">
               <span className="font-semibold capitalize">
-                {pageData.level} Level
+                {pageData.level} Level 
               </span>
             </div>
           )}
@@ -507,7 +515,7 @@ const StreamLevelPage = () => {
       <div className="w-full flex items-start mt-10">
         {/* <Events /> */}
 
-         {/* <ConsellingBanner /> */}
+        {/* <ConsellingBanner /> */}
       </div>
     </>
   );

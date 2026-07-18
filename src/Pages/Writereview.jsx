@@ -13,6 +13,7 @@ import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import Promotions from "./CoursePromotions";
 import successImage from "../assets/Images/check.png";
+import { Helmet } from "react-helmet-async";
 
 const Writereview = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -176,6 +177,14 @@ const Writereview = () => {
 
   return (
     <>
+    {/* SEO */}
+    <Helmet>
+      <title>Write a College Review | Share Your Experience | Eduroutez</title>
+      <meta name="description"
+      content="Write a college review and share your campus experience with future students. Submit honest ratings and feedback on Eduroutez."/>
+      <link rel="canonical" href="https://eduroutez.com/writereview" />
+    </Helmet>
+
       <div className="universal-max-width  max-w-4xl overflow-hidden shadow-none">
         <Promotions location="REVIEW_PAGE" className="h-[90px]" />
       </div>

@@ -30,8 +30,12 @@ import { likeQuestion, likeAnswer, updateQuestion, deleteQuestion, getMyQuestion
 import { toast } from "react-toastify";
 import AuthPopup from "../Components/AuthPopup";
 import Promotions from "./CoursePromotions";
+<<<<<<< HEAD
 import RichEditor from "../Ui components/RichEditor";
 import DOMPurify from "dompurify";
+=======
+import { Helmet } from "react-helmet-async";
+>>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
 
 const Card = ({ children, className = "" }) => (
   <div
@@ -752,19 +756,17 @@ const CombinedQuestionsPage = () => {
   };
 
   return (
-    <div className="universal-container min-h-screen h-fit">
-      <div className="mb-4">
-        <button
-          onClick={() => window.history.back()}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors"
-        >
-          &larr; Back to Dashboard
-        </button>
-      </div>
-      <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">
-        Student Q&A Hub
-      </h1>
+    <>
+      {/* SEO */}
+      <Helmet>
+        <title>Education Questions & Answers Hub | Student Q&A | Eduroutez</title>
+        <meta name="description"
+          content="Find answers to education, college admissions, courses, entrance exams, scholarships, and career guidance questions. Ask experts and explore the Eduroutez Question & Answer Hub."
+        />
+        <link rel="canonical" href="https://eduroutez.com/question-&-answers" />
+      </Helmet>
 
+<<<<<<< HEAD
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Column - Question Form */}
         <div className="lg:w-1/4 flex flex-col">
@@ -998,45 +1000,158 @@ const CombinedQuestionsPage = () => {
               <Promotions location="QA_PAGE" />
             </div>
           </div>
+=======
+      <div className="universal-container min-h-screen h-fit">
+        <div className="mb-4">
+          <button
+            onClick={() => window.history.back()}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            &larr; Back to Dashboard
+          </button>
+>>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
         </div>
+        <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">
+          Student Q&A Hub
+        </h1>
 
-        {/* Right Column - Questions List */}
-        <div className="lg:w-3/4">
-          {/* Search Bar and Sort Controls (Sticky) */}
-          <div className="sticky top-16 z-20 bg-white pb-4">
-            <div className="flex items-center gap-4">
-              <input
-                type="text"
-                placeholder="Search questions..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-              <button
-                onClick={toggleSortOrder}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-              >
-                {sortOrder === "desc" ? (
-                  <>
-                    <ArrowDown className="w-4 h-4" />
-                    Newest First
-                  </>
-                ) : (
-                  <>
-                    <ArrowUp className="w-4 h-4" />
-                    Oldest First
-                  </>
-                )}
-              </button>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Column - Question Form */}
+          <div className="lg:w-1/4 flex flex-col">
+            {/* Sticky Question Form */}
+            <div className="sticky top-24">
+              {/* Category Filter - Added above the Ask a Question card */}
+              <CategoryFilter onFilterChange={handleFilterChange} />
+
+              <Card>
+                <CardHeader>
+                  <h2 className="text-2xl font-semibold text-gray-800">
+                    Ask a Question
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Get guidance from experts and peers!
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <form
+                    id="questionForm"
+                    onSubmit={handleSubmit}
+                    className="space-y-5"
+                  >
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Your Question
+                      </label>
+                      <textarea
+                        name="question"
+                        value={formData.question}
+                        onChange={handleInputChange}
+                        required
+                        rows="4"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                        placeholder="Type your question..."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Grade
+                        </label>
+                        <select
+                          name="grade"
+                          value={formData.grade}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white"
+                        >
+                          <option value="">Select grade...</option>
+                          {grades.map((grade) => (
+                            <option key={grade} value={grade}>
+                              {grade}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Category
+                        </label>
+                        <select
+                          name="label"
+                          value={formData.label}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white"
+                        >
+                          <option value="">Select category...</option>
+                          {labels.map((label) => (
+                            <option key={label} value={label}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#b82025] text-white rounded-lg hover:bg-red-700 transition-colors ${isSubmitting ? "opacity-75 cursor-not-allowed" : ""
+                        }`}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-5 h-5" />
+                          Submit Question
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </CardContent>
+              </Card>
+              {/* Promotions moved outside the sticky container */}
+              <div className="w-full mt-8">
+                <Promotions location="QA_PAGE" />
+              </div>
             </div>
           </div>
 
-          {/* Questions List (Scrollable) */}
-          <div className="mt-4 relative z-10">
-            {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+          {/* Right Column - Questions List */}
+          <div className="lg:w-3/4">
+            {/* Search Bar and Sort Controls (Sticky) */}
+            <div className="sticky top-16 z-20 bg-white pb-4">
+              <div className="flex items-center gap-4">
+                <input
+                  type="text"
+                  placeholder="Search questions..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                />
+                <button
+                  onClick={toggleSortOrder}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                >
+                  {sortOrder === "desc" ? (
+                    <>
+                      <ArrowDown className="w-4 h-4" />
+                      Newest First
+                    </>
+                  ) : (
+                    <>
+                      <ArrowUp className="w-4 h-4" />
+                      Oldest First
+                    </>
+                  )}
+                </button>
               </div>
+<<<<<<< HEAD
             ) : error ? (
               <div className="text-center text-red-600 p-4">
                 Failed to load questions. Please try again later.
@@ -1186,49 +1301,96 @@ const CombinedQuestionsPage = () => {
                   </Card>
                   );
                 })}
+=======
+            </div>
 
-                {questionsData?.result?.length === 0 && (
-                  <div className="text-center py-12">
-                    <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-2xl font-semibold text-gray-800">
-                      No Questions Yet
-                    </h3>
-                    <p className="text-gray-600">
-                      Be the first to ask a question!
-                    </p>
-                  </div>
-                )}
+            {/* Questions List (Scrollable) */}
+            <div className="mt-4 relative z-10">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+                </div>
+              ) : error ? (
+                <div className="text-center text-red-600 p-4">
+                  Failed to load questions. Please try again later.
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {questionsData?.result?.map((question) => (
+                    <Card
+                      key={question._id}
+                      className="hover:shadow-xl transition-shadow"
+                    >
+                      <CardHeader>
+                        <h3 className="text-lg font-bold text-gray-800">
+                          {question.question}
+                        </h3>
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-2">
+                          <div className="flex items-center gap-1">
+                            <School className="h-4 w-4" />
+                            <span>{question.grade}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Tag className="h-4 w-4" />
+                            <span>{question.label}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            <span>{formatDate(question.createdAt)}</span>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        {/* Replace the existing answers section with the new AnswersList component */}
+                        <AnswersList answers={question.answers} />
+                      </CardContent>
+                    </Card>
+                  ))}
 
-                <div className="flex justify-between items-center mt-6 pb-6">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`px-4 py-2 ${currentPage === 1
+                  {questionsData?.result?.length === 0 && (
+                    <div className="text-center py-12">
+                      <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-2xl font-semibold text-gray-800">
+                        No Questions Yet
+                      </h3>
+                      <p className="text-gray-600">
+                        Be the first to ask a question!
+                      </p>
+                    </div>
+                  )}
+>>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
+
+                  <div className="flex justify-between items-center mt-6 pb-6">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={`px-4 py-2 ${currentPage === 1
                         ? "bg-gray-200 cursor-not-allowed"
                         : "bg-gray-300 hover:bg-gray-400"
-                      } text-gray-700 rounded-lg transition-colors`}
-                  >
-                    Previous
-                  </button>
-                  <span className="text-gray-600">Page {currentPage}</span>
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={questionsData?.hasNextPage === false}
-                    className={`px-4 py-2 ${questionsData?.hasNextPage === false
+                        } text-gray-700 rounded-lg transition-colors`}
+                    >
+                      Previous
+                    </button>
+                    <span className="text-gray-600">Page {currentPage}</span>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={questionsData?.hasNextPage === false}
+                      className={`px-4 py-2 ${questionsData?.hasNextPage === false
                         ? "bg-red-300 cursor-not-allowed"
                         : "bg-[#b82025] hover:bg-red-700"
-                      } text-white rounded-lg transition-colors`}
-                  >
-                    Next
-                  </button>
+                        } text-white rounded-lg transition-colors`}
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
         <AuthPopup isOpen={showLoginPopup} onClose={() => setShowLoginPopup(false)} />
-    </div>
+      </div>
+    </>
   );
 };
 
