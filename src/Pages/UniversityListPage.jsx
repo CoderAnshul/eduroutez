@@ -3,11 +3,7 @@ import SafeImage from "../Ui components/SafeImage";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import { bestRatedUniversityInstitutes } from "../ApiFunctions/api";
-<<<<<<< HEAD
 import WishlistButton from "../Components/WishlistButton";
-=======
-import { Helmet } from "react-helmet-async";
->>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
 
 
 const ITEMS_PER_PAGE = 6;
@@ -74,21 +70,20 @@ const UniversityListPage = () => {
   }
 
   return (
-    <>
-    {/* SEO */}
-    <Helmet>
-      <title></title>
-    </Helmet>
-    
-      <div className="universal-container py-8">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
-          <h1 className="text-4xl font-bold mb-4">Best Rated Universities</h1>
-          <p className="text-xl">
-            Discover top-rated universities that can transform your academic journey
-          </p>
+    <div className="universal-container py-8">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-16 text-center mb-12 rounded-lg shadow-lg">
+        <h1 className="text-4xl font-bold mb-4">Best Rated Universities</h1>
+        <p className="text-xl">
+          Discover top-rated universities that can transform your academic journey
+        </p>
+      </div>
+
+      {/* Universities Grid */}
+      {universities.length === 0 ? (
+        <div className="text-center text-gray-500 py-10">
+          No universities found
         </div>
-<<<<<<< HEAD
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -118,69 +113,40 @@ const UniversityListPage = () => {
                       </div>
                     )}
                   </div>
-=======
->>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
 
-        {/* Universities Grid */}
-        {universities.length === 0 ? (
-          <div className="text-center text-gray-500 py-10">
-            No universities found
+                {/* University Details */}
+                <div className="!p-6">
+                  <h2 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A] antialiased leading-tight">
+                    {university.instituteName || university.name}
+                  </h2>
+                  <p className="text-sm mt-2 mb-4 line-clamp-3">
+                    {university.about ? (
+                      <span
+                        dangerouslySetInnerHTML={{ __html: university.about }}
+                      />
+                    ) : (
+                      "No description available"
+                    )}
+                  </p>
+                </div>
+              </Link>
+            ))}
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {paginatedContent.map((university, index) => (
-                <Link
-                  key={university._id || index}
-                  to={university?.slug ? `/institute/${university.slug}` : `/institute/${university?._id}`}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                  aria-label={university.instituteName || university.name}
-                >
-                  {/* University Image */}
-                  <div className="h-56 overflow-hidden">
-                    <SafeImage
-                      src={university.thumbnailImage ? `${Images}/${university.thumbnailImage}` : "/fallback-institute.jpg"}
-                      alt={university.instituteName || university.name}
-                      title={university.instituteName || university.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
 
-                  {/* University Details */}
-                  <div className="!p-6">
-                    <h2 className="text-xl md:text-xl lg:text-xl font-bold text-[#0B104A] antialiased leading-tight">
-                      {university.instituteName || university.name}
-                    </h2>
-                    <p className="text-sm mt-2 mb-4 line-clamp-3">
-                      {university.about ? (
-                        <span
-                          dangerouslySetInnerHTML={{ __html: university.about }}
-                        />
-                      ) : (
-                        "No description available"
-                      )}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+          {/* Load More Button */}
+          {currentPage < totalPages && (
+            <div className="flex justify-center mt-10">
+              <button
+                onClick={handleLoadMore}
+                className="bg-[#b82025] text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-all"
+              >
+                Load More Universities
+              </button>
             </div>
-
-            {/* Load More Button */}
-            {currentPage < totalPages && (
-              <div className="flex justify-center mt-10">
-                <button
-                  onClick={handleLoadMore}
-                  className="bg-[#b82025] text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-all"
-                >
-                  Load More Universities
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </>
+          )}
+        </>
+      )}
+    </div>
   );
 };
 

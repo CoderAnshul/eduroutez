@@ -7,11 +7,7 @@ import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, ThumbsUp, Users, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { bestRatedInstitute } from "../ApiFunctions/api";
-<<<<<<< HEAD
-import WishlistButton from "./WishlistButton";
-=======
 import { Helmet } from "react-helmet-async";
->>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
 
 const BestRated = React.memo(() => {
   const scrollRef = React.useRef(null);
@@ -246,23 +242,9 @@ const BestRated = React.memo(() => {
 
               <div className="absolute inset-0 p-6 flex flex-col justify-between">
                 <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                      Best Rated
-                    </div>
-                    {institute.admissionOpen && (
-                      <div className="bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 animate-pulse">
-                        <span className="w-1.5 h-1.5 bg-white rounded-full" />
-                        Admission Open
-                      </div>
-                    )}
+                  <div className="bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                    Best Rated
                   </div>
-                  <WishlistButton
-                    type="institute"
-                    id={institute._id}
-                    className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110"
-                    size={4}
-                  />
                 </div>
 
                 <div>
@@ -356,18 +338,6 @@ const BestRated = React.memo(() => {
 
   return (
     <>
-      <Helmet>
-        <title>Eduroutez - Find Top Colleges, Universities & Career Counsellors in India</title>
-        <meta
-          name="description"
-          content="Explore top colleges, universities, courses, scholarships, entrance exams, and verified career counsellors across India with Eduroutez."
-        />
-        <meta
-          name="keywords"
-          content="top colleges, universities, career counsellor, admissions, courses, scholarships, Eduroutez"
-        />
-        <link rel="canonical" href="https://eduroutez.com/" />
-      </Helmet>
 
       <div className="universal-container py-12 w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-4">

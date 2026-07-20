@@ -21,12 +21,8 @@ import BestRated from "../Components/BestRated";
 import Events from "../Components/Events";
 import ConsellingBanner from "../Components/ConsellingBanner";
 import Pagination from "../Components/Pagination";
-<<<<<<< HEAD
 import WishlistButton from "../Components/WishlistButton";
-=======
 import { Helmet } from "react-helmet-async";
->>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
-
 // Function to fetch trending courses
 const baseURL = import.meta.env.VITE_BASE_URL;
 

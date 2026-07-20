@@ -9,11 +9,10 @@ import Promotions from "./CoursePromotions";
 import SocialShare from "../Components/SocialShare";
 import { Sparkles } from "lucide-react";
 import HighRatedCareers from "../Components/HighRatedCareers";
-<<<<<<< HEAD
+
 import WishlistButton from "../Components/WishlistButton";
-=======
+
 import { Helmet } from "react-helmet-async";
->>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
 
 const StreamLevelPage = () => {
   const [pageData, setPageData] = useState(null);
