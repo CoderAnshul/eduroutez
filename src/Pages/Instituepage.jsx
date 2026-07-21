@@ -5,7 +5,6 @@ import { getInstituteById } from "../ApiFunctions/api";
 import Loader from "../Components/Loader";
 import axios from "axios";
 import { Video, ArrowRight } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 
 // Lazy load components
 const ImageSlider = React.lazy(() => import("../Ui components/ImageSlider"));
@@ -357,17 +356,6 @@ const Instituepage = () => {
 
   return (
     <>
-    {/* SEO */}
-    <Helmet>
-      <title>{`${instituteData?.institutName} | ${instituteData?.city}`}</title>
-
-      <meta name="description"
-      content={`Explore ${instituteData?.institutName} in ${instituteData?.city}, ${instituteData?.state}. Check ${instituteData?.stream} courses, admission process, fees, placements, rankings, and more on Eduroutez.`}
-      />
-
-       <link rel="canonical" href={`https://eduroutez.com/institute${instituteData.slug}`} />
-    </Helmet>
-
       <div className="universal-container flex flex-col items-start pt-[2vw]">
         <ImageSlider instituteData={instituteData} />
         <InstitueName instituteData={instituteData} />

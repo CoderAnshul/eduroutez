@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axiosInstance from "../ApiFunctions/axios";
-import { Helmet } from "react-helmet-async";
 
 const Logout = () => {
   const [showPopup, setShowPopup] = useState(true);
@@ -25,23 +24,6 @@ const Logout = () => {
 
   return (
     <>
-      {/* SEO */}
-      <Helmet>
-        <title>Log Out of Your Account | Eduroutez</title>
-        <meta
-          name="decription"
-          content="Log out of your Eduroutez account securely. Sign in again anytime to continue your education journey."
-        />
-        <meta
-          name="robots"
-          ontent="noindex, nofollow"
-        />
-        <link
-          rel="canonical"
-          href="https://eduroutez.com/logout"
-        />
-      </Helmet>
-
       {showPopup && (
         <div className="popup fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
           <div className="popup-inner bg-white rounded-lg shadow-lg w-1/3 max-sm:w-2/3 p-6 text-center">

@@ -7,7 +7,7 @@ import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, ThumbsUp, Users, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { bestRatedInstitute } from "../ApiFunctions/api";
-import { Helmet } from "react-helmet-async";
+import WishlistButton from "./WishlistButton";
 
 const BestRated = React.memo(() => {
   const scrollRef = React.useRef(null);
@@ -337,55 +337,52 @@ const BestRated = React.memo(() => {
   }
 
   return (
-    <>
+    <div className="universal-container py-12 w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-4">
+        <h3 className="text-2xl font-bold text-center sm:text-left">Best Rated Institutes</h3>
+        <button
+          onClick={handleViewMore}
+          className="bg-[#b82025] text-white py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-gray-800 transition-all shadow-md font-semibold transform hover:scale-105 active:scale-95 text-sm"
+        >
+          <span>View more</span>
+          <ArrowRight size={18} />
+        </button>
+      </div>
 
-      <div className="universal-container py-12 w-full min-h-44 max-w-[1420px] px-4 pb-10 mx-auto">
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-4">
-          <h1 className="text-2xl font-bold text-center sm:text-left">Best Rated Institutes</h1>
-          <button
-            onClick={handleViewMore}
-            className="bg-[#b82025] text-white py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-gray-800 transition-all shadow-md font-semibold transform hover:scale-105 active:scale-95 text-sm"
-          >
-            <span>View more</span>
-            <ArrowRight size={18} />
-          </button>
-        </div>
-
-        <style dangerouslySetInnerHTML={{
-          __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
       `}} />
-        <div className="relative w-full">
-          {/* Left Navigation Button */}
-          <button
-            onClick={handlePrev}
-            className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
-          </button>
+      <div className="relative w-full">
+        {/* Left Navigation Button */}
+        <button
+          onClick={handlePrev}
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="w-5 h-5 text-gray-700" />
+        </button>
 
-          <div
-            ref={scrollRef}
-            className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {renderedContent}
-          </div>
-
-          {/* Right Navigation Button */}
-          <button
-            onClick={handleNext}
-            className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="w-5 h-5 text-gray-700" />
-          </button>
+        <div
+          ref={scrollRef}
+          className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {renderedContent}
         </div>
+
+        {/* Right Navigation Button */}
+        <button
+          onClick={handleNext}
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-black p-2 rounded-full shadow-md md:hidden flex items-center justify-center border border-gray-200 nav-btn"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-5 h-5 text-gray-700" />
+        </button>
       </div>
-    </>
+    </div>
   );
 });
 

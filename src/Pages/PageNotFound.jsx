@@ -8,7 +8,7 @@ const PageNotFound = () => {
     <>
        <Helmet>
         <title>404 - Page Not Found | Eduroutez</title>
-        <meta name="robots" content="noindex, nofollow" />
+        <meta name="robots" content="noindex,nofollow" />
       </Helmet>
 
       <h1>404 - Page Not Found</h1>

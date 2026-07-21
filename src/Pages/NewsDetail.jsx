@@ -186,7 +186,6 @@ const NewsDetailPage = () => {
         <meta name="keywords"
           content="Education News, College News, Admission, Scholarships, Exams, Eduroutez"
         />
-        <link rel="canonical" href={`https://eduroutez.com/news/${newsDetail.slug}`}/>
       </Helmet>
 
       <div className="universal-container min-h-screen bg-gray-50 py-8">

@@ -967,15 +967,11 @@ const SearchPage = () => {
     <>
       {/* SEO */}
       <Helmet>
-        <title>Explore Colleges, Universities & Courses in India | Eduroutez</title>
-        <meta
-          name="description"
-          content="Explore colleges, universities, courses, streams, specializations, entrance exams, fees, admissions, placements, and rankings across India. Find the right institute on Eduroutez."
-        />
-        <link
-          rel="canonical"
-          href="https://eduroutez.com/searchpage"
-        />
+        <title>Top Colleges, Universities & Courses in India 2025 | Eduroutez</title>
+        <meta name="description"
+          content="Search and compare colleges, universities, courses, fees, admissions, placements and rankings across India on Eduroutez." />
+
+        <link rel="canonical" href="https://eduroutez.com/searchpage/" />
       </Helmet>
 
       <Promotions location="SEARCH_PAGE" className="!h-fit"></Promotions>

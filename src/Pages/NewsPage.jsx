@@ -100,7 +100,7 @@ export default function NewsPage() {
           name="description"
           content="Latest college news, admission updates, placements, scholarships, and exam notifications."
         />
-        
+
         <link
           rel="canonical"
           href="https://eduroutez.com/news"

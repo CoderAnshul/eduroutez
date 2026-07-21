@@ -5,11 +5,7 @@ import { ThumbsUp, ThumbsDown } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
 import { likeQuestion, likeAnswer } from "../ApiFunctions/api";
 import useModal from "../Components/Modal/useModal";
-<<<<<<< HEAD
 import DOMPurify from "dompurify";
-=======
-import { Helmet } from "react-helmet-async";
->>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
 
 const QuestionandAnswer = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -146,7 +142,7 @@ const QuestionandAnswer = () => {
       if (!response.data || !response.data.data) return [];
 
       // Process questions and answers
-      return (response.data.data || []).map((question) => ({
+        return (response.data.data || []).map((question) => ({
         id: question._id || null,
         question: question.question || "No question available",
         grade: question.grade || "Not Specified",
@@ -251,17 +247,17 @@ const QuestionandAnswer = () => {
   useEffect(() => {
     const pendingQuestion = sessionStorage.getItem("pendingQuestion");
     const accessToken = localStorage.getItem("accessToken");
-
+    
     // Only auto-submit if we have both pending question AND valid access token
     if (pendingQuestion && accessToken && accessToken !== "null" && accessToken !== "undefined" && accessToken !== "") {
       try {
         const questionData = JSON.parse(pendingQuestion);
         // Pre-fill the form
         setForm(questionData);
-
+        
         // Clear session storage
         sessionStorage.removeItem("pendingQuestion");
-
+        
         // Auto-submit after a short delay to ensure form is ready
         setTimeout(() => {
           if (questionData.question && questionData.label && questionData.grade) {
@@ -383,67 +379,186 @@ const QuestionandAnswer = () => {
 
 
   return (
-    <>
-    {/* SEO */}
+    <div className="universal-container flex flex-col lg:flex-row gap-4 relative">
+      {/* Toggle Button for Sidebar (Small Screens) */}
+      <div className="block lg:hidden mb-4">
+        <button
+          onClick={() => setSidebarOpen(!isSidebarOpen)}
+          className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
+        >
+          {isSidebarOpen ? "Close Filters" : "Open Filters"}
+        </button>
+      </div>
 
-      <div className="universal-container flex flex-col lg:flex-row gap-4 relative">
-        {/* Toggle Button for Sidebar (Small Screens) */}
-        <div className="block lg:hidden mb-4">
+      {/* Sidebar for larger screens */}
+      <aside className="hidden lg:block w-full lg:w-1/4 bg-white shadow-lg rounded-lg p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Filters</h2>
           <button
-            onClick={() => setSidebarOpen(!isSidebarOpen)}
-            className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
+            onClick={clearFilters}
+            className="text-sm text-blue-500 hover:underline"
           >
-            {isSidebarOpen ? "Close Filters" : "Open Filters"}
+            Clear All
           </button>
         </div>
 
-        {/* Sidebar for larger screens */}
-        <aside className="hidden lg:block w-full lg:w-1/4 bg-white shadow-lg rounded-lg p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Filters</h2>
-            <button
-              onClick={clearFilters}
-              className="text-sm text-blue-500 hover:underline"
-            >
-              Clear All
-            </button>
-          </div>
+        {/* Search input */}
+        <div className="mb-4">
+          <label htmlFor="search" className="block text-sm font-medium mb-1">
+            Search
+          </label>
+          <input
+            type="text"
+            id="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search questions or answers..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+          />
+        </div>
 
-          {/* Search input */}
-          <div className="mb-4">
-            <label htmlFor="search" className="block text-sm font-medium mb-1">
-              Search
-            </label>
-            <input
-              type="text"
-              id="search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search questions or answers..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-            />
-          </div>
+        <h3 className="text-md font-medium mb-2">Interests</h3>
+        <ul className="space-y-2 max-h-[300px] overflow-y-auto">
+          {options.map((item) => (
+            <li key={item} className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id={item}
+                value={item}
+                checked={selectedInterests.includes(item)}
+                onChange={handleInterestChange}
+                className="text-blue-600 focus:ring-blue-500"
+              />
+              <label htmlFor={item} className="text-sm text-gray-700">
+                {item}
+              </label>
+            </li>
+          ))}
+        </ul>
 
-          <h3 className="text-md font-medium mb-2">Interests</h3>
-          <ul className="space-y-2 max-h-[300px] overflow-y-auto">
+        {/* Active filters display */}
+        {(selectedInterests.length > 0 || searchTerm) && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <h3 className="text-sm font-medium mb-2">Active Filters:</h3>
+            <div className="flex flex-wrap gap-2">
+              {searchTerm && (
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                  Search: {searchTerm}
+                </span>
+              )}
+              {selectedInterests.map((interest) => (
+                <span
+                  key={interest}
+                  className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center"
+                >
+                  {interest}
+                  <button
+                    onClick={() =>
+                      setSelectedInterests((prev) =>
+                        prev.filter((i) => i !== interest)
+                      )
+                    }
+                    className="ml-1 text-xs"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </aside>
+
+      {/* Dropdown for smaller screens with filters */}
+      <div
+        className={`lg:hidden w-full bg-white shadow-lg rounded-lg p-4 ${isSidebarOpen ? "block" : "hidden"
+          }`}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Filters</h2>
+          <button
+            onClick={clearFilters}
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Clear All
+          </button>
+        </div>
+
+        {/* Search input for mobile */}
+        <div className="mb-4">
+          <label
+            htmlFor="mobile-search"
+            className="block text-sm font-medium mb-1"
+          >
+            Search
+          </label>
+          <input
+            type="text"
+            id="mobile-search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search questions or answers..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+          />
+        </div>
+
+        <h3 className="text-md font-medium mb-2">Interests</h3>
+        <div className="space-y-2 max-h-[300px] overflow-y-auto">
+          {options.map((item) => (
+            <div key={item} className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id={`mobile-${item}`}
+                value={item}
+                onChange={handleInterestChange}
+                checked={selectedInterests.includes(item)}
+                className="text-blue-600 focus:ring-blue-500"
+              />
+              <label
+                htmlFor={`mobile-${item}`}
+                className="text-sm text-gray-700"
+              >
+                {item}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <main className="w-full lg:w-1/2 relative">
+        {/* Question submission form */}
+        <form
+          id="questionForm"
+          className="mb-6 bg-white shadow-lg rounded-lg p-4"
+          onSubmit={handleSubmit}
+        >
+          <h2 className="text-lg font-semibold mb-2">
+            Need guidance on career and education? Ask our experts
+          </h2>
+
+          <input
+            type="text"
+            name="question"
+            placeholder="Type Your Question"
+            required
+            className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+            onChange={handleChange}
+          />
+
+          <select
+            name="label"
+            required
+            className="w-full mt-2 px-4 py-2 border border-gray-400 rounded-lg"
+            onChange={handleChange}
+          >
+            <option value="">Select Interest</option>
             {options.map((item) => (
-              <li key={item} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id={item}
-                  value={item}
-                  checked={selectedInterests.includes(item)}
-                  onChange={handleInterestChange}
-                  className="text-blue-600 focus:ring-blue-500"
-                />
-                <label htmlFor={item} className="text-sm text-gray-700">
-                  {item}
-                </label>
-              </li>
+              <option key={item} value={item}>
+                {item}
+              </option>
             ))}
-          </ul>
+          </select>
 
-<<<<<<< HEAD
           <select
             name="grade"
             required
@@ -576,250 +691,24 @@ const QuestionandAnswer = () => {
                       </button>
                     )}
                   </div>
-=======
-          {/* Active filters display */}
-          {(selectedInterests.length > 0 || searchTerm) && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <h3 className="text-sm font-medium mb-2">Active Filters:</h3>
-              <div className="flex flex-wrap gap-2">
-                {searchTerm && (
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                    Search: {searchTerm}
-                  </span>
->>>>>>> 75ffd60 (improve SEO meta tags and canonical URLs)
                 )}
-                {selectedInterests.map((interest) => (
-                  <span
-                    key={interest}
-                    className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center"
-                  >
-                    {interest}
-                    <button
-                      onClick={() =>
-                        setSelectedInterests((prev) =>
-                          prev.filter((i) => i !== interest)
-                        )
-                      }
-                      className="ml-1 text-xs"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </aside>
 
-        {/* Dropdown for smaller screens with filters */}
-        <div
-          className={`lg:hidden w-full bg-white shadow-lg rounded-lg p-4 ${isSidebarOpen ? "block" : "hidden"
-            }`}
-        >
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Filters</h2>
-            <button
-              onClick={clearFilters}
-              className="text-sm text-blue-500 hover:underline"
-            >
-              Clear All
-            </button>
-          </div>
-
-          {/* Search input for mobile */}
-          <div className="mb-4">
-            <label
-              htmlFor="mobile-search"
-              className="block text-sm font-medium mb-1"
-            >
-              Search
-            </label>
-            <input
-              type="text"
-              id="mobile-search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search questions or answers..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-            />
-          </div>
-
-          <h3 className="text-md font-medium mb-2">Interests</h3>
-          <div className="space-y-2 max-h-[300px] overflow-y-auto">
-            {options.map((item) => (
-              <div key={item} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id={`mobile-${item}`}
-                  value={item}
-                  onChange={handleInterestChange}
-                  checked={selectedInterests.includes(item)}
-                  className="text-blue-600 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor={`mobile-${item}`}
-                  className="text-sm text-gray-700"
-                >
-                  {item}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <main className="w-full lg:w-1/2 relative">
-          {/* Question submission form */}
-          <form
-            id="questionForm"
-            className="mb-6 bg-white shadow-lg rounded-lg p-4"
-            onSubmit={handleSubmit}
-          >
-            <h2 className="text-lg font-semibold mb-2">
-              Need guidance on career and education? Ask our experts
-            </h2>
-
-            <input
-              type="text"
-              name="question"
-              placeholder="Type Your Question"
-              required
-              className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-              onChange={handleChange}
-            />
-
-            <select
-              name="label"
-              required
-              className="w-full mt-2 px-4 py-2 border border-gray-400 rounded-lg"
-              onChange={handleChange}
-            >
-              <option value="">Select Interest</option>
-              {options.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-
-            <select
-              name="grade"
-              required
-              className="w-full mt-2 px-4 py-2 border border-gray-400 rounded-lg"
-              onChange={handleChange}
-            >
-              <option value="">Select Education Level</option>
-              {Level.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="mt-2 w-full px-4 py-2 bg-[#b82025] text-white rounded-lg hover:bg-[#b82025] disabled:opacity-50"
-            >
-              {isSubmitting ? "Submitting..." : "Submit Question"}
-            </button>
-          </form>
-
-          {/* Results count and filtering info */}
-          <div className="mb-4 px-2">
-            <p className="text-sm text-gray-600">
-              Showing {filteredQuestions.length} of {questionsAndAnswers.length}{" "}
-              questions
-              {(selectedInterests.length > 0 || searchTerm) && " (filtered)"}
-            </p>
-          </div>
-
-          {/* Question list */}
-          <div className="space-y-4 max-h-[470px] overflow-y-scroll">
-            {filteredQuestions.length === 0 ? (
-              <div className="text-center text-gray-500 p-6 bg-gray-100 rounded-lg">
-                {questionsAndAnswers.length === 0
-                  ? "No questions found for this email. Be the first to ask!"
-                  : "No questions match your current filters."}
-              </div>
-            ) : (
-              filteredQuestions.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-red-100 shadow-lg rounded-lg p-4 space-y-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                    <span className="text-sm font-semibold">{formatUserDisplay(item.askedBy)}</span>
-                  </div>
-                  <h3 className="font-bold text-lg">Q: {item.question}</h3>
-
-                  <div className="text-sm text-gray-500">
-                    <span>Label: {item.label}</span>
-                    <span className="ml-2">Grade: {item.grade}</span>
-                  </div>
-
-                  {/* Answers Section */}
-                  {item.hasAnswers && (
-                    <div className="mt-2">
-                      <h4 className="mb-4 p-4 text-md">Answers:</h4>
-                      <div className="ml-2 space-y-2">
-                        {/* Show top 3 answers by default */}
-                        {item.answers
-                          .slice(
-                            0,
-                            expandedQuestion === item.id ? item.answers.length : 3
-                          )
-                          .map((answer, index) => (
-                            <div key={index} className="bg-white p-3 rounded-lg">
-                              <div className="flex items-center space-x-2 mb-1">
-                                <div className="w-6 h-6 bg-blue-200 rounded-full"></div>
-                                <span className="text-sm font-medium">
-                                  {formatUserDisplay(answer.answeredBy)}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                  {new Date(answer.answeredAt).toLocaleString()}
-                                </span>
-                              </div>
-                              <div
-                                dangerouslySetInnerHTML={{
-                                  __html: answer.answer,
-                                }}
-                              />
-                            </div>
-                          ))}
-                      </div>
-
-                      {/* View More/Less button */}
-                      {item.answers.length > 3 && (
-                        <button
-                          onClick={() => toggleExpandQuestion(item.id)}
-                          className="mt-2 text-blue-500 text-sm hover:underline"
-                        >
-                          {expandedQuestion === item.id
-                            ? "View Less"
-                            : "View More Answers"}
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="flex justify-end text-xs text-gray-400">
-                    {new Date(item.createdAt).toLocaleString()}
-                  </div>
+                <div className="flex justify-end text-xs text-gray-400">
+                  {new Date(item.createdAt).toLocaleString()}
                 </div>
-              ))
-            )}
-          </div>
-        </main>
+              </div>
+            ))
+          )}
+        </div>
+      </main>
 
-        {/* Ads sidebar */}
-        <aside className="w-full lg:w-1/4 bg-white shadow-lg rounded-lg p-4 lg:order-none order-last">
-          <div className="h-full flex items-center justify-center">
-            <span className="text-gray-500 font-semibold text-xl">Ads</span>
-          </div>
-        </aside>
-      </div>
-    </>
+      {/* Ads sidebar */}
+      <aside className="w-full lg:w-1/4 bg-white shadow-lg rounded-lg p-4 lg:order-none order-last">
+        <div className="h-full flex items-center justify-center">
+          <span className="text-gray-500 font-semibold text-xl">Ads</span>
+        </div>
+      </aside>
+    </div>
   );
 };
 

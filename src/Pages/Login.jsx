@@ -171,6 +171,10 @@ const Login = ({ isMode, onSwitch, onClose }) => {
           name="description"
           content="Login to your Eduroutez account to manage admissions, explore colleges and courses, connect with counselors, and access your personalized dashboard."
         />
+        <meta
+          name="keywords"
+          content="student login, college login, university login, institute login, counselor login, Eduroutez login"
+        />
         <meta name="robots" content="noindex, nofollow" />
         <link
           rel="canonical"
