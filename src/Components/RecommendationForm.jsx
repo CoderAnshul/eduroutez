@@ -16,6 +16,17 @@ const INDIAN_STATES = [
   "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
 ];
 
+const STATE_CODE_MAP = {
+  "Andhra Pradesh": "AP", "Arunachal Pradesh": "AR", "Assam": "AS", "Bihar": "BR", "Chhattisgarh": "CG",
+  "Goa": "GA", "Gujarat": "GJ", "Haryana": "HR", "Himachal Pradesh": "HP", "Jharkhand": "JH",
+  "Karnataka": "KA", "Kerala": "KL", "Madhya Pradesh": "MP", "Maharashtra": "MH", "Manipur": "MN",
+  "Meghalaya": "ML", "Mizoram": "MZ", "Nagaland": "NL", "Odisha": "OD", "Punjab": "PB",
+  "Rajasthan": "RJ", "Sikkim": "SK", "Tamil Nadu": "TN", "Telangana": "TS", "Tripura": "TR",
+  "Uttar Pradesh": "UP", "Uttarakhand": "UK", "West Bengal": "WB",
+  "Andaman and Nicobar Islands": "AN", "Chandigarh": "CH", "Dadra and Nagar Haveli and Daman and Diu": "DN",
+  "Delhi": "DL", "Jammu and Kashmir": "JK", "Ladakh": "LA", "Lakshadweep": "LD", "Puducherry": "PY"
+};
+
 const EDUCATION_LEVELS = [
   "10th Pass", "12th Pass", "Undergraduate", "Postgraduate", "Diploma", "PhD"
 ];
@@ -74,12 +85,19 @@ const RecommendationForm = ({ onSubmit, loading, initialProfile }) => {
     if (form.state) {
       const fetchCities = async () => {
         try {
+          const stateCode = STATE_CODE_MAP[form.state];
+          console.log('DEBUG CITY: state selected:', form.state, '-> code:', stateCode);
+          if (!stateCode) { setCities([]); return; }
           const response = await axios.post(`${baseURL}/cities-by-state`, {
-            state: form.state
+            stateCode,
+            countryCode: "IN"
           });
+          console.log('DEBUG CITY: API response:', response.data);
           const data = response.data?.data || response.data?.cities || [];
+          console.log('DEBUG CITY: cities data:', Array.isArray(data) ? data.length + ' cities' : data);
           setCities(Array.isArray(data) ? data : []);
-        } catch {
+        } catch (err) {
+          console.error('DEBUG CITY: API error:', err.message, err.response?.status, err.response?.data);
           setCities([]);
         }
       };
