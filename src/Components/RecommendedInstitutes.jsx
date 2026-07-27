@@ -8,6 +8,30 @@ import { ArrowRight, ThumbsUp, Users, MapPin, ChevronLeft, ChevronRight, BadgeCh
 const baseURL = import.meta.env.VITE_BASE_URL;
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
+const CACHE_PREFIX = "eduroutez_institutes_";
+const CACHE_TTL = 30 * 60 * 1000;
+
+const getCacheKey = (streams) => CACHE_PREFIX + streams.map(s => s.toLowerCase().trim()).join("_");
+
+const loadInstituteCache = (key) => {
+  try {
+    const raw = sessionStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Date.now() - parsed._ts > CACHE_TTL) {
+      sessionStorage.removeItem(key);
+      return null;
+    }
+    return parsed.data;
+  } catch { return null; }
+};
+
+const saveInstituteCache = (key, data) => {
+  try {
+    sessionStorage.setItem(key, JSON.stringify({ _ts: Date.now(), data }));
+  } catch {}
+};
+
 const RecommendedInstitutes = ({ streams = [], currentId }) => {
   const scrollRef = React.useRef(null);
   const streamSet = useMemo(() => streams.map(s => s.toLowerCase().trim()), [streams]);
@@ -124,6 +148,9 @@ const RecommendedInstitutes = ({ streams = [], currentId }) => {
     }
   };
 
+  const cacheKey = useMemo(() => getCacheKey(streams), [streams]);
+  const cachedData = useMemo(() => (streams.length ? loadInstituteCache(cacheKey) : null), [cacheKey]);
+
   const { data, isLoading, isError, error } = useQuery(
     ["recommendedInstitutes", ...streams],
     async () => {
@@ -137,7 +164,16 @@ const RecommendedInstitutes = ({ streams = [], currentId }) => {
       });
       return res.data;
     },
-    { enabled: streams.length > 0, refetchOnWindowFocus: false }
+    {
+      enabled: streams.length > 0,
+      initialData: cachedData,
+      onSuccess: (fetchedData) => {
+        if (fetchedData) {
+          saveInstituteCache(cacheKey, fetchedData);
+        }
+      },
+      refetchOnWindowFocus: false,
+    }
   );
 
   const institutes = data?.data?.result || data?.result || [];

@@ -4,8 +4,34 @@ import RecommendationResults from "../Components/RecommendationResults";
 import { getFilteredRecommendations, getRecommendations, quickNearby } from "../ApiFunctions/api";
 import { Sparkles, ArrowLeft, BookOpen, Building2, Users, Navigation, MapPin } from "lucide-react";
 
+const CACHE_KEY = "eduroutez_recommendations";
+const CACHE_TTL = 30 * 60 * 1000;
+
+const loadCache = () => {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Date.now() - parsed._ts > CACHE_TTL) {
+      sessionStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+    return parsed.data;
+  } catch { return null; }
+};
+
+const saveCache = (data) => {
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ _ts: Date.now(), data }));
+  } catch {}
+};
+
+const clearCache = () => {
+  try { sessionStorage.removeItem(CACHE_KEY); } catch {}
+};
+
 const RecommendationsPage = () => {
-  const [results, setResults] = useState(null);
+  const [results, setResults] = useState(() => loadCache());
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState(null);
@@ -78,11 +104,16 @@ const RecommendationsPage = () => {
     }
   }, [userState, userCity]);
 
+  useEffect(() => {
+    if (results) saveCache(results);
+  }, [results]);
+
   const handleReset = () => {
     setResults(null);
     setProfile(null);
     setError(null);
     setNearbyOnly(false);
+    clearCache();
   };
 
   return (
