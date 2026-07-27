@@ -27,6 +27,8 @@ const SubNavbar = ({ categories }) => {
   const [courseCategories, setCourseCategories] = useState([]);
   const [selectedCourseCat, setSelectedCourseCat] = useState(null);
   const [coursesByCategory, setCoursesByCategory] = useState({});
+  const [trendingByCategory, setTrendingByCategory] = useState({});
+  const [popularByCategory, setPopularByCategory] = useState({});
 
   const navigate = useNavigate();
 
@@ -168,16 +170,53 @@ const SubNavbar = ({ categories }) => {
 
   // Fetch courses when a course category is selected
   useEffect(() => {
-    if (!selectedCourseCat) return;
-    if (coursesByCategory[selectedCourseCat]) return;
+    if (!selectedCourseCat) {
+      console.log('DEBUG: selectedCourseCat is null/empty, skipping fetch');
+      return;
+    }
+    console.log('DEBUG: selectedCourseCat changed to:', selectedCourseCat);
+    console.log('DEBUG: category name:', courseCategories.find(c => c._id === selectedCourseCat)?.title || 'unknown');
+    console.log('DEBUG: Already cached - trending:', !!trendingByCategory[selectedCourseCat], 'popular:', !!popularByCategory[selectedCourseCat], 'regular:', !!coursesByCategory[selectedCourseCat]);
     const fetchCourses = async () => {
       try {
-        const res = await axiosInstance.get(`${import.meta.env.VITE_BASE_URL}/courses?filters={"category":"${selectedCourseCat}"}&limit=50`);
-        setCoursesByCategory((prev) => ({ ...prev, [selectedCourseCat]: res.data?.data?.result || [] }));
-      } catch { }
+        if (!coursesByCategory[selectedCourseCat]) {
+          const url = `${import.meta.env.VITE_BASE_URL}/courses?filters=${encodeURIComponent(JSON.stringify({ category: selectedCourseCat }))}&limit=50`;
+          console.log('DEBUG: Fetching regular courses:', url);
+          const res = await axiosInstance.get(url);
+          console.log('DEBUG: Regular courses response data structure:', Object.keys(res.data || {}));
+          console.log('DEBUG: Regular courses result count:', res.data?.data?.result?.length, res.data?.data?.totalDocuments);
+          setCoursesByCategory((prev) => ({ ...prev, [selectedCourseCat]: res.data?.data?.result || [] }));
+        } else {
+          console.log('DEBUG: Using cached regular courses, count:', coursesByCategory[selectedCourseCat]?.length);
+        }
+        if (!trendingByCategory[selectedCourseCat]) {
+          const filters = JSON.stringify({ isCourseTrending: true, category: selectedCourseCat });
+          const url = `${import.meta.env.VITE_BASE_URL}/courses?filters=${encodeURIComponent(filters)}&limit=6`;
+          console.log('DEBUG: Fetching trending courses:', url);
+          const trendingRes = await axiosInstance.get(url);
+          console.log('DEBUG: Trending full response:', JSON.stringify(trendingRes.data).slice(0, 500));
+          console.log('DEBUG: Trending result count:', trendingRes.data?.data?.result?.length);
+          setTrendingByCategory((prev) => ({ ...prev, [selectedCourseCat]: trendingRes.data?.data?.result || [] }));
+        } else {
+          console.log('DEBUG: Using cached trending courses, count:', trendingByCategory[selectedCourseCat]?.length);
+        }
+        if (!popularByCategory[selectedCourseCat]) {
+          const filters = JSON.stringify({ isCoursePopular: true, category: selectedCourseCat });
+          const url = `${import.meta.env.VITE_BASE_URL}/courses?filters=${encodeURIComponent(filters)}&limit=6`;
+          console.log('DEBUG: Fetching popular courses:', url);
+          const popularRes = await axiosInstance.get(url);
+          console.log('DEBUG: Popular full response:', JSON.stringify(popularRes.data).slice(0, 500));
+          console.log('DEBUG: Popular result count:', popularRes.data?.data?.result?.length);
+          setPopularByCategory((prev) => ({ ...prev, [selectedCourseCat]: popularRes.data?.data?.result || [] }));
+        } else {
+          console.log('DEBUG: Using cached popular courses, count:', popularByCategory[selectedCourseCat]?.length);
+        }
+      } catch (err) {
+        console.error('DEBUG: Error fetching courses for category:', selectedCourseCat, err.message, err.response?.status, err.response?.data);
+      }
     };
     fetchCourses();
-  }, [selectedCourseCat]);
+  }, [selectedCourseCat, courseCategories, trendingByCategory, popularByCategory, coursesByCategory]);
 
   const updateGlobalMap = () => {
     window.courseIdMap = { ...window.courseIdMap, ...courseIdMap };
@@ -350,53 +389,83 @@ const SubNavbar = ({ categories }) => {
   const handleInstituteClick = (institute) => { navigate(`/institute/${institute.slug || institute._id}`); setHoveredCategory(null); };
   const handleLinkClick = (url) => { navigate(url); setHoveredCategory(null); };
 
-  const renderCoursesContent = () => (
-    <div className="bg-white w-full max-h-[500px] shadow-lg border border-gray-100 flex overflow-hidden">
-      {/* Sidebar - Course Categories */}
-      <div className="w-[220px] bg-[#b82025] flex-shrink-0 h-full overflow-y-auto">
-        <div className="p-3 text-white text-xs font-bold uppercase tracking-wider border-b border-white/20">Categories</div>
-        <ul className="w-full flex flex-col ml-0 mb-0 space-y-0">
-          {courseCategories.map((cat) => (
-            <li
-              key={cat._id}
-              className={`pl-3 pr-3 py-2 text-xs cursor-pointer transition-all hover:bg-black/20 ${selectedCourseCat === cat._id ? "bg-black text-white font-medium" : "text-white/90"
-                }`}
-              onMouseEnter={() => setSelectedCourseCat(cat._id)}
-            >
-              {cat.title || cat.name}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Content - Courses in selected category */}
-      <div className="flex-1 p-6 bg-white h-full overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-base text-gray-800">
-            {courseCategories.find((c) => c._id === selectedCourseCat)?.title || "Courses"}
-          </h3>
-          <span
-            onClick={() => { navigate("/popularcourses"); setHoveredCategory(null); }}
-            className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
-          >
-            View All
-          </span>
-        </div>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-          {(coursesByCategory[selectedCourseCat] || popularCourses?.result || []).slice(0, 20).map((course) => (
-            <div key={course._id} className="group">
-              <a onClick={() => handleCourseClick(course)} className="flex items-center gap-2 px-2 py-1.5 cursor-pointer transition-all duration-200 hover:text-red-500 rounded hover:bg-red-50">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-red-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-                </svg>
-                <span className="text-sm text-gray-700 hover:text-red-500 truncate">{course.courseTitle || course.name}</span>
-              </a>
-            </div>
-          ))}
-        </div>
-      </div>
+  const renderCourseCard = (course) => (
+    <div key={course._id} className="group">
+      <a onClick={() => handleCourseClick(course)} className="flex items-center gap-2 px-2 py-1.5 cursor-pointer transition-all duration-200 hover:text-red-500 rounded hover:bg-red-50">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-red-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+        </svg>
+        <span className="text-sm text-gray-700 hover:text-red-500 truncate">{course.courseTitle || course.name}</span>
+      </a>
     </div>
   );
+
+  const renderCourseSection = (title, courses, emptyText) => (
+    <div className="mb-4">
+      <h4 className="font-semibold text-sm text-gray-800 mb-2 flex items-center gap-1.5">{title}</h4>
+      {courses.length > 0 ? (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          {courses.slice(0, 4).map(renderCourseCard)}
+        </div>
+      ) : (
+        <p className="text-xs text-gray-400">{emptyText}</p>
+      )}
+    </div>
+  );
+
+  const renderCoursesContent = () => {
+    const catTitle = courseCategories.find((c) => c._id === selectedCourseCat)?.title || "Courses";
+    const catTrending = trendingByCategory[selectedCourseCat] || [];
+    const catPopular = popularByCategory[selectedCourseCat] || [];
+    const catCourses = coursesByCategory[selectedCourseCat] || popularCourses?.result || [];
+
+    console.log('DEBUG RENDER: selectedCourseCat:', selectedCourseCat, 'catTitle:', catTitle);
+    console.log('DEBUG RENDER: trendingByCategory keys:', Object.keys(trendingByCategory));
+    console.log('DEBUG RENDER: popularByCategory keys:', Object.keys(popularByCategory));
+    console.log('DEBUG RENDER: catTrending length:', catTrending.length, 'catPopular length:', catPopular.length, 'catCourses length:', catCourses.length);
+
+    return (
+      <div className="bg-white w-full max-h-[500px] shadow-lg border border-gray-100 flex overflow-hidden">
+        {/* Sidebar - Course Categories */}
+        <div className="w-[220px] bg-[#b82025] flex-shrink-0 h-full overflow-y-auto">
+          <div className="p-3 text-white text-xs font-bold uppercase tracking-wider border-b border-white/20">Categories</div>
+          <ul className="w-full flex flex-col ml-0 mb-0 space-y-0">
+            {courseCategories.map((cat) => (
+              <li
+                key={cat._id}
+                className={`pl-3 pr-3 py-2 text-xs cursor-pointer transition-all hover:bg-black/20 ${selectedCourseCat === cat._id ? "bg-black text-white font-medium" : "text-white/90"}`}
+                onMouseEnter={() => setSelectedCourseCat(cat._id)}
+              >
+                {cat.title || cat.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Content - Trending, Popular, and All courses for this category */}
+        <div className="flex-1 p-5 bg-white h-full overflow-y-auto">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-base text-gray-800">{catTitle}</h3>
+            <span
+              onClick={() => { navigate("/popularcourses"); setHoveredCategory(null); }}
+              className="text-xs text-red-500 hover:text-red-600 cursor-pointer font-medium"
+            >
+              View All
+            </span>
+          </div>
+
+          {renderCourseSection("🔥 Trending Courses", catTrending, "No trending courses in this category")}
+          {renderCourseSection("⭐ Popular Courses", catPopular, "No popular courses in this category")}
+
+          <div className="border-t border-gray-100 my-3"></div>
+          <h4 className="font-semibold text-sm text-gray-800 mb-2">All Courses</h4>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+            {catCourses.slice(0, 8).map(renderCourseCard)}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderCareersContent = () => (
     <div className="p-8 bg-white w-full max-h-[500px] overflow-y-auto shadow-lg border border-gray-100">
