@@ -14,6 +14,7 @@ const DIMENSION_COLORS = {
     Leadership: '#6366f1',
     Practical: '#f97316',
     Conventional: '#8b5cf6',
+    ProblemSolving: '#0ea5e9',
 };
 
 const STEPS = ['welcome', 'questions', 'results'];
@@ -76,7 +77,7 @@ export default function PersonalityAssessment() {
         : [];
 
     const formatProfileKey = (key) => {
-        const map = { Analytical: 'Analytical', Creative: 'Creative', Social: 'Social', Leadership: 'Leadership', Practical: 'Practical', Conventional: 'Conventional' };
+        const map = { Analytical: 'Analytical', Creative: 'Creative', Social: 'Social', Leadership: 'Leadership', Practical: 'Practical', Conventional: 'Conventional', ProblemSolving: 'Problem Solving' };
         return map[key] || key;
     };
 
