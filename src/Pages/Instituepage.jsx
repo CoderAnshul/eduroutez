@@ -17,7 +17,7 @@ const ReviewandRating = React.lazy(() => import("../Components/ReviewandRating")
 const InstituteFacilites = React.lazy(() => import("../Components/InstituteFacilites"));
 const RecruitersSlider = React.lazy(() => import("../Ui components/RecruitersSlider"));
 const Faqs = React.lazy(() => import("../Components/Faqs"));
-const BestRated = React.lazy(() => import("../Components/BestRated"));
+const RecommendedInstitutes = React.lazy(() => import("../Components/RecommendedInstitutes"));
 const Events = React.lazy(() => import("../Components/Events"));
 const Addmissioninfo = React.lazy(() => import("../Components/Addmissioninfo"));
 const Placementinfo = React.lazy(() => import("../Components/Placementinfo"));
@@ -565,7 +565,7 @@ const Instituepage = () => {
         </div>
         <HighRatedCareers />
         <BlogComponent />
-        <BestRated />
+        <RecommendedInstitutes streams={instituteData?.data?.streams || []} currentId={instituteData?.data?._id} />
         {instituteData && <RelatedContent contentId={instituteData._id} contentType="institute" />}
         {/* <Events className="!w-full" /> */}
       </div>

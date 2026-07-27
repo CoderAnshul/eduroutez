@@ -550,6 +550,50 @@ export const alltrendingInstitute = async () => {
   }
 };
 
+export const popularInstitute = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/popular-institutes?limit=3`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching popular institutes:`, error);
+    throw error;
+  }
+};
+
+export const allPopularInstitute = async () => {
+  try {
+    const response = await axios.get(`${baseURL}/popular-institutes`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching all popular institutes:`, error);
+    throw error;
+  }
+};
+
+export const recommendedInstitute = async () => {
+  try {
+    const response = await axios.get(
+      `${baseURL}/recommended-institutes?limit=3`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching recommended institutes:`, error);
+    throw error;
+  }
+};
+
+export const allRecommendedInstitute = async () => {
+  try {
+    const response = await axios.get(`${baseURL}/recommended-institutes`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching all recommended institutes:`, error);
+    throw error;
+  }
+};
+
 //careerCategories
 export const careerCategories = async () => {
   try {

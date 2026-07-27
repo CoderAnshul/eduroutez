@@ -22,6 +22,8 @@ import ReviewActivity from './Pages/ReviewActivity';
 import PopularCourses from './Pages/PopularCoursePage';
 import BestRatedInstitute from './Pages/Best-Rated-Institute';
 import TrendingInstitute from './Pages/TrendingInstitute';
+import PopularInstitute from './Pages/PopularInstitute';
+import RecommendedInstitute from './Pages/RecommendedInstitute';
 import Counselor from './Pages/Counselor';
 import NewsDetail from './Pages/NewsDetail';
 import ScheduledSlots from './Pages/ScheduledSlots';
@@ -196,6 +198,8 @@ const AppShell = () => {
           <Route path="/university" element={<UniversityListPage />} />
 
           <Route path="/trending-institute" element={<TrendingInstitute />} />
+          <Route path="/popular-institute" element={<PopularInstitute />} />
+          <Route path="/recommended-institute" element={<RecommendedInstitute />} />
           <Route path='/counselor' element={<Counselor />}></Route>
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/news/:slug" element={<NewsDetail />} />
