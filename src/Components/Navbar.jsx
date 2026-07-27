@@ -350,6 +350,13 @@ const Navbar = () => {
               <span className="text-black">Recommend</span>
             </Link>
             <Link
+              to="/searchpage"
+              className="CustomFlex gap-1 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md text-xs font-bold hover:scale-95 group transform transition-all"
+            >
+              Explore College
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
               to="/career-outcome"
               className="CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
             >
