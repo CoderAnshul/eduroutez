@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useNavigate } from 'react-router-dom';
 import useVoice from '../utils/useVoice';
+import { isEducationRelated, isAssessmentActive, getQuestionCount, incrementQuestionCount, getMessage, MAX_QUESTIONS } from '../utils/chatRestrictions';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:4001/api/v1';
 
@@ -209,15 +210,42 @@ export default function ChatbotWidget() {
         const trimmed = (text || input).trim();
         if (!trimmed || loading) return;
 
+        if (!isAssessmentActive(messages) && !isEducationRelated(trimmed)) {
+            setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
+            setMessages((prev) => [...prev, {
+                role: 'assistant',
+                content: getMessage('notEducation', language),
+            }]);
+            setInput('');
+            return;
+        }
+
+        const currentCount = getQuestionCount();
+        if (currentCount >= MAX_QUESTIONS) {
+            setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
+            setMessages((prev) => [...prev, {
+                role: 'assistant',
+                content: getMessage('limitReached', language),
+            }]);
+            setInput('');
+            return;
+        }
+
         setInput('');
         setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
         setLoading(true);
+        incrementQuestionCount();
+
+        const langHint = language === 'en'
+            ? '\n\n[Respond only in English. Never use Hindi.]'
+            : '\n\n[केवल हिंदी में उत्तर दें। अंग्रेज़ी का उपयोग न करें।]';
+        const messageToSend = trimmed + langHint;
 
         try {
             const res = await fetch(`${BASE_URL}/chatbot/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: trimmed, sessionId, language }),
+                body: JSON.stringify({ message: messageToSend, sessionId, language }),
             });
 
             if (!res.ok) throw new Error(`Server error: ${res.status}`);
