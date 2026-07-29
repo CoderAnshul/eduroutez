@@ -15,6 +15,13 @@ const convertToReadableFormat = (number) => {
   return "₹" + n.toString();
 };
 
+const stripHtml = (html) => {
+  if (!html) return "";
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent || div.innerText || "";
+};
+
 const SectionHeader = ({ icon: Icon, title, count, color }) => (
   <div className="flex items-center gap-3 mb-6">
     <div className={`p-2.5 rounded-xl ${color}`}>
@@ -54,7 +61,7 @@ const CourseCard = ({ course }) => (
             </span>
           )}
           <h3 className="font-bold text-gray-800 text-lg leading-tight group-hover:text-red-600 transition-colors line-clamp-2">
-            {course.courseTitle}
+            {stripHtml(course.courseTitle)}
           </h3>
           <div className="flex flex-wrap gap-1.5 mt-1">
             {course._examMatch === "accepted" && <MatchPill>Exam Accepted</MatchPill>}
@@ -73,7 +80,7 @@ const CourseCard = ({ course }) => (
       {course._aiReason && (
         <p className="mb-3 text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 leading-snug">
           <Sparkles className="w-3 h-3 inline mr-1 -mt-0.5" />
-          {course._aiReason}
+          {stripHtml(course._aiReason)}
         </p>
       )}
 
@@ -225,7 +232,7 @@ const InstituteCard = ({ institute }) => {
       </div>
       <div className="p-5 pt-4">
         <h3 className="font-bold text-gray-800 text-base leading-tight group-hover:text-red-600 transition-colors line-clamp-2 mb-1">
-          {institute.instituteName}
+          {stripHtml(institute.instituteName)}
         </h3>
         {(institute.city || institute.state) && (
           <p className="text-xs text-gray-400 mb-3">
@@ -247,7 +254,7 @@ const InstituteCard = ({ institute }) => {
         {institute._aiReason && (
           <p className="mb-3 text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 leading-snug">
             <Sparkles className="w-3 h-3 inline mr-1 -mt-0.5" />
-            {institute._aiReason}
+            {stripHtml(institute._aiReason)}
           </p>
         )}
 
@@ -266,7 +273,7 @@ const InstituteCard = ({ institute }) => {
               }
               const color = passed === null ? "text-gray-500" : passed ? "text-green-600" : "text-red-500";
               const icon = passed === null ? "•" : passed ? "✓" : "✗";
-              let label = rule.text;
+              let label = stripHtml(rule.text);
               if (rule.type === "subjects_required" && rule.subjects) {
                 label = `Requires: ${rule.subjects.join(", ")}`;
               }
@@ -338,10 +345,10 @@ const CounselorCard = ({ counselor }) => (
         </div>
         <div className="min-w-0">
           <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors truncate">
-            {counselor.firstname} {counselor.lastname}
+            {stripHtml(counselor.firstname)} {stripHtml(counselor.lastname)}
           </h3>
           {counselor.category && (
-            <p className="text-sm text-gray-500 truncate">{counselor.category}</p>
+            <p className="text-sm text-gray-500 truncate">{stripHtml(counselor.category)}</p>
           )}
         </div>
       </div>
@@ -349,7 +356,7 @@ const CounselorCard = ({ counselor }) => (
       {counselor._aiReason && (
         <p className="mb-3 text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 leading-snug">
           <Sparkles className="w-3 h-3 inline mr-1 -mt-0.5" />
-          {counselor._aiReason}
+          {stripHtml(counselor._aiReason)}
         </p>
       )}
 

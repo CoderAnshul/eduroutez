@@ -30,6 +30,13 @@ const clearCache = () => {
   try { sessionStorage.removeItem(CACHE_KEY); } catch {}
 };
 
+const stripHtml = (html) => {
+  if (!html) return "";
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent || div.innerText || "";
+};
+
 const RecommendationsPage = () => {
   const [results, setResults] = useState(() => loadCache());
   const [loading, setLoading] = useState(false);
@@ -199,7 +206,7 @@ const RecommendationsPage = () => {
             )}
             {results.aiSummary && (
               <div className="mb-6 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl px-4 py-3 text-sm shadow">
-                <span className="font-semibold">AI Counselor:</span> {results.aiSummary}
+                <span className="font-semibold">AI Counselor:</span> {stripHtml(results.aiSummary)}
               </div>
             )}
             <RecommendationResults results={results} loading={false} profile={profile} />
