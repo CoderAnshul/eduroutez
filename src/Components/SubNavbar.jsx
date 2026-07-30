@@ -518,7 +518,7 @@ const SubNavbar = ({ categories }) => {
             {topRecentColleges.map((college) => (
               <a key={college._id} onClick={() => handleInstituteClick(college)} className="text-sm hover:text-red-500 cursor-pointer truncate flex justify-between">
                 <span>{college.instituteName}</span>
-                <span className="text-gray-500 text-xs">#{college.rank || "N/A"}</span>
+                <span className="text-gray-500 text-xs">{college.rank || " "}</span>
               </a>
             ))}
             <div className="text-right">
