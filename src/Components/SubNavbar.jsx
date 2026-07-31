@@ -678,7 +678,7 @@ const SubNavbar = ({ categories }) => {
               {recent.slice(0, 5).map((institute) => (
                 <div key={institute._id} onClick={() => handleInstituteClick(institute)} className="cursor-pointer transition-colors hover:text-red-500 text-sm font-sans flex justify-between">
                   <span>{institute.instituteName}</span>
-                  <span className="text-gray-500 text-xs">#{institute.rank || "N/A"}</span>
+                  <span className="text-gray-500 text-xs">  {institute.rank}</span>
                 </div>
               ))}
               <div className="text-right mt-2">
