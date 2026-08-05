@@ -1,8 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   BookOpen, Building2, Users, MapPin, Star, GraduationCap,
-  IndianRupee, Award, Target, ChevronRight, Navigation, Sparkles, Check
+  IndianRupee, Award, Target, ChevronRight, Navigation, Sparkles, Check,
+  BadgeCheck, Phone, ArrowRight
 } from "lucide-react";
 
 const convertToReadableFormat = (number) => {
@@ -165,6 +166,11 @@ const MatchBadge = ({ match }) => {
       <MapPin className="w-3 h-3" /> In Your State
     </span>
   );
+  if (match === "nearby_state") return (
+    <span className="flex items-center gap-1 text-xs font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full">
+      <Navigation className="w-3 h-3" /> Nearby State
+    </span>
+  );
   return null;
 };
 
@@ -246,6 +252,7 @@ const InstituteCard = ({ institute }) => {
             {institute._examMatch === "accepted" && <MatchPill>Exam Accepted</MatchPill>}
             {institute._match === "same_city" && <MatchPill>In your city</MatchPill>}
             {institute._match === "same_state" && <MatchPill>In your state</MatchPill>}
+            {institute._match === "nearby_state" && <MatchPill>Nearby state</MatchPill>}
             {institute._behaviorMatch && <MatchPill>Matches your interest</MatchPill>}
             {institute._courseMatch > 0 && <MatchPill>Course fit</MatchPill>}
           </div>
@@ -336,56 +343,127 @@ const InstituteCard = ({ institute }) => {
   );
 };
 
-const CounselorCard = ({ counselor }) => (
-  <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
-    <div className="p-5">
-      <div className="flex items-center gap-4 mb-4">
-        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white font-bold text-xl shrink-0">
-          {counselor.firstname?.charAt(0)}{counselor.lastname?.charAt(0)}
+const CounselorCard = ({ counselor }) => {
+  const navigate = useNavigate();
+
+  const openCounselor = () => {
+    const name = [counselor.firstname, counselor.lastname].filter(Boolean).join(" ").trim();
+    const params = new URLSearchParams();
+    if (name) params.set("name", name);
+    if (counselor.category) params.set("category", counselor.category);
+    const qs = params.toString();
+    navigate(`/counselor${qs ? `?${qs}` : ""}`);
+  };
+
+  const streams = Array.isArray(counselor.streams) ? counselor.streams : [];
+
+  return (
+    <div
+      onClick={openCounselor}
+      className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-red-200 transition-all duration-300 overflow-hidden group cursor-pointer"
+    >
+      <div className="bg-gradient-to-r from-red-50 to-orange-50 px-5 py-3 flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-wide text-red-600">Career Counselor</span>
+        {counselor._match === "same_city" && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-green-700 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full">
+            <Navigation className="w-3 h-3" /> In your city
+          </span>
+        )}
+        {counselor._match === "same_state" && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
+            <MapPin className="w-3 h-3" /> In your state
+          </span>
+        )}
+        {counselor._match === "nearby_state" && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-teal-700 bg-teal-50 border border-teal-100 px-2 py-0.5 rounded-full">
+            <Navigation className="w-3 h-3" /> Nearby state
+          </span>
+        )}
+      </div>
+      <div className="p-5">
+        <div className="flex items-center gap-4 mb-3">
+          {counselor.profilePhoto ? (
+            <img
+              src={counselor.profilePhoto}
+              alt={counselor.firstname}
+              className="w-14 h-14 rounded-full object-cover shrink-0 border-2 border-red-100"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white font-bold text-xl shrink-0">
+              {counselor.firstname?.charAt(0)}{counselor.lastname?.charAt(0)}
+            </div>
+          )}
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors truncate">
+                {stripHtml(counselor.firstname)} {stripHtml(counselor.lastname)}
+              </h3>
+              {(counselor.verifiedBadge || counselor.isVerified) && (
+                <BadgeCheck className="w-4 h-4 text-blue-500 shrink-0" />
+              )}
+            </div>
+            {counselor.category && (
+              <p className="text-sm text-gray-500 truncate">{stripHtml(counselor.category)}</p>
+            )}
+          </div>
         </div>
-        <div className="min-w-0">
-          <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors truncate">
-            {stripHtml(counselor.firstname)} {stripHtml(counselor.lastname)}
-          </h3>
-          {counselor.category && (
-            <p className="text-sm text-gray-500 truncate">{stripHtml(counselor.category)}</p>
+
+        <div className="flex items-center gap-2 mb-3">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-yellow-700 bg-yellow-50 border border-yellow-100 px-2 py-0.5 rounded-full">
+            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+            {counselor.rating || "2.0"}
+          </span>
+          {counselor.ExperienceYear && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">
+              <Award className="w-3 h-3 text-purple-500" />
+              {counselor.ExperienceYear} yrs exp
+            </span>
           )}
         </div>
-      </div>
 
-      {counselor._aiReason && (
-        <p className="mb-3 text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 leading-snug">
-          <Sparkles className="w-3 h-3 inline mr-1 -mt-0.5" />
-          {stripHtml(counselor._aiReason)}
-        </p>
-      )}
-
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        {locName(counselor.city) && (
-          <div className="flex items-center gap-2 text-gray-600">
-            <MapPin className="w-4 h-4 text-red-500 shrink-0" />
-            <span className="text-sm truncate">{locName(counselor.city)}</span>
-          </div>
+        {counselor._aiReason && (
+          <p className="mb-3 text-xs text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 leading-snug">
+            <Sparkles className="w-3 h-3 inline mr-1 -mt-0.5" />
+            {stripHtml(counselor._aiReason)}
+          </p>
         )}
-        {counselor.ExperienceYear && (
-          <div className="flex items-center gap-2 text-gray-600">
-            <Award className="w-4 h-4 text-purple-500 shrink-0" />
-            <span className="text-sm">{counselor.ExperienceYear} yrs</span>
-          </div>
-        )}
-      </div>
 
-      {counselor.contactno && (
-        <a
-          href={`tel:${counselor.contactno}`}
-          className="inline-flex items-center justify-center w-full gap-2 bg-red-50 hover:bg-red-100 text-red-700 font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+        <div className="grid grid-cols-1 gap-y-1.5 mb-4 text-xs">
+          {locName(counselor.city) && (
+            <div className="flex items-center gap-2 text-gray-600">
+              <MapPin className="w-4 h-4 text-red-500 shrink-0" />
+              <span className="truncate">
+                {locName(counselor.city)}{locName(counselor.state) ? `, ${locName(counselor.state)}` : ""}
+              </span>
+            </div>
+          )}
+          {streams.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {streams.slice(0, 3).map((s, i) => (
+                <span key={i} className="text-[10px] font-medium text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full">
+                  {s}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={(e) => { e.stopPropagation(); openCounselor(); }}
+          className="inline-flex items-center justify-center w-full gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors text-sm"
         >
-          <Users className="w-4 h-4" /> Contact Counselor
-        </a>
-      )}
+          <Phone className="w-4 h-4" /> Take Counselling
+          <ArrowRight className="w-4 h-4" />
+        </button>
+        {counselor.contactno && (
+          <p className="text-center text-[10px] text-gray-400 mt-1.5">
+            Click to book a session with {stripHtml(counselor.firstname)}
+          </p>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const EmptyState = ({ icon: Icon, title, description }) => (
   <div className="text-center py-12 px-6">
@@ -437,8 +515,35 @@ const RecommendationResults = ({ results, loading, profile }) => {
     );
   }
 
+  // Region fallback banner: when the student's own state/city has no matches
+  // but we still have institutes/counselors from nearby/other regions, show a
+  // clear message and surface those best recommendations.
+  const hasRegionMatch = [...institutes, ...counselors].some((x) =>
+    x._match === "same_city" || x._match === "same_state"
+  );
+  const regionFallback =
+    Boolean(profile?.state || profile?.city) &&
+    !hasRegionMatch &&
+    (institutes.length > 0 || counselors.length > 0);
+
   return (
     <div className="space-y-10">
+      {regionFallback && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+            <MapPin className="w-5 h-5 text-amber-600" />
+          </div>
+          <div>
+            <p className="font-semibold text-amber-800 text-sm">
+              No recommendations available in {profile?.city || "your"} {profile?.city && profile?.state ? ", " : ""}{profile?.state || "region"}
+            </p>
+            <p className="text-amber-700 text-xs mt-0.5">
+              Based on your profile, here are the best institutes from nearby regions we recommend for you.
+            </p>
+          </div>
+        </div>
+      )}
+
       {profile && (
         <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl border border-red-100 p-4">
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700">

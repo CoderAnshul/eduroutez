@@ -1024,7 +1024,7 @@ const classifyTier = (inst) => {
 
 // ── Multi-Dimensional Institute Scoring ────────────────────────────────────
 
-const scoreInstitute = (inst, { marks, exam, preferredCourse, budget, state, city, category }) => {
+const scoreInstitute = (inst, { marks, exam, preferredCourse, budget, state, city, category, nearbySet }) => {
   const tier = classifyTier(inst);
   let dims = { reputation: 0, affordability: 0, infrastructure: 0, location: 0 };
 
@@ -1093,11 +1093,13 @@ const scoreInstitute = (inst, { marks, exam, preferredCourse, budget, state, cit
     if (ic === cN) dims.location = 100;
     else if (ic.includes(cN) || cN.includes(ic)) dims.location = 75;
     else if (sN && is) {
-      if (is === sN) dims.location = 55;
+      if (is === sN) dims.location = 65;
+      else if (nearbySet?.has(is)) dims.location = 45;
       else dims.location = 20;
     } else dims.location = 30;
   } else if (sN && is) {
     if (is === sN) dims.location = 65;
+    else if (nearbySet?.has(is)) dims.location = 45;
     else dims.location = 20;
   } else {
     dims.location = 30;
@@ -1142,10 +1144,12 @@ const scoreInstitute = (inst, { marks, exam, preferredCourse, budget, state, cit
   };
 };
 
-export const getNearbyInstitutes = async ({ state, city, budget, exam, marks, category } = {}) => {
+export const getNearbyInstitutes = async ({ state, city, budget, exam, marks, category, preferredCourse } = {}) => {
   try {
-    const institutes = await fetchInstitutes({ state, city });
+    const institutes = await fetchInstitutes({ state, city, preferredCourse });
     let filtered = applyBudgetFilter(institutes, budget);
+    const nearbyStates = state ? await getNearbyStates(state) : [];
+    const nearbySet = new Set(nearbyStates);
     return filtered
       .map((i) => ({
         ...i,
@@ -1153,12 +1157,14 @@ export const getNearbyInstitutes = async ({ state, city, budget, exam, marks, ca
         _tier: classifyTier(i).tier,
         _tierLabel: classifyTier(i).tierLabel,
         _match: city && normText(i.city?.name) === normText(city) ? "same_city" :
-          state && normText(i.state?.name) === normText(state) ? "same_state" : "other",
+          state && normText(i.state?.name) === normText(state) ? "same_state" :
+          state && nearbySet.has(normText(i.state?.name)) ? "nearby_state" : "other",
         _score: city && normText(i.city?.name) === normText(city) ? 100 :
-          state && normText(i.state?.name) === normText(state) ? 70 : 40
+          state && normText(i.state?.name) === normText(state) ? 70 :
+          state && nearbySet.has(normText(i.state?.name)) ? 50 : 40
       }))
       .sort((a, b) => {
-        if (a._match !== b._match) return a._match === "same_city" ? -1 : a._match === "same_state" ? -1 : 1;
+        if (a._match !== b._match) return a._match === "same_city" ? -1 : a._match === "same_state" ? -1 : a._match === "nearby_state" ? -1 : 1;
         return (classifyTier(b).tierScore) - (classifyTier(a).tierScore);
       })
       .slice(0, 10);
@@ -1172,17 +1178,27 @@ export const getRecommendedInstitutes = async ({
   marks, exam, preferredCourse, budget, state, city, category
 } = {}) => {
   try {
-    let institutes = await fetchInstitutes({ state, city });
+    let institutes = await fetchInstitutes({ state, city, preferredCourse });
     institutes = applyBudgetFilter(institutes, budget);
+    const nearbyStates = state ? await getNearbyStates(state) : [];
+    const nearbySet = new Set(nearbyStates);
 
-    let scored = institutes.map((inst) =>
-      scoreInstitute(inst, { marks, exam, preferredCourse, budget, state, city, category })
-    );
+    let scored = institutes.map((inst) => {
+      const scoredInst = scoreInstitute(inst, { marks, exam, preferredCourse, budget, state, city, category, nearbySet });
+      return {
+        ...scoredInst,
+        _match: city && normText(inst.city?.name) === normText(city) ? "same_city" :
+          state && normText(inst.state?.name) === normText(state) ? "same_state" :
+          state && nearbySet.has(normText(inst.state?.name)) ? "nearby_state" : "other",
+      };
+    });
 
     // Push ineligible institutes to the bottom but DON'T remove them
     // (user may still want to see them with the "Check Eligibility" warning)
     scored.sort((a, b) => {
       if (a._eligible !== b._eligible) return a._eligible ? -1 : 1;
+      const rank = { same_city: 4, same_state: 3, nearby_state: 2, other: 1 };
+      if (rank[a._match] !== rank[b._match]) return rank[b._match] - rank[a._match];
       return b._score - a._score;
     });
 
@@ -1198,7 +1214,38 @@ export const getRecommendedInstitutes = async ({
 
 // ── Shared Helpers ─────────────────────────────────────────────────────────
 
-const fetchInstitutes = async ({ state, city } = {}) => {
+let nearbyStateCache = { state: null, names: [] };
+
+// Nearby states for a given state name, computed by the backend (haversine,
+// cached). Mirrors the recommendation engine's geo fallback exactly.
+const getNearbyStates = async (stateName, maxCount = 6) => {
+  const sKey = normText(stateName);
+  if (!sKey) return [];
+  if (nearbyStateCache.state === sKey) return nearbyStateCache.names;
+  try {
+    const res = await axiosInstance.get(`/recommendation/nearby-states`, {
+      params: { state: stateName },
+    });
+    const names = (res.data?.data?.nearbyStates || [])
+      .slice(0, maxCount)
+      .map((n) => normText(n));
+    nearbyStateCache = { state: sKey, names };
+    return names;
+  } catch {
+    return [];
+  }
+};
+
+const hasStreamMatch = (item, preferredCourse) => {
+  if (!preferredCourse) return true;
+  const pref = normText(preferredCourse);
+  const hay = normText(
+    [item.streams, item.specialization, item.courseTitle, item.category].filter(Boolean).join(" ")
+  );
+  return hay.includes(pref);
+};
+
+const fetchInstitutes = async ({ state, city, preferredCourse } = {}) => {
   // Fetch a broad pool, then filter client-side. The DB stores city/state as
   // objects ({ name, iso2 }), so server-side string search is unreliable and
   // would otherwise collapse to a tiny/fixed result set.
@@ -1215,16 +1262,27 @@ const fetchInstitutes = async ({ state, city } = {}) => {
   const c = city ? normText(city) : null;
   const s = state ? normText(state) : null;
   if (c || s) {
-    const filtered = results.filter((i) => {
+    const inLoc = (i) => {
       const ic = normText(i.city?.name || "");
       const is = normText(i.state?.name || "");
       if (c && ic && (ic.includes(c) || c.includes(ic))) return true;
       if (c && is && (is.includes(c) || c.includes(is))) return true;
       if (s && is && (is.includes(s) || s.includes(is))) return true;
       return false;
-    });
-    // Keep a varied list: only narrow to the location if we still have enough.
-    if (filtered.length >= 3) results = filtered;
+    };
+    const exact = results.filter(inLoc);
+    if (exact.length >= 3) return exact;
+    // Too few exact matches -> add nearby-state (same stream preferred), then
+    // any same-stream institutes, so the list never collapses.
+    const nearbyStates = s ? await getNearbyStates(state) : [];
+    const nearbySet = new Set(nearbyStates);
+    const nearby = results.filter(
+      (i) => !inLoc(i) && nearbySet.has(normText(i.state?.name || "")) && hasStreamMatch(i, preferredCourse)
+    );
+    const anyStream = results.filter(
+      (i) => !inLoc(i) && !nearby.includes(i) && hasStreamMatch(i, preferredCourse)
+    );
+    return [...exact, ...nearby, ...anyStream];
   }
 
   return results;
@@ -1304,22 +1362,59 @@ export const getNearbyCounselors = async ({ state, city, preferredCourse } = {})
     if (state) filters.state = state;
 
     const response = await axiosInstance.get(`/counselors`, {
-      params: { limit: 50, filters: JSON.stringify(filters) }
+      params: { limit: 100, filters: JSON.stringify(filters) }
     });
-    const counselors = normalize(response)?.result || [];
+    let counselors = normalize(response)?.result || [];
+
+    const c = city ? normText(city) : null;
+    const s = state ? normText(state) : null;
+    if (c || s) {
+      const inLoc = (x) => {
+        const ic = normText(x.city?.name || "");
+        const is = normText(x.state?.name || "");
+        if (c && ic && ic.includes(c)) return true;
+        if (s && is && is.includes(s)) return true;
+        return false;
+      };
+      const exact = counselors.filter(inLoc);
+      if (exact.length < 3) {
+        const nearbyStates = s ? await getNearbyStates(state) : [];
+        const nearbySet = new Set(nearbyStates);
+        const nearby = counselors.filter(
+          (x) => !inLoc(x) && nearbySet.has(normText(x.state?.name || "")) && hasStreamMatch(x, preferredCourse)
+        );
+        const anyStream = counselors.filter(
+          (x) => !inLoc(x) && !nearby.includes(x) && hasStreamMatch(x, preferredCourse)
+        );
+        counselors = [...exact, ...nearby, ...anyStream];
+      } else {
+        counselors = exact;
+      }
+    }
 
     return counselors
-      .map((c) => {
+      .map((counselor) => {
         let score = 0;
-        if (city && normText(c.city?.name) === normText(city)) score += 50;
-        else if (state && normText(c.state?.name) === normText(state)) score += 30;
-        if (preferredCourse && c.category) {
-          if (normText(c.category).includes(normText(preferredCourse))) score += 20;
+        const cCity = normText(counselor.city?.name || "");
+        const cState = normText(counselor.state?.name || "");
+        if (city && cCity === c) score += 50;
+        else if (state && cState === s) score += 30;
+        if (preferredCourse && counselor.category) {
+          if (normText(counselor.category).includes(normText(preferredCourse))) score += 20;
         }
-        if (c.ExperienceYear) score += Math.min(Number(c.ExperienceYear), 10);
-        return { ...c, _score: score };
+        if (counselor.ExperienceYear) score += Math.min(Number(counselor.ExperienceYear), 10);
+        return {
+          ...counselor,
+          _score: score,
+          _match: city && cCity === c ? "same_city" :
+            state && cState === s ? "same_state" : "other",
+        };
       })
-      .sort((a, b) => b._score - a._score)
+      .sort((a, b) => {
+        const rank = { same_city: 4, same_state: 3, nearby_state: 2, other: 1 };
+        if (rank[a._match] !== rank[b._match]) return rank[b._match] - rank[a._match];
+        return b._score - a._score;
+      })
       .slice(0, 10);
   } catch (error) {
     console.error("Error fetching nearby counselors:", error);
