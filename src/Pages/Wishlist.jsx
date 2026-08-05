@@ -13,6 +13,18 @@ const TABS = [
   { key: "careers", label: "Liked Careers", icon: Briefcase },
 ];
 
+const stripHtml = (html) => {
+  if (!html) return "";
+  return String(html)
+    .replace(/<[^>]*>?/gm, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
 const Wishlist = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("institutes");
@@ -109,6 +121,26 @@ const Wishlist = () => {
     try {
       await addToWishlist({ courseId });
       setCourses((prev) => prev.filter((c) => c._id !== courseId));
+    } catch {}
+  }, []);
+
+  const handleRemoveBlog = useCallback(async (targetId, e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    try {
+      await axiosInstance.post("/like-dislike", { id: targetId, type: "blog", like: "0" });
+      setActivities((prev) => prev.filter((a) => !(a.type === "like_blog" && String(a.targetId) === String(targetId))));
+      setBlogItems((prev) => prev.filter((i) => String(i._id) !== String(targetId)));
+    } catch {}
+  }, []);
+
+  const handleRemoveCareer = useCallback(async (targetId, e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    try {
+      await axiosInstance.post("/like-dislike", { id: targetId, type: "career", like: "0" });
+      setActivities((prev) => prev.filter((a) => !(a.type === "like_career" && String(a.targetId) === String(targetId))));
+      setCareerItems((prev) => prev.filter((i) => String(i._id) !== String(targetId)));
     } catch {}
   }, []);
 
@@ -338,7 +370,7 @@ const Wishlist = () => {
                         {course.courseTitle || "Untitled Course"}
                       </h3>
                       {course.shortDescription && (
-                        <p className="text-sm text-gray-500 line-clamp-2 mb-3">{course.shortDescription}</p>
+                        <p className="text-sm text-gray-500 line-clamp-2 mb-3">{stripHtml(course.shortDescription)}</p>
                       )}
                       <div className="flex items-center justify-between">
                         {course.coursePrice ? (
@@ -387,11 +419,19 @@ const Wishlist = () => {
         ) : (
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {blogItems.map((item) => (
-              <Link key={item._id} to={`/blog/${item.slug || item._id}`} className="group">
-                <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
+              <Link key={item._id} to={`/blogdetailpage/${item.slug || item._id}`} className="group">
+                <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full relative">
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRemoveBlog(item._activity?.targetId || item._id, e); }}
+                    className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-red-50 p-2 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
+                    aria-label="Remove from liked blogs"
+                    title="Remove"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </button>
                   <div className="relative h-44 overflow-hidden">
                     <img
-                      src={item.thumbnailImage ? `${Image_URL}/${item.thumbnailImage}` : searchBoximg}
+                      src={item.thumbnail || item.thumbnailImage || item.coverImage ? `${Image_URL}/${item.thumbnail || item.thumbnailImage || item.coverImage}` : searchBoximg}
                       alt={item.title || item.heading || "Blog"}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                     />
@@ -401,8 +441,8 @@ const Wishlist = () => {
                     <h3 className="font-semibold text-gray-800 group-hover:text-red-600 transition-colors line-clamp-2">
                       {item.title || item.heading || item.name || item._activity?.targetName || "Blog"}
                     </h3>
-                    {item.shortDescription && (
-                      <p className="text-sm text-gray-500 line-clamp-2 mt-2">{item.shortDescription}</p>
+                    {item.description && (
+                      <p className="text-sm text-gray-500 line-clamp-2 mt-2">{stripHtml(item.description)}</p>
                     )}
                     <div className="mt-3 flex items-center text-xs text-gray-400">
                       <Clock className="w-3 h-3 mr-1" />
@@ -427,10 +467,18 @@ const Wishlist = () => {
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {careerItems.map((item) => (
               <Link key={item._id} to={`/detailpage/${item.slug || item._id}`} className="group">
-                <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
+                <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full relative">
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRemoveCareer(item._activity?.targetId || item._id, e); }}
+                    className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-red-50 p-2 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
+                    aria-label="Remove from liked careers"
+                    title="Remove"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </button>
                   <div className="relative h-44 overflow-hidden">
                     <img
-                      src={item.thumbnailImage ? `${Image_URL}/${item.thumbnailImage}` : searchBoximg}
+                      src={item.thumbnail || item.thumbnailImage || item.coverImage ? `${Image_URL}/${item.thumbnail || item.thumbnailImage || item.coverImage}` : searchBoximg}
                       alt={item.title || item.careerName || "Career"}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                     />
@@ -440,8 +488,8 @@ const Wishlist = () => {
                     <h3 className="font-semibold text-gray-800 group-hover:text-red-600 transition-colors line-clamp-2">
                       {item.title || item.careerName || item.name || item._activity?.targetName || "Career"}
                     </h3>
-                    {item.shortDescription && (
-                      <p className="text-sm text-gray-500 line-clamp-2 mt-2">{item.shortDescription}</p>
+                    {item.description && (
+                      <p className="text-sm text-gray-500 line-clamp-2 mt-2">{stripHtml(item.description)}</p>
                     )}
                     <div className="mt-4 w-full bg-gray-50 text-center py-2 rounded-lg text-sm font-medium text-red-600 group-hover:bg-red-50 transition-colors">
                       View Career
