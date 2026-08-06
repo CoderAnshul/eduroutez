@@ -565,7 +565,9 @@ const Instituepage = () => {
         </div>
         <HighRatedCareers />
         <BlogComponent />
+        <Suspense fallback={<div className="w-full max-w-[1420px] mx-auto p-6"><div className="flex items-center mb-8"><div className="w-6 h-6 bg-gray-200 animate-pulse rounded mr-2"></div><h2 className="text-2xl font-bold bg-gray-200 animate-pulse rounded w-64 h-8">&nbsp;</h2></div><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"><div className="box w-full shadow-lg animate-pulse"><div className="h-48 bg-gray-200"></div><div className="p-4 space-y-3"><div className="h-6 bg-gray-200 rounded"></div><div className="h-4 bg-gray-200 rounded w-3/4"></div></div></div><div className="box w-full shadow-lg animate-pulse"><div className="h-48 bg-gray-200"></div><div className="p-4 space-y-3"><div className="h-6 bg-gray-200 rounded"></div><div className="h-4 bg-gray-200 rounded w-3/4"></div></div></div><div className="box w-full shadow-lg animate-pulse"><div className="h-48 bg-gray-200"></div><div className="p-4 space-y-3"><div className="h-6 bg-gray-200 rounded"></div><div className="h-4 bg-gray-200 rounded w-3/4"></div></div></div></div></div>}>
         <RecommendedInstitutes streams={instituteData?.data?.streams || []} currentId={instituteData?.data?._id} />
+      </Suspense>
         {instituteData && <RelatedContent contentId={instituteData._id} contentType="institute" />}
         {/* <Events className="!w-full" /> */}
       </div>
