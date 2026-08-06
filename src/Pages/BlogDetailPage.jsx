@@ -78,6 +78,7 @@ const BlogDetailPage = () => {
   const [error, setError] = useState(null);
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
+  const [liking, setLiking] = useState(false);
   const [view, setView] = useState("overview");
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const { id } = useParams(); // This can be either ID or slug
@@ -227,8 +228,8 @@ const BlogDetailPage = () => {
 
   // Handle like/dislike functionality
   const handleLike = async () => {
+    if (liking) return;
     if (!currentUserId) {
-      // Save pending like intent and show the shared AuthPopup
       try {
         sessionStorage.setItem(
           "pendingLike",
@@ -242,12 +243,10 @@ const BlogDetailPage = () => {
     }
 
     try {
-      const likeValue = isLiked ? "0" : "1"; // Toggle like value
-
-      // Use the blog's actual ID for the API call
+      setLiking(true);
+      const likeValue = isLiked ? "0" : "1";
       const blogId = data._id;
 
-      // Call the like-dislike API
       await axiosInstance.post(
         `${baseURL}/like-dislike`,
         {
@@ -264,12 +263,11 @@ const BlogDetailPage = () => {
         }
       );
 
-      // Update local state
       setIsLiked(!isLiked);
       setData((prevData) => {
         const updatedLikes = isLiked
-          ? prevData.likes.filter((userId) => userId !== currentUserId) // Remove user ID
-          : [...prevData.likes, currentUserId]; // Add user ID
+          ? prevData.likes.filter((userId) => userId !== currentUserId)
+          : [...prevData.likes, currentUserId];
 
         return {
           ...prevData,
@@ -279,6 +277,8 @@ const BlogDetailPage = () => {
       console.log(`Blog ${blogId} like status updated to ${!isLiked}`);
     } catch (error) {
       console.error("Error updating like status:", error);
+    } finally {
+      setLiking(false);
     }
   };
 
@@ -506,11 +506,12 @@ const BlogDetailPage = () => {
               {/* Like Button - Not disabled for non-logged in users */}
               <button
                 onClick={handleLike}
+                disabled={liking}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
                   ${isLiked
                     ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
                     : "bg-gray-100 text-black border-gray-300 hover:bg-gray-200"
-                  } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
+                  } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 ${liking ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {/* Thumb SVG */}
                 <svg

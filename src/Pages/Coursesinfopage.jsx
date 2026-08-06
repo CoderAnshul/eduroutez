@@ -43,6 +43,7 @@ const Coursesinfopage = () => {
   const [activeTab, setActiveTab] = useState(0);
   const sectionRefs = tabs.map(() => useRef(null));
   const [isLiked, setIsLiked] = useState(false);
+  const [liking, setLiking] = useState(false);
   const [courseData, setCourseData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
@@ -222,30 +223,28 @@ const Coursesinfopage = () => {
   }, [courseData, sectionRefs]);
 
   const handleLike = async () => {
+    if (liking) return;
     if (!currentUserId) {
       setShowLoginPopup(true);
       return;
     }
 
     try {
+      setLiking(true);
       const courseId = courseData.data._id;
-      const likeValue = isLiked ? "0" : "1"; // Toggle like value
+      const likeValue = isLiked ? "0" : "1";
 
-      // Optimistically update state
       setIsLiked(!isLiked);
-
-      // Update the likes count locally
       setCourseData((prevData) => ({
         ...prevData,
         data: {
           ...prevData.data,
           likes: isLiked
-            ? prevData.data.likes.filter((id) => id !== currentUserId) // Remove user ID
-            : [...prevData.data.likes, currentUserId], // Add user ID
+            ? prevData.data.likes.filter((id) => id !== currentUserId)
+            : [...prevData.data.likes, currentUserId],
         },
       }));
 
-      // Call the API to update like status
       await axiosInstance.post(
         `${baseURL}/like-dislike`,
         {
@@ -263,8 +262,9 @@ const Coursesinfopage = () => {
       );
     } catch (error) {
       console.error("Error updating like status:", error);
-      // Revert the UI change in case of error
       setIsLiked((prev) => !prev);
+    } finally {
+      setLiking(false);
     }
   };
 
@@ -454,11 +454,12 @@ const Coursesinfopage = () => {
 
           <button
             onClick={handleLike}
+            disabled={liking}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 border
                 ${isLiked
                 ? "bg-yellow-100 text-yellow-600 border-yellow-300 hover:bg-yellow-200"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-              } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400`}
+              } focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 ${liking ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             {/* Thumb SVG */}
             <svg

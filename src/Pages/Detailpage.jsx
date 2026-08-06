@@ -90,6 +90,7 @@ const DetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Overview");
   const [isLiked, setIsLiked] = useState(false);
+  const [liking, setLiking] = useState(false);
   const Images = import.meta.env.VITE_IMAGE_BASE_URL;
   const baseURL = import.meta.env.VITE_BASE_URL;
   const { id } = useParams(); // This can be either ID or slug
@@ -229,12 +230,14 @@ const DetailPage = () => {
 
   // Handle like/dislike functionality
   const handleLike = async () => {
+    if (liking) return;
     if (!currentUserId) {
       navigate("/login", { state: { backgroundLocation: location } });
       return;
     }
 
     try {
+      setLiking(true);
       const likeValue = isLiked ? "0" : "1";
       const careerId = data._id;
 
@@ -267,6 +270,8 @@ const DetailPage = () => {
       });
     } catch (error) {
       console.error("Error updating like status:", error);
+    } finally {
+      setLiking(false);
     }
   };
 
@@ -412,10 +417,11 @@ const DetailPage = () => {
                 {/* Like Button */}
                 <button
                   onClick={handleLike}
+                  disabled={liking}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all duration-300 border ${isLiked
                     ? "bg-red-50 text-red-600 border-red-200"
                     : "bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100"
-                    }`}
+                    } ${liking ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   <ThumbsUp className={`h-5 w-5 ${isLiked ? "fill-current" : ""}`} />
                   {data.likes?.length || 0}

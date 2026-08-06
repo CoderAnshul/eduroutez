@@ -124,25 +124,29 @@ const Wishlist = () => {
     } catch {}
   }, []);
 
-  const handleRemoveBlog = useCallback(async (targetId, e) => {
-    e?.preventDefault();
-    e?.stopPropagation();
-    try {
-      await axiosInstance.post("/like-dislike", { id: targetId, type: "blog", like: "0" });
-      setActivities((prev) => prev.filter((a) => !(a.type === "like_blog" && String(a.targetId) === String(targetId))));
-      setBlogItems((prev) => prev.filter((i) => String(i._id) !== String(targetId)));
-    } catch {}
-  }, []);
+   const handleRemoveBlog = useCallback(async (targetId, e) => {
+     e?.preventDefault();
+     e?.stopPropagation();
+     try {
+       await axiosInstance.post("/like-dislike", { id: targetId, type: "blog", like: "0" });
+       setActivities((prev) => prev.filter((a) => !(a.type === "like_blog" && String(a.targetId) === String(targetId))));
+       setBlogItems((prev) => prev.filter((i) => String(i._id) !== String(targetId)));
+     } catch (error) {
+       console.error("Error removing blog from wishlist:", error);
+     }
+   }, []);
 
-  const handleRemoveCareer = useCallback(async (targetId, e) => {
-    e?.preventDefault();
-    e?.stopPropagation();
-    try {
-      await axiosInstance.post("/like-dislike", { id: targetId, type: "career", like: "0" });
-      setActivities((prev) => prev.filter((a) => !(a.type === "like_career" && String(a.targetId) === String(targetId))));
-      setCareerItems((prev) => prev.filter((i) => String(i._id) !== String(targetId)));
-    } catch {}
-  }, []);
+   const handleRemoveCareer = useCallback(async (targetId, e) => {
+     e?.preventDefault();
+     e?.stopPropagation();
+     try {
+       await axiosInstance.post("/like-dislike", { id: targetId, type: "career", like: "0" });
+       setActivities((prev) => prev.filter((a) => !(a.type === "like_career" && String(a.targetId) === String(targetId))));
+       setCareerItems((prev) => prev.filter((i) => String(i._id) !== String(targetId)));
+     } catch (error) {
+       console.error("Error removing career from wishlist:", error);
+     }
+   }, []);
 
   const handleExplore = (path) => {
     window.location.href = path;
@@ -157,8 +161,12 @@ const Wishlist = () => {
     const fetchBlogs = async () => {
       setContentLoading(true);
       const items = [];
+      const seen = new Set();
       for (const act of likedBlogs) {
         if (!act.targetId) continue;
+        const targetIdStr = String(act.targetId);
+        if (seen.has(targetIdStr)) continue;
+        seen.add(targetIdStr);
         try {
           const res = await axiosInstance.get(`/blog/${act.targetId}`);
           const d = res?.data?.data || res?.data;
@@ -186,8 +194,12 @@ const Wishlist = () => {
     const fetchCareers = async () => {
       setContentLoading(true);
       const items = [];
+      const seen = new Set();
       for (const act of likedCareers) {
         if (!act.targetId) continue;
+        const targetIdStr = String(act.targetId);
+        if (seen.has(targetIdStr)) continue;
+        seen.add(targetIdStr);
         try {
           const isObjectId = /^[a-fA-F0-9]{24}$/.test(String(act.targetId));
           const res = await axiosInstance.get("/careers", {
