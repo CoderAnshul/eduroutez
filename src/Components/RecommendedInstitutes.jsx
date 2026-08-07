@@ -11,7 +11,7 @@ const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 const CACHE_PREFIX = "eduroutez_institutes_";
 const CACHE_TTL = 30 * 60 * 1000;
 
-const getCacheKey = (streams) => CACHE_PREFIX + streams.map(s => s.toLowerCase().trim()).join("_");
+const getCacheKey = (streams) => CACHE_PREFIX + streams.map(s => s.trim()).join("_");
 
 const loadInstituteCache = (key) => {
   try {
@@ -34,7 +34,6 @@ const saveInstituteCache = (key, data) => {
 
 const RecommendedInstitutes = ({ streams = [], currentId }) => {
   const scrollRef = React.useRef(null);
-  const streamSet = useMemo(() => streams.map(s => s.toLowerCase().trim()), [streams]);
 
   const stripHtml = (html) => {
     if (!html) return "";
@@ -149,34 +148,31 @@ const RecommendedInstitutes = ({ streams = [], currentId }) => {
   };
 
   const cacheKey = useMemo(() => getCacheKey(streams), [streams]);
-  const cachedData = useMemo(() => (streams.length ? loadInstituteCache(cacheKey) : null), [cacheKey]);
+  const cachedData = useMemo(() => loadInstituteCache(cacheKey), [cacheKey]);
 
-  const { data, isLoading, isError, error } = useQuery(
-    ["recommendedInstitutes", ...streams],
-    async () => {
-      const filters = { isRecommended: true };
-      if (streams.length) filters.streams = streams;
-      const res = await axios.get(`${baseURL}/institutes`, {
-        params: {
-          filters: JSON.stringify(filters),
-          limit: 20,
-        },
-      });
-      return res.data;
-    },
-    {
-      enabled: streams.length > 0,
-      initialData: cachedData,
-      onSuccess: (fetchedData) => {
-        if (fetchedData) {
-          saveInstituteCache(cacheKey, fetchedData);
-        }
+const { data, isLoading, isError, error } = useQuery(
+  ["recommendedInstitutes", ...streams],
+  async () => {
+    const res = await axios.get(`${baseURL}/recommended-institutes`, {
+      params: {
+        filters: JSON.stringify(streams.length ? { streams } : {}),
+        limit: 20,
       },
-      refetchOnWindowFocus: false,
-    }
-  );
+    });
+    return res.data;
+  },
+  {
+    ...(cachedData ? { initialData: cachedData } : {}),
+    onSuccess: (fetchedData) => {
+      if (fetchedData) {
+        saveInstituteCache(cacheKey, fetchedData);
+      }
+    },
+    refetchOnWindowFocus: false,
+  }
+);
 
-  const institutes = data?.data?.result || data?.result || [];
+const institutes = data?.data?.result || data?.result || [];
 
   const displayList = useMemo(() => {
     return institutes.filter(inst => {
@@ -257,8 +253,6 @@ const RecommendedInstitutes = ({ streams = [], currentId }) => {
       )),
     [displayList, getInstituteUrl]
   );
-
-  if (!streamSet.length) return null;
 
   if (isLoading) {
     return (
