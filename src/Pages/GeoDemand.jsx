@@ -3,6 +3,7 @@ import { MapPin, TrendingUp, Loader2, AlertCircle, Building2, GraduationCap, Arr
 import { getGeoDemand } from "../ApiFunctions/api";
 import { Link } from "react-router-dom";
 import cardPhoto from "../assets/Images/teacher.jpg";
+import loadingSvg from "../assets/loading.svg";
 
 const Images = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -263,8 +264,9 @@ export default function GeoDemand() {
 
         {/* Loading */}
         {loading && (
-          <div className="flex items-center justify-center py-20 text-gray-400 gap-2">
-            <Loader2 className="w-5 h-5 animate-spin" /> Loading demand intelligence…
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
+            <img src={loadingSvg} alt="Loading..." className="w-12 h-12" />
+            <span className="text-sm font-medium">Loading demand intelligence…</span>
           </div>
         )}
 

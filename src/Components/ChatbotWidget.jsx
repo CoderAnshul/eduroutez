@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useVoice from '../utils/useVoice';
 import { isEducationRelated, isAssessmentActive, getQuestionCount, incrementQuestionCount, getMessage, MAX_QUESTIONS } from '../utils/chatRestrictions';
 
@@ -89,10 +89,8 @@ function MessageBubble({ msg, isSpeaking, onSpeak, onStopSpeaking }) {
     return (
         <div className={`flex items-end gap-2.5 mb-3 animate-fade-in ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
             {!isUser && (
-                <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-rose-500 to-rose-700 flex items-center justify-center flex-shrink-0 shadow-md ring-2 ring-white">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-white">
-                        <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                <div className="w-[30px] h-[30px] rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-md ring-2 ring-white overflow-hidden">
+                    <img src="/favicon.png" alt="Eduroutez" className="w-5 h-5 object-contain" />
                 </div>
             )}
             <div className={`max-w-[80%] text-sm leading-relaxed break-words ${isUser ? 'order-1' : 'order-2'}`}>
@@ -153,6 +151,8 @@ export default function ChatbotWidget() {
     const [speakingIndex, setSpeakingIndex] = useState(null);
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const isAuthenticated = Boolean(localStorage.getItem('accessToken'));
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
     const langMenuRef = useRef(null);
@@ -192,7 +192,10 @@ export default function ChatbotWidget() {
                 } else {
                     setMessages([{
                         role: 'assistant',
-                        content: '👋 Hi! I\'m **EduBot**, your 24×7 admission counselor.\n\n🎯 **Try our AI tools:**\n• 🧠 **Personality Assessment** — Find your ideal college match\n• 📊 **Market Trends** — Course demand & salary insights\n• 🎤 **Voice Counselor** — Speak in Hindi, English & more\n\nWhat would you like to explore today?',
+                        content: '👋 Hi! I\'m **EduBot**, your 24×7 admission counselor.\n\n🎯 **Try our AI tools:**\n' +
+                            // '• 🧠 **Personality Assessment** — Find your ideal college match\n' +
+                            // '• 📊 **Market Trends** — Course demand & salary insights\n' +
+                            '• 🎤 **Voice Counselor** — Speak in Hindi, English & more\n\nWhat would you like to explore today?',
                     }]);
                 }
             }
@@ -356,10 +359,8 @@ export default function ChatbotWidget() {
 
                     <div className="relative z-10 flex items-center gap-2.5 flex-1 min-w-0">
                         <div className="relative flex-shrink-0">
-                            <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center ring-2 ring-white/30">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M12 2a9 9 0 018.66 6.57M12 2a9 9 0 00-8.66 6.57M12 22a9 9 0 008.66-6.57M12 22a9 9 0 01-8.66-6.57M3.34 8.57a9 9 0 000 6.86M20.66 8.57a9 9 0 010 6.86" />
-                                </svg>
+                            <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center ring-2 ring-white/30 overflow-hidden">
+                                <img src="/favicon.png" alt="Eduroutez" className="w-6 h-6 object-contain" />
                             </div>
                             <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-rose-700" />
                         </div>
@@ -374,6 +375,7 @@ export default function ChatbotWidget() {
 
                     {/* Feature links */}
                     <div className="flex items-center gap-0.5 flex-shrink-0 relative z-10">
+                        {/* 
                         <button onClick={() => navigate('/personality-assessment')}
                             className="text-white/60 hover:text-white transition-all p-1.5 rounded-lg hover:bg-white/10 active:bg-white/15"
                             title="Personality Assessment"
@@ -390,6 +392,7 @@ export default function ChatbotWidget() {
                                 <path d="M18 20V10M12 20V4M6 20v-6" />
                             </svg>
                         </button>
+                        */}
                         <button onClick={() => navigate('/voice-counselor')}
                             className="text-white/60 hover:text-white transition-all p-1.5 rounded-lg hover:bg-white/10 active:bg-white/15"
                             title="Voice Counselor"
@@ -439,125 +442,155 @@ export default function ChatbotWidget() {
                     </button>
                 </div>
 
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto px-3 py-4 scrollbar-custom" style={{ background: '#f1f5f9' }}>
-                    {messages.length === 0 && !loading && (
-                        <div className="flex flex-col items-center justify-center h-full text-center px-6">
-                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-100 to-rose-200 flex items-center justify-center mb-4 shadow-inner">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-rose-400">
-                                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                {!isAuthenticated ? (
+                    <div className="flex-1 flex flex-col bg-slate-50">
+                        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center select-none">
+                            <div className="w-16 h-16 rounded-2xl bg-rose-50 flex items-center justify-center mb-4 shadow-sm border border-rose-100/60 animate-bounce" style={{ animationDuration: '3s' }}>
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                    <path d="M7 11V7a5 5 0 0110 0v4" />
                                 </svg>
                             </div>
-                            <p className="text-gray-400 text-sm font-medium">Start a conversation</p>
-                            <p className="text-gray-400 text-xs mt-1">Ask about courses, colleges, or admissions</p>
-                        </div>
-                    )}
-                    {messages.map((msg, i) => (
-                        <MessageBubble
-                            key={i}
-                            msg={msg}
-                            isSpeaking={speakingIndex === i && voice.isSpeaking}
-                            onSpeak={msg.role === 'assistant' ? () => handleSpeak(msg.content, i) : undefined}
-                            onStopSpeaking={() => { voice.stopSpeaking(); setSpeakingIndex(null); }}
-                        />
-                    ))}
-                    {loading && (
-                        <div className="flex items-end gap-2.5 mb-3 animate-fade-in">
-                            <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-rose-500 to-rose-700 flex items-center justify-center flex-shrink-0 shadow-md ring-2 ring-white">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-white">
-                                    <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                            <div className="bg-white rounded-[18px] rounded-bl-[4px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-gray-100/80">
-                                <TypingDots />
-                            </div>
-                        </div>
-                    )}
-                    <div ref={messagesEndRef} />
-                </div>
-
-                {/* Quick prompts */}
-                {messages.length <= 1 && !loading && (
-                    <div className="px-3 py-2.5 flex gap-2 overflow-x-auto flex-shrink-0 hide-scrollbar" style={{ background: '#f1f5f9', borderTop: '1px solid rgba(0,0,0,0.04)' }}>
-                        {QUICK_PROMPTS.map((p) => (
-                            <button key={p.text}
-                                onClick={() => sendMessage(p.icon + ' ' + p.text)}
-                                className="flex-shrink-0 text-xs font-medium bg-white text-gray-600 rounded-full px-3.5 py-2 hover:bg-rose-600 hover:text-white transition-all whitespace-nowrap shadow-sm border border-gray-100/80"
+                            <h3 className="text-gray-800 font-bold text-lg mb-2">Unlock EduBot AI</h3>
+                            <p className="text-gray-500 text-xs leading-relaxed max-w-[240px] mb-6">
+                                Log in to chat with our 24x7 AI Counselor, take the personality assessment, and explore career trends.
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setOpen(false);
+                                    navigate('/login', { state: { backgroundLocation: location } });
+                                }}
+                                className="px-6 py-2.5 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white font-medium text-sm rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95"
                             >
-                                <span className="mr-1">{p.icon}</span>
-                                {p.text}
+                                Sign In / Register
                             </button>
-                        ))}
+                        </div>
+                        {/* Footer */}
+                        <div className="text-[10px] text-gray-400 py-[10px] bg-white flex-shrink-0 text-center font-medium tracking-wide border-t border-gray-100">
+                            <span className="text-rose-500">●</span> Powered by <span className="text-rose-600 font-semibold">Eduroutez AI</span>
+                        </div>
                     </div>
+                ) : (
+                    <>
+                        {/* Messages */}
+                        <div className="flex-1 overflow-y-auto px-3 py-4 scrollbar-custom" style={{ background: '#f1f5f9' }}>
+                            {messages.length === 0 && !loading && (
+                                <div className="flex flex-col items-center justify-center h-full text-center px-6">
+                                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-100 to-rose-200 flex items-center justify-center mb-4 shadow-inner">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-rose-400">
+                                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                                        </svg>
+                                    </div>
+                                    <p className="text-gray-400 text-sm font-medium">Start a conversation</p>
+                                    <p className="text-gray-400 text-xs mt-1">Ask about courses, colleges, or admissions</p>
+                                </div>
+                            )}
+                            {messages.map((msg, i) => (
+                                <MessageBubble
+                                    key={i}
+                                    msg={msg}
+                                    isSpeaking={speakingIndex === i && voice.isSpeaking}
+                                    onSpeak={msg.role === 'assistant' ? () => handleSpeak(msg.content, i) : undefined}
+                                    onStopSpeaking={() => { voice.stopSpeaking(); setSpeakingIndex(null); }}
+                                />
+                            ))}
+                            {loading && (
+                                <div className="flex items-end gap-2.5 mb-3 animate-fade-in">
+                                    <div className="w-[30px] h-[30px] rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-md ring-2 ring-white overflow-hidden">
+                                        <img src="/favicon.png" alt="Eduroutez" className="w-5 h-5 object-contain" />
+                                    </div>
+                                    <div className="bg-white rounded-[18px] rounded-bl-[4px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-gray-100/80">
+                                        <TypingDots />
+                                    </div>
+                                </div>
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Quick prompts */}
+                        {messages.length <= 1 && !loading && (
+                            <div className="px-3 py-2.5 flex gap-2 overflow-x-auto flex-shrink-0 hide-scrollbar" style={{ background: '#f1f5f9', borderTop: '1px solid rgba(0,0,0,0.04)' }}>
+                                {QUICK_PROMPTS.map((p) => (
+                                    <button key={p.text}
+                                        onClick={() => sendMessage(p.icon + ' ' + p.text)}
+                                        className="flex-shrink-0 text-xs font-medium bg-white text-gray-600 rounded-full px-3.5 py-2 hover:bg-rose-600 hover:text-white transition-all whitespace-nowrap shadow-sm border border-gray-100/80"
+                                    >
+                                        <span className="mr-1">{p.icon}</span>
+                                        {p.text}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Input bar */}
+                        <div className="relative flex items-end gap-2 px-3 py-[10px] bg-white flex-shrink-0" style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent" />
+
+                            {voice.isListening && (
+                                <div className="absolute bottom-full left-0 right-0 bg-gradient-to-r from-rose-600 to-rose-500 text-white text-xs py-2.5 flex items-center justify-center gap-2.5 shadow-lg">
+                                    <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                                    <span className="font-medium tracking-wide">Listening... Speak now</span>
+                                    <button onClick={voice.stopListening} className="text-white/70 hover:text-white underline font-medium">Cancel</button>
+                                </div>
+                            )}
+                            {voice.voiceError && !voice.isListening && (
+                                <div className="absolute bottom-full left-0 right-0 bg-red-500 text-white text-xs py-2.5 text-center shadow-lg font-medium tracking-wide">
+                                    {voice.voiceError}
+                                </div>
+                            )}
+
+                            <textarea
+                                ref={inputRef}
+                                id="chatbot-input"
+                                rows={1}
+                                value={input}
+                                onChange={(e) => {
+                                    setInput(e.target.value);
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = Math.min(e.target.scrollHeight, 96) + 'px';
+                                }}
+                                onKeyDown={handleKeyDown}
+                                placeholder={voice.isListening ? 'Listening…' : "Ask about admissions, courses…"}
+                                className="flex-1 resize-none bg-gray-50 text-gray-800 placeholder-gray-400 text-sm rounded-2xl px-4 py-2.5 outline-none transition-all max-h-24 overflow-y-auto border-0 focus:ring-2 focus:ring-rose-500/20 focus:bg-white focus:shadow-inner"
+                                style={{ minHeight: '42px' }}
+                                disabled={loading || voice.isListening}
+                            />
+
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                                <button id="chatbot-mic-btn"
+                                    onClick={voice.toggleListening}
+                                    disabled={loading}
+                                    className={`w-[42px] h-[42px] rounded-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${
+                                        voice.isListening
+                                            ? 'bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-lg shadow-rose-500/30 animate-pulse'
+                                            : 'bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 border border-gray-100'
+                                    }`}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+                                        <path d="M19 10v2a7 7 0 01-14 0v-2" />
+                                        <path d="M12 19v3" />
+                                    </svg>
+                                </button>
+                                <button id="chatbot-send-btn"
+                                    onClick={() => sendMessage()}
+                                    disabled={loading || !input.trim()}
+                                    className="w-[42px] h-[42px] rounded-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 shadow-lg shadow-rose-500/25"
+                                    style={{ background: 'linear-gradient(135deg, #e11d48, #be123c)' }}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="text-[10px] text-gray-400 py-[10px] bg-white flex-shrink-0 text-center font-medium tracking-wide">
+                            <span className="text-rose-500">●</span> Powered by <span className="text-rose-600 font-semibold">Eduroutez AI</span>
+                        </div>
+                    </>
                 )}
-
-                {/* Input bar */}
-                <div className="relative flex items-end gap-2 px-3 py-[10px] bg-white flex-shrink-0" style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent" />
-
-                    {voice.isListening && (
-                        <div className="absolute bottom-full left-0 right-0 bg-gradient-to-r from-rose-600 to-rose-500 text-white text-xs py-2.5 flex items-center justify-center gap-2.5 shadow-lg">
-                            <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-                            <span className="font-medium tracking-wide">Listening... Speak now</span>
-                            <button onClick={voice.stopListening} className="text-white/70 hover:text-white underline font-medium">Cancel</button>
-                        </div>
-                    )}
-                    {voice.voiceError && !voice.isListening && (
-                        <div className="absolute bottom-full left-0 right-0 bg-red-500 text-white text-xs py-2.5 text-center shadow-lg font-medium tracking-wide">
-                            {voice.voiceError}
-                        </div>
-                    )}
-
-                    <textarea
-                        ref={inputRef}
-                        id="chatbot-input"
-                        rows={1}
-                        value={input}
-                        onChange={(e) => {
-                            setInput(e.target.value);
-                            e.target.style.height = 'auto';
-                            e.target.style.height = Math.min(e.target.scrollHeight, 96) + 'px';
-                        }}
-                        onKeyDown={handleKeyDown}
-                        placeholder={voice.isListening ? 'Listening…' : "Ask about admissions, courses…"}
-                        className="flex-1 resize-none bg-gray-50 text-gray-800 placeholder-gray-400 text-sm rounded-2xl px-4 py-2.5 outline-none transition-all max-h-24 overflow-y-auto border-0 focus:ring-2 focus:ring-rose-500/20 focus:bg-white focus:shadow-inner"
-                        style={{ minHeight: '42px' }}
-                        disabled={loading || voice.isListening}
-                    />
-
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button id="chatbot-mic-btn"
-                            onClick={voice.toggleListening}
-                            disabled={loading}
-                            className={`w-[42px] h-[42px] rounded-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${
-                                voice.isListening
-                                    ? 'bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-lg shadow-rose-500/30 animate-pulse'
-                                    : 'bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 border border-gray-100'
-                            }`}
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
-                                <path d="M19 10v2a7 7 0 01-14 0v-2" />
-                                <path d="M12 19v3" />
-                            </svg>
-                        </button>
-                        <button id="chatbot-send-btn"
-                            onClick={() => sendMessage()}
-                            disabled={loading || !input.trim()}
-                            className="w-[42px] h-[42px] rounded-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 shadow-lg shadow-rose-500/25"
-                            style={{ background: 'linear-gradient(135deg, #e11d48, #be123c)' }}
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <div className="text-[10px] text-gray-400 py-[10px] bg-white flex-shrink-0 text-center font-medium tracking-wide">
-                    <span className="text-rose-500">●</span> Powered by <span className="text-rose-600 font-semibold">Eduroutez AI</span>
-                </div>
             </div>
         </>
     );

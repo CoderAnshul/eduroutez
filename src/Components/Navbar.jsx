@@ -4,12 +4,11 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/Images/logo.png";
 
 import edit from "../assets/Images/editBtn.png";
-import menu from "../assets/Images/menuBar.png";
 import menubar from "../assets/Images/secondMenu.png";
 import SecondMenu from "./SubNavbar";
 import MobileNavbar from "./MobileNavbar";
 import axiosInstance from "../ApiFunctions/axios";
-import { ArrowRight, LogOut, User, Settings, LayoutDashboard, Sparkles, Search, ChevronDown, Scale, TrendingUp, MapPin } from "lucide-react";
+import { ArrowRight, LogOut, User, Settings, LayoutDashboard, Sparkles, Search, ChevronDown, Scale, TrendingUp, MapPin, MessageCircleQuestion, X, Brain } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setInput } from "../config/inputSlice";
@@ -18,15 +17,12 @@ import { toast } from "react-toastify";
 import useModal from "./Modal/useModal";
 
 const Navbar = () => {
-  console.log('Navbar component rendered');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // For hover menu
   const dropdownRef = useRef(null);
   const location = useLocation();
   const { categoriesData, loading, error } = useCategories();
-  console.log("categoriesData", categoriesData);
   useEffect(() => {
-    console.log('Eligibility useEffect running. accessToken:', accessToken);
     if (error) {
       console.log("Navbar Error:", error?.message);
     }
@@ -43,8 +39,6 @@ const Navbar = () => {
       if (!accessToken) return;
       setCheckingTest(true);
       try {
-        // Use axiosInstance and hardcode port 5173 as in the request
-        console.log('Calling eligibility API...');
         const response = await axiosInstance.get(
           `/api/v1/counselor-test/can-give`,
           {
@@ -53,8 +47,6 @@ const Navbar = () => {
             },
           }
         );
-        console.log('Eligibility API response:', response.data); // Debug log
-        // Use the new API response structure: response.data.data.eligible
         if (response.data && response.data.data) {
           if (response.data.data.eligible === true) {
             setCanGiveTest(true);
@@ -92,8 +84,6 @@ const Navbar = () => {
   };
 
   const handleQuestion = () => {
-    // Always navigate to question-answer page
-    // The page will handle login check on form submission
     navigate("/question-&-answers");
   };
 
@@ -105,6 +95,7 @@ const Navbar = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchContainerRef = useRef(null);
 
   // Fetch suggestions based on input
@@ -174,6 +165,7 @@ const Navbar = () => {
       navigate("/searchpage?fromSearch=true&searchType=institute");
     }
     setShowSuggestions(false);
+    setIsSearchOpen(false);
   };
 
   const handleBtnClick = async () => {
@@ -188,13 +180,15 @@ const Navbar = () => {
       setIsSearching(false);
     }
     setShowSuggestions(false);
+    setIsSearchOpen(false);
   };
 
-  // Close suggestions on outside click
+  // Close suggestions (and the dropdown search panel) on outside click
   useEffect(() => {
     function handleClickOutside(e) {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
         setShowSuggestions(false);
+        setIsSearchOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -250,234 +244,291 @@ const Navbar = () => {
     return null;
   }
 
+  // Desktop-only nav cluster shown between the search bar and the action
+  // buttons. Kept as data so the row stays visually even no matter how many
+  // items it holds.
+  const primaryLinks = [
+    { to: "/recommendations", label: "Recommend" },
+    { to: "/career-outcome", label: "Career AI" },
+    { to: "/geo-demand", label: "Demand Map" },
+    { to: "/compare", label: "Compare" },
+  ];
+
   return (
     <>
       {/* Main Navbar - Fixed */}
       <nav className="fixed top-0 left-0 right-0 z-[999] bg-white border-b border-gray-200">
-        <div className="universal-max-width h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="universal-max-width h-16 lg:h-[76px] flex items-center gap-4 lg:gap-8">
+          {/* Logo — pinned left, same spot on every breakpoint */}
+          <div className="flex items-center gap-2 shrink-0">
             <button onClick={toggleMenu} className="lg:hidden">
               <img className="h-6" src={menubar} alt="Open navigation menu" />
             </button>
-            <Link to="/">
+            <Link to="/" className="shrink-0">
               <img className="h-8 md:h-10" src={logo} alt="Eduroutez Logo" />
             </Link>
           </div>
 
-          {/* Search Bar */}
-          <div ref={searchContainerRef} className="hidden md:flex flex-1 max-w-md mx-2 lg:mx-4 relative">
-            <div className="flex items-center w-full h-10 bg-gray-100 border border-gray-200 rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-red-300 focus-within:bg-white focus-within:border-red-300 transition-all">
-              <select
-                value={searchType}
-                onChange={(e) => setSearchType(e.target.value)}
-                className="h-full bg-gray-100 border-r border-gray-300 px-2 text-xs outline-none cursor-pointer"
-              >
-                <option value="institute">Institute</option>
-                <option value="course">Course</option>
-                <option value="counsellor">Counsellor</option>
-              </select>
-              <div className="flex items-center flex-1 px-2 gap-1.5">
-                <Search className="w-4 h-4 text-gray-400 shrink-0" />
-                <input
-                  type="text"
-                  value={inputField}
-                  onChange={handleInputChange}
-                  placeholder={searchType === "counsellor" ? "Search counsellors..." : searchType === "course" ? "Search courses..." : "Search institutes..."}
-                  className="text-xs w-full outline-none bg-transparent"
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleBtnClick(); }}
-                />
-              </div>
-              <button
-                onClick={handleBtnClick}
-                disabled={isSearching}
-                className="h-full px-3 bg-[#b82025] text-white text-xs font-medium hover:bg-red-700 transition-colors disabled:opacity-60"
-              >
-                {isSearching ? "..." : "Search"}
-              </button>
-            </div>
-
-            {/* Suggestions dropdown */}
-            {showSuggestions && (
-              <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
-                {suggestions.length > 0 ? suggestions.map((suggestion, index) => (
-                  <div key={index} className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    <div className="font-medium text-xs">
-                      {searchType === "course" ? suggestion.courseTitle : searchType === "counsellor" ? suggestion.firstname + " " + suggestion.lastname : suggestion.instituteName}
-                    </div>
-                    {searchType === "course" && <div className="text-[10px] text-gray-500">{suggestion.instituteName} - {suggestion.cityName}</div>}
-                    {searchType === "counsellor" && suggestion.specialization && <div className="text-[10px] text-gray-500">{suggestion.specialization}</div>}
-                    {searchType === "institute" && suggestion.cityName && <div className="text-[10px] text-gray-500">{suggestion.cityName}</div>}
-                  </div>
-                )) : !isLoading && <div className="px-3 py-2 text-xs text-gray-500">No results found</div>}
-              </div>
-            )}
-          </div>
-
-          <div className="CustomFlex gap-3">
-            <div className="">
-              <button
-                onClick={handleQuestion}
-                className="md:flex hidden items-center text-xs font-medium gap-2 px-4 hover:scale-95 py-2 bg-[#b82025] uppercase text-white hover:bg-[#b82025] transition-colors"
-              >
-                Ask
-                <ArrowRight className="h-4 w-4 hidden md:flex" />
-              </button>
-            </div>
-            <Link
-              to="/writereview"
-              className="CustomFlex gap-1 group hover:text-red-500 hover:scale-95 transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
-              onClick={handleReviewClick}
+          {/* ===== Mobile / tablet layout — untouched from the original ===== */}
+          <div className="flex md:hidden items-center gap-3 ml-auto">
+            <button
+              onClick={handleQuestion}
+              className="flex items-center text-xs font-medium gap-2 px-4 py-2 bg-[#b82025] uppercase text-white"
             >
-              <button>
-                <img
-                  className="h-4 group-hover:rotate-[360deg] transition-all"
-                  src={edit}
-                  alt="editBtn"
-                />
-              </button>
-              <span className="text-black">Write a Review</span>
-            </Link>
-
-            <Link
-              to="/recommendations"
-              className="CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
-            >
-              <Sparkles className="h-4 w-4 group-hover:scale-110 transition-transform" />
-              <span className="text-black">Recommend</span>
-            </Link>
-            <Link
-              to="/searchpage"
-              className="CustomFlex gap-1 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md text-xs font-bold hover:scale-95 group transform transition-all"
-            >
-              Explore College
+              Ask
               <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/career-outcome"
-              className="CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
-            >
-              <TrendingUp className="h-4 w-4 group-hover:scale-110 transition-transform" />
-              <span className="text-black">Career AI</span>
-            </Link>
-            <Link
-              to="/geo-demand"
-              className="CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
-            >
-              <MapPin className="h-4 w-4 group-hover:scale-110 transition-transform" />
-              <span className="text-black">Demand Map</span>
-            </Link>
-            <Link
-              to="/compare"
-              className="CustomFlex gap-1 hover:text-red-500 hover:scale-95 group transform transition-all font-medium cursor-pointer text-sm hidden lg:flex"
-            >
-              <Scale className="h-4 w-4 group-hover:scale-110 transition-transform" />
-              <span className="text-black">Compare</span>
-            </Link>
+            </button>
             {!accessToken && (
               <Link
                 to="/login"
                 state={{ backgroundLocation: location }}
-                className="CustomFlex gap-1 bg-[#b82025] px-4 py-2 rounded-md text-white text-xs  hover:scale-95 group transform transition-all font-medium cursor-pointer"
+                className="flex items-center gap-1 bg-[#b82025] px-4 py-2 rounded-md text-white text-xs font-medium"
               >
                 <span>LOGIN</span>
               </Link>
             )}
+          </div>
 
-            {/* Menu with hover functionality */}
-            {accessToken && (
-              <>
-                {/* Start Test button if eligible */}
-                {canGiveTest && !checkingTest && (
-                  <button
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-xs font-bold mr-2 transition-all"
-                    onClick={() => navigate("/counselor-test/exam")}
-                  >
-                    Start Test
-                  </button>
-                )}
-                {/* Pay Now button if not eligible and need to pay */}
-                {needToPay && !checkingTest && (
-                  <button
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-xs font-bold mr-2 transition-all"
-                    onClick={() => navigate("/counselor-test/payment")}
-                  >
-                    Become a Counselor
-                  </button>
-                )}
-                <div className="relative" ref={dropdownRef}>
-                  <div
-                    className="CustomFlex gap-1 font-medium text-sm border-2 py-1 px-2 border-gray-400 rounded-2xl cursor-pointer"
-                    onClick={() => setIsDropdownOpen((s) => !s)}
-                  >
-                    <img className="h-3 opacity-75" src={menu} alt="menu" />
+          {/* ===== Desktop layout ===== */}
 
-                    <div
-                      className="secondMenu bg-gray-500 hover:scale-105 transition-all h-5 w-5 rounded-full"
-                    ></div>
+          {/* Search — a plain icon in the bar; the real search bar drops down from the top of the page */}
+          <div ref={searchContainerRef} className="hidden md:block relative shrink-0">
+            <button
+              onClick={() => setIsSearchOpen((o) => !o)}
+              className={`h-10 w-10 flex items-center justify-center rounded-full border transition-colors ${isSearchOpen ? "bg-red-50 border-red-200 text-[#b82025]" : "bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200"
+                }`}
+              aria-label="Toggle search"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+
+            {/* Backdrop — click anywhere on it to close */}
+            <div
+              onClick={() => setIsSearchOpen(false)}
+              aria-hidden={!isSearchOpen}
+              className={`fixed inset-0 top-16 lg:top-[76px] bg-black/30 z-[998] transition-opacity duration-300 ${isSearchOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+                }`}
+            />
+
+            {/* Panel — slides down from the top of the page, under the fixed navbar, full page width */}
+            <div
+              aria-hidden={!isSearchOpen}
+              className={`fixed left-0 right-0 top-16 lg:top-[76px] z-[999] bg-white border-b border-gray-200 shadow-xl transition-all duration-300 ease-out ${isSearchOpen ? "translate-y-0 opacity-100 visible" : "-translate-y-full opacity-0 invisible pointer-events-none"
+                }`}
+            >
+              <div className="universal-max-width py-5 flex items-center gap-3">
+                <div className="flex items-center h-11 flex-1 bg-gray-100 border border-gray-200 rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-red-300 focus-within:bg-white focus-within:border-red-300 transition-all">
+                  <select
+                    value={searchType}
+                    onChange={(e) => setSearchType(e.target.value)}
+                    className="h-full bg-gray-100 border-r border-gray-300 px-3 text-xs outline-none cursor-pointer shrink-0"
+                  >
+                    <option value="institute">Institute</option>
+                    <option value="course">Course</option>
+                    <option value="counsellor">Counsellor</option>
+                  </select>
+                  <div className="flex items-center flex-1 min-w-0 px-3 gap-1.5">
+                    <Search className="w-4 h-4 text-gray-400 shrink-0" />
+                    <input
+                      autoFocus={isSearchOpen}
+                      type="text"
+                      value={inputField}
+                      onChange={handleInputChange}
+                      placeholder={searchType === "counsellor" ? "Search counsellors..." : searchType === "course" ? "Search courses..." : "Search institutes..."}
+                      className="text-sm w-full min-w-0 outline-none bg-transparent"
+                      onKeyDown={(e) => { if (e.key === "Enter") handleBtnClick(); if (e.key === "Escape") setIsSearchOpen(false); }}
+                    />
                   </div>
+                  <button
+                    onClick={handleBtnClick}
+                    disabled={isSearching}
+                    className="h-full px-4 bg-[#b82025] text-white text-xs font-medium hover:bg-red-700 transition-colors disabled:opacity-60 shrink-0"
+                  >
+                    {isSearching ? "..." : "Search"}
+                  </button>
+                </div>
 
-                  {/* Enhanced Dropdown menu - Animated */}
-                  <div className={`absolute z-[1000] right-0 top-[calc(100%+12px)] min-w-[220px] bg-white border border-gray-100 p-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-300 origin-top-right ${
-                    isDropdownOpen 
-                      ? "opacity-100 translate-y-0 scale-100 pointer-events-auto" 
-                      : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
-                  }`}>
-                    <Link
-                      to="/dashboard/profile-page"
-                      className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
-                        <User className="w-4 h-4 text-[#b82025] opacity-70 group-hover:opacity-100" />
+                <button
+                  onClick={() => setIsSearchOpen(false)}
+                  className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-[#b82025] transition-colors shrink-0"
+                  aria-label="Close search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Suggestions dropdown */}
+              {showSuggestions && (
+                <div className="universal-max-width pb-4 -mt-2">
+                  <div className="bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                    {suggestions.length > 0 ? suggestions.map((suggestion, index) => (
+                      <div key={index} className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        <div className="font-medium text-xs">
+                          {searchType === "course" ? suggestion.courseTitle : searchType === "counsellor" ? suggestion.firstname + " " + suggestion.lastname : suggestion.instituteName}
+                        </div>
+                        {searchType === "course" && <div className="text-[10px] text-gray-500">{suggestion.instituteName} - {suggestion.cityName}</div>}
+                        {searchType === "counsellor" && suggestion.specialization && <div className="text-[10px] text-gray-500">{suggestion.specialization}</div>}
+                        {searchType === "institute" && suggestion.cityName && <div className="text-[10px] text-gray-500">{suggestion.cityName}</div>}
                       </div>
-                      Profile
-                    </Link>
-                    <Link
-                      to="/dashboard/settings"
-                      className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                        <Settings className="w-4 h-4 text-blue-600 opacity-70 group-hover:opacity-100" />
-                      </div>
-                      Settings
-                    </Link>
-                    <Link
-                      to="/dashboard/"
-                      className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
-                        <LayoutDashboard className="w-4 h-4 text-orange-600 opacity-70 group-hover:opacity-100" />
-                      </div>
-                      Dashboard
-                    </Link>
-                    
-                    <div className="h-px bg-gray-100 my-2 mx-2"></div>
-                    
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-3 w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
-                        <LogOut className="w-4 h-4 text-gray-600 group-hover:text-[#b82025] opacity-70 group-hover:opacity-100" />
-                      </div>
-                      Logout
-                    </button>
+                    )) : !isLoading && <div className="px-3 py-2 text-xs text-gray-500">No results found</div>}
                   </div>
                 </div>
-              </>
+              )}
+            </div>
+          </div>
+
+          {/* Center nav — takes the leftover space, so it breathes no matter the viewport width */}
+          <ul className="hidden lg:flex flex-1 items-center justify-center gap-8 list-none">
+            {primaryLinks.map(({ to, label }) => (
+              <li key={to} className="relative group">
+                <Link to={to} className="text-[13.5px] font-medium text-gray-700 group-hover:text-[#b82025] transition-colors">
+                  {label}
+                </Link>
+                <span className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-[#b82025] scale-x-0 group-hover:scale-x-100 origin-center transition-transform duration-200" />
+              </li>
+            ))}
+            <li className="relative group">
+              <Link
+                to="/writereview"
+                onClick={handleReviewClick}
+                className="flex items-center gap-1.5 text-[13.5px] font-medium text-gray-700 group-hover:text-[#b82025] transition-colors"
+              >
+                <img className="h-3.5" src={edit} alt="" />
+                Write a Review
+              </Link>
+              <span className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-[#b82025] scale-x-0 group-hover:scale-x-100 origin-center transition-transform duration-200" />
+            </li>
+          </ul>
+
+          {/* Right actions — CTAs + auth, grouped tightly since they're all "do something now" controls */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
+            {accessToken && canGiveTest && !checkingTest && (
+              <button
+                className="bg-green-600 hover:bg-green-700 text-white px-3.5 py-2 rounded-md text-xs font-bold transition-colors"
+                onClick={() => navigate("/counselor-test/exam")}
+              >
+                Start Test
+              </button>
+            )}
+            {accessToken && needToPay && !checkingTest && (
+              <button
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-3.5 py-2 rounded-md text-xs font-bold transition-colors"
+                onClick={() => navigate("/counselor-test/payment")}
+              >
+                Become a Counselor
+              </button>
+            )}
+
+            <Link
+              to="/personality-assessment"
+              className="flex items-center justify-center text-gray-500 hover:text-[#b82025] p-2 transition-colors shrink-0"
+              title="Personality Assessment"
+            >
+              <Brain className="h-5 w-5" />
+            </Link>
+
+            <Link
+              to="/market-trends"
+              className="flex items-center justify-center text-gray-500 hover:text-[#b82025] p-2 transition-colors shrink-0"
+              title="Market Trends"
+            >
+              <TrendingUp className="h-5 w-5" />
+            </Link>
+
+            <button
+              onClick={handleQuestion}
+              className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 hover:text-[#b82025] px-2 transition-colors"
+              title="Ask a question"
+            >
+              <MessageCircleQuestion className="h-4 w-4" />
+              Ask
+            </button>
+
+            <Link
+              to="/searchpage"
+              className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md text-xs font-bold transition-colors"
+            >
+              Explore College
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+
+            {!accessToken ? (
+              <Link
+                to="/login"
+                state={{ backgroundLocation: location }}
+                className="flex items-center bg-[#b82025] px-4 py-2 rounded-md text-white text-xs font-semibold hover:bg-red-700 transition-colors"
+              >
+                LOGIN
+              </Link>
+            ) : (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  className="flex items-center gap-2 pl-1.5 pr-2.5 py-1.5 border border-gray-200 rounded-full hover:border-gray-300 hover:bg-gray-50 transition-colors"
+                  onClick={() => setIsDropdownOpen((s) => !s)}
+                >
+                  <div className="h-7 w-7 rounded-full bg-gray-500" />
+                  <ChevronDown className={`h-3.5 w-3.5 text-gray-500 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {/* Dropdown menu - Animated */}
+                <div className={`absolute z-[1000] right-0 top-[calc(100%+12px)] min-w-[220px] bg-white border border-gray-100 p-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-300 origin-top-right ${isDropdownOpen
+                  ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+                  : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
+                  }`}>
+                  <Link
+                    to="/dashboard/profile-page"
+                    className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                      <User className="w-4 h-4 text-[#b82025] opacity-70 group-hover:opacity-100" />
+                    </div>
+                    Profile
+                  </Link>
+                  <Link
+                    to="/dashboard/settings"
+                    className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                      <Settings className="w-4 h-4 text-blue-600 opacity-70 group-hover:opacity-100" />
+                    </div>
+                    Settings
+                  </Link>
+                  <Link
+                    to="/dashboard/"
+                    className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+                      <LayoutDashboard className="w-4 h-4 text-orange-600 opacity-70 group-hover:opacity-100" />
+                    </div>
+                    Dashboard
+                  </Link>
+
+                  <div className="h-px bg-gray-100 my-2 mx-2"></div>
+
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-[#b82025] rounded-xl transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                      <LogOut className="w-4 h-4 text-gray-600 group-hover:text-[#b82025] opacity-70 group-hover:opacity-100" />
+                    </div>
+                    Logout
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>
       </nav>
 
       {/* Spacer for main navbar only */}
-      <div className="h-16"></div>
+      <div className="h-16 lg:h-[76px]"></div>
 
       {/* SecondMenu - Not fixed */}
       <div className="hidden lg:block ">

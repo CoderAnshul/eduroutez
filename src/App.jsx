@@ -238,7 +238,7 @@ const AppShell = () => {
           <Route path="/counselor-test/payment" element={<CounselorTestPayment />} />
           <Route path="/counselor-test/exam" element={<CounselorTestExam />} />
           <Route path="/counselor-test/result" element={<LegacyCounselorResultRedirect />} />
-          <Route path="/voice-counselor" element={<VoiceCounselor />} />
+          <Route path="/voice-counselor" element={<AuthRoute><VoiceCounselor /></AuthRoute>} />
           <Route path="/personality-assessment" element={<PersonalityAssessment />} />
           <Route path="/market-trends" element={<MarketTrends />} />
         </Routes>

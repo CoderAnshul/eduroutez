@@ -57,7 +57,7 @@ export default function VoiceCounselor() {
     const [sessionId] = useState(getOrCreateSessionId);
     const [mode, setMode] = useState('voice');
 
-    const messagesEndRef = useRef(null);
+    const chatContainerRef = useRef(null);
 
     const onTranscript = useCallback((text) => {
         setInput(text);
@@ -67,7 +67,12 @@ export default function VoiceCounselor() {
     const voice = useVoice({ language, onTranscript });
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTo({
+                top: chatContainerRef.current.scrollHeight,
+                behavior: 'smooth',
+            });
+        }
     }, [messages, loading]);
 
     useEffect(() => {
@@ -232,9 +237,9 @@ export default function VoiceCounselor() {
             <div className="max-w-4xl mx-auto px-4 py-6">
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden" style={{ minHeight: 'calc(100vh - 200px)' }}>
                     {/* Messages */}
-                    <div className="h-[calc(100vh-340px)] min-h-[400px] overflow-y-auto px-6 py-6 bg-gray-50/50">
+                    <div ref={chatContainerRef} className="h-[calc(100vh-340px)] min-h-[400px] overflow-y-auto px-6 py-6 bg-gray-50/50 flex flex-col gap-4">
                         {messages.map((msg, i) => (
-                            <div key={i} className={`flex items-end gap-3 mb-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                            <div key={i} className={`flex items-end gap-3 w-full ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                                 {msg.role === 'assistant' && (
                                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#b82025] to-[#8e1419] flex items-center justify-center flex-shrink-0 shadow-md">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -250,7 +255,23 @@ export default function VoiceCounselor() {
                                     {msg.role === 'user' ? (
                                         <p>{msg.content}</p>
                                     ) : (
-                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            components={{
+                                                table: ({ node, ...props }) => (
+                                                    <div className="overflow-x-auto my-2.5 rounded-xl border border-gray-200/80 shadow-sm max-w-full">
+                                                        <table className="min-w-full divide-y divide-gray-200 text-xs" {...props} />
+                                                    </div>
+                                                ),
+                                                thead: ({ node, ...props }) => <thead className="bg-gray-50/80" {...props} />,
+                                                tbody: ({ node, ...props }) => <tbody className="divide-y divide-gray-100 bg-white" {...props} />,
+                                                tr: ({ node, ...props }) => <tr className="hover:bg-gray-50/30 transition-colors" {...props} />,
+                                                th: ({ node, ...props }) => <th className="px-3 py-2 text-left font-bold text-gray-700 whitespace-nowrap" {...props} />,
+                                                td: ({ node, ...props }) => <td className="px-3 py-2 text-gray-600 whitespace-normal break-words leading-relaxed" {...props} />,
+                                            }}
+                                        >
+                                            {msg.content}
+                                        </ReactMarkdown>
                                     )}
                                 </div>
                                 {msg.role === 'user' && (
@@ -264,7 +285,7 @@ export default function VoiceCounselor() {
                             </div>
                         ))}
                         {loading && (
-                            <div className="flex items-end gap-3 mb-4">
+                            <div className="flex items-end gap-3 w-full flex-row">
                                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#b82025] to-[#8e1419] flex items-center justify-center flex-shrink-0 shadow-md">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M12 2a9 9 0 018.66 6.57M12 2a9 9 0 00-8.66 6.57M12 22a9 9 0 008.66-6.57M12 22a9 9 0 01-8.66-6.57M3.34 8.57a9 9 0 000 6.86M20.66 8.57a9 9 0 010 6.86" />
@@ -279,7 +300,6 @@ export default function VoiceCounselor() {
                                 </div>
                             </div>
                         )}
-                        <div ref={messagesEndRef} />
                     </div>
 
                     {/* Voice / Input Area */}

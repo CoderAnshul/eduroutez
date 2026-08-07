@@ -15,6 +15,7 @@ const DIMENSION_COLORS = {
     Practical: '#f97316',
     Conventional: '#8b5cf6',
     ProblemSolving: '#0ea5e9',
+    'Problem Solving': '#0ea5e9',
 };
 
 const STEPS = ['welcome', 'questions', 'results'];
@@ -182,11 +183,11 @@ export default function PersonalityAssessment() {
                             </div>
 
                             <div className="flex flex-col lg:flex-row items-center gap-8">
-                                <div className="w-72 h-72 flex-shrink-0">
+                                <div className="w-full max-w-[340px] h-80 flex-shrink-0">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <RadarChart data={profileData} cx="50%" cy="50%" outerRadius="70%">
+                                        <RadarChart margin={{ top: 10, right: 45, bottom: 10, left: 45 }} data={profileData} cx="50%" cy="50%" outerRadius="50%">
                                             <PolarGrid stroke="#e5e7eb" />
-                                            <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 11, fill: '#6b7280' }} />
+                                            <PolarAngleAxis dataKey="dimension" tickFormatter={formatProfileKey} tick={{ fontSize: 11, fill: '#6b7280' }} />
                                             <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                                             <Radar dataKey="score" stroke="#b82025" fill="#b82025" fillOpacity={0.2} strokeWidth={2} />
                                         </RadarChart>
@@ -197,7 +198,7 @@ export default function PersonalityAssessment() {
                                         {profileData.sort((a, b) => b.score - a.score).map((d) => (
                                             <div key={d.dimension}>
                                                 <div className="flex justify-between text-sm mb-1">
-                                                    <span className="font-medium text-gray-700">{d.dimension}</span>
+                                                    <span className="font-medium text-gray-700">{formatProfileKey(d.dimension)}</span>
                                                     <span className="text-gray-500">{d.score}%</span>
                                                 </div>
                                                 <div className="w-full bg-gray-100 rounded-full h-2">
@@ -209,7 +210,7 @@ export default function PersonalityAssessment() {
                                     {result.dominantDimensions?.length > 0 && (
                                         <div className="mt-6 p-4 bg-gray-50 rounded-xl">
                                             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Dominant Traits</p>
-                                            <p className="text-sm font-medium text-gray-800">{result.dominantDimensions.join(', ')}</p>
+                                            <p className="text-sm font-medium text-gray-800">{result.dominantDimensions.map(formatProfileKey).join(', ')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -233,7 +234,7 @@ export default function PersonalityAssessment() {
                                                 {inst.matchedDimensions?.length > 0 && (
                                                     <div className="flex gap-1 mt-1.5 flex-wrap">
                                                         {inst.matchedDimensions.map((d) => (
-                                                            <span key={d} className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: `${DIMENSION_COLORS[d]}20`, color: DIMENSION_COLORS[d] }}>{d}</span>
+                                                            <span key={d} className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: `${DIMENSION_COLORS[d]}20`, color: DIMENSION_COLORS[d] }}>{formatProfileKey(d)}</span>
                                                         ))}
                                                     </div>
                                                 )}
