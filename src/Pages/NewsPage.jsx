@@ -4,6 +4,7 @@ import { Loader2, Search } from "lucide-react";
 import axiosInstance from "../ApiFunctions/axios";
 import { Link } from "react-router-dom";
 import Pagination from "../Components/Pagination";
+import { Helmet } from "react-helmet-async";
 
 export default function NewsPage() {
   const [latestNews, setLatestNews] = useState([]);
@@ -142,9 +143,10 @@ export default function NewsPage() {
           <>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {currentNews.map((news, index) => (
-                <div
-                  key={news.id || index}
-                  className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+                <Link
+                  key={news._id || news.id || index}
+                  to={`/news/${news.slug || news._id}`}
+                  className="block overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md cursor-pointer"
                 >
                   {news.image && (
                     <SafeImage
@@ -155,7 +157,7 @@ export default function NewsPage() {
                     />
                   )}
                   <div className="p-4">
-                    <h2 className="mb-2 line-clamp-2 text-xl font-semibold text-gray-800">
+                    <h2 className="mb-2 line-clamp-2 text-xl font-semibold text-gray-800 hover:text-red-600 transition-colors">
                       {news.title}
                     </h2>
                     <p className="line-clamp-3 text-gray-600">
@@ -172,7 +174,7 @@ export default function NewsPage() {
                       )}
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 

@@ -66,12 +66,25 @@ const WishlistButton = ({ type, id, initialWishlisted = false, onToggle, classNa
     }
   }, [id, type, isWishlisted, navigate, location, onToggle]);
 
+  const sanitizedClassName = className
+    .split(" ")
+    .filter((cls) => {
+      return !(
+        cls.startsWith("bg-") ||
+        cls.startsWith("hover:bg-") ||
+        cls.startsWith("p-") ||
+        cls.startsWith("rounded-") ||
+        cls.startsWith("shadow-")
+      );
+    })
+    .join(" ");
+
   return (
     <button
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className={`inline-flex items-center gap-1.5 transition-all duration-200 select-none ${className} ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+      className={`inline-flex items-center gap-1.5 transition-all duration-200 select-none ${sanitizedClassName} ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
       title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
     >
@@ -80,10 +93,10 @@ const WishlistButton = ({ type, id, initialWishlisted = false, onToggle, classNa
           animating ? "scale-125" : ""
         } ${
           isWishlisted
-            ? "fill-red-500 text-red-500 drop-shadow-sm"
-            : "text-gray-400 hover:text-red-400"
+            ? "fill-red-500 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]"
+            : "text-white hover:text-red-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]"
         }`}
-        style={{ width: `${size * 0.25 + 0.75}rem`, height: `${size * 0.25 + 0.75}rem` }}
+        style={{ width: `${(size * 0.25 + 0.75) * 0.8}rem`, height: `${(size * 0.25 + 0.75) * 0.8}rem` }}
       />
       {showLabel && (
         <span className={`text-xs font-semibold transition-colors duration-200 ${labelClass || (isWishlisted ? "text-red-500" : "text-gray-500")}`}>
